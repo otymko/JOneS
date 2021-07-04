@@ -5,6 +5,7 @@ import com.github.otymko.jos.compiler.image.ModuleImage;
 import com.github.otymko.jos.context.ContextInitializer;
 import com.github.otymko.jos.context.RuntimeContextInstance;
 import com.github.otymko.jos.context.ScriptDrivenObject;
+import com.github.otymko.jos.context.value.Arithmetic;
 import com.github.otymko.jos.context.value.Value;
 import com.github.otymko.jos.context.value.ValueFactory;
 import com.github.otymko.jos.context.value.Variable;
@@ -124,7 +125,15 @@ public class MachineInstance {
     map.put(OperationCode.PushVar, this::pushVar);
     map.put(OperationCode.LoadVar, this::loadVar);
     map.put(OperationCode.Return, this::_return);
+    map.put(OperationCode.Add, this::add);
     return map;
+  }
+
+  private void add(int argument) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    operationStack.push(Arithmetic.add(valueOne, valueTwo));
+    nextInstruction();
   }
 
   private void lineNum(int argument) {

@@ -2,14 +2,14 @@ package com.github.otymko.jos.compiler;
 
 import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github._1c_syntax.bsl.parser.BSLParserBaseVisitor;
-import com.github.otymko.jos.vm.Command;
+import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
 import com.github.otymko.jos.compiler.image.ModuleImageCache;
 import com.github.otymko.jos.context.value.ValueFactory;
+import com.github.otymko.jos.vm.Command;
 import com.github.otymko.jos.vm.OperationCode;
 import com.github.otymko.jos.vm.info.MethodInfo;
 import com.github.otymko.jos.vm.info.ParameterInfo;
 import com.github.otymko.jos.vm.info.VariableInfo;
-import lombok.SneakyThrows;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -126,19 +126,38 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     }
   }
 
+  private void castlingOperation() {
+    var indexCode = imageCache.getCode().size() - 2;
+    var preLastCode = imageCache.getCode().get(indexCode);
+    if (preLastCode.getCode() == OperationCode.Add) {
+      imageCache.getCode().remove(indexCode);
+      imageCache.getCode().add(preLastCode);
+    }
+  }
+
   private void processAssigment(BSLParser.AssignmentContext assignment) {
-    var iValue = assignment.lValue();
+    var lValue = assignment.lValue();
 
-    var members = assignment.expression().member();
-    for (var member : members) {
-      if (member.constValue() != null) {
-        processConstValue(member.constValue());
+    var expression = assignment.expression();
+    processMember(expression.member(0));
+    for (int indexChild = 1; indexChild < expression.children.size(); indexChild++) {
+      var child = (BSLParserRuleContext) expression.getChild(indexChild);
+      if (child.getRuleIndex() == BSLParser.RULE_member) {
+        processMember((BSLParser.MemberContext) child);
+        castlingOperation();
+      } else if (child.getRuleIndex() == BSLParser.RULE_operation) {
+        var operation = (BSLParser.OperationContext) child;
+        if (operation.PLUS() != null) {
+          addCommand(OperationCode.Add, 0);
+        } else {
+          throw new RuntimeException("not supported");
+        }
       } else {
-
+        throw new RuntimeException("not supported");
       }
     }
 
-    var variableName = iValue.getText();
+    var variableName = lValue.getText();
     var address = compiler.findVariableInContext(variableName);
     if (address != null) {
 
@@ -160,6 +179,14 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
 
   }
 
+  private void processMember(BSLParser.MemberContext memberContext) {
+    if (memberContext.constValue() != null) {
+      processConstValue(memberContext.constValue());
+    } else {
+      throw new RuntimeException("not supported");
+    }
+  }
+
   private void processCallStatement(BSLParser.CallStatementContext callStatement) {
     if (callStatement.globalMethodCall() != null) {
       var paramList = callStatement.globalMethodCall().doCall().callParamList();
@@ -171,13 +198,12 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     }
   }
 
-  @SneakyThrows
   private void processMethodCall(BSLParser.MethodNameContext methodNameContext) {
     var methodName = methodNameContext.getText();
     var address = compiler.findMethodInContext(methodName);
     if (address == null) {
       // todo: кричать
-      throw new Exception("Метод не найден");
+      throw new RuntimeException("Метод не найден");
     }
     if (!imageCache.getMethodRefs().contains(address)) {
       imageCache.getMethodRefs().add(address);
