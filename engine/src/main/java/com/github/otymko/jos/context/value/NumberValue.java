@@ -30,7 +30,12 @@ public class NumberValue extends GenericValue {
 
   @Override
   public String asString() {
-    return String.valueOf(asNumber());
+    var number = asNumber();
+    var longNumber = (long) number;
+    if (number == longNumber) {
+      return String.format("%d", longNumber);
+    }
+    return String.format("%s", number);
   }
 
   @Override
