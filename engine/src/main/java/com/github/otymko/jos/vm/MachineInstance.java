@@ -13,7 +13,11 @@ import com.github.otymko.jos.vm.info.MethodInfo;
 import com.github.otymko.jos.vm.info.VariableInfo;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.function.Consumer;
 
 /**
@@ -113,7 +117,6 @@ public class MachineInstance {
 
   }
 
-
   private Map<OperationCode, Consumer<Integer>> createMachineCommands() {
     Map<OperationCode, Consumer<Integer>> map = new EnumMap<>(OperationCode.class);
     map.put(OperationCode.LineNum, this::lineNum);
@@ -126,6 +129,9 @@ public class MachineInstance {
     map.put(OperationCode.LoadVar, this::loadVar);
     map.put(OperationCode.Return, this::_return);
     map.put(OperationCode.Add, this::add);
+    map.put(OperationCode.Sub, this::sub);
+    map.put(OperationCode.Mul, this::mul);
+    map.put(OperationCode.Div, this::div);
     return map;
   }
 
@@ -133,6 +139,27 @@ public class MachineInstance {
     var valueOne = operationStack.pop();
     var valueTwo = operationStack.pop();
     operationStack.push(Arithmetic.add(valueOne, valueTwo));
+    nextInstruction();
+  }
+
+  private void sub(int argument) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    operationStack.push(Arithmetic.sub(valueTwo, valueOne));
+    nextInstruction();
+  }
+
+  private void mul(int argument) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    operationStack.push(Arithmetic.mul(valueOne, valueTwo));
+    nextInstruction();
+  }
+
+  private void div(int argument) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    operationStack.push(Arithmetic.div(valueTwo, valueOne));
     nextInstruction();
   }
 
@@ -196,9 +223,9 @@ public class MachineInstance {
   }
 
   private void setFrame(ExecutionFrame frame) {
-   currentImage = frame.getImage();
-   scopes.set(frame.getModuleLoadIndex(), frame.getModuleScope());
-   currentFrame = frame;
+    currentImage = frame.getImage();
+    scopes.set(frame.getModuleLoadIndex(), frame.getModuleScope());
+    currentFrame = frame;
   }
 
   private void loadLoc(int argument) {

@@ -3,6 +3,7 @@ package com.github.otymko.jos.compiler;
 import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github._1c_syntax.bsl.parser.BSLParserBaseVisitor;
 import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
+import com.github.otymko.jos.compiler.expression.Operator;
 import com.github.otymko.jos.compiler.image.ModuleImageCache;
 import com.github.otymko.jos.context.value.ValueFactory;
 import com.github.otymko.jos.vm.Command;
@@ -13,13 +14,16 @@ import com.github.otymko.jos.vm.info.VariableInfo;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 
 public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
+  private static final String ENTRY_METHOD = "$entry";
+
   private final ScriptCompiler compiler;
   private final ModuleImageCache imageCache;
-
 
   private MethodDescriptor currentMethodDescriptor;
   private SymbolScope localScope;
@@ -90,17 +94,13 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     return super.visitCodeBlock(ctx);
   }
 
-  private void fillMethodDescriptorFromScope(MethodDescriptor methodDescriptor, SymbolScope scope) {
-    methodDescriptor.getVariables().addAll(scope.getVariables());
-  }
-
   private void processFileCodeBlock(BSLParser.CodeBlockContext codeBlock) {
     var statements = codeBlock.statement();
     if (statements == null) {
       return;
     }
 
-    var methodInfo = new MethodInfo("$entry", "", false, new ParameterInfo[0], null);
+    var methodInfo = new MethodInfo(ENTRY_METHOD, ENTRY_METHOD, false, new ParameterInfo[0], null);
     currentMethodDescriptor.setSignature(methodInfo);
     processStatements(statements);
   }
@@ -122,40 +122,14 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     } else if (statementContext.assignment() != null) {
       processAssigment(statementContext.assignment());
     } else {
-
-    }
-  }
-
-  private void castlingOperation() {
-    var indexCode = imageCache.getCode().size() - 2;
-    var preLastCode = imageCache.getCode().get(indexCode);
-    if (preLastCode.getCode() == OperationCode.Add) {
-      imageCache.getCode().remove(indexCode);
-      imageCache.getCode().add(preLastCode);
+      throw new RuntimeException("Not supported");
     }
   }
 
   private void processAssigment(BSLParser.AssignmentContext assignment) {
     var lValue = assignment.lValue();
-
     var expression = assignment.expression();
-    processMember(expression.member(0));
-    for (int indexChild = 1; indexChild < expression.children.size(); indexChild++) {
-      var child = (BSLParserRuleContext) expression.getChild(indexChild);
-      if (child.getRuleIndex() == BSLParser.RULE_member) {
-        processMember((BSLParser.MemberContext) child);
-        castlingOperation();
-      } else if (child.getRuleIndex() == BSLParser.RULE_operation) {
-        var operation = (BSLParser.OperationContext) child;
-        if (operation.PLUS() != null) {
-          addCommand(OperationCode.Add, 0);
-        } else {
-          throw new RuntimeException("not supported");
-        }
-      } else {
-        throw new RuntimeException("not supported");
-      }
-    }
+    processExpression(expression, new ArrayDeque<>());
 
     var variableName = lValue.getText();
     var address = compiler.findVariableInContext(variableName);
@@ -176,14 +150,51 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
       addCommand(OperationCode.LoadLoc, index);
 
     }
+  }
 
+  private void processExpression(BSLParser.ExpressionContext expression, Deque<Operator> operators) {
+    for (var index = 0; index < expression.getChildCount(); index++) {
+      var child = (BSLParserRuleContext) expression.getChild(index);
+      if (child.getRuleIndex() == BSLParser.RULE_member) {
+        processMember((BSLParser.MemberContext) child);
+      } else if (child.getRuleIndex() == BSLParser.RULE_operation) {
+        processOperator((BSLParser.OperationContext) child, operators);
+      } else {
+        throw new RuntimeException("Не поддерживается");
+      }
+    }
+
+    while (!operators.isEmpty()) {
+      addOperator(operators.pop());
+    }
+  }
+
+  private void processOperator(BSLParser.OperationContext operationContext, Deque<Operator> operators) {
+    var operation = getOperatorByChild(operationContext);
+    if (!operators.isEmpty()) {
+      Operator operatorFromDeque;
+      while (!operators.isEmpty()) {
+        operatorFromDeque = operators.peek();
+        if (operatorFromDeque.getPriority() >= operation.getPriority()) {
+          addOperator(operators.pop());
+        } else {
+          break;
+        }
+      }
+    }
+    operators.push(operation);
   }
 
   private void processMember(BSLParser.MemberContext memberContext) {
     if (memberContext.constValue() != null) {
       processConstValue(memberContext.constValue());
+    } else if (memberContext.expression() != null) {
+      // тут скобки `(` \ `)`
+      processExpression(memberContext.expression(), new ArrayDeque<>());
+    } else if (memberContext.complexIdentifier() != null) {
+      processComplexIdentifier(memberContext.complexIdentifier());
     } else {
-      throw new RuntimeException("not supported");
+      throw new RuntimeException("Member not supported");
     }
   }
 
@@ -216,29 +227,26 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
       if (callParamContext.expression() == null) {
         return;
       }
-      var member = callParamContext.expression().member().get(0);
-      if (member.constValue() != null) {
-        processConstValue(member.constValue());
-      } else if (member.complexIdentifier() != null) {
-        // FIXME: мракобесие
-        var identifier = member.complexIdentifier().getText();
-        var address = compiler.findVariableInContext(identifier);
-        if (address == null) {
-          // fixme:
-          throw new RuntimeException("var not found: " + identifier);
-        }
-
-        if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
-          addCommand(OperationCode.PushLoc, address.getSymbolId());
-        } else {
-          imageCache.getVariableRefs().add(address);
-          addCommand(OperationCode.PushVar, imageCache.getVariableRefs().indexOf(address));
-        }
-      } else {
-
-      }
+      processExpression(callParamContext.expression(), new ArrayDeque<>());
     });
 
+  }
+
+  private void processComplexIdentifier(BSLParser.ComplexIdentifierContext complexIdentifierContext) {
+    // FIXME: мракобесие
+    var identifier = complexIdentifierContext.getText();
+    var address = compiler.findVariableInContext(identifier);
+    if (address == null) {
+      // fixme:
+      throw new RuntimeException("var not found: " + identifier);
+    }
+
+    if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
+      addCommand(OperationCode.PushLoc, address.getSymbolId());
+    } else {
+      imageCache.getVariableRefs().add(address);
+      addCommand(OperationCode.PushVar, imageCache.getVariableRefs().indexOf(address));
+    }
   }
 
   private void processConstValue(BSLParser.ConstValueContext constValue) {
@@ -312,6 +320,42 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
 
   private void addReturn() {
     addCommand(OperationCode.Return, 0);
+  }
+
+  private void fillMethodDescriptorFromScope(MethodDescriptor methodDescriptor, SymbolScope scope) {
+    methodDescriptor.getVariables().addAll(scope.getVariables());
+  }
+
+  private void addOperator(Operator operator) {
+    OperationCode operationCode;
+    if (operator == Operator.ADD) {
+      operationCode = OperationCode.Add;
+    } else if (operator == Operator.SUB) {
+      operationCode = OperationCode.Sub;
+    } else if (operator == Operator.MUL) {
+      operationCode = OperationCode.Mul;
+    } else if (operator == Operator.DIV) {
+      operationCode = OperationCode.Div;
+    } else {
+      throw new RuntimeException("Operator not supported");
+    }
+    addCommand(operationCode, 0);
+  }
+
+  private Operator getOperatorByChild(BSLParser.OperationContext operationContext) {
+    Operator operator;
+    if (operationContext.PLUS() != null) {
+      operator = Operator.ADD;
+    } else if (operationContext.MINUS() != null) {
+      operator = Operator.SUB;
+    } else if (operationContext.MUL() != null) {
+      operator = Operator.MUL;
+    } else if (operationContext.QUOTIENT() != null) {
+      operator = Operator.DIV;
+    } else {
+      throw new RuntimeException("Not supported operator");
+    }
+    return operator;
   }
 
 }
