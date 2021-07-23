@@ -15,6 +15,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
@@ -153,24 +154,54 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
   }
 
   private void processExpression(BSLParser.ExpressionContext expression, Deque<Operator> operators) {
+    var booleanExpression = false;
+    List<Integer> booleanCommands = new ArrayList<>();
     for (var index = 0; index < expression.getChildCount(); index++) {
       var child = (BSLParserRuleContext) expression.getChild(index);
       if (child.getRuleIndex() == BSLParser.RULE_member) {
-        processMember((BSLParser.MemberContext) child);
+        processMember((BSLParser.MemberContext) child, operators);
       } else if (child.getRuleIndex() == BSLParser.RULE_operation) {
-        processOperator((BSLParser.OperationContext) child, operators);
+        var operation = getOperatorByChild((BSLParser.OperationContext) child);
+        if (isLogicOperator(operation)) {
+          booleanExpression = true;
+          var indexCommand = addOperator(operation);
+          booleanCommands.add(indexCommand);
+        } else {
+          processOperator(operation, operators);
+        }
       } else {
         throw new RuntimeException("Не поддерживается");
       }
     }
 
     while (!operators.isEmpty()) {
-      addOperator(operators.pop());
+      var indexCommand = addOperator(operators.pop());
+      booleanCommands.add(indexCommand);
+    }
+
+    if (booleanExpression) {
+      var lastIndexCommand = addCommand(OperationCode.MakeBool, 0);
+      booleanCommands.forEach(commandId -> {
+        var command = imageCache.getCode().get(commandId);
+        command.setArgument(lastIndexCommand);
+      });
+    }
+
+  }
+
+  private void processUnaryModifier(BSLParser.UnaryModifierContext child, Deque<Operator> operators) {
+    if (child.NOT_KEYWORD() != null) {
+      operators.push(Operator.NOT);
+    } else if (child.PLUS() != null) {
+      operators.push(Operator.UNARY_PLUS);
+    } else if (child.MINUS() != null) {
+      operators.push(Operator.UNARY_MINUS);
+    } else {
+      throw new RuntimeException("Not supported");
     }
   }
 
-  private void processOperator(BSLParser.OperationContext operationContext, Deque<Operator> operators) {
-    var operation = getOperatorByChild(operationContext);
+  private void processOperator(Operator operation, Deque<Operator> operators) {
     if (!operators.isEmpty()) {
       Operator operatorFromDeque;
       while (!operators.isEmpty()) {
@@ -185,7 +216,7 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     operators.push(operation);
   }
 
-  private void processMember(BSLParser.MemberContext memberContext) {
+  private void processMember(BSLParser.MemberContext memberContext, Deque<Operator> operators) {
     if (memberContext.constValue() != null) {
       processConstValue(memberContext.constValue());
     } else if (memberContext.expression() != null) {
@@ -196,6 +227,11 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     } else {
       throw new RuntimeException("Member not supported");
     }
+
+    if (memberContext.unaryModifier() != null) {
+      processUnaryModifier(memberContext.unaryModifier(), operators);
+    }
+
   }
 
   private void processCallStatement(BSLParser.CallStatementContext callStatement) {
@@ -260,8 +296,16 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
       var constant = new ConstantDefinition(ValueFactory.create(value));
       imageCache.getConstants().add(constant);
       addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
+    } else if (constValue.FALSE() != null) {
+      var constant = new ConstantDefinition(ValueFactory.create(false));
+      imageCache.getConstants().add(constant);
+      addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
+    } else if (constValue.TRUE() != null) {
+      var constant = new ConstantDefinition(ValueFactory.create(true));
+      imageCache.getConstants().add(constant);
+      addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
     } else {
-
+      throw new RuntimeException("Constant value not supported");
     }
   }
 
@@ -314,8 +358,10 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     currentMethodDescriptor.setSignature(info);
   }
 
-  private void addCommand(OperationCode operationCode, int argument) {
+  private int addCommand(OperationCode operationCode, int argument) {
+    var index = imageCache.getCode().size();
     imageCache.getCode().add(new Command(operationCode, argument));
+    return index;
   }
 
   private void addReturn() {
@@ -326,7 +372,7 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     methodDescriptor.getVariables().addAll(scope.getVariables());
   }
 
-  private void addOperator(Operator operator) {
+  private int addOperator(Operator operator) {
     OperationCode operationCode;
     if (operator == Operator.ADD) {
       operationCode = OperationCode.Add;
@@ -336,10 +382,32 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
       operationCode = OperationCode.Mul;
     } else if (operator == Operator.DIV) {
       operationCode = OperationCode.Div;
+    } else if (operator == Operator.UNARY_PLUS) {
+      operationCode = OperationCode.Number;
+    } else if (operator == Operator.UNARY_MINUS) {
+      operationCode = OperationCode.Neg;
+    } else if (operator == Operator.NOT) {
+      operationCode = OperationCode.Not;
+    } else if (operator == Operator.OR) {
+      operationCode = OperationCode.Or;
+    } else if (operator == Operator.AND) {
+      operationCode = OperationCode.And;
+    } else if (operator == Operator.EQUAL) {
+      operationCode = OperationCode.Equals;
+    } else if (operator == Operator.LESS) {
+      operationCode = OperationCode.Less;
+    } else if (operator == Operator.LESS_OR_EQUAL) {
+      operationCode = OperationCode.LessOrEqual;
+    } else if (operator == Operator.GREATER) {
+      operationCode = OperationCode.Greater;
+    } else if (operator == Operator.GREATER_OR_EQUAL) {
+      operationCode = OperationCode.GreaterOrEqual;
+    } else if (operator == Operator.NOT_EQUAL) {
+      operationCode = OperationCode.NotEqual;
     } else {
       throw new RuntimeException("Operator not supported");
     }
-    addCommand(operationCode, 0);
+    return addCommand(operationCode, 0);
   }
 
   private Operator getOperatorByChild(BSLParser.OperationContext operationContext) {
@@ -352,10 +420,40 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
       operator = Operator.MUL;
     } else if (operationContext.QUOTIENT() != null) {
       operator = Operator.DIV;
+    } else if (operationContext.boolOperation() != null) {
+      var bool = operationContext.boolOperation();
+      if (bool.AND_KEYWORD() != null) {
+        operator = Operator.AND;
+      } else if (bool.OR_KEYWORD() != null) {
+        operator = Operator.OR;
+      } else {
+        throw new RuntimeException("Not supported operator");
+      }
+    } else if (operationContext.compareOperation() != null) {
+      var compare = operationContext.compareOperation();
+      if (compare.ASSIGN() != null) {
+        operator = Operator.EQUAL;
+      } else if (compare.LESS() != null) {
+        operator = Operator.LESS;
+      } else if (compare.LESS_OR_EQUAL() != null) {
+        operator = Operator.LESS_OR_EQUAL;
+      } else if (compare.GREATER() != null) {
+        operator = Operator.GREATER;
+      } else if (compare.GREATER_OR_EQUAL() != null) {
+        operator = Operator.GREATER_OR_EQUAL;
+      } else if (compare.NOT_EQUAL() != null) {
+        operator = Operator.NOT_EQUAL;
+      } else {
+        throw new RuntimeException("Not supported operator");
+      }
     } else {
       throw new RuntimeException("Not supported operator");
     }
     return operator;
+  }
+
+  private boolean isLogicOperator(Operator operator) {
+    return operator == Operator.OR || operator == Operator.AND;
   }
 
 }

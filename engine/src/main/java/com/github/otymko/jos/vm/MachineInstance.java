@@ -132,6 +132,12 @@ public class MachineInstance {
     map.put(OperationCode.Sub, this::sub);
     map.put(OperationCode.Mul, this::mul);
     map.put(OperationCode.Div, this::div);
+    map.put(OperationCode.Not, this::not);
+
+    map.put(OperationCode.And, this::and);
+    map.put(OperationCode.Or, this::or);
+    map.put(OperationCode.MakeBool, this::makeBool);
+    map.put(OperationCode.Jmp, this::jmp);
     return map;
   }
 
@@ -170,6 +176,44 @@ public class MachineInstance {
 
   private void pushConst(int argument) {
     operationStack.push(currentImage.getConstants().get(argument).getValue());
+    nextInstruction();
+  }
+
+  private void not(int argument) {
+    var value = operationStack.pop();
+    var newValue = ValueFactory.create(!value.asBoolean());
+    operationStack.push(newValue);
+    nextInstruction();
+  }
+
+  private void and(int argument) {
+    var value = operationStack.peek().asBoolean();
+    if (!value) {
+      jmp(argument);
+    } else {
+      operationStack.pop();
+      nextInstruction();
+    }
+  }
+
+  private void or(int argument) {
+    var value = operationStack.peek().asBoolean();
+    if (value) {
+      jmp(argument);
+    } else {
+      operationStack.pop();
+      nextInstruction();
+    }
+  }
+
+  private void jmp(int argument) {
+    currentFrame.setInstructionPointer(argument);
+  }
+
+  private void makeBool(int argument) {
+    var value = operationStack.pop().asBoolean();
+    var newValue = ValueFactory.create(value);
+    operationStack.push(newValue);
     nextInstruction();
   }
 

@@ -19,6 +19,28 @@ public class ExpressionTest {
     checkEvalExpression("1 + (1 + 2 * 3) + 4 / 5", "8.8");
   }
 
+  @Test
+  void testSimpleLogic() throws Exception {
+    checkEvalExpression("Истина", "Да");
+    checkEvalExpression("Не Истина", "Нет");
+    checkEvalExpression("Ложь", "Нет");
+    checkEvalExpression("Не Ложь", "Да");
+    checkEvalExpression("Ложь И Ложь", "Нет");
+    checkEvalExpression("Истина И Ложь", "Нет");
+    checkEvalExpression("Ложь И Истина", "Нет");
+    checkEvalExpression("Истина И Истина", "Да");
+    checkEvalExpression("Ложь Или Ложь", "Нет");
+    checkEvalExpression("Истина Или Ложь", "Да");
+    checkEvalExpression("Ложь Или Истина", "Да");
+    checkEvalExpression("Истина И Истина", "Да");
+    checkEvalExpression("Истина Или Истина И Истина", "Да");
+    checkEvalExpression("Ложь Или Истина И Истина", "Да");
+    checkEvalExpression("Ложь Или Ложь И Истина", "Нет");
+    checkEvalExpression("Ложь Или Истина И Ложь", "Нет");
+    checkEvalExpression("Истина И (Истина Или Ложь)", "Да");
+    checkEvalExpression("(Истина Или Ложь) И Истина", "Да");
+  }
+
   private void checkEvalExpression(String data, String model) throws Exception {
     var code = String.format(TEMPLATE, data);
     var out = getAttachedOut();

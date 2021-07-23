@@ -47,7 +47,7 @@ public class BooleanValue extends GenericValue {
 
   @Override
   public String asString() {
-    return String.valueOf(value);
+    return value ? "Да" : "Нет";
   }
 
   // FIXME
