@@ -25,4 +25,6 @@ public interface Value {
     return null;
   }
 
+  int compareTo(Value value);
+
 }

@@ -41,6 +41,20 @@ public class ExpressionTest {
     checkEvalExpression("(Истина Или Ложь) И Истина", "Да");
   }
 
+  @Test
+  void testCompare() throws Exception {
+    checkEvalExpression("1 > 0", "Да");
+    checkEvalExpression("1 < 0", "Нет");
+    checkEvalExpression("10 >= 10", "Да");
+    checkEvalExpression("10 >= 11", "Нет");
+    checkEvalExpression("10 <= 10", "Да");
+    checkEvalExpression("10 <= 9", "Нет");
+    checkEvalExpression("10 = 10", "Да");
+    checkEvalExpression("10 = 9", "Нет");
+    checkEvalExpression("10 <> 10", "Нет");
+    checkEvalExpression("10 <> 9", "Да");
+  }
+
   private void checkEvalExpression(String data, String model) throws Exception {
     var code = String.format(TEMPLATE, data);
     var out = getAttachedOut();

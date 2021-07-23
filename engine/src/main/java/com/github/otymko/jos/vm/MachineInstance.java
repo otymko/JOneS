@@ -138,7 +138,63 @@ public class MachineInstance {
     map.put(OperationCode.Or, this::or);
     map.put(OperationCode.MakeBool, this::makeBool);
     map.put(OperationCode.Jmp, this::jmp);
+
+    map.put(OperationCode.Greater, this::greater);
+    map.put(OperationCode.GreaterOrEqual, this::greaterOrEqual);
+    map.put(OperationCode.Less, this::less);
+    map.put(OperationCode.LessOrEqual, this::lessOrEqual);
+    map.put(OperationCode.Equals, this::toEquals);
+    map.put(OperationCode.NotEqual, this::notEqual);
     return map;
+  }
+
+  private void notEqual(int notEqual) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    var newValue = ValueFactory.create(valueOne.compareTo(valueTwo) != 0);
+    operationStack.push(newValue);
+    nextInstruction();
+  }
+
+  private void toEquals(int argument) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    var newValue = ValueFactory.create(valueOne.compareTo(valueTwo) == 0);
+    operationStack.push(newValue);
+    nextInstruction();
+  }
+
+  private void greater(int argument) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    var newValue = ValueFactory.create(valueTwo.compareTo(valueOne) > 0);
+    operationStack.push(newValue);
+    nextInstruction();
+  }
+
+  private void greaterOrEqual(int argument) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    var newValue = ValueFactory.create(valueTwo.compareTo(valueOne) >= 0);
+    operationStack.push(newValue);
+    nextInstruction();
+  }
+
+  private void lessOrEqual(int argument) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    var newValue = ValueFactory.create(valueTwo.compareTo(valueOne) <= 0);
+    operationStack.push(newValue);
+    nextInstruction();
+  }
+
+
+  private void less(int argument) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    var newValue = ValueFactory.create(valueTwo.compareTo(valueOne) < 0);
+    operationStack.push(newValue);
+    nextInstruction();
   }
 
   private void add(int argument) {
