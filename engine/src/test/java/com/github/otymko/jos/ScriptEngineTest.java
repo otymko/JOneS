@@ -1,7 +1,8 @@
 package com.github.otymko.jos;
 
 import com.github.otymko.jos.compiler.ScriptCompiler;
-import com.github.otymko.jos.context.UserScriptContext;
+import com.github.otymko.jos.hosting.ScriptEngine;
+import com.github.otymko.jos.runtime.context.UserScriptContext;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;

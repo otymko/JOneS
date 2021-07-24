@@ -5,12 +5,12 @@ import com.github._1c_syntax.bsl.parser.BSLParserBaseVisitor;
 import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
 import com.github.otymko.jos.compiler.expression.Operator;
 import com.github.otymko.jos.compiler.image.ModuleImageCache;
-import com.github.otymko.jos.context.value.ValueFactory;
-import com.github.otymko.jos.vm.Command;
-import com.github.otymko.jos.vm.OperationCode;
-import com.github.otymko.jos.vm.info.MethodInfo;
-import com.github.otymko.jos.vm.info.ParameterInfo;
-import com.github.otymko.jos.vm.info.VariableInfo;
+import com.github.otymko.jos.runtime.ValueFactory;
+import com.github.otymko.jos.runtime.machine.Command;
+import com.github.otymko.jos.runtime.machine.OperationCode;
+import com.github.otymko.jos.runtime.machine.info.MethodInfo;
+import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
+import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -368,7 +368,7 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     if (ctx.statement() != null) {
       processStatements(ctx.statement());
     }
-    
+
     if (currentMethodDescriptor.getSignature().isFunction()) {
       // скрытый возврат
       var constant = new ConstantDefinition(ValueFactory.create());

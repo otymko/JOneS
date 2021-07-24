@@ -1,6 +1,6 @@
 package com.github.otymko.jos.compiler;
 
-import com.github.otymko.jos.vm.info.ParameterInfo;
+import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import lombok.Value;
 
 import java.util.ArrayList;

@@ -1,10 +1,10 @@
 package com.github.otymko.jos.compiler.image;
 
-import com.github.otymko.jos.vm.Command;
+import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.compiler.ConstantDefinition;
 import com.github.otymko.jos.compiler.MethodDescriptor;
 import com.github.otymko.jos.compiler.SymbolAddress;
-import com.github.otymko.jos.vm.info.VariableInfo;
+import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Data;
 
 import java.util.ArrayList;

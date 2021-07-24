@@ -1,8 +1,8 @@
 package com.github.otymko.jos.compiler;
 
-import com.github.otymko.jos.context.ContextInitializer;
-import com.github.otymko.jos.context.RuntimeContextInstance;
-import com.github.otymko.jos.vm.info.VariableInfo;
+import com.github.otymko.jos.runtime.context.ContextInitializer;
+import com.github.otymko.jos.runtime.context.RuntimeContextInstance;
+import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Getter;
 
 import java.util.ArrayList;

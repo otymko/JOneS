@@ -1,7 +1,7 @@
 package com.github.otymko.jos.compiler;
 
-import com.github.otymko.jos.vm.info.MethodInfo;
-import com.github.otymko.jos.vm.info.VariableInfo;
+import com.github.otymko.jos.runtime.machine.info.MethodInfo;
+import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Data;
 
 import java.util.ArrayList;

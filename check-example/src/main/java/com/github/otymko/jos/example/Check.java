@@ -1,11 +1,11 @@
 package com.github.otymko.jos.example;
 
 import com.github.otymko.jos.compiler.image.ModuleImage;
-import com.github.otymko.jos.context.ScriptDrivenObject;
+import com.github.otymko.jos.runtime.context.ScriptDrivenObject;
 import com.github.otymko.jos.context.value.Value;
-import com.github.otymko.jos.label.ContextMethod;
-import com.github.otymko.jos.label.ContextProperty;
-import com.github.otymko.jos.label.ContextType;
+import com.github.otymko.jos.runtime.context.label.ContextMethod;
+import com.github.otymko.jos.runtime.context.label.ContextProperty;
+import com.github.otymko.jos.runtime.context.label.ContextType;
 import lombok.Setter;
 
 @ContextType(name = "ВнешняяПроверка", alias = "ExternalCheck")
