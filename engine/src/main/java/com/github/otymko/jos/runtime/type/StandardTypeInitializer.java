@@ -1,4 +1,4 @@
-package com.github.otymko.jos.runtime;
+package com.github.otymko.jos.runtime.type;
 
 import com.github.otymko.jos.runtime.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.type.primitive.DateValue;

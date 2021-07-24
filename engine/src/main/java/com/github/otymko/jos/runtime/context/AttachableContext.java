@@ -1,6 +1,6 @@
 package com.github.otymko.jos.runtime.context;
 
-import com.github.otymko.jos.runtime.IValue;
+import com.github.otymko.jos.runtime.type.BaseValue;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 
 import java.lang.reflect.InvocationTargetException;
@@ -12,7 +12,7 @@ public abstract class AttachableContext implements RuntimeContextInstance {
     methods = ContextInitializer.getContextMethods(getClass());
   }
 
-  public void callMethodScript(int methodId, IValue[] arguments) {
+  public void callMethodScript(int methodId, BaseValue[] arguments) {
     var methodInfo = methods[methodId];
     var callMethod = methodInfo.getMethod();
 

@@ -1,6 +1,6 @@
 package com.github.otymko.jos.context.value;
 
-import com.github.otymko.jos.runtime.ValueFactory;
+import com.github.otymko.jos.runtime.type.ValueFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

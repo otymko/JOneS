@@ -1,7 +1,7 @@
 package com.github.otymko.jos.context.value;
 
-import com.github.otymko.jos.runtime.DataType;
-import com.github.otymko.jos.runtime.ValueFactory;
+import com.github.otymko.jos.runtime.type.DataType;
+import com.github.otymko.jos.runtime.type.ValueFactory;
 import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;

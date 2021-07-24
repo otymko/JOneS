@@ -1,11 +1,11 @@
-package com.github.otymko.jos.compiler.expression;
+package com.github.otymko.jos.compiler;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum Operator {
+public enum ExpressionOperator {
   OR(1, "ИЛИ"),
   AND(2, "И"),
   NOT(3, "НЕ"),

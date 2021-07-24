@@ -1,7 +1,7 @@
 package com.github.otymko.jos.runtime.context;
 
 import com.github.otymko.jos.hosting.ScriptEngine;
-import com.github.otymko.jos.compiler.image.ModuleImage;
+import com.github.otymko.jos.module.ModuleImage;
 import lombok.Getter;
 
 /**

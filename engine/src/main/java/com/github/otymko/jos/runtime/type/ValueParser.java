@@ -1,4 +1,4 @@
-package com.github.otymko.jos.runtime;
+package com.github.otymko.jos.runtime.type;
 
 import com.github.otymko.jos.runtime.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.type.primitive.DateValue;
@@ -10,8 +10,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ValueParser {
 
-  public IValue parse(String view, DataType dataType) {
-    IValue result;
+  public BaseValue parse(String view, DataType dataType) {
+    BaseValue result;
     switch (dataType) {
       case BOOLEAN:
         result = BooleanValue.parse(view);

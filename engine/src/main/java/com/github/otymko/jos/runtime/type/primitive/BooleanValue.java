@@ -1,13 +1,12 @@
 package com.github.otymko.jos.runtime.type.primitive;
 
-import com.github.otymko.jos.runtime.DataType;
-import com.github.otymko.jos.runtime.GenericIValue;
-import com.github.otymko.jos.runtime.IValue;
-import com.github.otymko.jos.runtime.ValueFactory;
+import com.github.otymko.jos.runtime.type.BaseValue;
+import com.github.otymko.jos.runtime.type.DataType;
+import com.github.otymko.jos.runtime.type.ValueFactory;
 
 import java.util.function.Predicate;
 
-public class BooleanValue extends GenericIValue {
+public class BooleanValue extends BaseValue {
   public static final BooleanValue TRUE = new BooleanValue(true);
   public static final BooleanValue FALSE = new BooleanValue(false);
 
@@ -23,8 +22,8 @@ public class BooleanValue extends GenericIValue {
     setDataType(DataType.BOOLEAN);
   }
 
-  public static IValue parse(String view) {
-    IValue result;
+  public static BaseValue parse(String view) {
+    BaseValue result;
     if (IS_TRUE.test(view)) {
       result = ValueFactory.create(true);
     } else if (IS_FALSE.test(view)) {
@@ -55,7 +54,7 @@ public class BooleanValue extends GenericIValue {
 
   // FIXME
   @Override
-  public int compareTo(IValue other) {
+  public int compareTo(BaseValue other) {
     if (other.getDataType() == DataType.BOOLEAN || other.getDataType() == DataType.NUMBER) {
       return Float.compare(asNumber(), other.asNumber());
     }

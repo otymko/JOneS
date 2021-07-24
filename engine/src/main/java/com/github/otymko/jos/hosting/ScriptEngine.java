@@ -1,8 +1,8 @@
 package com.github.otymko.jos.hosting;
 
-import com.github.otymko.jos.compiler.image.ModuleImage;
-import com.github.otymko.jos.runtime.StandardTypeInitializer;
-import com.github.otymko.jos.runtime.TypeManager;
+import com.github.otymko.jos.module.ModuleImage;
+import com.github.otymko.jos.runtime.type.StandardTypeInitializer;
+import com.github.otymko.jos.runtime.type.TypeManager;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.UserScriptContext;

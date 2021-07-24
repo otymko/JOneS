@@ -1,11 +1,10 @@
 package com.github.otymko.jos.runtime.type.primitive;
 
-import com.github.otymko.jos.runtime.DataType;
-import com.github.otymko.jos.runtime.GenericIValue;
-import com.github.otymko.jos.runtime.IValue;
-import com.github.otymko.jos.runtime.ValueFactory;
+import com.github.otymko.jos.runtime.type.BaseValue;
+import com.github.otymko.jos.runtime.type.DataType;
+import com.github.otymko.jos.runtime.type.ValueFactory;
 
-public class NumberValue extends GenericIValue {
+public class NumberValue extends BaseValue {
   private final float value;
 
   private NumberValue(float value) {
@@ -42,14 +41,14 @@ public class NumberValue extends GenericIValue {
   }
 
   @Override
-  public int compareTo(IValue object) {
+  public int compareTo(BaseValue object) {
     if (object.getDataType() == DataType.BOOLEAN || object.getDataType() == DataType.NUMBER) {
       return Float.compare(value, object.asNumber());
     }
     return super.compareTo(object);
   }
 
-  public static IValue parse(String view) {
+  public static BaseValue parse(String view) {
     float value;
     try {
       value = Float.parseFloat(view);
@@ -64,10 +63,10 @@ public class NumberValue extends GenericIValue {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof IValue)) {
+    if (!(obj instanceof BaseValue)) {
       return false;
     }
-    var baseValue = (IValue) obj;
+    var baseValue = (BaseValue) obj;
     if (baseValue.getDataType() == DataType.BOOLEAN || baseValue.getDataType() == DataType.NUMBER) {
       return value == baseValue.asNumber();
     }

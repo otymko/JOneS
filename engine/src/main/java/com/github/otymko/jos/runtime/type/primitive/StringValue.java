@@ -1,14 +1,13 @@
 package com.github.otymko.jos.runtime.type.primitive;
 
-import com.github.otymko.jos.runtime.DataType;
-import com.github.otymko.jos.runtime.GenericIValue;
-import com.github.otymko.jos.runtime.IValue;
-import com.github.otymko.jos.runtime.ValueFactory;
-import com.github.otymko.jos.runtime.ValueParser;
+import com.github.otymko.jos.runtime.type.BaseValue;
+import com.github.otymko.jos.runtime.type.DataType;
+import com.github.otymko.jos.runtime.type.ValueFactory;
+import com.github.otymko.jos.runtime.type.ValueParser;
 
 import java.util.Date;
 
-public final class StringValue extends GenericIValue {
+public final class StringValue extends BaseValue {
   public static final StringValue EMPTY = new StringValue("");
 
   private final String value;
@@ -32,7 +31,8 @@ public final class StringValue extends GenericIValue {
   public String asString() {
     return value;
   }
-  public static IValue parse(String view) {
+
+  public static BaseValue parse(String view) {
     return ValueFactory.create(view);
   }
 
@@ -53,7 +53,7 @@ public final class StringValue extends GenericIValue {
 
 
   @Override
-  public int compareTo(IValue other) {
+  public int compareTo(BaseValue other) {
     if (other.getDataType() == getDataType()) {
       return value.compareTo(other.asString());
     }
@@ -63,10 +63,10 @@ public final class StringValue extends GenericIValue {
   // FIXME
   @Override
   public boolean equals(Object object) {
-    if (!(object instanceof IValue)) {
+    if (!(object instanceof BaseValue)) {
       throw new RuntimeException("Not supported");
     }
-    var other = (IValue) object;
+    var other = (BaseValue) object;
     if (other.getDataType() == getDataType()) {
       return other.asString().equals(value);
     }

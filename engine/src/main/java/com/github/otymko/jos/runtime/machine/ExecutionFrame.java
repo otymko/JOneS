@@ -1,6 +1,6 @@
 package com.github.otymko.jos.runtime.machine;
 
-import com.github.otymko.jos.compiler.image.ModuleImage;
+import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Variable;
 import lombok.Data;
 

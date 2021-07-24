@@ -1,10 +1,10 @@
 package com.github.otymko.jos.runtime.machine;
 
 import com.github.otymko.jos.compiler.MethodDescriptor;
-import com.github.otymko.jos.compiler.image.ModuleImage;
+import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Arithmetic;
-import com.github.otymko.jos.runtime.IValue;
-import com.github.otymko.jos.runtime.ValueFactory;
+import com.github.otymko.jos.runtime.type.BaseValue;
+import com.github.otymko.jos.runtime.type.ValueFactory;
 import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.RuntimeContextInstance;
@@ -29,7 +29,7 @@ public class MachineInstance {
   @Getter
   private final List<Scope> scopes = new ArrayList<>();
 
-  private final Stack<IValue> operationStack = new Stack<>();
+  private final Stack<BaseValue> operationStack = new Stack<>();
 
   private final Stack<ExecutionFrame> callStack = new Stack<>();
   private ExecutionFrame currentFrame;
@@ -312,7 +312,7 @@ public class MachineInstance {
       var methodDescriptor = currentImage.getMethods().get(address.getSymbolId());
 
       int argumentCount = (int) operationStack.pop().asNumber();
-      var argumentValues = new IValue[argumentCount];
+      var argumentValues = new BaseValue[argumentCount];
       for (var index = argumentCount - 1; index >= 0; index--) {
         var value = operationStack.pop();
         argumentValues[index] = value;
@@ -339,7 +339,7 @@ public class MachineInstance {
       var method = scope.getMethods()[address.getSymbolId()];
 
       int argumentCount = (int) operationStack.pop().asNumber();
-      IValue[] argumentValues = new IValue[argumentCount];
+      var argumentValues = new BaseValue[argumentCount];
 
       for (var index = argumentCount - 1; index >= 0; index--) {
         var value = operationStack.pop();
@@ -405,7 +405,7 @@ public class MachineInstance {
     currentFrame.setInstructionPointer(currentFrame.getInstructionPointer() + 1);
   }
 
-  private void callContext(RuntimeContextInstance drivenObject, int methodId, MethodInfo methodInfo, IValue[] arguments) {
+  private void callContext(RuntimeContextInstance drivenObject, int methodId, MethodInfo methodInfo, BaseValue[] arguments) {
     drivenObject.callMethodScript(methodId, arguments);
   }
 

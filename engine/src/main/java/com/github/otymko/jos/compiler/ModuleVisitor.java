@@ -3,14 +3,13 @@ package com.github.otymko.jos.compiler;
 import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github._1c_syntax.bsl.parser.BSLParserBaseVisitor;
 import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
-import com.github.otymko.jos.compiler.expression.Operator;
-import com.github.otymko.jos.compiler.image.ModuleImageCache;
-import com.github.otymko.jos.runtime.ValueFactory;
+import com.github.otymko.jos.module.ModuleImageCache;
 import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.OperationCode;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
+import com.github.otymko.jos.runtime.type.ValueFactory;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -22,10 +21,8 @@ import java.util.Locale;
 
 public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
   private static final String ENTRY_METHOD = "$entry";
-
   private final ScriptCompiler compiler;
   private final ModuleImageCache imageCache;
-
   private MethodDescriptor currentMethodDescriptor;
   private List<Integer> currentCommandReturnInMethod;
   private SymbolScope localScope;
@@ -33,22 +30,6 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
   public ModuleVisitor(ModuleImageCache imageCache, ScriptCompiler compiler) {
     this.imageCache = imageCache;
     this.compiler = compiler;
-  }
-
-  @Override
-  public ParseTree visitFile(BSLParser.FileContext ctx) {
-
-//    int blockCount = 0;
-//    if (!ctx.fileCodeBlock().codeBlock().statement().isEmpty()) {
-//      blockCount++;
-//    }
-//    if (ctx.subs() != null) {
-//      blockCount += ctx.subs().sub().size();
-//    }
-//
-//    methods = new MethodDescriptor[blockCount];
-
-    return super.visitFile(ctx);
   }
 
   @Override
@@ -145,7 +126,6 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     currentCommandReturnInMethod.add(indexJump);
   }
 
-
   private void processAssigment(BSLParser.AssignmentContext assignment) {
     var lValue = assignment.lValue();
     var expression = assignment.expression();
@@ -172,7 +152,7 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     }
   }
 
-  private void processExpression(BSLParser.ExpressionContext expression, Deque<Operator> operators) {
+  private void processExpression(BSLParser.ExpressionContext expression, Deque<ExpressionOperator> operators) {
     var booleanExpression = false;
     List<Integer> booleanCommands = new ArrayList<>();
     for (var index = 0; index < expression.getChildCount(); index++) {
@@ -208,21 +188,21 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
 
   }
 
-  private void processUnaryModifier(BSLParser.UnaryModifierContext child, Deque<Operator> operators) {
+  private void processUnaryModifier(BSLParser.UnaryModifierContext child, Deque<ExpressionOperator> operators) {
     if (child.NOT_KEYWORD() != null) {
-      operators.push(Operator.NOT);
+      operators.push(ExpressionOperator.NOT);
     } else if (child.PLUS() != null) {
-      operators.push(Operator.UNARY_PLUS);
+      operators.push(ExpressionOperator.UNARY_PLUS);
     } else if (child.MINUS() != null) {
-      operators.push(Operator.UNARY_MINUS);
+      operators.push(ExpressionOperator.UNARY_MINUS);
     } else {
       throw new RuntimeException("Not supported");
     }
   }
 
-  private void processOperator(Operator operation, Deque<Operator> operators) {
+  private void processOperator(ExpressionOperator operation, Deque<ExpressionOperator> operators) {
     if (!operators.isEmpty()) {
-      Operator operatorFromDeque;
+      ExpressionOperator operatorFromDeque;
       while (!operators.isEmpty()) {
         operatorFromDeque = operators.peek();
         if (operatorFromDeque.getPriority() >= operation.getPriority()) {
@@ -235,7 +215,7 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     operators.push(operation);
   }
 
-  private void processMember(BSLParser.MemberContext memberContext, Deque<Operator> operators) {
+  private void processMember(BSLParser.MemberContext memberContext, Deque<ExpressionOperator> operators) {
     if (memberContext.constValue() != null) {
       processConstValue(memberContext.constValue());
     } else if (memberContext.expression() != null) {
@@ -441,37 +421,37 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     methodDescriptor.getVariables().addAll(scope.getVariables());
   }
 
-  private int addOperator(Operator operator) {
+  private int addOperator(ExpressionOperator operator) {
     OperationCode operationCode;
-    if (operator == Operator.ADD) {
+    if (operator == ExpressionOperator.ADD) {
       operationCode = OperationCode.Add;
-    } else if (operator == Operator.SUB) {
+    } else if (operator == ExpressionOperator.SUB) {
       operationCode = OperationCode.Sub;
-    } else if (operator == Operator.MUL) {
+    } else if (operator == ExpressionOperator.MUL) {
       operationCode = OperationCode.Mul;
-    } else if (operator == Operator.DIV) {
+    } else if (operator == ExpressionOperator.DIV) {
       operationCode = OperationCode.Div;
-    } else if (operator == Operator.UNARY_PLUS) {
+    } else if (operator == ExpressionOperator.UNARY_PLUS) {
       operationCode = OperationCode.Number;
-    } else if (operator == Operator.UNARY_MINUS) {
+    } else if (operator == ExpressionOperator.UNARY_MINUS) {
       operationCode = OperationCode.Neg;
-    } else if (operator == Operator.NOT) {
+    } else if (operator == ExpressionOperator.NOT) {
       operationCode = OperationCode.Not;
-    } else if (operator == Operator.OR) {
+    } else if (operator == ExpressionOperator.OR) {
       operationCode = OperationCode.Or;
-    } else if (operator == Operator.AND) {
+    } else if (operator == ExpressionOperator.AND) {
       operationCode = OperationCode.And;
-    } else if (operator == Operator.EQUAL) {
+    } else if (operator == ExpressionOperator.EQUAL) {
       operationCode = OperationCode.Equals;
-    } else if (operator == Operator.LESS) {
+    } else if (operator == ExpressionOperator.LESS) {
       operationCode = OperationCode.Less;
-    } else if (operator == Operator.LESS_OR_EQUAL) {
+    } else if (operator == ExpressionOperator.LESS_OR_EQUAL) {
       operationCode = OperationCode.LessOrEqual;
-    } else if (operator == Operator.GREATER) {
+    } else if (operator == ExpressionOperator.GREATER) {
       operationCode = OperationCode.Greater;
-    } else if (operator == Operator.GREATER_OR_EQUAL) {
+    } else if (operator == ExpressionOperator.GREATER_OR_EQUAL) {
       operationCode = OperationCode.GreaterOrEqual;
-    } else if (operator == Operator.NOT_EQUAL) {
+    } else if (operator == ExpressionOperator.NOT_EQUAL) {
       operationCode = OperationCode.NotEqual;
     } else {
       throw new RuntimeException("Operator not supported");
@@ -479,39 +459,39 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     return addCommand(operationCode, 0);
   }
 
-  private Operator getOperatorByChild(BSLParser.OperationContext operationContext) {
-    Operator operator;
+  private ExpressionOperator getOperatorByChild(BSLParser.OperationContext operationContext) {
+    ExpressionOperator operator;
     if (operationContext.PLUS() != null) {
-      operator = Operator.ADD;
+      operator = ExpressionOperator.ADD;
     } else if (operationContext.MINUS() != null) {
-      operator = Operator.SUB;
+      operator = ExpressionOperator.SUB;
     } else if (operationContext.MUL() != null) {
-      operator = Operator.MUL;
+      operator = ExpressionOperator.MUL;
     } else if (operationContext.QUOTIENT() != null) {
-      operator = Operator.DIV;
+      operator = ExpressionOperator.DIV;
     } else if (operationContext.boolOperation() != null) {
       var bool = operationContext.boolOperation();
       if (bool.AND_KEYWORD() != null) {
-        operator = Operator.AND;
+        operator = ExpressionOperator.AND;
       } else if (bool.OR_KEYWORD() != null) {
-        operator = Operator.OR;
+        operator = ExpressionOperator.OR;
       } else {
         throw new RuntimeException("Not supported operator");
       }
     } else if (operationContext.compareOperation() != null) {
       var compare = operationContext.compareOperation();
       if (compare.ASSIGN() != null) {
-        operator = Operator.EQUAL;
+        operator = ExpressionOperator.EQUAL;
       } else if (compare.LESS() != null) {
-        operator = Operator.LESS;
+        operator = ExpressionOperator.LESS;
       } else if (compare.LESS_OR_EQUAL() != null) {
-        operator = Operator.LESS_OR_EQUAL;
+        operator = ExpressionOperator.LESS_OR_EQUAL;
       } else if (compare.GREATER() != null) {
-        operator = Operator.GREATER;
+        operator = ExpressionOperator.GREATER;
       } else if (compare.GREATER_OR_EQUAL() != null) {
-        operator = Operator.GREATER_OR_EQUAL;
+        operator = ExpressionOperator.GREATER_OR_EQUAL;
       } else if (compare.NOT_EQUAL() != null) {
-        operator = Operator.NOT_EQUAL;
+        operator = ExpressionOperator.NOT_EQUAL;
       } else {
         throw new RuntimeException("Not supported operator");
       }
@@ -521,8 +501,8 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     return operator;
   }
 
-  private boolean isLogicOperator(Operator operator) {
-    return operator == Operator.OR || operator == Operator.AND;
+  private boolean isLogicOperator(ExpressionOperator operator) {
+    return operator == ExpressionOperator.OR || operator == ExpressionOperator.AND;
   }
 
 }

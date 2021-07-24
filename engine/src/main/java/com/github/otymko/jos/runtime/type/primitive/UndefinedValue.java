@@ -1,10 +1,9 @@
 package com.github.otymko.jos.runtime.type.primitive;
 
-import com.github.otymko.jos.runtime.DataType;
-import com.github.otymko.jos.runtime.GenericIValue;
-import com.github.otymko.jos.runtime.IValue;
+import com.github.otymko.jos.runtime.type.BaseValue;
+import com.github.otymko.jos.runtime.type.DataType;
 
-public class UndefinedValue extends GenericIValue {
+public class UndefinedValue extends BaseValue {
   public static final UndefinedValue VALUE = new UndefinedValue();
 
   private UndefinedValue() {
@@ -17,7 +16,7 @@ public class UndefinedValue extends GenericIValue {
   }
 
   @Override
-  public int compareTo(IValue object) {
+  public int compareTo(BaseValue object) {
     if (object.getDataType() == getDataType()) {
       return 0;
     }

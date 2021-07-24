@@ -1,4 +1,4 @@
-package com.github.otymko.jos.compiler.image;
+package com.github.otymko.jos.module;
 
 import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.compiler.ConstantDefinition;

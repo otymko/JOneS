@@ -1,8 +1,8 @@
 package com.github.otymko.jos.example;
 
-import com.github.otymko.jos.compiler.image.ModuleImage;
+import com.github.otymko.jos.module.ModuleImage;
+import com.github.otymko.jos.runtime.type.BaseValue;
 import com.github.otymko.jos.runtime.context.ScriptDrivenObject;
-import com.github.otymko.jos.context.value.Value;
 import com.github.otymko.jos.runtime.context.label.ContextMethod;
 import com.github.otymko.jos.runtime.context.label.ContextProperty;
 import com.github.otymko.jos.runtime.context.label.ContextType;
@@ -33,7 +33,7 @@ public class Check extends ScriptDrivenObject {
   }
 
   @Override
-  public void callMethodScript(int methodId, Value[] arguments) {
+  public void callMethodScript(int methodId, BaseValue[] arguments) {
 
   }
 
