@@ -27,6 +27,7 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
   private final ModuleImageCache imageCache;
 
   private MethodDescriptor currentMethodDescriptor;
+  private List<Integer> currentCommandReturnInMethod;
   private SymbolScope localScope;
 
   public ModuleVisitor(ModuleImageCache imageCache, ScriptCompiler compiler) {
@@ -103,6 +104,9 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
 
     var methodInfo = new MethodInfo(ENTRY_METHOD, ENTRY_METHOD, false, new ParameterInfo[0], null);
     currentMethodDescriptor.setSignature(methodInfo);
+
+    // загрузить переменные?
+
     processStatements(statements);
   }
 
@@ -122,10 +126,25 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
       processCallStatement(statementContext.callStatement());
     } else if (statementContext.assignment() != null) {
       processAssigment(statementContext.assignment());
+    } else if (statementContext.compoundStatement() != null) {
+      var compoundStatement = statementContext.compoundStatement();
+      if (compoundStatement.returnStatement() != null) {
+        processReturnStatement(compoundStatement.returnStatement());
+      } else {
+        throw new RuntimeException("Not supported");
+      }
     } else {
       throw new RuntimeException("Not supported");
     }
   }
+
+  private void processReturnStatement(BSLParser.ReturnStatementContext returnStatementContext) {
+    processExpression(returnStatementContext.expression(), new ArrayDeque<>());
+    addCommand(OperationCode.MakeRawValue, 0);
+    var indexJump = addCommand(OperationCode.Jmp, -1);
+    currentCommandReturnInMethod.add(indexJump);
+  }
+
 
   private void processAssigment(BSLParser.AssignmentContext assignment) {
     var lValue = assignment.lValue();
@@ -238,14 +257,31 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     if (callStatement.globalMethodCall() != null) {
       var paramList = callStatement.globalMethodCall().doCall().callParamList();
       processParamList(paramList);
-      addCommand(OperationCode.ArgNum, paramList.callParam().size());
-      processMethodCall(callStatement.globalMethodCall().methodName());
+      addCommand(OperationCode.ArgNum, calcParams(paramList));
+      processMethodCall(callStatement.globalMethodCall().methodName(), false);
     } else {
-
+      throw new RuntimeException("Не реализовано");
     }
   }
 
-  private void processMethodCall(BSLParser.MethodNameContext methodNameContext) {
+  private void processGlobalStatement(BSLParser.GlobalMethodCallContext globalMethodCall) {
+    var paramList = globalMethodCall.doCall().callParamList();
+    processParamList(paramList);
+    addCommand(OperationCode.ArgNum, calcParams(paramList));
+    processMethodCall(globalMethodCall.methodName(), true);
+  }
+
+  private int calcParams(BSLParser.CallParamListContext callParamListContext) {
+    var count = 0;
+    for (var callParam : callParamListContext.callParam()) {
+      if (callParam.getChildCount() > 0) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  private void processMethodCall(BSLParser.MethodNameContext methodNameContext, boolean isFunction) {
     var methodName = methodNameContext.getText();
     var address = compiler.findMethodInContext(methodName);
     if (address == null) {
@@ -255,7 +291,12 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     if (!imageCache.getMethodRefs().contains(address)) {
       imageCache.getMethodRefs().add(address);
     }
-    addCommand(OperationCode.CallProc, imageCache.getMethodRefs().indexOf(address));
+    var refs = imageCache.getMethodRefs().indexOf(address);
+    if (isFunction) {
+      addCommand(OperationCode.CallFunc, refs);
+    } else {
+      addCommand(OperationCode.CallProc, refs);
+    }
   }
 
   private void processParamList(BSLParser.CallParamListContext paramList) {
@@ -269,6 +310,11 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
   }
 
   private void processComplexIdentifier(BSLParser.ComplexIdentifierContext complexIdentifierContext) {
+    if (complexIdentifierContext.globalMethodCall() != null) {
+      processGlobalStatement(complexIdentifierContext.globalMethodCall());
+      return;
+    }
+
     // FIXME: мракобесие
     var identifier = complexIdentifierContext.getText();
     var address = compiler.findVariableInContext(identifier);
@@ -310,6 +356,8 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
   }
 
   private void processSubCodeBlock(BSLParser.CodeBlockContext ctx) {
+    currentCommandReturnInMethod = new ArrayList<>();
+
     var subContext = ctx.parent.parent;
     if (subContext.getRuleIndex() == BSLParser.RULE_procedure) {
       processProcedure(subContext);
@@ -320,27 +368,26 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     if (ctx.statement() != null) {
       processStatements(ctx.statement());
     }
-
-    // FIXME: ?? а как для функции?
+    
     if (currentMethodDescriptor.getSignature().isFunction()) {
-
+      // скрытый возврат
+      var constant = new ConstantDefinition(ValueFactory.create());
+      imageCache.getConstants().add(constant);
+      addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
     }
-    addReturn();
+
+    var indexEndMethod = addReturn();
+    currentCommandReturnInMethod.forEach(index -> {
+      var command = imageCache.getCode().get(index);
+      command.setArgument(indexEndMethod);
+    });
 
     if (currentMethodDescriptor.getEntry() < 0) {
       currentMethodDescriptor.setEntry(imageCache.getCode().size() - 1);
     }
   }
 
-  private void processFunction(RuleContext ruleContext) {
-    // TODO:
-  }
-
-  private void processProcedure(RuleContext ruleContext) {
-    var procedure = (BSLParser.ProcedureContext) ruleContext;
-
-    var name = procedure.procDeclaration().subName().getText();
-    var paramList = procedure.procDeclaration().paramList();
+  private ParameterInfo[] buildParameterInfos(BSLParser.ParamListContext paramList) {
     ParameterInfo[] parameterInfos;
     if (paramList != null) {
       int index = 0;
@@ -353,8 +400,30 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     } else {
       parameterInfos = new ParameterInfo[0];
     }
+    return parameterInfos;
+  }
 
-    var info = new MethodInfo(name, "", false, parameterInfos, null);
+  private void processFunction(RuleContext ruleContext) {
+    var function = (BSLParser.FunctionContext) ruleContext;
+    var name = function.funcDeclaration().subName().getText();
+    var paramList = function.funcDeclaration().paramList();
+    var parameterInfos = buildParameterInfos(paramList);
+    for (var parameterInfo : parameterInfos) {
+      var variableInfo = new VariableInfo(parameterInfo.getName());
+      localScope.getVariables().add(variableInfo);
+      localScope.getVariableNumbers().put(parameterInfo.getName().toUpperCase(Locale.ENGLISH),
+        localScope.getVariables().indexOf(variableInfo));
+    }
+    var info = new MethodInfo(name, name, true, parameterInfos, null);
+    currentMethodDescriptor.setSignature(info);
+  }
+
+  private void processProcedure(RuleContext ruleContext) {
+    var procedure = (BSLParser.ProcedureContext) ruleContext;
+    var name = procedure.procDeclaration().subName().getText();
+    var paramList = procedure.procDeclaration().paramList();
+    var parameterInfos = buildParameterInfos(paramList);
+    var info = new MethodInfo(name, name, false, parameterInfos, null);
     currentMethodDescriptor.setSignature(info);
   }
 
@@ -364,8 +433,8 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     return index;
   }
 
-  private void addReturn() {
-    addCommand(OperationCode.Return, 0);
+  private int addReturn() {
+    return addCommand(OperationCode.Return, 0);
   }
 
   private void fillMethodDescriptorFromScope(MethodDescriptor methodDescriptor, SymbolScope scope) {

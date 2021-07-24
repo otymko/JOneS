@@ -14,4 +14,6 @@ public class ExecutionFrame {
   private int moduleLoadIndex;
   private ModuleImage image;
   private String methodName;
+
+  private boolean discardReturnValue;
 }

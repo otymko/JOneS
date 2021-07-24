@@ -127,7 +127,7 @@ public class MachineInstance {
     map.put(OperationCode.PushLoc, this::pushLoc);
     map.put(OperationCode.PushVar, this::pushVar);
     map.put(OperationCode.LoadVar, this::loadVar);
-    map.put(OperationCode.Return, this::_return);
+    map.put(OperationCode.Return, this::toReturn);
     map.put(OperationCode.Add, this::add);
     map.put(OperationCode.Sub, this::sub);
     map.put(OperationCode.Mul, this::mul);
@@ -145,7 +145,19 @@ public class MachineInstance {
     map.put(OperationCode.LessOrEqual, this::lessOrEqual);
     map.put(OperationCode.Equals, this::toEquals);
     map.put(OperationCode.NotEqual, this::notEqual);
+
+
+    map.put(OperationCode.MakeRawValue, this::makeRawValue);
+    map.put(OperationCode.CallFunc, this::callFunc);
+
+
     return map;
+  }
+
+  private void makeRawValue(int argument) {
+    var value = operationStack.pop().getRawValue();
+    operationStack.push(value);
+    nextInstruction();
   }
 
   private void notEqual(int notEqual) {
@@ -280,6 +292,16 @@ public class MachineInstance {
   }
 
   private void callProc(int argument) {
+    methodCall(argument, false);
+    currentFrame.setDiscardReturnValue(false);
+  }
+
+  private void callFunc(int argument) {
+    var discarding = methodCall(argument, true);
+    currentFrame.setDiscardReturnValue(discarding);
+  }
+
+  private boolean methodCall(int argument, boolean isFunction) {
     var address = currentImage.getMethodRefs().get(argument);
     if (address.getContextId() == scopes.size() - 1) {
 
@@ -289,14 +311,27 @@ public class MachineInstance {
       // FIXME: под общую гребенку: хранить в sdo сколько методов из модели, сколько из кода
       var methodDescriptor = currentImage.getMethods().get(address.getSymbolId());
 
+      int argumentCount = (int) operationStack.pop().asNumber();
+      var argumentValues = new Value[argumentCount];
+      for (var index = argumentCount - 1; index >= 0; index--) {
+        var value = operationStack.pop();
+        argumentValues[index] = value;
+      }
+
       var frame = new ExecutionFrame();
       frame.setImage(currentImage);
       frame.setModuleLoadIndex(scopes.size() - 1);
       frame.setModuleScope(scopes.get(frame.getModuleLoadIndex()));
       frame.setMethodName(methodDescriptor.getSignature().getName());
+
       // здесь нужно учесть значения по умолчанию и т.п.
       var variables = createVariables(methodDescriptor.getVariables());
       frame.setLocalVariables(variables);
+      for (var position = 0; position < methodDescriptor.getSignature().getParameters().length; position++) {
+        var variable = variables[position];
+        variable.setValue(argumentValues[position]);
+      }
+
       frame.setInstructionPointer(methodDescriptor.getEntry());
       pushFrame(frame);
     } else {
@@ -314,8 +349,10 @@ public class MachineInstance {
       callContext(scope.getInstance(), address.getSymbolId(), method, argumentValues);
       nextInstruction();
     }
-//    nextInstruction();
+    // FIXME: учесть, что функция может быть вызвана не в присваивании
+    return !isFunction;
   }
+
 
   private void pushFrame(ExecutionFrame frame) {
     callStack.push(frame);
@@ -372,10 +409,13 @@ public class MachineInstance {
     drivenObject.callMethodScript(methodId, arguments);
   }
 
-  private void _return(int argument) {
+  private void toReturn(int argument) {
+
+    if (currentFrame.isDiscardReturnValue()) {
+      operationStack.pop();
+    }
 
     popFrame();
-
   }
 
   private void popFrame() {
