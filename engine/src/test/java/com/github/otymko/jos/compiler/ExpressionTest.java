@@ -1,4 +1,4 @@
-package com.github.otymko.jos.compiler.expression;
+package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.compiler.ScriptCompiler;

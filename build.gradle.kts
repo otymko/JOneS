@@ -3,6 +3,7 @@ import java.net.URI
 plugins {
     `java-library`
     id("io.freefair.lombok") version "6.0.0-m2"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 allprojects {
@@ -17,6 +18,7 @@ allprojects {
 
 subprojects {
     apply(plugin = "java-library")
+    apply(plugin = "com.github.johnrengelman.shadow")
 
     dependencies {
         // https://github.com/1c-syntax/bsl-parser
@@ -43,8 +45,6 @@ subprojects {
 
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
-        options.compilerArgs.add("-Xlint:unchecked")
-        options.compilerArgs.add("-Xlint:deprecation")
     }
 
     val test by tasks.getting(Test::class) {
