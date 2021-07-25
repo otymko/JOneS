@@ -1,7 +1,7 @@
 package com.github.otymko.jos.runtime.machine;
 
 import com.github.otymko.jos.runtime.Variable;
-import com.github.otymko.jos.runtime.context.RuntimeContextInstance;
+import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import lombok.Value;
 
@@ -10,7 +10,7 @@ import lombok.Value;
  */
 @Value
 public class Scope {
-  RuntimeContextInstance instance;
+  RuntimeContext instance;
   Variable[] variables;
   MethodInfo[] methods;
 }

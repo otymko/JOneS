@@ -1,17 +1,18 @@
-package com.github.otymko.jos.runtime.type;
+package com.github.otymko.jos.runtime.context.type;
 
-import com.github.otymko.jos.runtime.type.primitive.BooleanValue;
-import com.github.otymko.jos.runtime.type.primitive.DateValue;
-import com.github.otymko.jos.runtime.type.primitive.NullValue;
-import com.github.otymko.jos.runtime.type.primitive.NumberValue;
-import com.github.otymko.jos.runtime.type.primitive.StringValue;
+import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
+import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
+import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
+import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
+import com.github.otymko.jos.runtime.context.type.primitive.StringValue;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ValueParser {
 
-  public BaseValue parse(String view, DataType dataType) {
-    BaseValue result;
+  public IValue parse(String view, DataType dataType) {
+    IValue result;
     switch (dataType) {
       case BOOLEAN:
         result = BooleanValue.parse(view);

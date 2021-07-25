@@ -1,8 +1,8 @@
 package com.github.otymko.jos.runtime;
 
-import com.github.otymko.jos.runtime.type.BaseValue;
-import com.github.otymko.jos.runtime.type.DataType;
-import com.github.otymko.jos.runtime.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import lombok.experimental.UtilityClass;
 
 import java.util.Date;
@@ -10,7 +10,7 @@ import java.util.Date;
 @UtilityClass
 public class Arithmetic {
 
-  public BaseValue add(BaseValue one, BaseValue two) {
+  public IValue add(IValue one, IValue two) {
     if (one.getDataType() == DataType.TYPE) {
       return ValueFactory.create(one.asString() + two.asString());
     }
@@ -22,7 +22,7 @@ public class Arithmetic {
     return ValueFactory.create(one.asNumber() + two.asNumber());
   }
 
-  public BaseValue sub(BaseValue one, BaseValue two) {
+  public IValue sub(IValue one, IValue two) {
     if (one.getDataType() == DataType.NUMBER) {
       return ValueFactory.create(one.asNumber() - two.asNumber());
     }
@@ -40,11 +40,11 @@ public class Arithmetic {
     return ValueFactory.create(one.asNumber() - two.asNumber());
   }
 
-  public BaseValue mul(BaseValue one, BaseValue two) {
+  public IValue mul(IValue one, IValue two) {
     return ValueFactory.create(one.asNumber() * two.asNumber());
   }
 
-  public BaseValue div(BaseValue one, BaseValue two) {
+  public IValue div(IValue one, IValue two) {
     if (two.asNumber() == 0) {
       // TODO
       throw new RuntimeException("деление на 0");

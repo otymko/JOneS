@@ -1,11 +1,11 @@
 package com.github.otymko.jos.compiler;
 
-import com.github.otymko.jos.runtime.type.BaseValue;
+import com.github.otymko.jos.runtime.context.IValue;
 import lombok.Value;
 
 @Value
 public class ConstantDefinition {
-  BaseValue value;
+  IValue value;
 
   public String toString() {
     return String.format("%s:%s", value.getDataType(), value.asString());

@@ -1,6 +1,6 @@
 package com.github.otymko.jos.context.value;
 
-import com.github.otymko.jos.runtime.type.primitive.NumberValue;
+import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

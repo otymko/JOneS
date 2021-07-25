@@ -9,7 +9,7 @@ import com.github.otymko.jos.runtime.machine.OperationCode;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
-import com.github.otymko.jos.runtime.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -293,6 +293,9 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     if (complexIdentifierContext.globalMethodCall() != null) {
       processGlobalStatement(complexIdentifierContext.globalMethodCall());
       return;
+    } else if (complexIdentifierContext.newExpression() != null) {
+      processNewExpression(complexIdentifierContext.newExpression());
+      return;
     }
 
     // FIXME: мракобесие
@@ -309,6 +312,19 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
       imageCache.getVariableRefs().add(address);
       addCommand(OperationCode.PushVar, imageCache.getVariableRefs().indexOf(address));
     }
+  }
+
+  private void processNewExpression(BSLParser.NewExpressionContext newExpressionContext) {
+    // TODO: хранить в отдельной стопке, не в контантах?
+    var typeName = newExpressionContext.typeName().getText();
+    var constant = new ConstantDefinition(ValueFactory.create(typeName));
+    imageCache.getConstants().add(constant);
+    addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
+
+    // TODO:
+    var argumentCount = 0;
+
+    addCommand(OperationCode.NewInstance, argumentCount);
   }
 
   private void processConstValue(BSLParser.ConstValueContext constValue) {

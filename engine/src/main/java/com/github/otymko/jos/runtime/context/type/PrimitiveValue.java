@@ -1,12 +1,14 @@
-package com.github.otymko.jos.runtime.type;
+package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.runtime.context.ContextType;
+import com.github.otymko.jos.runtime.context.IValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
 
-public abstract class BaseValue implements Comparable<BaseValue> {
+public class PrimitiveValue implements IValue, ContextType, Comparable<IValue> {
   @Getter
   @Setter(AccessLevel.PROTECTED)
   private DataType dataType;
@@ -29,7 +31,7 @@ public abstract class BaseValue implements Comparable<BaseValue> {
 
   // TODO: asObject
 
-  public BaseValue getRawValue() {
+  public IValue getRawValue() {
     return this;
   }
 
@@ -39,11 +41,12 @@ public abstract class BaseValue implements Comparable<BaseValue> {
   }
 
   @Override
-  public int compareTo(BaseValue o) {
+  public int compareTo(IValue o) {
     throw new RuntimeException("Not supported");
   }
 
-  public static BaseValue parse(String view) {
+  public static IValue parse(String view) {
     throw new RuntimeException("Not supported");
   }
+
 }

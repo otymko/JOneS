@@ -3,11 +3,11 @@ package com.github.otymko.jos.hosting;
 import com.github.otymko.jos.compiler.ScriptCompiler;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
-import com.github.otymko.jos.runtime.context.ScriptDrivenObject;
-import com.github.otymko.jos.runtime.context.UserScriptContext;
+import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
+import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.machine.MachineInstance;
-import com.github.otymko.jos.runtime.type.StandardTypeInitializer;
-import com.github.otymko.jos.runtime.type.TypeManager;
+import com.github.otymko.jos.runtime.context.type.StandardTypeInitializer;
+import com.github.otymko.jos.runtime.context.type.TypeManager;
 import lombok.Getter;
 
 import java.nio.file.Path;
@@ -20,7 +20,7 @@ public class ScriptEngine {
 
   public ScriptEngine() {
     typeManager = new TypeManager();
-    machine = new MachineInstance();
+    machine = new MachineInstance(this);
     // RuntimeEnvironment
     // SystemGlobalContext
     // CreateProcess

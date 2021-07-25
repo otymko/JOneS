@@ -1,8 +1,9 @@
-package com.github.otymko.jos.runtime.type.primitive;
+package com.github.otymko.jos.runtime.context.type.primitive;
 
-import com.github.otymko.jos.runtime.type.BaseValue;
-import com.github.otymko.jos.runtime.type.DataType;
-import com.github.otymko.jos.runtime.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -10,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.function.Predicate;
 
-public class DateValue extends BaseValue {
+public class DateValue extends PrimitiveValue {
   private static final Predicate<String> IS_EMPTY_DATE = view -> view.equals("00000000") || view.equals("000000000000")
     || view.equals("00000000000000");
   private static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -33,15 +34,15 @@ public class DateValue extends BaseValue {
   }
 
   @Override
-  public int compareTo(BaseValue object) {
+  public int compareTo(IValue object) {
     if (object.getDataType() == DataType.DATE) {
       return value.compareTo(object.asDate());
     }
     return super.compareTo(object);
   }
 
-  public static BaseValue parse(String view) {
-    BaseValue result;
+  public static IValue parse(String view) {
+    IValue result;
     String format;
     if (view.length() == 14) {
       format = "yyyyMMddHHmmss";
@@ -72,10 +73,10 @@ public class DateValue extends BaseValue {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof BaseValue)) {
+    if (!(obj instanceof IValue)) {
       return false;
     }
-    var baseValue = (BaseValue) obj;
+    var baseValue = (IValue) obj;
     return baseValue.getDataType() == DataType.DATE && value.equals(baseValue.asDate());
   }
 

@@ -1,7 +1,7 @@
 package com.github.otymko.jos.context.value;
 
-import com.github.otymko.jos.runtime.type.ValueFactory;
-import com.github.otymko.jos.runtime.type.primitive.NullValue;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

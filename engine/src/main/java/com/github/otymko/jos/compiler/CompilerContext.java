@@ -1,7 +1,7 @@
 package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.runtime.context.ContextInitializer;
-import com.github.otymko.jos.runtime.context.RuntimeContextInstance;
+import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Getter;
 
@@ -22,7 +22,7 @@ public class CompilerContext {
     scopeIndexOffset = 0;
   }
 
-  public void implementContext(Class<? extends RuntimeContextInstance> targetClass) {
+  public void implementContext(Class<? extends RuntimeContext> targetClass) {
     var methods = ContextInitializer.getContextMethods(targetClass);
     var scope = new SymbolScope();
     var index = 0;

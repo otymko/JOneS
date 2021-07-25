@@ -2,7 +2,7 @@ package com.github.otymko.jos;
 
 import com.github.otymko.jos.compiler.ScriptCompiler;
 import com.github.otymko.jos.hosting.ScriptEngine;
-import com.github.otymko.jos.runtime.context.UserScriptContext;
+import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -48,6 +48,22 @@ class ScriptEngineTest {
   @Test
   void testFunction() throws Exception {
     check(Path.of("src/test/resources/function.os"), "130");
+  }
+
+  @Test
+  void testSimpleInstanceType() throws Exception {
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    var moduleImage = compiler.compile("МойМассив = Новый Массив;", UserScriptContext.class);
+    engine.newObject(moduleImage);
+  }
+
+  @Test
+  void testSimpleCall() throws Exception {
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    var moduleImage = compiler.compile("Сообщить(\"Привет, мир!\");", UserScriptContext.class);
+    engine.newObject(moduleImage);
   }
 
   private void check(Path pathToScript, String model) throws Exception {

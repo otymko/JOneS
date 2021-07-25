@@ -1,13 +1,14 @@
-package com.github.otymko.jos.runtime.type.primitive;
+package com.github.otymko.jos.runtime.context.type.primitive;
 
-import com.github.otymko.jos.runtime.type.BaseValue;
-import com.github.otymko.jos.runtime.type.DataType;
-import com.github.otymko.jos.runtime.type.ValueFactory;
-import com.github.otymko.jos.runtime.type.ValueParser;
+import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.ValueParser;
 
 import java.util.Date;
 
-public final class StringValue extends BaseValue {
+public final class StringValue extends PrimitiveValue {
   public static final StringValue EMPTY = new StringValue("");
 
   private final String value;
@@ -32,7 +33,7 @@ public final class StringValue extends BaseValue {
     return value;
   }
 
-  public static BaseValue parse(String view) {
+  public static IValue parse(String view) {
     return ValueFactory.create(view);
   }
 
@@ -53,7 +54,7 @@ public final class StringValue extends BaseValue {
 
 
   @Override
-  public int compareTo(BaseValue other) {
+  public int compareTo(IValue other) {
     if (other.getDataType() == getDataType()) {
       return value.compareTo(other.asString());
     }
@@ -63,10 +64,10 @@ public final class StringValue extends BaseValue {
   // FIXME
   @Override
   public boolean equals(Object object) {
-    if (!(object instanceof BaseValue)) {
+    if (!(object instanceof IValue)) {
       throw new RuntimeException("Not supported");
     }
-    var other = (BaseValue) object;
+    var other = (IValue) object;
     if (other.getDataType() == getDataType()) {
       return other.asString().equals(value);
     }

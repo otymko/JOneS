@@ -1,12 +1,13 @@
-package com.github.otymko.jos.runtime.type.primitive;
+package com.github.otymko.jos.runtime.context.type.primitive;
 
-import com.github.otymko.jos.runtime.type.BaseValue;
-import com.github.otymko.jos.runtime.type.DataType;
-import com.github.otymko.jos.runtime.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 
 import java.util.function.Predicate;
 
-public class BooleanValue extends BaseValue {
+public class BooleanValue extends PrimitiveValue {
   public static final BooleanValue TRUE = new BooleanValue(true);
   public static final BooleanValue FALSE = new BooleanValue(false);
 
@@ -22,8 +23,8 @@ public class BooleanValue extends BaseValue {
     setDataType(DataType.BOOLEAN);
   }
 
-  public static BaseValue parse(String view) {
-    BaseValue result;
+  public static IValue parse(String view) {
+    IValue result;
     if (IS_TRUE.test(view)) {
       result = ValueFactory.create(true);
     } else if (IS_FALSE.test(view)) {
@@ -54,7 +55,7 @@ public class BooleanValue extends BaseValue {
 
   // FIXME
   @Override
-  public int compareTo(BaseValue other) {
+  public int compareTo(IValue other) {
     if (other.getDataType() == DataType.BOOLEAN || other.getDataType() == DataType.NUMBER) {
       return Float.compare(asNumber(), other.asNumber());
     }

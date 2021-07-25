@@ -1,8 +1,9 @@
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.context.global.SystemGlobalContext;
-import com.github.otymko.jos.runtime.context.label.ContextMethod;
 import com.github.otymko.jos.runtime.machine.MachineInstance;
+import com.github.otymko.jos.runtime.machine.info.ConstructorInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import lombok.experimental.UtilityClass;
@@ -18,7 +19,7 @@ public class ContextInitializer {
     machineInstance.implementContext(new SystemGlobalContext());
   }
 
-  public MethodInfo[] getContextMethods(Class<? extends RuntimeContextInstance> targetClass) {
+  public MethodInfo[] getContextMethods(Class<? extends RuntimeContext> targetClass) {
     List<MethodInfo> methods = new ArrayList<>();
     for (var method : targetClass.getMethods()) {
       var contextMethod = method.getAnnotation(ContextMethod.class);
@@ -31,6 +32,21 @@ public class ContextInitializer {
     }
     return methods.toArray(new MethodInfo[0]);
   }
+
+//  public MethodInfo[] getTypeMethods(Class<? extends BaseValue> targetClass) {
+//    // FIXME
+//    List<MethodInfo> methods = new ArrayList<>();
+//    for (var method : targetClass.getMethods()) {
+//      var contextMethod = method.getAnnotation(ContextMethod.class);
+//      if (contextMethod == null) {
+//        continue;
+//      }
+//      var parameters = ContextInitializer.getMethodParameters(method);
+//      var info = new MethodInfo(contextMethod.name(), contextMethod.alias(), false, parameters, method);
+//      methods.add(info);
+//    }
+//    return methods.toArray(new MethodInfo[0]);
+//  }
 
   public ParameterInfo[] getMethodParameters(Method method) {
     var length = method.getParameters().length;
@@ -48,4 +64,20 @@ public class ContextInitializer {
     return parameters;
   }
 
+  public ConstructorInfo[] getConstructors(Class<? extends RuntimeContext> targetClass) {
+    List<ConstructorInfo> constructors = new ArrayList<>();
+    for (var method : targetClass.getMethods()) {
+      var contextMethod = method.getAnnotation(ContextConstructor.class);
+      if (contextMethod == null) {
+        continue;
+      }
+
+      var parameters = getMethodParameters(method);
+      var constructor = new ConstructorInfo(parameters, method);
+      constructors.add(constructor);
+    }
+
+
+    return constructors.toArray(new ConstructorInfo[0]);
+  }
 }

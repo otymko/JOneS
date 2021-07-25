@@ -1,14 +1,17 @@
 package com.github.otymko.jos.runtime.machine;
 
 import com.github.otymko.jos.compiler.MethodDescriptor;
+import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Arithmetic;
-import com.github.otymko.jos.runtime.type.BaseValue;
-import com.github.otymko.jos.runtime.type.ValueFactory;
+import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
-import com.github.otymko.jos.runtime.context.RuntimeContextInstance;
-import com.github.otymko.jos.runtime.context.ScriptDrivenObject;
+import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
+import com.github.otymko.jos.runtime.context.type.TypeFactory;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Getter;
@@ -26,18 +29,24 @@ import java.util.function.Consumer;
 public class MachineInstance {
   private final Map<OperationCode, Consumer<Integer>> commands = createMachineCommands();
 
+  private final ScriptEngine engine;
+
   @Getter
   private final List<Scope> scopes = new ArrayList<>();
 
-  private final Stack<BaseValue> operationStack = new Stack<>();
+  private final Stack<IValue> operationStack = new Stack<>();
 
   private final Stack<ExecutionFrame> callStack = new Stack<>();
   private ExecutionFrame currentFrame;
 
   private ModuleImage currentImage;
 
+  public MachineInstance(ScriptEngine engine) {
+    this.engine = engine;
+  }
 
-  public void implementContext(RuntimeContextInstance context) {
+
+  public void implementContext(RuntimeContext context) {
     var methods = ContextInitializer.getContextMethods(context.getClass());
     // FIXME: this
     var variables = new Variable[0];
@@ -150,8 +159,35 @@ public class MachineInstance {
     map.put(OperationCode.MakeRawValue, this::makeRawValue);
     map.put(OperationCode.CallFunc, this::callFunc);
 
+    map.put(OperationCode.NewInstance, this::newInstance);
 
     return map;
+  }
+
+  private void newInstance(int argument) {
+    var argumentValues = new IValue[argument];
+    // TODO: заполнить аргументы для передачи
+
+    // получим описание типа
+    // определим конструктор
+    // создадим новый экземпляр
+    // закинем в стопку
+
+    var typeName = operationStack.pop().asString();
+    var contextInfoOptional = engine.getTypeManager().getContextInfoByName(typeName);
+    if (contextInfoOptional.isEmpty()) {
+      throw new RuntimeException("Тип не найден");
+    }
+
+    var contextInfo = contextInfoOptional.get();
+    if (contextInfo == ContextInfo.EMPTY) {
+      throw new RuntimeException("Пустой контекст типа");
+    }
+
+    var typeInstance = TypeFactory.callConstructor(contextInfo, argumentValues);
+    operationStack.push(typeInstance);
+
+    nextInstruction();
   }
 
   private void makeRawValue(int argument) {
@@ -312,7 +348,7 @@ public class MachineInstance {
       var methodDescriptor = currentImage.getMethods().get(address.getSymbolId());
 
       int argumentCount = (int) operationStack.pop().asNumber();
-      var argumentValues = new BaseValue[argumentCount];
+      var argumentValues = new IValue[argumentCount];
       for (var index = argumentCount - 1; index >= 0; index--) {
         var value = operationStack.pop();
         argumentValues[index] = value;
@@ -339,7 +375,7 @@ public class MachineInstance {
       var method = scope.getMethods()[address.getSymbolId()];
 
       int argumentCount = (int) operationStack.pop().asNumber();
-      var argumentValues = new BaseValue[argumentCount];
+      var argumentValues = new IValue[argumentCount];
 
       for (var index = argumentCount - 1; index >= 0; index--) {
         var value = operationStack.pop();
@@ -375,13 +411,6 @@ public class MachineInstance {
     var scope = scopes.get(address.getContextId());
     scope.getVariables()[address.getSymbolId()].setValue(operationStack.pop());
     nextInstruction();
-//    Scope scope;
-//    if (address.getContextId() == scopes.size() - 1) {
-//      scope = scopes.get(scopes.size() - 1);
-//    } else {
-//      scope = scopes.get(address.getContextId());
-//    }
-//    operationStack.push(scope.getVariables()[address.getSymbolId()].getValue());
   }
 
   private void pushLoc(int argument) {
@@ -405,8 +434,13 @@ public class MachineInstance {
     currentFrame.setInstructionPointer(currentFrame.getInstructionPointer() + 1);
   }
 
-  private void callContext(RuntimeContextInstance drivenObject, int methodId, MethodInfo methodInfo, BaseValue[] arguments) {
-    drivenObject.callMethodScript(methodId, arguments);
+  private void callContext(RuntimeContext drivenObject, int methodId, MethodInfo methodInfo, IValue[] arguments) {
+    if (methodInfo.isFunction()) {
+      var result = drivenObject.callAsFunction(methodId, arguments);
+      // FIXME: поставить значение на стек, если нужно?
+    } else {
+      drivenObject.callAsProcedure(methodId, arguments);
+    }
   }
 
   private void toReturn(int argument) {

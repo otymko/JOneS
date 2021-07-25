@@ -1,4 +1,4 @@
-package com.github.otymko.jos.runtime.type;
+package com.github.otymko.jos.runtime.context.type;
 
 public enum DataType {
   UNDEFINED,
