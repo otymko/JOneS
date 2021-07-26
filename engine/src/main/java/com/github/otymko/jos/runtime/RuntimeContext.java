@@ -1,7 +1,8 @@
 package com.github.otymko.jos.runtime;
 
-import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -30,5 +31,21 @@ public interface RuntimeContext {
     }
     return (IValue) result;
   }
+
+  default int findMethodId(String name) {
+    var contextInfo = getContextInfo();
+    for (var index = 0; index < contextInfo.getMethods().length; index++) {
+      var method = contextInfo.getMethods()[index];
+      if (method.getName().equalsIgnoreCase(name)) {
+        return index;
+      }
+    }
+    return -1;
+  }
+
+  default MethodInfo getMethodById(int methodId) {
+    return getContextInfo().getMethods()[methodId];
+  }
+
 
 }

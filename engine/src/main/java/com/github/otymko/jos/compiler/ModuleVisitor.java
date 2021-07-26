@@ -4,12 +4,12 @@ import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github._1c_syntax.bsl.parser.BSLParserBaseVisitor;
 import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
 import com.github.otymko.jos.module.ModuleImageCache;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.OperationCode;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
-import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -239,8 +239,44 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
       processParamList(paramList);
       addCommand(OperationCode.ArgNum, calcParams(paramList));
       processMethodCall(callStatement.globalMethodCall().methodName(), false);
+    } else if (callStatement.accessCall() != null) {
+      var identifier = callStatement.IDENTIFIER().getText();
+      processIdentifier(identifier);
+      processAccessCall(callStatement.accessCall(), false);
     } else {
       throw new RuntimeException("Не реализовано");
+    }
+  }
+
+  private void processAccessCall(BSLParser.AccessCallContext accessCallContext, boolean ifFunction) {
+    var paramList = accessCallContext.methodCall().doCall().callParamList();
+    processParamList(paramList);
+    addCommand(OperationCode.ArgNum, calcParams(paramList));
+
+    var constant = new ConstantDefinition(ValueFactory.create(accessCallContext.methodCall().methodName().getText()));
+    imageCache.getConstants().add(constant);
+    var index = imageCache.getConstants().indexOf(constant);
+
+    if (ifFunction) {
+      addCommand(OperationCode.ResolveMethodFunc, index);
+    } else {
+      addCommand(OperationCode.ResolveMethodProc, index);
+    }
+  }
+
+  private void processIdentifier(String identifier) {
+    // FIXME: мракобесие
+    var address = compiler.findVariableInContext(identifier);
+    if (address == null) {
+      // fixme:
+      throw new RuntimeException("var not found: " + identifier);
+    }
+
+    if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
+      addCommand(OperationCode.PushLoc, address.getSymbolId());
+    } else {
+      imageCache.getVariableRefs().add(address);
+      addCommand(OperationCode.PushVar, imageCache.getVariableRefs().indexOf(address));
     }
   }
 
@@ -298,20 +334,26 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
       return;
     }
 
-    // FIXME: мракобесие
-    var identifier = complexIdentifierContext.getText();
-    var address = compiler.findVariableInContext(identifier);
-    if (address == null) {
-      // fixme:
-      throw new RuntimeException("var not found: " + identifier);
+    processIdentifier(complexIdentifierContext.IDENTIFIER().getText());
+
+    // проверим, что идет дальше
+    if (complexIdentifierContext.modifier() != null) {
+      for (var modifier : complexIdentifierContext.modifier()) {
+
+        if (modifier.accessCall() != null) {
+          processAccessCall(modifier.accessCall(), true);
+        } else if (modifier.accessProperty() != null) {
+          throw new RuntimeException("accessProperty");
+        } else if (modifier.accessIndex() != null) {
+          processExpression(modifier.accessIndex().expression(), new ArrayDeque<>());
+          addCommand(OperationCode.PushIndexed, 0);
+        } else {
+          throw new RuntimeException("Обработка modifier не поддерживается");
+        }
+
+      }
     }
 
-    if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
-      addCommand(OperationCode.PushLoc, address.getSymbolId());
-    } else {
-      imageCache.getVariableRefs().add(address);
-      addCommand(OperationCode.PushVar, imageCache.getVariableRefs().indexOf(address));
-    }
   }
 
   private void processNewExpression(BSLParser.NewExpressionContext newExpressionContext) {

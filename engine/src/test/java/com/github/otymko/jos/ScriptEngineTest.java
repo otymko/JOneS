@@ -52,10 +52,8 @@ class ScriptEngineTest {
 
   @Test
   void testSimpleInstanceType() throws Exception {
-    var engine = new ScriptEngine();
-    var compiler = new ScriptCompiler(engine);
-    var moduleImage = compiler.compile("МойМассив = Новый Массив;", UserScriptContext.class);
-    engine.newObject(moduleImage);
+    var pathToScript = Path.of("src/test/resources/array.os");
+    check(pathToScript, "101");
   }
 
   @Test

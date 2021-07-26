@@ -8,6 +8,7 @@ import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.type.TypeFactory;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
@@ -161,7 +162,64 @@ public class MachineInstance {
 
     map.put(OperationCode.NewInstance, this::newInstance);
 
+    map.put(OperationCode.ResolveMethodProc, this::resolveMethodProc);
+    map.put(OperationCode.ResolveMethodFunc, this::resolveMethodFunc);
+
+    map.put(OperationCode.PushIndexed, this::pushIndexed);
+
     return map;
+  }
+
+  private void pushIndexed(int argument) {
+    var index = operationStack.pop();
+    var context = operationStack.pop();
+
+    if (!(context instanceof IndexAccessor)) {
+      throw new RuntimeException("Индексный доступ не доступен");
+    }
+
+    var indexAccessor = (IndexAccessor) context;
+    var valueRef = indexAccessor.get((int) index.asNumber());
+    operationStack.push(valueRef);
+    nextInstruction();
+
+  }
+
+  private void resolveMethodCall(int argument) {
+    int argumentCount = (int) operationStack.pop().asNumber();
+    var argumentValues = new IValue[argumentCount];
+
+    for (var index = argumentCount - 1; index >= 0; index--) {
+      var value = operationStack.pop();
+      argumentValues[index] = value;
+    }
+
+    var instance = (operationStack.pop());
+    if (!(instance instanceof RuntimeContext)) {
+      throw new RuntimeException("Это не contextType");
+    }
+
+    var context = (RuntimeContext) instance;
+
+    var methodName = currentImage.getConstants().get(argument).getValue().asString();
+    var methodId = context.findMethodId(methodName);
+    var methodInfo = context.getMethodById(methodId);
+
+    callContext(context, methodId, methodInfo, argumentValues);
+
+    nextInstruction();
+  }
+
+  private void resolveMethodFunc(int argument) {
+
+    resolveMethodCall(argument);
+
+  }
+
+  private void resolveMethodProc(int argument) {
+
+    resolveMethodCall(argument);
+
   }
 
   private void newInstance(int argument) {
@@ -437,7 +495,7 @@ public class MachineInstance {
   private void callContext(RuntimeContext drivenObject, int methodId, MethodInfo methodInfo, IValue[] arguments) {
     if (methodInfo.isFunction()) {
       var result = drivenObject.callAsFunction(methodId, arguments);
-      // FIXME: поставить значение на стек, если нужно?
+      operationStack.push(result);
     } else {
       drivenObject.callAsProcedure(methodId, arguments);
     }

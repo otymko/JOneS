@@ -27,26 +27,13 @@ public class ContextInitializer {
         continue;
       }
       var parameters = getMethodParameters(method);
-      var info = new MethodInfo(contextMethod.name(), contextMethod.alias(), false, parameters, method);
+      var info = new MethodInfo(contextMethod.name(), contextMethod.alias(),
+        method.getReturnType() != void.class, parameters, method);
+
       methods.add(info);
     }
     return methods.toArray(new MethodInfo[0]);
   }
-
-//  public MethodInfo[] getTypeMethods(Class<? extends BaseValue> targetClass) {
-//    // FIXME
-//    List<MethodInfo> methods = new ArrayList<>();
-//    for (var method : targetClass.getMethods()) {
-//      var contextMethod = method.getAnnotation(ContextMethod.class);
-//      if (contextMethod == null) {
-//        continue;
-//      }
-//      var parameters = ContextInitializer.getMethodParameters(method);
-//      var info = new MethodInfo(contextMethod.name(), contextMethod.alias(), false, parameters, method);
-//      methods.add(info);
-//    }
-//    return methods.toArray(new MethodInfo[0]);
-//  }
 
   public ParameterInfo[] getMethodParameters(Method method) {
     var length = method.getParameters().length;
