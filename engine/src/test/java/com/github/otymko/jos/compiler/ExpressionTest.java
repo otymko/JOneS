@@ -54,9 +54,21 @@ public class ExpressionTest {
     checkEvalExpression("10 <> 9", "Да");
   }
 
+  @Test
+  void test0() throws Exception {
+    var code =
+      "Значение = 1;\n" +
+      "Сообщить(\"Число \" + Значение);";
+    check(code, "\"Число \"1");
+  }
+
   private void checkEvalExpression(String data, String model) throws Exception {
     var code = String.format(TEMPLATE, data);
-    var out = getAttachedOut();
+    check(code, model);
+  }
+
+  private void check(String code, String model) throws Exception {
+    final ByteArrayOutputStream out = getAttachedOut();
     var engine = new ScriptEngine();
     var compiler = new ScriptCompiler(engine);
     var moduleImage = compiler.compile(code, UserScriptContext.class);

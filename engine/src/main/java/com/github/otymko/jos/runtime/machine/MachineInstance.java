@@ -306,7 +306,7 @@ public class MachineInstance {
   private void add(int argument) {
     var valueOne = operationStack.pop();
     var valueTwo = operationStack.pop();
-    operationStack.push(Arithmetic.add(valueOne, valueTwo));
+    operationStack.push(Arithmetic.add(valueTwo, valueOne));
     nextInstruction();
   }
 
@@ -320,7 +320,7 @@ public class MachineInstance {
   private void mul(int argument) {
     var valueOne = operationStack.pop();
     var valueTwo = operationStack.pop();
-    operationStack.push(Arithmetic.mul(valueOne, valueTwo));
+    operationStack.push(Arithmetic.mul(valueTwo, valueOne));
     nextInstruction();
   }
 

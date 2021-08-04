@@ -11,7 +11,7 @@ import java.util.Date;
 public class Arithmetic {
 
   public IValue add(IValue one, IValue two) {
-    if (one.getDataType() == DataType.TYPE) {
+    if (one.getDataType() == DataType.STRING) {
       return ValueFactory.create(one.asString() + two.asString());
     }
     if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.NUMBER) {
