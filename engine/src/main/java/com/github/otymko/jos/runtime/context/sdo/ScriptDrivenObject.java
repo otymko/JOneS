@@ -31,6 +31,19 @@ public abstract class ScriptDrivenObject extends ContextValue {
 //    throw new RuntimeException("Не реализовано");
 //  }
 
+  public int getScriptMethod(String name) {
+    for (var index = 0; index < moduleImage.getMethods().size(); index++) {
+      var methodDescription = moduleImage.getMethods().get(index);
+      if (methodDescription.getSignature().getName().equalsIgnoreCase(name)) {
+        return index;
+      }
+    }
+    return -1;
+  }
+
+  public IValue callScriptMethod(ScriptEngine engine, int methodId, IValue[] parameters) {
+    return engine.getMachine().executeMethod(this, methodId, parameters);
+  }
 
   @Override
   public int compareTo(IValue o) {

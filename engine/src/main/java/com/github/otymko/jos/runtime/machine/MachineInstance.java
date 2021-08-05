@@ -46,7 +46,6 @@ public class MachineInstance {
     this.engine = engine;
   }
 
-
   public void implementContext(RuntimeContext context) {
     var methods = ContextInitializer.getContextMethods(context.getClass());
     // FIXME: this
@@ -59,6 +58,32 @@ public class MachineInstance {
     currentImage = sdo.getModuleImage();
     createModuleScope(sdo);
     executeModuleBody(currentImage);
+  }
+
+  public IValue executeMethod(ScriptDrivenObject sdo, int methodId, IValue[] parameters) {
+    // FIXME: нельзя повторно добавлять модульскоуп
+    //createModuleScope(sdo);
+
+    currentImage = sdo.getModuleImage();
+
+    var methodDescriptor = currentImage.getMethods().get(methodId);
+    var frame = prepareFrame(currentImage, methodDescriptor);
+
+    // TODO: подготовить параметры
+    setMethodParameters(frame, methodDescriptor, parameters);
+
+    executeCode();
+
+    IValue methodResult = null;
+    if (methodDescriptor.getSignature().isFunction()) {
+      methodResult = operationStack.pop();
+    }
+
+    if (callStack.size() > 1) {
+      popFrame();
+    }
+
+    return methodResult;
   }
 
   private void createModuleScope(ScriptDrivenObject sdo) {
@@ -98,7 +123,7 @@ public class MachineInstance {
   }
 
   // ???
-  private void prepareFrame(ModuleImage image, MethodDescriptor methodDescriptor) {
+  private ExecutionFrame prepareFrame(ModuleImage image, MethodDescriptor methodDescriptor) {
     var frame = new ExecutionFrame();
     frame.setImage(currentImage);
     frame.setInstructionPointer(methodDescriptor.getEntry());
@@ -109,6 +134,7 @@ public class MachineInstance {
     frame.setModuleScope(scopes.get(frame.getModuleLoadIndex()));
 
     pushFrame(frame);
+    return frame;
   }
 
   private void executeCode() {
@@ -418,13 +444,7 @@ public class MachineInstance {
       frame.setModuleScope(scopes.get(frame.getModuleLoadIndex()));
       frame.setMethodName(methodDescriptor.getSignature().getName());
 
-      // здесь нужно учесть значения по умолчанию и т.п.
-      var variables = createVariables(methodDescriptor.getVariables());
-      frame.setLocalVariables(variables);
-      for (var position = 0; position < methodDescriptor.getSignature().getParameters().length; position++) {
-        var variable = variables[position];
-        variable.setValue(argumentValues[position]);
-      }
+      setMethodParameters(frame, methodDescriptor, argumentValues);
 
       frame.setInstructionPointer(methodDescriptor.getEntry());
       pushFrame(frame);
@@ -445,6 +465,16 @@ public class MachineInstance {
     }
     // FIXME: учесть, что функция может быть вызвана не в присваивании
     return !isFunction;
+  }
+
+  private void setMethodParameters(ExecutionFrame frame, MethodDescriptor methodDescriptor, IValue[] argumentValues) {
+    // здесь нужно учесть значения по умолчанию и т.п.
+    var variables = createVariables(methodDescriptor.getVariables());
+    frame.setLocalVariables(variables);
+    for (var position = 0; position < methodDescriptor.getSignature().getParameters().length; position++) {
+      var variable = variables[position];
+      variable.setValue(argumentValues[position]);
+    }
   }
 
 

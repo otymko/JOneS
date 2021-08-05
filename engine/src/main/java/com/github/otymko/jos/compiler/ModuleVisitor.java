@@ -446,12 +446,9 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     var name = function.funcDeclaration().subName().getText();
     var paramList = function.funcDeclaration().paramList();
     var parameterInfos = buildParameterInfos(paramList);
-    for (var parameterInfo : parameterInfos) {
-      var variableInfo = new VariableInfo(parameterInfo.getName());
-      localScope.getVariables().add(variableInfo);
-      localScope.getVariableNumbers().put(parameterInfo.getName().toUpperCase(Locale.ENGLISH),
-        localScope.getVariables().indexOf(variableInfo));
-    }
+
+    addParametersToCurrentScope(parameterInfos);
+
     var info = new MethodInfo(name, name, true, parameterInfos, null);
     currentMethodDescriptor.setSignature(info);
   }
@@ -461,6 +458,9 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     var name = procedure.procDeclaration().subName().getText();
     var paramList = procedure.procDeclaration().paramList();
     var parameterInfos = buildParameterInfos(paramList);
+
+    addParametersToCurrentScope(parameterInfos);
+
     var info = new MethodInfo(name, name, false, parameterInfos, null);
     currentMethodDescriptor.setSignature(info);
   }
@@ -477,6 +477,15 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
 
   private void fillMethodDescriptorFromScope(MethodDescriptor methodDescriptor, SymbolScope scope) {
     methodDescriptor.getVariables().addAll(scope.getVariables());
+  }
+
+  private void addParametersToCurrentScope(ParameterInfo[] parameterInfos) {
+    for (var parameterInfo : parameterInfos) {
+      var variableInfo = new VariableInfo(parameterInfo.getName());
+      var upperName = parameterInfo.getName().toUpperCase(Locale.ENGLISH);
+      localScope.getVariables().add(variableInfo);
+      localScope.getVariableNumbers().put(upperName, localScope.getVariables().indexOf(variableInfo));
+    }
   }
 
   private int addOperator(ExpressionOperator operator) {
