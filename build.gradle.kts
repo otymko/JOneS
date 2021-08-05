@@ -27,16 +27,16 @@ subprojects {
         implementation("commons-io", "commons-io", "2.8.0")
         implementation("org.apache.commons", "commons-lang3", "3.12.0")
 
-        compileOnly("org.projectlombok:lombok:1.18.18")
-        annotationProcessor("org.projectlombok:lombok:1.18.18")
+        compileOnly("org.projectlombok:lombok:1.18.20")
+        annotationProcessor("org.projectlombok:lombok:1.18.20")
 
-        testCompileOnly("org.projectlombok:lombok:1.18.18")
-        testAnnotationProcessor("org.projectlombok:lombok:1.18.18")
+        testCompileOnly("org.projectlombok:lombok:1.18.20")
+        testAnnotationProcessor("org.projectlombok:lombok:1.18.20")
 
 
         // Use JUnit Jupiter
-        testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+        testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
 
         testImplementation("com.ginsberg:junit5-system-exit:1.1.1")
 
