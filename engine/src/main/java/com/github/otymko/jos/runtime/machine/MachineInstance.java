@@ -198,7 +198,7 @@ public class MachineInstance {
 
   private void pushIndexed(int argument) {
     var index = operationStack.pop();
-    var context = operationStack.pop();
+    var context = breakVariableLink(operationStack.pop()); // ???
 
     if (!(context instanceof IndexAccessor)) {
       throw new RuntimeException("Индексный доступ не доступен");
@@ -217,10 +217,11 @@ public class MachineInstance {
 
     for (var index = argumentCount - 1; index >= 0; index--) {
       var value = operationStack.pop();
+      // если по значению BreakVariableLink
       argumentValues[index] = value;
     }
 
-    var instance = (operationStack.pop());
+    var instance = (operationStack.pop()).getRawValue();
     if (!(instance instanceof RuntimeContext)) {
       throw new RuntimeException("Это не contextType");
     }
@@ -472,9 +473,18 @@ public class MachineInstance {
     var variables = createVariables(methodDescriptor.getVariables());
     frame.setLocalVariables(variables);
     for (var position = 0; position < methodDescriptor.getSignature().getParameters().length; position++) {
-      var variable = variables[position];
-      variable.setValue(argumentValues[position]);
+      IValue value = argumentValues[position];
+      if (value instanceof Variable) {
+        variables[position] = (Variable) value;
+      } else {
+        var variable = variables[position];
+        variable.setValue(argumentValues[position]);
+      }
     }
+  }
+
+  private IValue breakVariableLink(IValue value) {
+    return value.getRawValue();
   }
 
 
@@ -490,19 +500,21 @@ public class MachineInstance {
   }
 
   private void loadLoc(int argument) {
-    currentFrame.getLocalVariables()[argument].setValue(operationStack.pop());
+    var value = breakVariableLink(operationStack.pop());
+    currentFrame.getLocalVariables()[argument].setValue(value);
     nextInstruction();
   }
 
   private void loadVar(int argument) {
     var address = currentImage.getVariableRefs().get(argument);
     var scope = scopes.get(address.getContextId());
-    scope.getVariables()[address.getSymbolId()].setValue(operationStack.pop());
+    var value = breakVariableLink(operationStack.pop());
+    scope.getVariables()[address.getSymbolId()].setValue(value);
     nextInstruction();
   }
 
   private void pushLoc(int argument) {
-    operationStack.push(currentFrame.getLocalVariables()[argument].getValue());
+    operationStack.push(currentFrame.getLocalVariables()[argument]);
     nextInstruction();
   }
 

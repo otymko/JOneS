@@ -64,6 +64,11 @@ class ScriptEngineTest {
     engine.newObject(moduleImage);
   }
 
+  @Test
+  void testTransferVariable() throws Exception {
+    check(Path.of("src/test/resources/use-transfer-variable.os"), "99");
+  }
+
   private void check(Path pathToScript, String model) throws Exception {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     System.setOut(new PrintStream(out));
