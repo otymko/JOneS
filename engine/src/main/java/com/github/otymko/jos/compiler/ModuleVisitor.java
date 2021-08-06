@@ -432,7 +432,14 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
       parameterInfos = new ParameterInfo[paramList.param().size()];
       for (var param : paramList.param()) {
         var parameterName = param.IDENTIFIER().toString();
-        parameterInfos[index] = new ParameterInfo(parameterName);
+
+        var parameterInfo = ParameterInfo.builder()
+          .name(parameterName)
+          .byValue(param.VAL_KEYWORD() != null)
+          .hasDefaultValue(param.defaultValue() != null)
+          .build();
+
+        parameterInfos[index] = parameterInfo;
         index++;
       }
     } else {

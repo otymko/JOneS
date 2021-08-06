@@ -43,8 +43,10 @@ public class ContextInitializer {
     var parameters = new ParameterInfo[length];
     var index = 0;
     for (var parameter : method.getParameters()) {
-      var name = parameter.getName();
-      var parameterInfo = new ParameterInfo(name);
+      var parameterInfo = ParameterInfo.builder()
+        .name(parameter.getName())
+        .build();
+
       parameters[index] = parameterInfo;
       index++;
     }
