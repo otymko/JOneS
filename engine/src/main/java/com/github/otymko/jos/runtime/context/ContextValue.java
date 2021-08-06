@@ -24,7 +24,7 @@ public abstract class ContextValue implements IValue, ContextType, RuntimeContex
 
   @Override
   public String asString() {
-    return getDataType().name();
+    return getContextInfo().getName();
   }
 
   @Override

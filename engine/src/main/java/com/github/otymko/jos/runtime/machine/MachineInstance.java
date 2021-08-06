@@ -63,12 +63,13 @@ public class MachineInstance {
 
   public IValue executeMethod(ScriptDrivenObject sdo, int methodId, IValue[] parameters) {
     // FIXME: нельзя повторно добавлять модульскоуп
-    //createModuleScope(sdo);
+    createModuleScope(sdo);
 
     currentImage = sdo.getModuleImage();
 
     var methodDescriptor = currentImage.getMethods().get(methodId);
     var frame = prepareFrame(currentImage, methodDescriptor);
+    frame.setOneTimeCall(true);
 
     // TODO: подготовить параметры
     setMethodParameters(frame, methodDescriptor, parameters);
@@ -88,6 +89,11 @@ public class MachineInstance {
   }
 
   private void createModuleScope(ScriptDrivenObject sdo) {
+    var lastScope = scopes.get(scopes.size() - 1);
+    if (lastScope.getInstance() == sdo) {
+      return;
+    }
+
     Variable[] variables = createVariables(currentImage.getVariables());
 
     // + из sdo
@@ -565,12 +571,15 @@ public class MachineInstance {
   }
 
   private void toReturn(int argument) {
-
     if (currentFrame.isDiscardReturnValue()) {
       operationStack.pop();
     }
 
-    popFrame();
+    if (currentFrame.isOneTimeCall()) {
+      currentFrame.setInstructionPointer(-1);
+    } else {
+      popFrame();
+    }
   }
 
   private void popFrame() {

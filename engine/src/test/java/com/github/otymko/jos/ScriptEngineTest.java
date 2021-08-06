@@ -2,6 +2,7 @@ package com.github.otymko.jos;
 
 import com.github.otymko.jos.compiler.ScriptCompiler;
 import com.github.otymko.jos.hosting.ScriptEngine;
+import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import org.junit.jupiter.api.Test;
 
@@ -84,6 +85,13 @@ class ScriptEngineTest {
     check(Path.of("src/test/resources/module-var.os"), "44");
   }
 
+  @Test
+  void testScript() throws Exception {
+    var pathToScript = Path.of("src/test/resources/console-script.os");
+    checkWithMethod(pathToScript, "ПроверкаПримитива", "1");
+    checkWithMethod(pathToScript, "ПроверкаОбъекта", "911");
+  }
+
   private void check(Path pathToScript, String model) throws Exception {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     System.setOut(new PrintStream(out));
@@ -91,6 +99,21 @@ class ScriptEngineTest {
     var compiler = new ScriptCompiler(engine);
     var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
     engine.newObject(moduleImage);
+    var result = out.toString().trim();
+    assertThat(result).isEqualTo(model);
+  }
+
+  private void checkWithMethod(Path pathToScript, String methodName, String model) throws Exception {
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(out));
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
+    var sdo = engine.newObject(moduleImage);
+
+    var methodId = sdo.getScriptMethod(methodName);
+    sdo.callScriptMethod(engine, methodId, new IValue[0]);
+
     var result = out.toString().trim();
     assertThat(result).isEqualTo(model);
   }

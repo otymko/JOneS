@@ -16,4 +16,6 @@ public class ExecutionFrame {
   private String methodName;
 
   private boolean discardReturnValue;
+
+  private boolean oneTimeCall;
 }
