@@ -254,7 +254,9 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     addCommand(OperationCode.ArgNum, calcParams(paramList));
 
     var constant = new ConstantDefinition(ValueFactory.create(accessCallContext.methodCall().methodName().getText()));
-    imageCache.getConstants().add(constant);
+    if (!imageCache.getConstants().contains(constant)) {
+      imageCache.getConstants().add(constant);
+    }
     var index = imageCache.getConstants().indexOf(constant);
 
     if (ifFunction) {
@@ -360,7 +362,9 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     // TODO: хранить в отдельной стопке, не в контантах?
     var typeName = newExpressionContext.typeName().getText();
     var constant = new ConstantDefinition(ValueFactory.create(typeName));
-    imageCache.getConstants().add(constant);
+    if (!imageCache.getConstants().contains(constant)) {
+      imageCache.getConstants().add(constant);
+    }
     addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
 
     // TODO:
@@ -371,7 +375,9 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
 
   private void processConstValue(BSLParser.ConstValueContext constValue) {
     var constant = getConstantDefinitionByConstValue(constValue, false);
-    imageCache.getConstants().add(constant);
+    if (!imageCache.getConstants().contains(constant)) {
+      imageCache.getConstants().add(constant);
+    }
     addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
   }
 

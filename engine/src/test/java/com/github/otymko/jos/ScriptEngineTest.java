@@ -86,6 +86,17 @@ class ScriptEngineTest {
   }
 
   @Test
+  void testCheckConstants() throws Exception {
+    var pathToScript = Path.of("src/test/resources/check-constants.os");
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(out));
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
+    assertThat(moduleImage.getConstants()).hasSize(2);
+  }
+
+  @Test
   void testScript() throws Exception {
     var pathToScript = Path.of("src/test/resources/console-script.os");
     checkWithMethod(pathToScript, "ПроверкаПримитива", "1");
