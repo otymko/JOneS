@@ -69,6 +69,11 @@ class ScriptEngineTest {
     check(Path.of("src/test/resources/use-transfer-variable.os"), "99");
   }
 
+  @Test
+  void testTransferVariableByValue() throws Exception {
+    check(Path.of("src/test/resources/byValuePrimitive.os"), "101");
+  }
+
   private void check(Path pathToScript, String model) throws Exception {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     System.setOut(new PrintStream(out));

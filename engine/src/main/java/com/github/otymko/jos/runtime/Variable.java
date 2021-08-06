@@ -54,4 +54,10 @@ public class Variable extends ContextValue {
     return value;
   }
 
+  public static Variable create(IValue value, String name) {
+    var variable = new Variable();
+    variable.setName(name);
+    variable.setValue(value);
+    return variable;
+  }
 }

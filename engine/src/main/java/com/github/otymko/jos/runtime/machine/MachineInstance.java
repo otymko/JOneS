@@ -472,13 +472,33 @@ public class MachineInstance {
     // здесь нужно учесть значения по умолчанию и т.п.
     var variables = createVariables(methodDescriptor.getVariables());
     frame.setLocalVariables(variables);
-    for (var position = 0; position < methodDescriptor.getSignature().getParameters().length; position++) {
-      IValue value = argumentValues[position];
-      if (value instanceof Variable) {
-        variables[position] = (Variable) value;
+    var parameters = methodDescriptor.getSignature().getParameters();
+    for (var position = 0; position < parameters.length; position++) {
+
+      if (position >= argumentValues.length) {
+
+        // TODO: дефолтное значение?
+        throw new RuntimeException("Не реализовано");
+
+      } else if (argumentValues[position] instanceof Variable) {
+
+        if (parameters[position].isByValue()) {
+          variables[position] = Variable.create(argumentValues[position], parameters[position].getName());
+        } else {
+          var value = argumentValues[position];
+          variables[position] = (Variable) value;
+        }
+
+      } else if (argumentValues[position] == null) { // или DataType.NotAValidValue
+
+        // TODO: дефолтное значение?
+        throw new RuntimeException("Не реализовано");
+
       } else {
+
         var variable = variables[position];
         variable.setValue(argumentValues[position]);
+
       }
     }
   }
