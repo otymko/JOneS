@@ -26,7 +26,8 @@ class ModuleVisitorTest {
     assertThat(signature.getParameters()).hasSize(3)
       .anyMatch(info -> info.getName().equals("ПервыйАргумент") && info.isByValue() && !info.hasDefaultValue())
       .anyMatch(info -> info.getName().equals("ВторойАргумент") && !info.isByValue() && !info.hasDefaultValue())
-      .anyMatch(info -> info.getName().equals("ТретийАргумент") && !info.isByValue() && info.hasDefaultValue());
+      .anyMatch(info -> info.getName().equals("ТретийАргумент") && !info.isByValue() && info.hasDefaultValue()
+        && info.getDefaultValueIndex() >= 0);
   }
 
 }

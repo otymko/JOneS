@@ -370,27 +370,9 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
   }
 
   private void processConstValue(BSLParser.ConstValueContext constValue) {
-    if (constValue.string() != null) {
-      var value = constValue.string().getText();
-      var constant = new ConstantDefinition(ValueFactory.create(value));
-      imageCache.getConstants().add(constant);
-      addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
-    } else if (constValue.numeric() != null) {
-      var value = Integer.parseInt(constValue.numeric().getText());
-      var constant = new ConstantDefinition(ValueFactory.create(value));
-      imageCache.getConstants().add(constant);
-      addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
-    } else if (constValue.FALSE() != null) {
-      var constant = new ConstantDefinition(ValueFactory.create(false));
-      imageCache.getConstants().add(constant);
-      addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
-    } else if (constValue.TRUE() != null) {
-      var constant = new ConstantDefinition(ValueFactory.create(true));
-      imageCache.getConstants().add(constant);
-      addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
-    } else {
-      throw new RuntimeException("Constant value not supported");
-    }
+    var constant = getConstantDefinitionByConstValue(constValue, false);
+    imageCache.getConstants().add(constant);
+    addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
   }
 
   private void processSubCodeBlock(BSLParser.CodeBlockContext ctx) {
@@ -433,13 +415,21 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
       for (var param : paramList.param()) {
         var parameterName = param.IDENTIFIER().toString();
 
-        var parameterInfo = ParameterInfo.builder()
+        var builder = ParameterInfo.builder()
           .name(parameterName)
-          .byValue(param.VAL_KEYWORD() != null)
-          .hasDefaultValue(param.defaultValue() != null)
-          .build();
+          .byValue(param.VAL_KEYWORD() != null);
 
-        parameterInfos[index] = parameterInfo;
+        if (param.defaultValue() != null) {
+          var constant = getConstantDefinitionByConstValue(param.defaultValue().constValue(), true);
+          imageCache.getConstants().add(constant);
+          var indexConstant = imageCache.getConstants().indexOf(constant);
+          addCommand(OperationCode.PushConst, indexConstant);
+
+          builder.hasDefaultValue(true);
+          builder.defaultValueIndex(indexConstant);
+        }
+
+        parameterInfos[index] = builder.build();
         index++;
       }
     } else {
@@ -577,6 +567,32 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
 
   private boolean isLogicOperator(ExpressionOperator operator) {
     return operator == ExpressionOperator.OR || operator == ExpressionOperator.AND;
+  }
+
+  private ConstantDefinition getConstantDefinitionByConstValue(BSLParser.ConstValueContext constValue,
+                                                               boolean isDefaultValue) {
+    ConstantDefinition constant;
+    if (constValue.string() != null) {
+      var value = constValue.string().getText();
+      constant = new ConstantDefinition(ValueFactory.create(value));
+    } else if (constValue.numeric() != null) {
+      var value = Integer.parseInt(constValue.numeric().getText());
+      if (isDefaultValue) {
+        if (constValue.MINUS() != null) {
+          value *= -1;
+        }
+      }
+      constant = new ConstantDefinition(ValueFactory.create(value));
+    } else if (constValue.FALSE() != null) {
+      constant = new ConstantDefinition(ValueFactory.create(false));
+    } else if (constValue.TRUE() != null) {
+      constant = new ConstantDefinition(ValueFactory.create(true));
+    } else if (constValue.UNDEFINED() != null) {
+      constant = new ConstantDefinition(ValueFactory.create());
+    } else {
+      throw new RuntimeException("Constant value not supported");
+    }
+    return constant;
   }
 
 }

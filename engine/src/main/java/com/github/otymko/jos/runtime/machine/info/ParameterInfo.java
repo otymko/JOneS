@@ -19,7 +19,8 @@ public class ParameterInfo {
   @Accessors(fluent = true)
   boolean hasDefaultValue = false;
 
-  // DefaultValueIndex ??
+  @Builder.Default
+  int defaultValueIndex = -1;
 
   // todo: Аннотации ?
 
