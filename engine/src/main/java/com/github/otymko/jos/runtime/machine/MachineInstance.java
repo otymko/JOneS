@@ -14,6 +14,7 @@ import com.github.otymko.jos.runtime.context.type.TypeFactory;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
+import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Getter;
 
@@ -477,8 +478,8 @@ public class MachineInstance {
 
       if (position >= argumentValues.length) {
 
-        // TODO: дефолтное значение?
-        throw new RuntimeException("Не реализовано");
+        var defaultValue = getDefaultArgumentValue(parameters[position]);
+        variables[position] = Variable.create(defaultValue, parameters[position].getName());
 
       } else if (argumentValues[position] instanceof Variable) {
 
@@ -491,8 +492,8 @@ public class MachineInstance {
 
       } else if (argumentValues[position] == null) { // или DataType.NotAValidValue
 
-        // TODO: дефолтное значение?
-        throw new RuntimeException("Не реализовано");
+        var defaultValue = getDefaultArgumentValue(parameters[position]);
+        variables[position] = Variable.create(defaultValue, parameters[position].getName());
 
       } else {
 
@@ -575,6 +576,13 @@ public class MachineInstance {
   private void popFrame() {
     callStack.pop();
     setFrame(callStack.peek());
+  }
+
+  private IValue getDefaultArgumentValue(ParameterInfo parameterInfo) {
+    if (parameterInfo.hasDefaultValue() && parameterInfo.getDefaultValueIndex() >= 0) {
+      return currentImage.getConstants().get(parameterInfo.getDefaultValueIndex()).getValue();
+    }
+    return ValueFactory.create();
   }
 
 }

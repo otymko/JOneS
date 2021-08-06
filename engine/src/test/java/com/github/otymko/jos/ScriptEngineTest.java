@@ -74,6 +74,11 @@ class ScriptEngineTest {
     check(Path.of("src/test/resources/byValuePrimitive.os"), "101");
   }
 
+  @Test
+  void testMethodWithDefaultValue() throws Exception {
+    check(Path.of("src/test/resources/method-default-value.os"), "151");
+  }
+
   private void check(Path pathToScript, String model) throws Exception {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     System.setOut(new PrintStream(out));
