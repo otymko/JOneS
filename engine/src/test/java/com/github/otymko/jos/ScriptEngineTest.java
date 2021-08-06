@@ -79,6 +79,11 @@ class ScriptEngineTest {
     check(Path.of("src/test/resources/method-default-value.os"), "151");
   }
 
+  @Test
+  void testModuleVar() throws Exception {
+    check(Path.of("src/test/resources/module-var.os"), "44");
+  }
+
   private void check(Path pathToScript, String model) throws Exception {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     System.setOut(new PrintStream(out));
