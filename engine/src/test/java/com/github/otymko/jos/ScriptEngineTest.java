@@ -26,7 +26,7 @@ class ScriptEngineTest {
     engine.newObject(moduleImage);
 
     var result = out.toString().trim();
-    var example = "\"Проверка 1\"\r\n\"ПеременнаяБоди\"";
+    var example = "Проверка 1\r\nПеременнаяБоди";
     assertThat(result).isEqualTo(example);
   }
 

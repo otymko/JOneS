@@ -59,7 +59,7 @@ public class ExpressionTest {
     var code =
       "Значение = 1;\n" +
       "Сообщить(\"Число \" + Значение);";
-    check(code, "\"Число \"1");
+    check(code, "Число 1");
   }
 
   private void checkEvalExpression(String data, String model) throws Exception {

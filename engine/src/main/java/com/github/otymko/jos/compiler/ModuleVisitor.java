@@ -10,6 +10,7 @@ import com.github.otymko.jos.runtime.machine.OperationCode;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
+import com.github.otymko.jos.util.StringLineCleaner;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -580,6 +581,7 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
     ConstantDefinition constant;
     if (constValue.string() != null) {
       var value = constValue.string().getText();
+      value = StringLineCleaner.clean(value);
       constant = new ConstantDefinition(ValueFactory.create(value));
     } else if (constValue.numeric() != null) {
       var value = Integer.parseInt(constValue.numeric().getText());
