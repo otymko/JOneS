@@ -106,16 +106,20 @@ public class MachineInstance {
   }
 
   private Scope createModuleScope(ScriptDrivenObject sdo) {
-    Variable[] variables = createVariables(currentImage.getVariables());
+    var image = sdo.getModuleImage();
 
-    // + из sdo
-    MethodInfo[] methods = new MethodInfo[currentImage.getMethods().size()];
-    // FIXME: ???
-    methods = sdo.getContextInfo().getMethods();
-//    var index = 0;
-//    for (var method : currentImage.getMethods()) {
-//      methods[index] = method.getSignature();
-//    }
+    Variable[] variables = createVariables(image.getVariables());
+    var methodSize = image.getMethods().size() + sdo.getContextInfo().getMethods().length;
+    MethodInfo[] methods = new MethodInfo[methodSize];
+    var position = 0;
+    for (var method : sdo.getContextInfo().getMethods()) {
+      methods[position] = method;
+      position++;
+    }
+    for (var method : image.getMethods()) {
+      methods[position] = method.getSignature();
+      position++;
+    }
 
     return new Scope(sdo, variables, methods);
   }
@@ -131,21 +135,6 @@ public class MachineInstance {
       index++;
     }
     return variables;
-  }
-
-  // ???
-  private ExecutionFrame prepareFrame(ModuleImage image, MethodDescriptor methodDescriptor) {
-    var frame = new ExecutionFrame();
-    frame.setImage(currentImage);
-    frame.setInstructionPointer(methodDescriptor.getEntry());
-    var variables = createVariables(methodDescriptor.getVariables());
-    frame.setLocalVariables(variables);
-
-    frame.setModuleLoadIndex(scopes.size() - 1);
-    frame.setModuleScope(scopes.get(frame.getModuleLoadIndex()));
-
-    pushFrame(frame);
-    return frame;
   }
 
   private void executeCode() {
