@@ -45,6 +45,7 @@ public class ScriptEngine {
 
   public ScriptDrivenObject newObject(ModuleImage image) {
     var scriptContext = new UserScriptContext(image); // непонятно как тут хранится состояние
+    getMachine().implementContext(scriptContext);
     initializeScriptObject(scriptContext);
     return scriptContext;
   }

@@ -2,7 +2,6 @@ package com.github.otymko.jos.runtime.machine;
 
 import com.github.otymko.jos.compiler.MethodDescriptor;
 import com.github.otymko.jos.compiler.SymbolAddress;
-import com.github.otymko.jos.compiler.SymbolScope;
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Arithmetic;
@@ -59,8 +58,24 @@ public class MachineInstance {
 
   public void executeModuleBody(ScriptDrivenObject sdo) {
     currentImage = sdo.getModuleImage();
-    createModuleScope(sdo);
-    executeModuleBody(currentImage);
+    if (currentImage.getEntry() >= 0) {
+      var methodDescriptor = currentImage.getMethods().get(currentImage.getEntry());
+      prepareReentrantMethodExecution(sdo, methodDescriptor);
+      executeCode();
+    }
+  }
+
+  private void prepareReentrantMethodExecution(ScriptDrivenObject sdo, MethodDescriptor methodDescriptor) {
+    var image = sdo.getModuleImage();
+    var frame = new ExecutionFrame();
+    frame.setImage(image);
+    frame.setInstructionPointer(methodDescriptor.getEntry());
+    var variables = createVariables(methodDescriptor.getVariables());
+    frame.setLocalVariables(variables);
+    frame.setModuleLoadIndex(scopes.size() - 1);
+    frame.setModuleScope(createModuleScope(sdo));
+
+    pushFrame(frame);
   }
 
   public IValue executeMethod(ScriptDrivenObject sdo, int methodId, IValue[] parameters) {
@@ -70,11 +85,11 @@ public class MachineInstance {
     currentImage = sdo.getModuleImage();
 
     var methodDescriptor = currentImage.getMethods().get(methodId);
-    var frame = prepareFrame(currentImage, methodDescriptor);
-    frame.setOneTimeCall(true);
+    prepareReentrantMethodExecution(sdo, methodDescriptor);
+    currentFrame.setOneTimeCall(true);
 
     // TODO: подготовить параметры
-    setMethodParameters(frame, methodDescriptor, parameters);
+    setMethodParameters(currentFrame, methodDescriptor, parameters);
 
     executeCode();
 
@@ -90,23 +105,19 @@ public class MachineInstance {
     return methodResult;
   }
 
-  private void createModuleScope(ScriptDrivenObject sdo) {
-    var lastScope = scopes.get(scopes.size() - 1);
-    if (lastScope.getInstance() == sdo) {
-      return;
-    }
-
+  private Scope createModuleScope(ScriptDrivenObject sdo) {
     Variable[] variables = createVariables(currentImage.getVariables());
 
     // + из sdo
     MethodInfo[] methods = new MethodInfo[currentImage.getMethods().size()];
-    var index = 0;
-    for (var method : currentImage.getMethods()) {
-      methods[index] = method.getSignature();
-    }
+    // FIXME: ???
+    methods = sdo.getContextInfo().getMethods();
+//    var index = 0;
+//    for (var method : currentImage.getMethods()) {
+//      methods[index] = method.getSignature();
+//    }
 
-    var scope = new Scope(sdo, variables, methods);
-    scopes.add(scope);
+    return new Scope(sdo, variables, methods);
   }
 
   private Variable[] createVariables(List<VariableInfo> variableInfos) {
@@ -120,15 +131,6 @@ public class MachineInstance {
       index++;
     }
     return variables;
-  }
-
-  // ??
-  public void executeModuleBody(ModuleImage image) {
-    if (image.getEntry() >= 0) {
-      var methodDescriptor = image.getMethods().get(image.getEntry());
-      prepareFrame(image, methodDescriptor);
-      executeCode();
-    }
   }
 
   // ???
@@ -329,7 +331,6 @@ public class MachineInstance {
     operationStack.push(newValue);
     nextInstruction();
   }
-
 
   private void less(int argument) {
     var valueOne = operationStack.pop();
