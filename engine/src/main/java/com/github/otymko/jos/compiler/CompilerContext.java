@@ -1,7 +1,7 @@
 package com.github.otymko.jos.compiler;
 
-import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.RuntimeContext;
+import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Getter;
 
@@ -38,15 +38,13 @@ public class CompilerContext {
   public SymbolAddress getMethodByName(String originalName) {
     var name = originalName.toUpperCase(Locale.ENGLISH);
     SymbolAddress address = null;
-    int scopeId = 0;
-    // FIXME: перебор снизу стопки
-    for (var scope : scopes) {
+    for (var scopeId = scopes.size() - 1; scopeId >= 0; scopeId--) {
+      var scope = scopes.get(scopeId);
       if (scope.getMethodNumbers().containsKey(name)) {
         int symbolId = scope.getMethodNumbers().get(name);
         address = new SymbolAddress(symbolId, scopeId + scopeIndexOffset);
         break;
       }
-      scopeId++;
     }
     return address;
   }

@@ -26,4 +26,12 @@ class TestSDO {
     sdo.callScriptMethod(engine, methodId, new IValue[]{ValueFactory.create(42)});
   }
 
+  @Test
+  void testCustomKey() throws Exception {
+    var pathToScript = Path.of("src/test/resources/sdo/custom-key.os");
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    var moduleImage = compiler.compile(pathToScript, TestTwoScriptContext.class);
+    var sdo = engine.newObject(moduleImage, TestTwoScriptContext.class);
+  }
 }

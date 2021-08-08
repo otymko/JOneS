@@ -1,6 +1,8 @@
 package com.github.otymko.jos.runtime.machine;
 
 import com.github.otymko.jos.compiler.MethodDescriptor;
+import com.github.otymko.jos.compiler.SymbolAddress;
+import com.github.otymko.jos.compiler.SymbolScope;
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Arithmetic;
@@ -432,44 +434,17 @@ public class MachineInstance {
   private boolean methodCall(int argument, boolean isFunction) {
     var address = currentImage.getMethodRefs().get(argument);
     if (address.getContextId() == scopes.size() - 1) {
-
-      // уход из зацикливания
-      nextInstruction();
-
-      // FIXME: под общую гребенку: хранить в sdo сколько методов из модели, сколько из кода
-      var methodDescriptor = currentImage.getMethods().get(address.getSymbolId());
-
-      int argumentCount = (int) operationStack.pop().asNumber();
-      var argumentValues = new IValue[argumentCount];
-      for (var index = argumentCount - 1; index >= 0; index--) {
-        var value = operationStack.pop();
-        argumentValues[index] = value;
+      var scope = scopes.get(scopes.size() - 1);
+      var sdo = (ScriptDrivenObject) scope.getInstance();
+      var lengthSdoMethod = sdo.getContextInfo().getMethods().length;
+      if (address.getSymbolId() <= lengthSdoMethod - 1) {
+        methodSdoCall(scope, address);
+      } else {
+        methodScriptCall(address, lengthSdoMethod);
       }
-
-      var frame = new ExecutionFrame();
-      frame.setImage(currentImage);
-      frame.setModuleLoadIndex(scopes.size() - 1);
-      frame.setModuleScope(scopes.get(frame.getModuleLoadIndex()));
-      frame.setMethodName(methodDescriptor.getSignature().getName());
-
-      setMethodParameters(frame, methodDescriptor, argumentValues);
-
-      frame.setInstructionPointer(methodDescriptor.getEntry());
-      pushFrame(frame);
     } else {
       var scope = getScopes().get(address.getContextId());
-      var method = scope.getMethods()[address.getSymbolId()];
-
-      int argumentCount = (int) operationStack.pop().asNumber();
-      var argumentValues = new IValue[argumentCount];
-
-      for (var index = argumentCount - 1; index >= 0; index--) {
-        var value = operationStack.pop();
-        argumentValues[index] = value;
-      }
-
-      callContext(scope.getInstance(), address.getSymbolId(), method, argumentValues);
-      nextInstruction();
+      methodSdoCall(scope, address);
     }
     // FIXME: учесть, что функция может быть вызвана не в присваивании
     return !isFunction;
@@ -592,6 +567,44 @@ public class MachineInstance {
       return currentImage.getConstants().get(parameterInfo.getDefaultValueIndex()).getValue();
     }
     return ValueFactory.create();
+  }
+
+  private void methodSdoCall(Scope scope, SymbolAddress address) {
+    var method = scope.getMethods()[address.getSymbolId()];
+    int argumentCount = (int) operationStack.pop().asNumber();
+    var argumentValues = new IValue[argumentCount];
+    for (var index = argumentCount - 1; index >= 0; index--) {
+      var value = operationStack.pop();
+      argumentValues[index] = value;
+    }
+    callContext(scope.getInstance(), address.getSymbolId(), method, argumentValues);
+    nextInstruction();
+  }
+
+  private void methodScriptCall(SymbolAddress address, int methodIndexOffset) {
+    // уход из зацикливания
+    nextInstruction();
+
+    // FIXME: под общую гребенку: хранить в sdo сколько методов из модели, сколько из кода
+    var methodDescriptor = currentImage.getMethods().get(address.getSymbolId() - methodIndexOffset);
+
+    int argumentCount = (int) operationStack.pop().asNumber();
+    var argumentValues = new IValue[argumentCount];
+    for (var index = argumentCount - 1; index >= 0; index--) {
+      var value = operationStack.pop();
+      argumentValues[index] = value;
+    }
+
+    var frame = new ExecutionFrame();
+    frame.setImage(currentImage);
+    frame.setModuleLoadIndex(scopes.size() - 1);
+    frame.setModuleScope(scopes.get(frame.getModuleLoadIndex()));
+    frame.setMethodName(methodDescriptor.getSignature().getName());
+
+    setMethodParameters(frame, methodDescriptor, argumentValues);
+
+    frame.setInstructionPointer(methodDescriptor.getEntry());
+    pushFrame(frame);
   }
 
 }

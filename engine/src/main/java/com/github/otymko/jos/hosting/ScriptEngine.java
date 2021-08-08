@@ -5,11 +5,12 @@ import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
-import com.github.otymko.jos.runtime.machine.MachineInstance;
 import com.github.otymko.jos.runtime.context.type.StandardTypeInitializer;
 import com.github.otymko.jos.runtime.context.type.TypeManager;
+import com.github.otymko.jos.runtime.machine.MachineInstance;
 import lombok.Getter;
 
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 
 public class ScriptEngine {
@@ -44,6 +45,19 @@ public class ScriptEngine {
 
   public ScriptDrivenObject newObject(ModuleImage image) {
     var scriptContext = new UserScriptContext(image); // непонятно как тут хранится состояние
+    initializeScriptObject(scriptContext);
+    return scriptContext;
+  }
+
+  public ScriptDrivenObject newObject(ModuleImage image, Class<? extends ScriptDrivenObject> targetClass) throws Exception {
+    ScriptDrivenObject scriptContext;
+    try {
+      var constructor = targetClass.getConstructor(ModuleImage.class);
+      scriptContext = constructor.newInstance(image);
+    } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+      throw new Exception("Не удалось создай экземпляр SDO");
+    }
+    getMachine().implementContext(scriptContext);
     initializeScriptObject(scriptContext);
     return scriptContext;
   }
