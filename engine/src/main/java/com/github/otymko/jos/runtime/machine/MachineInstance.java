@@ -13,6 +13,7 @@ import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.type.TypeFactory;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.primitive.TypeValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
@@ -193,7 +194,21 @@ public class MachineInstance {
 
     map.put(OperationCode.PushIndexed, this::pushIndexed);
 
+    // Функции работы с типами
+    map.put(OperationCode.Type, this::callType);
+
     return map;
+  }
+
+  private void callType(int argument) {
+    var typeName = operationStack.pop().asString();
+    var type = engine.getTypeManager().getContextInfoByName(typeName);
+    if (type.isEmpty()) {
+      throw new RuntimeException("Тип не зарегистрирован");
+    }
+    var value = new TypeValue(type.get());
+    operationStack.push(value);
+    nextInstruction();
   }
 
   private void pushIndexed(int argument) {

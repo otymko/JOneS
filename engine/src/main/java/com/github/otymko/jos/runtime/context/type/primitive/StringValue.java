@@ -1,14 +1,19 @@
 package com.github.otymko.jos.runtime.context.type.primitive;
 
+import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.ValueParser;
+import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.Date;
 
+@ContextClass(name = "Строка", alias = "String")
 public final class StringValue extends PrimitiveValue {
+  public static final ContextInfo INFO = ContextInfo.createByClass(StringValue.class);
+
   public static final StringValue EMPTY = new StringValue("");
 
   private final String value;
@@ -78,5 +83,10 @@ public final class StringValue extends PrimitiveValue {
   @Override
   public int hashCode() {
     return super.hashCode();
+  }
+
+  @Override
+  public ContextInfo getContextInfo() {
+    return INFO;
   }
 }

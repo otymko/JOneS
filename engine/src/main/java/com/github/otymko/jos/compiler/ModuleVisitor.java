@@ -286,8 +286,23 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
   private void processGlobalStatement(BSLParser.GlobalMethodCallContext globalMethodCall) {
     var paramList = globalMethodCall.doCall().callParamList();
     processParamList(paramList);
-    addCommand(OperationCode.ArgNum, calcParams(paramList));
-    processMethodCall(globalMethodCall.methodName(), true);
+
+    if (globalMethodCall.methodName().getText().equalsIgnoreCase("Тип")) {
+
+      int paramsCount = calcParams(paramList);
+      if (paramsCount > 1) {
+        throw new RuntimeException("Слишком много фактических параметров");
+      } else if (paramsCount < 1) {
+        throw new RuntimeException("Слишком мало фактических параметров");
+      }
+      addCommand(OperationCode.Type, 1);
+
+    } else {
+
+      addCommand(OperationCode.ArgNum, calcParams(paramList));
+      processMethodCall(globalMethodCall.methodName(), true);
+
+    }
   }
 
   private int calcParams(BSLParser.CallParamListContext callParamListContext) {

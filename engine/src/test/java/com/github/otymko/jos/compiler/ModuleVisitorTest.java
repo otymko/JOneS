@@ -4,6 +4,8 @@ import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +30,17 @@ class ModuleVisitorTest {
       .anyMatch(info -> info.getName().equals("ВторойАргумент") && !info.isByValue() && !info.hasDefaultValue())
       .anyMatch(info -> info.getName().equals("ТретийАргумент") && !info.isByValue() && info.hasDefaultValue()
         && info.getDefaultValueIndex() >= 0);
+  }
+
+  @Test
+  void testCheckConstants() throws Exception {
+    var pathToScript = Path.of("src/test/resources/check-constants.os");
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(out));
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
+    assertThat(moduleImage.getConstants()).hasSize(2);
   }
 
 }

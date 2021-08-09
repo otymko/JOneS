@@ -1,12 +1,15 @@
 package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.runtime.context.ContextType;
 import com.github.otymko.jos.runtime.context.type.collection.ArrayImpl;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
 import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
 import com.github.otymko.jos.runtime.context.type.primitive.StringValue;
+import com.github.otymko.jos.runtime.context.type.primitive.TypeValue;
 import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
+import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -21,23 +24,29 @@ public class StandardTypeInitializer {
     for (var type : DataType.values()) {
 
       if (type == DataType.UNDEFINED) {
-        typeManager.registerType("Неопределено", UndefinedValue.class);
+        implementTypeByInfo(typeManager, UndefinedValue.INFO, UndefinedValue.class);
       } else if (type == DataType.GENERIC_VALUE) {
-        typeManager.registerType("Null", NullValue.class);
+        implementTypeByInfo(typeManager, NullValue.INFO, NullValue.class);
       } else if (type == DataType.BOOLEAN) {
-        typeManager.registerType("Булево", BooleanValue.class);
+        implementTypeByInfo(typeManager, BooleanValue.INFO, BooleanValue.class);
       } else if (type == DataType.STRING) {
-        typeManager.registerType("Строка", StringValue.class);
+        implementTypeByInfo(typeManager, StringValue.INFO, StringValue.class);
       } else if (type == DataType.NUMBER) {
-        typeManager.registerType("Число", NumberValue.class);
+        implementTypeByInfo(typeManager, NumberValue.INFO, NumberValue.class);
       } else if (type == DataType.DATE) {
-        typeManager.registerType("Дата", DateValue.class);
+        implementTypeByInfo(typeManager, DateValue.INFO, DateValue.class);
+      } else if (type == DataType.TYPE) {
+        implementTypeByInfo(typeManager, TypeValue.INFO, TypeValue.class);
       }
-      // type
       // object
       // + алиас?
-
     }
+  }
+
+  private void implementTypeByInfo(TypeManager typeManager, ContextInfo info,
+                                   Class<? extends ContextType> implementClass) {
+    typeManager.registerType(info.getName(), implementClass);
+    typeManager.registerType(info.getAlias(), implementClass);
   }
 
   private void initCollections(TypeManager typeManager) {

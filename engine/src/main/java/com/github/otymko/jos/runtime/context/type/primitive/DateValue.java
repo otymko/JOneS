@@ -1,9 +1,11 @@
 package com.github.otymko.jos.runtime.context.type.primitive;
 
+import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -11,7 +13,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.function.Predicate;
 
+@ContextClass(name = "Дата", alias = "Date")
 public class DateValue extends PrimitiveValue {
+  public static final ContextInfo INFO = ContextInfo.createByClass(DateValue.class);
+
   private static final Predicate<String> IS_EMPTY_DATE = view -> view.equals("00000000") || view.equals("000000000000")
     || view.equals("00000000000000");
   private static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -21,6 +26,11 @@ public class DateValue extends PrimitiveValue {
   public DateValue(Date value) {
     this.value = value;
     setDataType(DataType.DATE);
+  }
+
+  @Override
+  public ContextInfo getContextInfo() {
+    return INFO;
   }
 
   @Override

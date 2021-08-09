@@ -1,13 +1,19 @@
 package com.github.otymko.jos.runtime.context.type.primitive;
 
+import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.collection.ArrayImpl;
+import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.function.Predicate;
 
+@ContextClass(name = "Булево", alias = "Boolean")
 public class BooleanValue extends PrimitiveValue {
+  public static final ContextInfo INFO = ContextInfo.createByClass(BooleanValue.class);
+
   public static final BooleanValue TRUE = new BooleanValue(true);
   public static final BooleanValue FALSE = new BooleanValue(false);
 
@@ -33,6 +39,11 @@ public class BooleanValue extends PrimitiveValue {
       throw new RuntimeException("Преобразование к типу 'Булево' не поддерживается");
     }
     return result;
+  }
+
+  @Override
+  public ContextInfo getContextInfo() {
+    return INFO;
   }
 
   @Override

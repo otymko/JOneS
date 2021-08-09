@@ -1,11 +1,16 @@
 package com.github.otymko.jos.runtime.context.type.primitive;
 
+import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
+@ContextClass(name = "Null", alias = "Null")
 public class NullValue extends PrimitiveValue {
+  public static final ContextInfo INFO = ContextInfo.createByClass(NullValue.class);
+
   public static final NullValue VALUE = new NullValue();
 
   private NullValue() {
@@ -27,4 +32,8 @@ public class NullValue extends PrimitiveValue {
     return "";
   }
 
+  @Override
+  public ContextInfo getContextInfo() {
+    return INFO;
+  }
 }

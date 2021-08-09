@@ -1,11 +1,16 @@
 package com.github.otymko.jos.runtime.context.type.primitive;
 
+import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
+@ContextClass(name = "Число", alias = "Number")
 public class NumberValue extends PrimitiveValue {
+  public static final ContextInfo INFO = ContextInfo.createByClass(NumberValue.class);
+
   private final float value;
 
   private NumberValue(float value) {
@@ -74,4 +79,8 @@ public class NumberValue extends PrimitiveValue {
     return false;
   }
 
+  @Override
+  public ContextInfo getContextInfo() {
+    return INFO;
+  }
 }

@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.util.Date;
 
-public class PrimitiveValue implements IValue, ContextType, Comparable<IValue> {
+public abstract class PrimitiveValue implements IValue, ContextType, Comparable<IValue> {
   @Getter
   @Setter(AccessLevel.PROTECTED)
   private DataType dataType;
