@@ -196,6 +196,7 @@ public class MachineInstance {
 
     // Функции работы с типами
     map.put(OperationCode.Type, this::callType);
+    map.put(OperationCode.ValType, this::callTypeOf);
 
     return map;
   }
@@ -208,6 +209,17 @@ public class MachineInstance {
     }
     var value = new TypeValue(type.get());
     operationStack.push(value);
+    nextInstruction();
+  }
+
+  private void callTypeOf(int argument) {
+    var value = operationStack.pop();
+    if (!(value instanceof RuntimeContext)) {
+      throw new RuntimeException("Тип не поддерживается");
+    }
+    var contextType = (RuntimeContext) value;
+    var type = new TypeValue((contextType.getContextInfo()));
+    operationStack.push(type);
     nextInstruction();
   }
 

@@ -75,4 +75,11 @@ class ScriptEngineTest {
     TestHelper.checkCode(code, "Массив\r\nЧисло");
   }
 
+  @Test
+  void testTypeOf() throws Exception {
+    TestHelper.checkCode("Сообщить(ТипЗнч(1));", "Число");
+    TestHelper.checkCode("Сообщить(ТипЗнч(\"Простая строка\"));", "Строка");
+    TestHelper.checkCode("Сообщить(ТипЗнч(Новый Массив));", "Массив");
+  }
+
 }
