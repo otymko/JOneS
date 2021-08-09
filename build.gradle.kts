@@ -4,6 +4,7 @@ plugins {
     `java-library`
     id("io.freefair.lombok") version "6.0.0-m2"
     id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("net.kyori.indra.license-header") version "2.0.6"
 }
 
 allprojects {
@@ -19,6 +20,7 @@ allprojects {
 subprojects {
     apply(plugin = "java-library")
     apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "net.kyori.indra.license-header")
 
     dependencies {
         // https://github.com/1c-syntax/bsl-parser
@@ -50,6 +52,16 @@ subprojects {
     val test by tasks.getting(Test::class) {
         // Use junit platform for unit tests
         useJUnitPlatform()
+    }
+
+    license {
+        header(rootProject.file("license_header.txt"))
+        exclude("**/*.properties")
+        exclude("**/*.xml")
+        exclude("**/*.json")
+        exclude("**/*.txt")
+        exclude("**/*.java.orig")
+        exclude("**/*.impl")
     }
 
 }
