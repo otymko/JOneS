@@ -16,6 +16,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Слепок образа модуля при компиляции
+ */
 @Data
 public class ModuleImageCache {
   private ModuleSource source;

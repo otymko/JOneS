@@ -77,7 +77,7 @@ public class ScriptCompiler {
     var tokenizer = new BSLTokenizer(source.getContent());
     var ast = tokenizer.getAst();
     findError(ast);
-    var moduleVisitor = new ModuleVisitor(imageCache, this);
+    var moduleVisitor = new Compiler(imageCache, this);
     moduleVisitor.visitFile(ast);
     return buildImage(imageCache);
   }

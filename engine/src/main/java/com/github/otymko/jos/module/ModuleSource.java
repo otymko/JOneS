@@ -5,6 +5,9 @@ import lombok.Value;
 
 import java.nio.file.Path;
 
+/**
+ * Источник скрипта
+ */
 @Value
 @RequiredArgsConstructor
 public class ModuleSource {

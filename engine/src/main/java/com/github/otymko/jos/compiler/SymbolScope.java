@@ -16,11 +16,11 @@ import java.util.Map;
 
 public class SymbolScope {
   @Getter
-  private Map<String, Integer> variableNumbers = new HashMap<>();
+  private final Map<String, Integer> variableNumbers = new HashMap<>();
   @Getter
-  private List<VariableInfo> variables = new ArrayList<>();
+  private final List<VariableInfo> variables = new ArrayList<>();
   @Getter
-  private Map<String, Integer> methodNumbers = new HashMap<>();
+  private final Map<String, Integer> methodNumbers = new HashMap<>();
   @Getter
-  private List<MethodInfo> methods = new ArrayList<>();
+  private final List<MethodInfo> methods = new ArrayList<>();
 }

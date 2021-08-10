@@ -26,7 +26,10 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 
-public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
+/**
+ * Компилятор в опкод
+ */
+public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   private static final String ENTRY_METHOD = "$entry";
   private final ScriptCompiler compiler;
   private final ModuleImageCache imageCache;
@@ -34,7 +37,7 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
   private List<Integer> currentCommandReturnInMethod;
   private SymbolScope localScope;
 
-  public ModuleVisitor(ModuleImageCache imageCache, ScriptCompiler compiler) {
+  public Compiler(ModuleImageCache imageCache, ScriptCompiler compiler) {
     this.imageCache = imageCache;
     this.compiler = compiler;
   }
