@@ -7,6 +7,7 @@ package com.github.otymko.jos.runtime.machine;
 
 import com.github.otymko.jos.compiler.MethodDescriptor;
 import com.github.otymko.jos.compiler.SymbolAddress;
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Arithmetic;
@@ -23,6 +24,7 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
+import com.github.otymko.jos.util.Common;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -144,7 +146,21 @@ public class MachineInstance {
   }
 
   private void executeCode() {
-    startExecuting();
+
+    try {
+
+      startExecuting();
+
+    } catch (MachineException exception) {
+
+      var errorInfo = exception.getErrorInfo();
+      errorInfo.setLine(currentFrame.getLineNumber());
+      errorInfo.setSource(Common.getAbsolutPath(currentImage.getSource().getPath()));
+      Common.fillCodePositionInErrorInfo(errorInfo, currentImage, currentFrame.getLineNumber());
+
+      throw exception;
+    }
+
   }
 
   private void startExecuting() {
@@ -210,7 +226,7 @@ public class MachineInstance {
     var typeName = operationStack.pop().asString();
     var type = engine.getTypeManager().getContextInfoByName(typeName);
     if (type.isEmpty()) {
-      throw new RuntimeException("Тип не зарегистрирован");
+      throw MachineException.typeNotRegisteredException(typeName);
     }
     var value = new TypeValue(type.get());
     operationStack.push(value);
@@ -220,7 +236,7 @@ public class MachineInstance {
   private void callTypeOf(int argument) {
     var value = operationStack.pop();
     if (!(value instanceof RuntimeContext)) {
-      throw new RuntimeException("Тип не поддерживается");
+      throw MachineException.typeNotSupportedException(value.getClass().getSimpleName());
     }
     var contextType = (RuntimeContext) value;
     var type = new TypeValue((contextType.getContextInfo()));
@@ -233,7 +249,7 @@ public class MachineInstance {
     var context = breakVariableLink(operationStack.pop()); // ???
 
     if (!(context instanceof IndexAccessor)) {
-      throw new RuntimeException("Индексный доступ не доступен");
+      throw MachineException.objectNotSupportAccessByIndexException();
     }
 
     var indexAccessor = (IndexAccessor) context;
@@ -255,7 +271,7 @@ public class MachineInstance {
 
     var instance = (operationStack.pop()).getRawValue();
     if (!(instance instanceof RuntimeContext)) {
-      throw new RuntimeException("Это не contextType");
+      throw MachineException.objectIsNotContextTypeException();
     }
 
     var context = (RuntimeContext) instance;
@@ -293,14 +309,15 @@ public class MachineInstance {
     var typeName = operationStack.pop().asString();
     var contextInfoOptional = engine.getTypeManager().getContextInfoByName(typeName);
     if (contextInfoOptional.isEmpty()) {
-      throw new RuntimeException("Тип не найден");
+      throw MachineException.typeNotRegisteredException(typeName);
     }
 
     var contextInfo = contextInfoOptional.get();
     if (contextInfo == ContextInfo.EMPTY) {
-      throw new RuntimeException("Пустой контекст типа");
+      throw MachineException.typeNotRegisteredException(typeName);
     }
 
+    // TODO: MachineRuntimeException.constructorNotFoundException
     var typeInstance = TypeFactory.callConstructor(contextInfo, argumentValues);
     operationStack.push(typeInstance);
 

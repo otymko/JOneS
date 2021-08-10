@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
@@ -38,7 +39,8 @@ public class ValueParser {
         result = NullValue.parse(view);
         break;
       default:
-        throw new RuntimeException("constant type is not supported");
+        var message = String.format("Тип %s не поддерживается для констант", dataType);
+        throw new MachineException(message);
     }
 
     return result;

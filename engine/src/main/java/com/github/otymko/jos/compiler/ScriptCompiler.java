@@ -5,14 +5,18 @@
  */
 package com.github.otymko.jos.compiler;
 
+import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github._1c_syntax.bsl.parser.BSLTokenizer;
+import com.github.otymko.jos.exception.CompilerException;
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.module.ModuleImageCache;
-import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
+import com.github.otymko.jos.module.ModuleSource;
 import com.github.otymko.jos.runtime.context.global.SystemGlobalContext;
+import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.util.Common;
 import lombok.Getter;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -32,20 +36,18 @@ public class ScriptCompiler {
     initContext();
   }
 
-  public ModuleImage compile(Path pathToScript, Class<? extends ScriptDrivenObject> sdoClass) throws Exception {
+  public ModuleImage compile(Path pathToScript, Class<? extends ScriptDrivenObject> sdoClass) throws CompilerException, IOException {
     moduleContext.implementContext(sdoClass);
     String content;
-    try {
-      content = Common.getContentFromFile(pathToScript);
-    } catch (IOException e) {
-      throw new Exception("failed to read the file");
-    }
-    return compileInternal(content);
+    content = Common.getContentFromFile(pathToScript);
+    var source = new ModuleSource(pathToScript, content);
+    return compileInternal(source);
   }
 
-  public ModuleImage compile(String content, Class<? extends ScriptDrivenObject> targetClass) throws Exception {
+  public ModuleImage compile(String content, Class<? extends ScriptDrivenObject> targetClass) throws CompilerException {
     moduleContext.implementContext(targetClass);
-    return compileInternal(content);
+    var source = new ModuleSource(content);
+    return compileInternal(source);
   }
 
   private void initContext() {
@@ -69,10 +71,12 @@ public class ScriptCompiler {
     return address;
   }
 
-  private ModuleImage compileInternal(String content) {
+  private ModuleImage compileInternal(ModuleSource source) {
     var imageCache = new ModuleImageCache();
-    var tokenizer = new BSLTokenizer(content);
+    imageCache.setSource(source);
+    var tokenizer = new BSLTokenizer(source.getContent());
     var ast = tokenizer.getAst();
+    findError(ast);
     var moduleVisitor = new ModuleVisitor(imageCache, this);
     moduleVisitor.visitFile(ast);
     return buildImage(imageCache);
@@ -80,6 +84,7 @@ public class ScriptCompiler {
 
   private static ModuleImage buildImage(ModuleImageCache cache) {
     return ModuleImage.builder()
+      .source(cache.getSource())
       .entry(cache.getEntryPoint())
       .code(List.copyOf(cache.getCode()))
       .methods(List.copyOf(cache.getMethods()))
@@ -88,6 +93,12 @@ public class ScriptCompiler {
       .methodRefs(List.copyOf(cache.getMethodRefs()))
       .variableRefs(List.copyOf(cache.getVariableRefs()))
       .build();
+  }
+
+  private static void findError(BSLParser.FileContext fileContext) {
+    var walker = new ParseTreeWalker();
+    var listener = new ParseErrorListener();
+    walker.walk(listener, fileContext);
   }
 
 }

@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.type.primitive;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
@@ -27,7 +28,7 @@ public class NullValue extends PrimitiveValue {
     if (view.equalsIgnoreCase("null")) {
       result = ValueFactory.createNullValue();
     } else {
-      throw new RuntimeException("constant type is not supported");
+      throw MachineException.operationNotSupportedException();
     }
     return result;
   }

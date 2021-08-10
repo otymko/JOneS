@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.type.primitive;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
@@ -32,7 +33,8 @@ public final class StringValue extends PrimitiveValue {
 
   private StringValue(String value) {
     if (value == null) {
-      throw new RuntimeException("Dont use null");
+      // FIXME
+      throw new MachineException("Запрещено использовать null");
     }
     this.value = value;
     setDataType(DataType.STRING);
@@ -68,14 +70,14 @@ public final class StringValue extends PrimitiveValue {
     if (other.getDataType() == getDataType()) {
       return value.compareTo(other.asString());
     }
-    throw new RuntimeException("Not supported");
+    throw MachineException.operationNotSupportedException();
   }
 
   // FIXME
   @Override
   public boolean equals(Object object) {
     if (!(object instanceof IValue)) {
-      throw new RuntimeException("Not supported");
+      throw MachineException.operationNotSupportedException();
     }
     var other = (IValue) object;
     if (other.getDataType() == getDataType()) {

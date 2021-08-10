@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.type.collection;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextMethod;
@@ -57,7 +58,7 @@ public class ArrayImpl extends ContextValue implements IndexAccessor {
   @ContextMethod(name = "Вставить", alias = "Insert")
   public void insert(int index, IValue value) {
     if (index < 0) {
-      throw new RuntimeException("Значение индекса выходит за пределы диапазона");
+      throw MachineException.indexValueOutOfRangeException();
     }
     if (index > values.size()) {
       extend(index - values.size());
@@ -99,7 +100,7 @@ public class ArrayImpl extends ContextValue implements IndexAccessor {
   @ContextMethod(name = "Установить", alias = "Set")
   public void set(int index, IValue value) {
     if (index < 0 || index >= values.size()) {
-      throw new RuntimeException("Значение индекса выходит за пределы диапазона");
+      throw MachineException.indexValueOutOfRangeException();
     }
     values.set(index, value);
   }

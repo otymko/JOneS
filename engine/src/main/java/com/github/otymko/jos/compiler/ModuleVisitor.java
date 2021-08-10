@@ -8,6 +8,7 @@ package com.github.otymko.jos.compiler;
 import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github._1c_syntax.bsl.parser.BSLParserBaseVisitor;
 import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
+import com.github.otymko.jos.exception.CompilerException;
 import com.github.otymko.jos.module.ModuleImageCache;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.Command;
@@ -273,11 +274,9 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
   }
 
   private void processIdentifier(String identifier) {
-    // FIXME: мракобесие
     var address = compiler.findVariableInContext(identifier);
     if (address == null) {
-      // fixme:
-      throw new RuntimeException("var not found: " + identifier);
+      throw CompilerException.symbolNotFoundException(identifier);
     }
 
     if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
@@ -300,9 +299,9 @@ public class ModuleVisitor extends BSLParserBaseVisitor<ParseTree> {
 
       int paramsCount = calcParams(paramList);
       if (paramsCount > arguments) {
-        throw new RuntimeException("Слишком много фактических параметров");
+        throw CompilerException.tooManyMethodArgumentsException();
       } else if (paramsCount < arguments) {
-        throw new RuntimeException("Слишком мало фактических параметров");
+        throw CompilerException.tooFewMethodArgumentsException();
       }
       addCommand(opCode, arguments);
 

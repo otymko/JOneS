@@ -12,11 +12,13 @@ import com.github.otymko.jos.compiler.SymbolAddress;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Data;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class ModuleImageCache {
+  private ModuleSource source;
   private int entryPoint = -1;
   private List<Command> code = new ArrayList<>();
   private List<ConstantDefinition> constants = new ArrayList<>();

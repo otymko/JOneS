@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
@@ -34,12 +35,12 @@ public class Arithmetic {
 
     if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.NUMBER) {
       // TODO
-      throw new RuntimeException("SUB not realize");
+      throw new MachineException("Сложение `Дата` и `Число` не реализовано");
     }
 
     if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.DATE) {
       // TODO
-      throw new RuntimeException("SUB not realize");
+      throw new MachineException("Сложение `Дата` и `Дата` не реализовано");
     }
 
     return ValueFactory.create(one.asNumber() - two.asNumber());
@@ -51,8 +52,7 @@ public class Arithmetic {
 
   public IValue div(IValue one, IValue two) {
     if (two.asNumber() == 0) {
-      // TODO
-      throw new RuntimeException("деление на 0");
+      throw MachineException.divideByZeroException();
     }
     // TODO тесты
     return ValueFactory.create(one.asNumber() / two.asNumber());

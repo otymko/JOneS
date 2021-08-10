@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.type.primitive;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
@@ -66,7 +67,7 @@ public class DateValue extends PrimitiveValue {
     } else if (view.length() == 12) {
       format = "yyyyMMddHHmm";
     } else {
-      throw new RuntimeException("Преобразование к типу 'Дата' не поддерживается");
+      throw MachineException.convertToDateException();
     }
     if (IS_EMPTY_DATE.test(view)) {
       result = ValueFactory.create(new Date());
@@ -76,7 +77,7 @@ public class DateValue extends PrimitiveValue {
         var dateFormat = new SimpleDateFormat(format);
         date = dateFormat.parse(view);
       } catch (ParseException exception) {
-        throw new RuntimeException("Преобразование к типу 'Дата' не поддерживается");
+        throw MachineException.convertToDateException();
       }
       result = ValueFactory.create(date);
     }

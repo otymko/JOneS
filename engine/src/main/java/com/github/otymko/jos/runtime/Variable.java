@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
@@ -31,7 +32,7 @@ public class Variable extends ContextValue {
     if (value instanceof ContextValue) {
       return ((ContextValue) value).getContextInfo();
     }
-    throw new RuntimeException("Не реализовано");
+    throw MachineException.operationNotImplementedException();
   }
 
   @Override

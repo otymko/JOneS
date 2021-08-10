@@ -26,16 +26,6 @@ public abstract class ScriptDrivenObject extends ContextValue {
     engine.getMachine().executeModuleBody(this);
   }
 
-//  @Override
-//  public void callAsProcedure(int methodId, IValue[] arguments) {
-//    throw new RuntimeException("Не реализовано");
-//  }
-//
-//  @Override
-//  public IValue callAsFunction(int methodId, IValue[] arguments) {
-//    throw new RuntimeException("Не реализовано");
-//  }
-
   public int getScriptMethod(String name) {
     for (var index = 0; index < moduleImage.getMethods().size(); index++) {
       var methodDescription = moduleImage.getMethods().get(index);

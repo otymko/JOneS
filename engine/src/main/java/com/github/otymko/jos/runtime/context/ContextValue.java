@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.context.type.DataType;
 
@@ -14,17 +15,17 @@ public abstract class ContextValue implements IValue, ContextType, RuntimeContex
 
   @Override
   public float asNumber() {
-    throw new RuntimeException("Not supported");
+    throw MachineException.operationNotSupportedException();
   }
 
   @Override
   public Date asDate() {
-    throw new RuntimeException("Not supported");
+    throw MachineException.operationNotSupportedException();
   }
 
   @Override
   public boolean asBoolean() {
-    throw new RuntimeException("Not supported");
+    throw MachineException.operationNotSupportedException();
   }
 
   @Override
@@ -44,7 +45,7 @@ public abstract class ContextValue implements IValue, ContextType, RuntimeContex
 
   @Override
   public int compareTo(IValue o) {
-    throw new RuntimeException("Not supported");
+    throw MachineException.operationNotSupportedException();
   }
 
 }

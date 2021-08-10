@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
@@ -32,7 +33,7 @@ public interface RuntimeContext {
     try {
       result = callMethod.invoke(this, arguments);
     } catch (IllegalAccessException | InvocationTargetException e) {
-      throw new RuntimeException("Не удалось выполнить функцию");
+      throw new MachineException("Ошибка при вызове функции");
     }
     return (IValue) result;
   }

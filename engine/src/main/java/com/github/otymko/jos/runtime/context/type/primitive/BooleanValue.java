@@ -5,12 +5,12 @@
  */
 package com.github.otymko.jos.runtime.context.type.primitive;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
-import com.github.otymko.jos.runtime.context.type.collection.ArrayImpl;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.function.Predicate;
@@ -41,7 +41,7 @@ public class BooleanValue extends PrimitiveValue {
     } else if (IS_FALSE.test(view)) {
       result = ValueFactory.create(false);
     } else {
-      throw new RuntimeException("Преобразование к типу 'Булево' не поддерживается");
+      throw MachineException.convertToBooleanException();
     }
     return result;
   }

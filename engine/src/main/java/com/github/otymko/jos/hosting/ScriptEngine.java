@@ -6,6 +6,8 @@
 package com.github.otymko.jos.hosting;
 
 import com.github.otymko.jos.compiler.ScriptCompiler;
+import com.github.otymko.jos.exception.EngineException;
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
@@ -15,6 +17,7 @@ import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.machine.MachineInstance;
 import lombok.Getter;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 
@@ -36,11 +39,26 @@ public class ScriptEngine {
     initialize();
   }
 
-  public int execute(Path pathToScript) throws Exception {
+  public int execute(Path pathToScript) {
+    int exitCode = 0;
+    try {
+      exitCode = executeInternal(pathToScript);
+    } catch (IOException exception) {
+      System.out.println("Ошибка при чтении " + pathToScript + ". Причина: " + exception.getMessage());
+      exitCode = 1;
+    } catch (EngineException exception) {
+      System.out.println(exception.getMessage());
+      exitCode = 1;
+    }
+    return exitCode;
+  }
+
+  private int executeInternal(Path pathToScript) throws IOException {
+    var exitCode = 0;
     var compiler = new ScriptCompiler(this);
     var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
-    var scriptObject = newObject(moduleImage);
-    return 0;
+    newObject(moduleImage);
+    return exitCode;
   }
 
   private void initialize() {
@@ -49,19 +67,19 @@ public class ScriptEngine {
   }
 
   public ScriptDrivenObject newObject(ModuleImage image) {
-    var scriptContext = new UserScriptContext(image); // непонятно как тут хранится состояние
+    var scriptContext = new UserScriptContext(image);
     getMachine().implementContext(scriptContext);
     initializeScriptObject(scriptContext);
     return scriptContext;
   }
 
-  public ScriptDrivenObject newObject(ModuleImage image, Class<? extends ScriptDrivenObject> targetClass) throws Exception {
+  public ScriptDrivenObject newObject(ModuleImage image, Class<? extends ScriptDrivenObject> targetClass) throws MachineException {
     ScriptDrivenObject scriptContext;
     try {
       var constructor = targetClass.getConstructor(ModuleImage.class);
       scriptContext = constructor.newInstance(image);
     } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      throw new Exception("Не удалось создай экземпляр SDO");
+      throw new MachineException("Не удалось создай экземпляр объекта");
     }
     getMachine().implementContext(scriptContext);
     initializeScriptObject(scriptContext);

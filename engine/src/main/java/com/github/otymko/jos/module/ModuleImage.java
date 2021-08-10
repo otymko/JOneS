@@ -5,14 +5,15 @@
  */
 package com.github.otymko.jos.module;
 
-import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.compiler.ConstantDefinition;
 import com.github.otymko.jos.compiler.MethodDescriptor;
 import com.github.otymko.jos.compiler.SymbolAddress;
+import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Builder;
 import lombok.Data;
 
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -21,6 +22,11 @@ import java.util.List;
 @Data
 @Builder
 public class ModuleImage {
+  /**
+   * Источник модуля
+   */
+  private ModuleSource source;
+
   /**
    * Байткоды
    */

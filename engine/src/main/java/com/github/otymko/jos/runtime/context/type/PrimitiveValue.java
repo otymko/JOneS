@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextType;
 import com.github.otymko.jos.runtime.context.IValue;
 import lombok.AccessLevel;
@@ -19,15 +20,15 @@ public abstract class PrimitiveValue implements IValue, ContextType, Comparable<
   private DataType dataType;
 
   public float asNumber() {
-    throw new RuntimeException("Not supported");
+    throw MachineException.operationNotSupportedException();
   }
 
   public Date asDate() {
-    throw new RuntimeException("Not supported");
+    throw MachineException.operationNotSupportedException();
   }
 
   public boolean asBoolean() {
-    throw new RuntimeException("Not supported");
+    throw MachineException.operationNotSupportedException();
   }
 
   public String asString() {
@@ -47,11 +48,11 @@ public abstract class PrimitiveValue implements IValue, ContextType, Comparable<
 
   @Override
   public int compareTo(IValue o) {
-    throw new RuntimeException("Not supported");
+    throw MachineException.operationNotSupportedException();
   }
 
   public static IValue parse(String view) {
-    throw new RuntimeException("Not supported");
+    throw MachineException.operationNotSupportedException();
   }
 
 }

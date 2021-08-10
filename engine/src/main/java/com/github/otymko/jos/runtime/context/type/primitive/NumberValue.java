@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.type.primitive;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
@@ -64,7 +65,7 @@ public class NumberValue extends PrimitiveValue {
     try {
       value = Float.parseFloat(view);
     } catch (NumberFormatException exception) {
-      throw new RuntimeException("Преобразование к типу 'Число' не поддерживается");
+      throw MachineException.convertToNumberException();
     }
     return ValueFactory.create(value);
   }
