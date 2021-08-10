@@ -6,8 +6,8 @@
 package com.github.otymko.jos.runtime;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import lombok.experimental.UtilityClass;
 
@@ -56,6 +56,10 @@ public class Arithmetic {
     }
     // TODO тесты
     return ValueFactory.create(one.asNumber() / two.asNumber());
+  }
+
+  public IValue negative(IValue value) {
+    return ValueFactory.create(value.asNumber() * -1);
   }
 
 }

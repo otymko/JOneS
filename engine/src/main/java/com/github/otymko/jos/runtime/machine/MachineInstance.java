@@ -191,6 +191,7 @@ public class MachineInstance {
     map.put(OperationCode.Mul, this::mul);
     map.put(OperationCode.Div, this::div);
     map.put(OperationCode.Not, this::not);
+    map.put(OperationCode.Neg, this::neg);
 
     map.put(OperationCode.And, this::and);
     map.put(OperationCode.Or, this::or);
@@ -220,6 +221,12 @@ public class MachineInstance {
     map.put(OperationCode.ValType, this::callTypeOf);
 
     return map;
+  }
+
+  private void neg(int argument) {
+    var value = operationStack.pop();
+    operationStack.push(Arithmetic.negative(value));
+    nextInstruction();
   }
 
   private void callType(int argument) {
