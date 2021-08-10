@@ -7,11 +7,14 @@ package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
+import com.github.otymko.jos.runtime.machine.Command;
+import com.github.otymko.jos.runtime.machine.OperationCode;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,6 +49,38 @@ class CompilerTest {
     var compiler = new ScriptCompiler(engine);
     var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
     assertThat(moduleImage.getConstants()).hasSize(2);
+  }
+
+  @Test
+  void testWhileLoopCompilation() throws Exception {
+    var pathToScript = Path.of("src/test/resources/while-loop.os");
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
+
+    var code = moduleImage.getCode();
+    var line = findCommand(code, OperationCode.LineNum, 0, 2);
+    var falseCondition = findCommand(code, OperationCode.JmpFalse, line);
+    var jmpFalse = code.get(falseCondition);
+    assertThat(code.get(jmpFalse.getArgument()).getCode()).isEqualTo(OperationCode.Nop);
+    var jump = code.get(jmpFalse.getArgument()-1);
+    assertThat(jump.getCode()).isEqualTo(OperationCode.Jmp);
+    assertThat(jump.getArgument()).isEqualTo(line);
+  }
+
+  private int findCommand(List<Command> commands, OperationCode code, int start) {
+    return findCommand(commands, code, start, -1);
+  }
+
+  private int findCommand(List<Command> commands, OperationCode code, int start, int arg) {
+    for (int i = start; i < commands.size(); i++){
+      if(commands.get(i).getCode() == code) {
+        if(arg == -1 || commands.get(i).getArgument() == arg)
+          return i;
+      }
+    }
+
+    return -1;
   }
 
 }
