@@ -130,6 +130,25 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         return ctx;
     }
 
+    @Override
+    public ParseTree visitBreakStatement(BSLParser.BreakStatementContext ctx) {
+        exitTryBlocks();
+        var loopInfo = nestedLoops.peek();
+        assert loopInfo != null;
+        var idx = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+        loopInfo.breakStatements.add(idx);
+        return ctx;
+    }
+
+    @Override
+    public ParseTree visitContinueStatement(BSLParser.ContinueStatementContext ctx) {
+        exitTryBlocks();
+        var loopInfo = nestedLoops.peek();
+        assert loopInfo != null;
+        addCommand(OperationCode.Jmp, loopInfo.startPoint);
+        return ctx;
+    }
+
     private void correctBreakStatements(NestedLoopInfo loop, int endLoop) {
         for (var breakCmdIndex : loop.breakStatements) {
             correctCommandArgument(breakCmdIndex, endLoop);
@@ -139,6 +158,29 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     private void correctCommandArgument(int index, int newValue) {
         var cmd = imageCache.getCode().get(index);
         cmd.setArgument(newValue);
+    }
+
+    private void exitTryBlocks()
+    {
+        var tryBlocks = nestedLoops.peek().tryNesting;
+        if (tryBlocks > 0)
+            addCommand(OperationCode.ExitTry, tryBlocks);
+    }
+
+    private void pushTryNesting()
+    {
+        if (nestedLoops.size() > 0)
+        {
+            nestedLoops.peek().tryNesting++;
+        }
+    }
+
+    private void popTryNesting()
+    {
+        if (nestedLoops.size() > 0)
+        {
+            nestedLoops.peek().tryNesting--;
+        }
     }
 
     private void processFileCodeBlock(BSLParser.CodeBlockContext codeBlock) {

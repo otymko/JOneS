@@ -66,6 +66,12 @@ class CompilerTest {
     var jump = code.get(jmpFalse.getArgument()-1);
     assertThat(jump.getCode()).isEqualTo(OperationCode.Jmp);
     assertThat(jump.getArgument()).isEqualTo(line);
+
+    var breakCommandIndex = findCommand(code, OperationCode.Jmp, falseCondition, jmpFalse.getArgument());
+    assertThat(breakCommandIndex).isNotEqualTo(-1);
+
+    var continueCommandIndex = findCommand(code, OperationCode.Jmp, falseCondition, line);
+    assertThat(continueCommandIndex).isNotEqualTo(-1);
   }
 
   private int findCommand(List<Command> commands, OperationCode code, int start) {
