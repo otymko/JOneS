@@ -63,7 +63,7 @@ class CompilerTest {
     var falseCondition = findCommand(code, OperationCode.JmpFalse, line);
     var jmpFalse = code.get(falseCondition);
     assertThat(code.get(jmpFalse.getArgument()).getCode()).isEqualTo(OperationCode.Nop);
-    var jump = code.get(jmpFalse.getArgument()-1);
+    var jump = code.get(jmpFalse.getArgument() - 1);
     assertThat(jump.getCode()).isEqualTo(OperationCode.Jmp);
     assertThat(jump.getArgument()).isEqualTo(line);
 
@@ -79,9 +79,9 @@ class CompilerTest {
   }
 
   private int findCommand(List<Command> commands, OperationCode code, int start, int arg) {
-    for (int i = start; i < commands.size(); i++){
-      if(commands.get(i).getCode() == code) {
-        if(arg == -1 || commands.get(i).getArgument() == arg)
+    for (int i = start; i < commands.size(); i++) {
+      if (commands.get(i).getCode() == code) {
+        if (arg == -1 || commands.get(i).getArgument() == arg)
           return i;
       }
     }
