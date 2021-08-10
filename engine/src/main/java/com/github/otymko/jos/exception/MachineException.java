@@ -90,4 +90,9 @@ public class MachineException extends EngineException {
     return new MachineException(message);
   }
 
+  public static MachineException invalidPropertyNameStructureException(String propertyName) {
+    var message = String.format("Задано неправильное имя атрибута структуры `%s`", propertyName);
+    return new MachineException(message);
+  }
+
 }
