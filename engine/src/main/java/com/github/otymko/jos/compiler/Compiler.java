@@ -17,6 +17,7 @@ import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import com.github.otymko.jos.util.StringLineCleaner;
+import lombok.Data;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -31,11 +32,36 @@ import java.util.Locale;
  */
 public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   private static final String ENTRY_METHOD = "$entry";
+  private static final Integer DUMMY_ADDRESS = -1;
+
   private final ScriptCompiler compiler;
   private final ModuleImageCache imageCache;
   private MethodDescriptor currentMethodDescriptor;
   private List<Integer> currentCommandReturnInMethod;
   private SymbolScope localScope;
+
+  private final Deque<NestedLoopInfo> nestedLoops = new ArrayDeque<>();
+
+  @Data
+  private static class NestedLoopInfo {
+    private int startPoint = DUMMY_ADDRESS;
+    private List<Integer> breakStatements = new ArrayList<>();
+    private int tryNesting = 0;
+
+    private NestedLoopInfo() {
+      // none
+    }
+
+    public static NestedLoopInfo create() {
+      return new NestedLoopInfo();
+    }
+
+    public static NestedLoopInfo create(int startIndex) {
+      var loop = new NestedLoopInfo();
+      loop.setStartPoint(startIndex);
+      return loop;
+    }
+  }
 
   public Compiler(ModuleImageCache imageCache, ScriptCompiler compiler) {
     this.imageCache = imageCache;
@@ -84,7 +110,82 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     currentMethodDescriptor = null;
     localScope = null;
 
-    return super.visitCodeBlock(ctx);
+    return ctx;
+  }
+
+  @Override
+  public ParseTree visitWhileStatement(BSLParser.WhileStatementContext ctx) {
+    // прыжок наверх цикла должен попадать на опкод LineNum
+    // поэтому указываем адрес - 1
+    var conditionIndex = imageCache.getCode().size() - 1;
+    var loopRecord = NestedLoopInfo.create(conditionIndex);
+
+    nestedLoops.push(loopRecord);
+    processExpression(ctx.expression(), new ArrayDeque<>());
+
+    var jumpFalseIndex = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+
+    processCodeBlock(ctx.codeBlock());
+
+    addCommand(OperationCode.Jmp, conditionIndex);
+    var endLoop = addCommand(OperationCode.Nop, 0);
+    correctCommandArgument(jumpFalseIndex, endLoop);
+    correctBreakStatements(nestedLoops.pop(), endLoop);
+
+    return ctx;
+  }
+
+  @Override
+  public ParseTree visitBreakStatement(BSLParser.BreakStatementContext ctx) {
+    exitTryBlocks();
+    var loopInfo = nestedLoops.peek();
+    assert loopInfo != null;
+    var idx = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+    loopInfo.getBreakStatements().add(idx);
+    return ctx;
+  }
+
+  @Override
+  public ParseTree visitContinueStatement(BSLParser.ContinueStatementContext ctx) {
+    exitTryBlocks();
+    var loopInfo = nestedLoops.peek();
+    assert loopInfo != null;
+    addCommand(OperationCode.Jmp, loopInfo.getStartPoint());
+    return ctx;
+  }
+
+  private void correctBreakStatements(NestedLoopInfo loop, int endLoop) {
+    for (var breakCmdIndex : loop.breakStatements) {
+      correctCommandArgument(breakCmdIndex, endLoop);
+    }
+  }
+
+  private void correctCommandArgument(int index, int newValue) {
+    var cmd = imageCache.getCode().get(index);
+    cmd.setArgument(newValue);
+  }
+
+  private void exitTryBlocks() {
+    assert nestedLoops.peek() != null;
+    var tryBlocks = nestedLoops.peek().getTryNesting();
+    if (tryBlocks > 0)
+      addCommand(OperationCode.ExitTry, tryBlocks);
+  }
+
+  // TODO:
+  private void pushTryNesting() {
+    if (nestedLoops.size() > 0) {
+      var loop = nestedLoops.peek();
+      loop.setTryNesting(loop.getTryNesting() + 1);
+    }
+  }
+
+  // TODO:
+  private void popTryNesting() {
+    if (nestedLoops.size() > 0) {
+      var loop = nestedLoops.peek();
+      loop.setTryNesting(loop.getTryNesting() - 1);
+    }
   }
 
   private void processFileCodeBlock(BSLParser.CodeBlockContext codeBlock) {
@@ -121,11 +222,19 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       var compoundStatement = statementContext.compoundStatement();
       if (compoundStatement.returnStatement() != null) {
         processReturnStatement(compoundStatement.returnStatement());
+      } else if (compoundStatement.whileStatement() != null) {
+        // visit, а не process, чтобы быстрее можно было переделать
+        // на обход через visitor
+        visitWhileStatement(compoundStatement.whileStatement());
+      } else if (compoundStatement.continueStatement() != null) {
+        visitContinueStatement(compoundStatement.continueStatement());
+      } else if (compoundStatement.breakStatement() != null) {
+        visitBreakStatement(compoundStatement.breakStatement());
       } else {
-        throw new RuntimeException("Not supported");
+        throw CompilerException.notImplementedException();
       }
     } else {
-      throw new RuntimeException("Not supported");
+      throw CompilerException.notImplementedException();
     }
   }
 
@@ -190,10 +299,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
     if (booleanExpression) {
       var lastIndexCommand = addCommand(OperationCode.MakeBool, 0);
-      booleanCommands.forEach(commandId -> {
-        var command = imageCache.getCode().get(commandId);
-        command.setArgument(lastIndexCommand);
-      });
+      booleanCommands.forEach(commandId -> correctCommandArgument(commandId, lastIndexCommand));
     }
 
   }
@@ -430,13 +536,16 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     }
 
     var indexEndMethod = addReturn();
-    currentCommandReturnInMethod.forEach(index -> {
-      var command = imageCache.getCode().get(index);
-      command.setArgument(indexEndMethod);
-    });
+    currentCommandReturnInMethod.forEach(index -> correctCommandArgument(index, indexEndMethod));
 
     if (currentMethodDescriptor.getEntry() < 0) {
       currentMethodDescriptor.setEntry(imageCache.getCode().size() - 1);
+    }
+  }
+
+  private void processCodeBlock(BSLParser.CodeBlockContext ctx) {
+    if (ctx.statement() != null) {
+      processStatements(ctx.statement());
     }
   }
 
