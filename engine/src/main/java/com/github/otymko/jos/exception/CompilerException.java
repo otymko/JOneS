@@ -24,4 +24,9 @@ public class CompilerException extends EngineException {
     return new CompilerException(message);
   }
 
+  public static CompilerException notImplementedException() {
+    var message = "Не реализовано";
+    return new CompilerException(message);
+  }
+
 }
