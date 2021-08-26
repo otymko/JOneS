@@ -55,6 +55,10 @@ public class MachineException extends EngineException {
     return message;
   }
 
+  public String getMessageWithoutCodeFragment() {
+    return super.getMessage();
+  }
+
   public static MachineException typeNotSupportedException(String typeName) {
     var message = String.format("Тип не поддерживается (%s)", typeName);
     return new MachineException(message);

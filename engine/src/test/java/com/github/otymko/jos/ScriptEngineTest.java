@@ -87,4 +87,10 @@ class ScriptEngineTest {
     TestHelper.checkCode("Сообщить(ТипЗнч(Новый Массив));", "Массив");
   }
 
+  @Test
+  void testExceptionsBehavior() throws Exception {
+    var script = Path.of("src/test/resources/exceptions.os");
+    TestHelper.checkScript(script, "РучноеИсключение\r\nНеВызывайМеня");
+  }
+
 }

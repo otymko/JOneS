@@ -16,6 +16,7 @@ import com.github.otymko.jos.runtime.Arithmetic;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
+import com.github.otymko.jos.runtime.context.ExceptionInfoContext;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
@@ -280,6 +281,9 @@ public class MachineInstance {
     map.put(OperationCode.Type, this::callType);
     map.put(OperationCode.ValType, this::callTypeOf);
 
+    map.put(OperationCode.ExceptionDescr, this::exceptionDescr);
+    map.put(OperationCode.ExceptionInfo, this::exceptionInfo);
+
     return map;
   }
 
@@ -315,6 +319,34 @@ public class MachineInstance {
 
       throw new MachineException(exceptionValue.asString());
     }
+  }
+
+  private void exceptionDescr(int integer) {
+    if (currentFrame.getLastException() != null) {
+      var excInfo = currentFrame.getLastException();
+      String message;
+      if (excInfo instanceof MachineException) {
+        // TODO: варианты текстов исключений привести к иерархии классов 1Script
+        var machineExc = (MachineException) excInfo;
+        message = machineExc.getMessageWithoutCodeFragment();
+      } else {
+        message = excInfo.getMessage();
+      }
+      operationStack.push(ValueFactory.create(message));
+    } else {
+      operationStack.push(ValueFactory.create(""));
+    }
+    nextInstruction();
+  }
+
+  private void exceptionInfo(int integer) {
+    if (currentFrame.getLastException() != null) {
+      var excInfo = new ExceptionInfoContext(currentFrame.getLastException());
+      operationStack.push(excInfo);
+    } else {
+      operationStack.push(ValueFactory.create());
+    }
+    nextInstruction();
   }
 
   private void neg(int argument) {
