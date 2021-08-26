@@ -114,42 +114,43 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   }
 
   @Override
-  public ParseTree visitProcedure(BSLParser.ProcedureContext ctx) {
-    var methodName = getMethodName(ctx);
+  public ParseTree visitProcedure(BSLParser.ProcedureContext procedure) {
+    var methodName = getMethodName(procedure);
     prepareModuleMethod(methodName, false);
-    super.visitProcedure(ctx);
+    super.visitProcedure(procedure);
     processMethodEnd(false);
     pruneContextModuleMethod();
-    return ctx;
+    return procedure;
   }
 
   @Override
-  public ParseTree visitFunction(BSLParser.FunctionContext ctx) {
-    var methodName = getMethodName(ctx);
+  public ParseTree visitFunction(BSLParser.FunctionContext function) {
+    var methodName = getMethodName(function);
     prepareModuleMethod(methodName, false);
-    super.visitFunction(ctx);
+    super.visitFunction(function);
     addHiddenReturnForMethod();
     processMethodEnd(false);
     pruneContextModuleMethod();
-    return ctx;
+    return function;
   }
 
   @Override
-  public ParseTree visitFileCodeBlock(BSLParser.FileCodeBlockContext ctx) {
-    if (ctx.codeBlock().statement().isEmpty()) {
-      return ctx;
+  public ParseTree visitFileCodeBlock(BSLParser.FileCodeBlockContext fileCodeBlock) {
+    // TODO
+    if (fileCodeBlock.codeBlock().statement().isEmpty()) {
+      return fileCodeBlock;
     }
 
     prepareModuleMethod(ENTRY_METHOD_NAME, true);
-    super.visitFileCodeBlock(ctx);
+    super.visitFileCodeBlock(fileCodeBlock);
     processMethodEnd(true);
     pruneContextModuleMethod();
-    return ctx;
+    return fileCodeBlock;
   }
 
   @Override
-  public ParseTree visitParamList(BSLParser.ParamListContext ctx) {
-    return ctx;
+  public ParseTree visitParamList(BSLParser.ParamListContext paramList) {
+    return paramList;
   }
 
   @Override
@@ -171,15 +172,14 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   }
 
   @Override
-  public ParseTree visitCodeBlock(BSLParser.CodeBlockContext ctx) {
-    return super.visitCodeBlock(ctx);
+  public ParseTree visitCodeBlock(BSLParser.CodeBlockContext codeBlock) {
+    return super.visitCodeBlock(codeBlock);
   }
 
   @Override
-  public ParseTree visitFileCodeBlockBeforeSub(BSLParser.FileCodeBlockBeforeSubContext ctx) {
-    // ниже не уходим
+  public ParseTree visitFileCodeBlockBeforeSub(BSLParser.FileCodeBlockBeforeSubContext fileCodeBlockBeforeSub) {
     // TODO: выкидывать ошибку, если есть код в codeblocks
-    return ctx;
+    return fileCodeBlockBeforeSub;
   }
 
   @Override
@@ -218,52 +218,51 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
     }
 
-    return assignment; // super.visitAssignment(ctx);
+    return assignment;
   }
 
   @Override
-  public ParseTree visitIfStatement(BSLParser.IfStatementContext ctx) {
+  public ParseTree visitIfStatement(BSLParser.IfStatementContext ifStatement) {
     // TODO
     throw CompilerException.notImplementedException();
   }
 
   @Override
-  public ParseTree visitWhileStatement(BSLParser.WhileStatementContext ctx) {
+  public ParseTree visitWhileStatement(BSLParser.WhileStatementContext whileStatement) {
     // прыжок наверх цикла должен попадать на опкод LineNum
     // поэтому указываем адрес - 1
     var conditionIndex = imageCache.getCode().size() - 1;
     var loopRecord = Compiler.NestedLoopInfo.create(conditionIndex);
 
     nestedLoops.push(loopRecord);
-    processExpression(ctx.expression(), new ArrayDeque<>());
+    processExpression(whileStatement.expression(), new ArrayDeque<>());
 
     var jumpFalseIndex = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
 
-    visitCodeBlock(ctx.codeBlock());
+    visitCodeBlock(whileStatement.codeBlock());
 
     addCommand(OperationCode.Jmp, conditionIndex);
     var endLoop = addCommand(OperationCode.Nop, 0);
     correctCommandArgument(jumpFalseIndex, endLoop);
     correctBreakStatements(nestedLoops.pop(), endLoop);
 
-    return ctx;
-    //return super.visitWhileStatement(ctx);
+    return whileStatement;
   }
 
   @Override
-  public ParseTree visitForStatement(BSLParser.ForStatementContext ctx) {
+  public ParseTree visitForStatement(BSLParser.ForStatementContext forStatement) {
     // TODO
     throw CompilerException.notImplementedException();
   }
 
   @Override
-  public ParseTree visitForEachStatement(BSLParser.ForEachStatementContext ctx) {
+  public ParseTree visitForEachStatement(BSLParser.ForEachStatementContext forEachStatement) {
     // TODO
     throw CompilerException.notImplementedException();
   }
 
   @Override
-  public ParseTree visitTryStatement(BSLParser.TryStatementContext ctx) {
+  public ParseTree visitTryStatement(BSLParser.TryStatementContext tryStatement) {
     // TODO
     throw CompilerException.notImplementedException();
   }
@@ -280,56 +279,58 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   }
 
   @Override
-  public ParseTree visitContinueStatement(BSLParser.ContinueStatementContext ctx) {
+  public ParseTree visitContinueStatement(BSLParser.ContinueStatementContext continueStatement) {
     exitTryBlocks();
     var loopInfo = nestedLoops.peek();
+    // FIXME
     assert loopInfo != null;
     addCommand(OperationCode.Jmp, loopInfo.getStartPoint());
-    return ctx;
+    return continueStatement;
   }
 
   @Override
-  public ParseTree visitBreakStatement(BSLParser.BreakStatementContext ctx) {
+  public ParseTree visitBreakStatement(BSLParser.BreakStatementContext breakStatement) {
     exitTryBlocks();
     var loopInfo = nestedLoops.peek();
+    // FIXME
     assert loopInfo != null;
     var idx = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
     loopInfo.getBreakStatements().add(idx);
-    return ctx;
+    return breakStatement;
   }
 
   @Override
-  public ParseTree visitRaiseStatement(BSLParser.RaiseStatementContext ctx) {
+  public ParseTree visitRaiseStatement(BSLParser.RaiseStatementContext raiseStatement) {
     // TODO
     throw CompilerException.notImplementedException();
   }
 
   @Override
-  public ParseTree visitExecuteStatement(BSLParser.ExecuteStatementContext ctx) {
+  public ParseTree visitExecuteStatement(BSLParser.ExecuteStatementContext executeStatement) {
     // TODO
     throw CompilerException.notImplementedException();
   }
 
   @Override
-  public ParseTree visitGotoStatement(BSLParser.GotoStatementContext ctx) {
+  public ParseTree visitGotoStatement(BSLParser.GotoStatementContext gotoStatement) {
     // TODO
     throw CompilerException.notImplementedException();
   }
 
   @Override
-  public ParseTree visitAddHandlerStatement(BSLParser.AddHandlerStatementContext ctx) {
+  public ParseTree visitAddHandlerStatement(BSLParser.AddHandlerStatementContext addHandlerStatement) {
     // TODO
     throw CompilerException.notImplementedException();
   }
 
   @Override
-  public ParseTree visitRemoveHandlerStatement(BSLParser.RemoveHandlerStatementContext ctx) {
+  public ParseTree visitRemoveHandlerStatement(BSLParser.RemoveHandlerStatementContext removeHandlerStatement) {
     // TODO
     throw CompilerException.notImplementedException();
   }
 
   @Override
-  public ParseTree visitWaitStatement(BSLParser.WaitStatementContext ctx) {
+  public ParseTree visitWaitStatement(BSLParser.WaitStatementContext waitStatement) {
     // TODO
     throw CompilerException.notImplementedException();
   }
@@ -356,9 +357,9 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   }
 
   @Override
-  public ParseTree visitExpression(BSLParser.ExpressionContext expressionContext) {
-    processExpression(expressionContext, new ArrayDeque<>());
-    return expressionContext;
+  public ParseTree visitExpression(BSLParser.ExpressionContext expression) {
+    processExpression(expression, new ArrayDeque<>());
+    return expression;
   }
 
   @Override
@@ -372,9 +373,9 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   }
 
   @Override
-  public ParseTree visitComplexIdentifier(BSLParser.ComplexIdentifierContext ctx) {
-    processComplexIdentifier(ctx);
-    return ctx;
+  public ParseTree visitComplexIdentifier(BSLParser.ComplexIdentifierContext complexIdentifier) {
+    processComplexIdentifier(complexIdentifier);
+    return complexIdentifier;
   }
 
   private MethodDescriptor createMethodDescriptor(BSLParser.SubContext subContext) {
