@@ -3,9 +3,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.github.otymko.jos.runtime.context;
+package com.github.otymko.jos.runtime;
 
-public interface IndexAccessor {
-  IValue getIndexedValue(IValue index);
-  void setIndexedValue(IValue index, IValue value);
+public enum ReferenceType {
+  SIMPLE, CONTEXT_PROPERTY, INDEXED_PROPERTY;
 }

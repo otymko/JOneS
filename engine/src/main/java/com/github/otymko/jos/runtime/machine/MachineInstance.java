@@ -13,8 +13,10 @@ import com.github.otymko.jos.exception.WrappedJavaException;
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Arithmetic;
+import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.Variable;
+import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.ExceptionInfoContext;
 import com.github.otymko.jos.runtime.context.IValue;
@@ -43,6 +45,7 @@ import java.util.stream.Collectors;
  * Экземпляр стековой машины
  */
 public class MachineInstance {
+  private static final String VARIABLE_STACK_NAME = "$stackvar";
   private final Map<OperationCode, Consumer<Integer>> commands = createMachineCommands();
 
   private final ScriptEngine engine;
@@ -65,7 +68,7 @@ public class MachineInstance {
   public void implementContext(RuntimeContext context) {
     var methods = ContextInitializer.getContextMethods(context.getClass());
     // FIXME: this
-    var variables = new Variable[0];
+    var variables = new IVariable[0];
     var scope = new Scope(context, variables, methods);
     scopes.add(scope);
   }
@@ -122,7 +125,7 @@ public class MachineInstance {
   private Scope createModuleScope(ScriptDrivenObject sdo) {
     var image = sdo.getModuleImage();
 
-    Variable[] variables = createVariables(image.getVariables());
+    IVariable[] variables = createVariables(image.getVariables());
     var methodSize = image.getMethods().size() + sdo.getContextInfo().getMethods().length;
     MethodInfo[] methods = new MethodInfo[methodSize];
     var position = 0;
@@ -138,8 +141,8 @@ public class MachineInstance {
     return new Scope(sdo, variables, methods);
   }
 
-  private Variable[] createVariables(List<VariableInfo> variableInfos) {
-    Variable[] variables = new Variable[variableInfos.size()];
+  private IVariable[] createVariables(List<VariableInfo> variableInfos) {
+    IVariable[] variables = new IVariable[variableInfos.size()];
     int index = 0;
     for (var variableInfo : variableInfos) {
       var variable = new Variable();
@@ -386,11 +389,11 @@ public class MachineInstance {
       throw MachineException.objectNotSupportAccessByIndexException();
     }
 
-    var indexAccessor = (IndexAccessor) context;
-    var valueRef = indexAccessor.get((int) index.asNumber());
-    operationStack.push(valueRef);
-    nextInstruction();
+    var variable = VariableReference.createIndexedPropertyReference((RuntimeContext) context,
+      index, VARIABLE_STACK_NAME);
 
+    operationStack.push(variable);
+    nextInstruction();
   }
 
   private void resolveMethodCall(int argument) {
@@ -635,13 +638,13 @@ public class MachineInstance {
         var defaultValue = getDefaultArgumentValue(parameters[position]);
         variables[position] = Variable.create(defaultValue, parameters[position].getName());
 
-      } else if (argumentValues[position] instanceof Variable) {
+      } else if (argumentValues[position] instanceof IVariable) {
 
         if (parameters[position].isByValue()) {
           variables[position] = Variable.create(argumentValues[position], parameters[position].getName());
         } else {
           var value = argumentValues[position];
-          variables[position] = (Variable) value;
+          variables[position] = VariableReference.create((IVariable) value, parameters[position].getName());
         }
 
       } else if (argumentValues[position] == null) { // или DataType.NotAValidValue

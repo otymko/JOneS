@@ -94,4 +94,10 @@ class ScriptEngineTest {
     TestHelper.checkScript(script, "РучноеИсключение\r\nНеВызывайМеня");
   }
 
+  @Test
+  void testSimpleReference() throws Exception {
+    Path script = Path.of("src/test/resources/test-var-reference.os");
+    TestHelper.checkScript(script, "101");
+  }
+
 }
