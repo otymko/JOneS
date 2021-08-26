@@ -18,7 +18,6 @@ import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import com.github.otymko.jos.util.StringLineCleaner;
 import lombok.Data;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayDeque;
@@ -31,16 +30,16 @@ import java.util.Locale;
  * Компилятор в опкод
  */
 public class Compiler extends BSLParserBaseVisitor<ParseTree> {
-  private static final String ENTRY_METHOD = "$entry";
+  private static final String ENTRY_METHOD_NAME = "$entry";
   private static final Integer DUMMY_ADDRESS = -1;
 
   private final ScriptCompiler compiler;
   private final ModuleImageCache imageCache;
-  private MethodDescriptor currentMethodDescriptor;
-  private List<Integer> currentCommandReturnInMethod;
-  private SymbolScope localScope;
+  private final List<Integer> currentCommandReturnInMethod = new ArrayList<>();
+  private final Deque<Compiler.NestedLoopInfo> nestedLoops = new ArrayDeque<>();
 
-  private final Deque<NestedLoopInfo> nestedLoops = new ArrayDeque<>();
+  private MethodDescriptor currentMethodDescriptor;
+  private SymbolScope localScope;
 
   @Data
   private static class NestedLoopInfo {
@@ -52,12 +51,12 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       // none
     }
 
-    public static NestedLoopInfo create() {
-      return new NestedLoopInfo();
+    public static Compiler.NestedLoopInfo create() {
+      return new Compiler.NestedLoopInfo();
     }
 
-    public static NestedLoopInfo create(int startIndex) {
-      var loop = new NestedLoopInfo();
+    public static Compiler.NestedLoopInfo create(int startIndex) {
+      var loop = new Compiler.NestedLoopInfo();
       loop.setStartPoint(startIndex);
       return loop;
     }
@@ -69,186 +68,135 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   }
 
   @Override
-  public ParseTree visitModuleVarDeclaration(BSLParser.ModuleVarDeclarationContext ctx) {
-    var variableName = ctx.var_name().getText();
-    var variableInfo = new VariableInfo(variableName);
-    compiler.getModuleContext().defineVariable(variableInfo);
-    imageCache.getVariables().add(variableInfo);
-    return ctx;
-  }
+  public ParseTree visitFile(BSLParser.FileContext fileContext) {
+    var moduleScope = compiler.getModuleContext().getScopes().get(0);
 
-  @Override
-  public ParseTree visitCodeBlock(BSLParser.CodeBlockContext ctx) {
-    localScope = new SymbolScope();
-    compiler.getModuleContext().pushScope(localScope);
-    currentMethodDescriptor = new MethodDescriptor();
+    var subsContext = fileContext.subs();
+    if (subsContext != null) {
+      var subs = subsContext.sub();
+      for (var sub : subs) {
+        var method = createMethodDescriptor(sub);
+        // TODO:
+        imageCache.getMethods().add(method);
+        moduleScope.getMethods().add(method.getSignature());
 
-    var isBody = false;
-    var parent = ctx.parent;
-    if (parent.getRuleIndex() == BSLParser.RULE_fileCodeBlock) {
-      processFileCodeBlock(ctx);
-      isBody = true;
-    } else if (parent.getRuleIndex() == BSLParser.RULE_subCodeBlock) {
-      processSubCodeBlock(ctx);
-    }
-
-    if (currentMethodDescriptor.getEntry() >= 0) {
-      fillMethodDescriptorFromScope(currentMethodDescriptor, localScope);
-      imageCache.getMethods().add(currentMethodDescriptor);
-
-      var topScopes = compiler.getModuleContext().getScopes().get(0);
-      topScopes.getMethods().add(currentMethodDescriptor.getSignature());
-      var index = topScopes.getMethods().indexOf(currentMethodDescriptor.getSignature());
-      topScopes.getMethodNumbers().put(currentMethodDescriptor.getSignature().getName().toUpperCase(Locale.ENGLISH), index);
-
-      compiler.getModuleContext().popScope(localScope);
-      if (isBody) {
-        imageCache.setEntryPoint(imageCache.getMethods().size() - 1);
+        var index = moduleScope.getMethods().indexOf(method.getSignature());
+        moduleScope.getMethodNumbers().put(method.getSignature().getName().toUpperCase(Locale.ENGLISH), index);
       }
     }
 
-    currentMethodDescriptor = null;
-    localScope = null;
+    if (fileContext.fileCodeBlock() != null && !fileContext.fileCodeBlock().codeBlock().statement().isEmpty()) {
+      var method = createMethodDescriptorFromBody();
+      // TODO:
+      imageCache.getMethods().add(method);
+      moduleScope.getMethods().add(method.getSignature());
 
-    return ctx;
+      var index = moduleScope.getMethods().indexOf(method.getSignature());
+      moduleScope.getMethodNumbers().put(method.getSignature().getName().toUpperCase(Locale.ENGLISH), index);
+    }
+
+    return super.visitFile(fileContext);
   }
 
   @Override
-  public ParseTree visitWhileStatement(BSLParser.WhileStatementContext ctx) {
-    // прыжок наверх цикла должен попадать на опкод LineNum
-    // поэтому указываем адрес - 1
-    var conditionIndex = imageCache.getCode().size() - 1;
-    var loopRecord = NestedLoopInfo.create(conditionIndex);
+  public ParseTree visitModuleVar(BSLParser.ModuleVarContext moduleVarContext) {
+    // TODO: обработка аннотаций
 
-    nestedLoops.push(loopRecord);
-    processExpression(ctx.expression(), new ArrayDeque<>());
+    var variables = moduleVarContext.moduleVarsList().moduleVarDeclaration();
+    for (var variable : variables) {
+      var name = variable.var_name().getText();
+      var variableInfo = new VariableInfo(name);
+      compiler.getModuleContext().defineVariable(variableInfo);
+      imageCache.getVariables().add(variableInfo);
+    }
 
-    var jumpFalseIndex = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
-
-    processCodeBlock(ctx.codeBlock());
-
-    addCommand(OperationCode.Jmp, conditionIndex);
-    var endLoop = addCommand(OperationCode.Nop, 0);
-    correctCommandArgument(jumpFalseIndex, endLoop);
-    correctBreakStatements(nestedLoops.pop(), endLoop);
-
-    return ctx;
+    return moduleVarContext;
   }
 
   @Override
-  public ParseTree visitBreakStatement(BSLParser.BreakStatementContext ctx) {
-    exitTryBlocks();
-    var loopInfo = nestedLoops.peek();
-    assert loopInfo != null;
-    var idx = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
-    loopInfo.getBreakStatements().add(idx);
-    return ctx;
+  public ParseTree visitProcedure(BSLParser.ProcedureContext procedure) {
+    var methodName = getMethodName(procedure);
+    prepareModuleMethod(methodName, false);
+    super.visitProcedure(procedure);
+    processMethodEnd(false);
+    pruneContextModuleMethod();
+    return procedure;
   }
 
   @Override
-  public ParseTree visitContinueStatement(BSLParser.ContinueStatementContext ctx) {
-    exitTryBlocks();
-    var loopInfo = nestedLoops.peek();
-    assert loopInfo != null;
-    addCommand(OperationCode.Jmp, loopInfo.getStartPoint());
-    return ctx;
+  public ParseTree visitFunction(BSLParser.FunctionContext function) {
+    var methodName = getMethodName(function);
+    prepareModuleMethod(methodName, false);
+    super.visitFunction(function);
+    addHiddenReturnForMethod();
+    processMethodEnd(false);
+    pruneContextModuleMethod();
+    return function;
   }
 
-  private void correctBreakStatements(NestedLoopInfo loop, int endLoop) {
-    for (var breakCmdIndex : loop.breakStatements) {
-      correctCommandArgument(breakCmdIndex, endLoop);
-    }
-  }
-
-  private void correctCommandArgument(int index, int newValue) {
-    var cmd = imageCache.getCode().get(index);
-    cmd.setArgument(newValue);
-  }
-
-  private void exitTryBlocks() {
-    assert nestedLoops.peek() != null;
-    var tryBlocks = nestedLoops.peek().getTryNesting();
-    if (tryBlocks > 0)
-      addCommand(OperationCode.ExitTry, tryBlocks);
-  }
-
-  // TODO:
-  private void pushTryNesting() {
-    if (nestedLoops.size() > 0) {
-      var loop = nestedLoops.peek();
-      loop.setTryNesting(loop.getTryNesting() + 1);
-    }
-  }
-
-  // TODO:
-  private void popTryNesting() {
-    if (nestedLoops.size() > 0) {
-      var loop = nestedLoops.peek();
-      loop.setTryNesting(loop.getTryNesting() - 1);
-    }
-  }
-
-  private void processFileCodeBlock(BSLParser.CodeBlockContext codeBlock) {
-    var statements = codeBlock.statement();
-    if (statements == null) {
-      return;
+  @Override
+  public ParseTree visitFileCodeBlock(BSLParser.FileCodeBlockContext fileCodeBlock) {
+    // TODO
+    if (fileCodeBlock.codeBlock().statement().isEmpty()) {
+      return fileCodeBlock;
     }
 
-    var methodInfo = new MethodInfo(ENTRY_METHOD, ENTRY_METHOD, false, new ParameterInfo[0], null);
-    currentMethodDescriptor.setSignature(methodInfo);
-
-    // загрузить переменные?
-
-    processStatements(statements);
+    prepareModuleMethod(ENTRY_METHOD_NAME, true);
+    super.visitFileCodeBlock(fileCodeBlock);
+    processMethodEnd(true);
+    pruneContextModuleMethod();
+    return fileCodeBlock;
   }
 
-  private void processStatements(List<? extends BSLParser.StatementContext> statements) {
-    for (var statement : statements) {
-      int numberLint = statement.getStart().getLine();
-      addCommand(OperationCode.LineNum, numberLint);
-      if (currentMethodDescriptor.getEntry() < 0) {
-        currentMethodDescriptor.setEntry(imageCache.getCode().size() - 1);
-      }
-      processStatement(statement);
+  @Override
+  public ParseTree visitParamList(BSLParser.ParamListContext paramList) {
+    return paramList;
+  }
+
+  @Override
+  public ParseTree visitSubVar(BSLParser.SubVarContext subVarContext) {
+    // TODO: обработка аннотаций ?
+
+    var variables = subVarContext.subVarsList().subVarDeclaration();
+    for (var variable : variables) {
+      var name = variable.var_name().getText();
+      var variableInfo = new VariableInfo(name);
+      currentMethodDescriptor.getVariables().add(variableInfo);
+
+      localScope.getVariables().add(variableInfo);
+      localScope.getVariableNumbers().put(name.toUpperCase(Locale.ENGLISH), localScope.getVariables().indexOf(variableInfo));
+      // LoadLoc ?
     }
+
+    return subVarContext;
   }
 
-  private void processStatement(BSLParser.StatementContext statementContext) {
-    if (statementContext.callStatement() != null) {
-      processCallStatement(statementContext.callStatement());
-    } else if (statementContext.assignment() != null) {
-      processAssigment(statementContext.assignment());
-    } else if (statementContext.compoundStatement() != null) {
-      var compoundStatement = statementContext.compoundStatement();
-      if (compoundStatement.returnStatement() != null) {
-        processReturnStatement(compoundStatement.returnStatement());
-      } else if (compoundStatement.whileStatement() != null) {
-        // visit, а не process, чтобы быстрее можно было переделать
-        // на обход через visitor
-        visitWhileStatement(compoundStatement.whileStatement());
-      } else if (compoundStatement.continueStatement() != null) {
-        visitContinueStatement(compoundStatement.continueStatement());
-      } else if (compoundStatement.breakStatement() != null) {
-        visitBreakStatement(compoundStatement.breakStatement());
-      } else {
-        throw CompilerException.notImplementedException();
-      }
-    } else {
-      throw CompilerException.notImplementedException();
+  @Override
+  public ParseTree visitCodeBlock(BSLParser.CodeBlockContext codeBlock) {
+    return super.visitCodeBlock(codeBlock);
+  }
+
+  @Override
+  public ParseTree visitFileCodeBlockBeforeSub(BSLParser.FileCodeBlockBeforeSubContext fileCodeBlockBeforeSub) {
+    // TODO: выкидывать ошибку, если есть код в codeblocks
+    return fileCodeBlockBeforeSub;
+  }
+
+  @Override
+  public ParseTree visitStatement(BSLParser.StatementContext statement) {
+    int numberLint = statement.getStart().getLine();
+    addCommand(OperationCode.LineNum, numberLint);
+    if (currentMethodDescriptor != null && currentMethodDescriptor.getEntry() == DUMMY_ADDRESS) {
+      currentMethodDescriptor.setEntry(imageCache.getCode().size() - 1);
     }
+    return super.visitStatement(statement);
   }
 
-  private void processReturnStatement(BSLParser.ReturnStatementContext returnStatementContext) {
-    processExpression(returnStatementContext.expression(), new ArrayDeque<>());
-    addCommand(OperationCode.MakeRawValue, 0);
-    var indexJump = addCommand(OperationCode.Jmp, -1);
-    currentCommandReturnInMethod.add(indexJump);
-  }
-
-  private void processAssigment(BSLParser.AssignmentContext assignment) {
+  @Override
+  public ParseTree visitAssignment(BSLParser.AssignmentContext assignment) {
     var lValue = assignment.lValue();
     var expression = assignment.expression();
-    processExpression(expression, new ArrayDeque<>());
+    visitExpression(expression);
 
     var variableName = lValue.getText();
     var address = compiler.findVariableInContext(variableName);
@@ -269,284 +217,212 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       addCommand(OperationCode.LoadLoc, index);
 
     }
+
+    return assignment;
   }
 
-  private void processExpression(BSLParser.ExpressionContext expression, Deque<ExpressionOperator> operators) {
-    var booleanExpression = false;
-    List<Integer> booleanCommands = new ArrayList<>();
-    for (var index = 0; index < expression.getChildCount(); index++) {
-      var child = (BSLParserRuleContext) expression.getChild(index);
-      if (child.getRuleIndex() == BSLParser.RULE_member) {
-        processMember((BSLParser.MemberContext) child, operators);
-      } else if (child.getRuleIndex() == BSLParser.RULE_operation) {
-        var operation = getOperatorByChild((BSLParser.OperationContext) child);
-        if (isLogicOperator(operation)) {
-          booleanExpression = true;
-          var indexCommand = addOperator(operation);
-          booleanCommands.add(indexCommand);
-        } else {
-          processOperator(operation, operators);
-        }
-      } else {
-        throw new RuntimeException("Не поддерживается");
-      }
-    }
-
-    while (!operators.isEmpty()) {
-      var indexCommand = addOperator(operators.pop());
-      booleanCommands.add(indexCommand);
-    }
-
-    if (booleanExpression) {
-      var lastIndexCommand = addCommand(OperationCode.MakeBool, 0);
-      booleanCommands.forEach(commandId -> correctCommandArgument(commandId, lastIndexCommand));
-    }
-
+  @Override
+  public ParseTree visitIfStatement(BSLParser.IfStatementContext ifStatement) {
+    // TODO
+    throw CompilerException.notImplementedException("ifStatement");
   }
 
-  private void processUnaryModifier(BSLParser.UnaryModifierContext child, Deque<ExpressionOperator> operators) {
-    if (child.NOT_KEYWORD() != null) {
-      operators.push(ExpressionOperator.NOT);
-    } else if (child.PLUS() != null) {
-      operators.push(ExpressionOperator.UNARY_PLUS);
-    } else if (child.MINUS() != null) {
-      operators.push(ExpressionOperator.UNARY_MINUS);
-    } else {
-      throw new RuntimeException("Not supported");
-    }
+  @Override
+  public ParseTree visitWhileStatement(BSLParser.WhileStatementContext whileStatement) {
+    // прыжок наверх цикла должен попадать на опкод LineNum
+    // поэтому указываем адрес - 1
+    var conditionIndex = imageCache.getCode().size() - 1;
+    var loopRecord = Compiler.NestedLoopInfo.create(conditionIndex);
+
+    nestedLoops.push(loopRecord);
+    processExpression(whileStatement.expression(), new ArrayDeque<>());
+
+    var jumpFalseIndex = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+
+    visitCodeBlock(whileStatement.codeBlock());
+
+    addCommand(OperationCode.Jmp, conditionIndex);
+    var endLoop = addCommand(OperationCode.Nop, 0);
+    correctCommandArgument(jumpFalseIndex, endLoop);
+    correctBreakStatements(nestedLoops.pop(), endLoop);
+
+    return whileStatement;
   }
 
-  private void processOperator(ExpressionOperator operation, Deque<ExpressionOperator> operators) {
-    if (!operators.isEmpty()) {
-      ExpressionOperator operatorFromDeque;
-      while (!operators.isEmpty()) {
-        operatorFromDeque = operators.peek();
-        if (operatorFromDeque.getPriority() >= operation.getPriority()) {
-          addOperator(operators.pop());
-        } else {
-          break;
-        }
-      }
-    }
-    operators.push(operation);
+  @Override
+  public ParseTree visitForStatement(BSLParser.ForStatementContext forStatement) {
+    // TODO
+    throw CompilerException.notImplementedException("forStatement");
   }
 
-  private void processMember(BSLParser.MemberContext memberContext, Deque<ExpressionOperator> operators) {
-    if (memberContext.constValue() != null) {
-      processConstValue(memberContext.constValue());
-    } else if (memberContext.expression() != null) {
-      // тут скобки `(` \ `)`
-      processExpression(memberContext.expression(), new ArrayDeque<>());
-    } else if (memberContext.complexIdentifier() != null) {
-      processComplexIdentifier(memberContext.complexIdentifier());
-    } else {
-      throw new RuntimeException("Member not supported");
-    }
-
-    if (memberContext.unaryModifier() != null) {
-      processUnaryModifier(memberContext.unaryModifier(), operators);
-    }
-
+  @Override
+  public ParseTree visitForEachStatement(BSLParser.ForEachStatementContext forEachStatement) {
+    // TODO
+    throw CompilerException.notImplementedException("forEachStatement");
   }
 
-  private void processCallStatement(BSLParser.CallStatementContext callStatement) {
-    if (callStatement.globalMethodCall() != null) {
-      var paramList = callStatement.globalMethodCall().doCall().callParamList();
-      processParamList(paramList);
-      addCommand(OperationCode.ArgNum, calcParams(paramList));
-      processMethodCall(callStatement.globalMethodCall().methodName(), false);
-    } else if (callStatement.accessCall() != null) {
-      var identifier = callStatement.IDENTIFIER().getText();
-      processIdentifier(identifier);
-      processAccessCall(callStatement.accessCall(), false);
-    } else {
-      throw new RuntimeException("Не реализовано");
-    }
+  @Override
+  public ParseTree visitTryStatement(BSLParser.TryStatementContext tryStatement) {
+    // TODO
+    throw CompilerException.notImplementedException("tryStatement");
   }
 
-  private void processAccessCall(BSLParser.AccessCallContext accessCallContext, boolean ifFunction) {
-    var paramList = accessCallContext.methodCall().doCall().callParamList();
+  @Override
+  public ParseTree visitReturnStatement(BSLParser.ReturnStatementContext returnStatement) {
+    super.visitReturnStatement(returnStatement);
+
+    addCommand(OperationCode.MakeRawValue, 0);
+    var indexJump = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+    currentCommandReturnInMethod.add(indexJump);
+
+    return returnStatement;
+  }
+
+  @Override
+  public ParseTree visitContinueStatement(BSLParser.ContinueStatementContext continueStatement) {
+    exitTryBlocks();
+    var loopInfo = nestedLoops.peek();
+    // FIXME
+    assert loopInfo != null;
+    addCommand(OperationCode.Jmp, loopInfo.getStartPoint());
+    return continueStatement;
+  }
+
+  @Override
+  public ParseTree visitBreakStatement(BSLParser.BreakStatementContext breakStatement) {
+    exitTryBlocks();
+    var loopInfo = nestedLoops.peek();
+    // FIXME
+    assert loopInfo != null;
+    var idx = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+    loopInfo.getBreakStatements().add(idx);
+    return breakStatement;
+  }
+
+  @Override
+  public ParseTree visitRaiseStatement(BSLParser.RaiseStatementContext raiseStatement) {
+    // TODO
+    throw CompilerException.notImplementedException("raiseStatement");
+  }
+
+  @Override
+  public ParseTree visitExecuteStatement(BSLParser.ExecuteStatementContext executeStatement) {
+    // TODO
+    throw CompilerException.notImplementedException("executeStatement");
+  }
+
+  @Override
+  public ParseTree visitGotoStatement(BSLParser.GotoStatementContext gotoStatement) {
+    // TODO
+    throw CompilerException.notImplementedException("gotoStatement");
+  }
+
+  @Override
+  public ParseTree visitAddHandlerStatement(BSLParser.AddHandlerStatementContext addHandlerStatement) {
+    // TODO
+    throw CompilerException.notSupportedException();
+  }
+
+  @Override
+  public ParseTree visitRemoveHandlerStatement(BSLParser.RemoveHandlerStatementContext removeHandlerStatement) {
+    // TODO
+    throw CompilerException.notSupportedException();
+  }
+
+  @Override
+  public ParseTree visitWaitStatement(BSLParser.WaitStatementContext waitStatement) {
+    // TODO
+    throw CompilerException.notSupportedException();
+  }
+
+  @Override
+  public ParseTree visitGlobalMethodCall(BSLParser.GlobalMethodCallContext globalMethodCall) {
+    var callStatement = (BSLParser.CallStatementContext) globalMethodCall.getParent();
+
+    var paramList = callStatement.globalMethodCall().doCall().callParamList();
     processParamList(paramList);
     addCommand(OperationCode.ArgNum, calcParams(paramList));
-
-    var constant = new ConstantDefinition(ValueFactory.create(accessCallContext.methodCall().methodName().getText()));
-    if (!imageCache.getConstants().contains(constant)) {
-      imageCache.getConstants().add(constant);
-    }
-    var index = imageCache.getConstants().indexOf(constant);
-
-    if (ifFunction) {
-      addCommand(OperationCode.ResolveMethodFunc, index);
-    } else {
-      addCommand(OperationCode.ResolveMethodProc, index);
-    }
+    processMethodCall(callStatement.globalMethodCall().methodName(), false);
+    return globalMethodCall;
   }
 
-  private void processIdentifier(String identifier) {
-    var address = compiler.findVariableInContext(identifier);
-    if (address == null) {
-      throw CompilerException.symbolNotFoundException(identifier);
-    }
+  @Override
+  public ParseTree visitAccessCall(BSLParser.AccessCallContext accessCall) {
+    var callStatement = (BSLParser.CallStatementContext) accessCall.getParent();
 
-    if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
-      addCommand(OperationCode.PushLoc, address.getSymbolId());
-    } else {
-      imageCache.getVariableRefs().add(address);
-      addCommand(OperationCode.PushVar, imageCache.getVariableRefs().indexOf(address));
-    }
+    var identifier = callStatement.IDENTIFIER().getText();
+    processIdentifier(identifier);
+    processAccessCall(accessCall, false);
+    return accessCall;
   }
 
-  private void processGlobalStatement(BSLParser.GlobalMethodCallContext globalMethodCall) {
-    var paramList = globalMethodCall.doCall().callParamList();
-    processParamList(paramList);
-
-    var identifier = globalMethodCall.methodName().getText();
-    var optionalOperationCode = NativeGlobalMethod.getOperationCode(identifier);
-    if (optionalOperationCode.isPresent()) {
-      var opCode = optionalOperationCode.get();
-      int arguments = NativeGlobalMethod.getArgumentsByOperationCode(opCode);
-
-      int paramsCount = calcParams(paramList);
-      if (paramsCount > arguments) {
-        throw CompilerException.tooManyMethodArgumentsException();
-      } else if (paramsCount < arguments) {
-        throw CompilerException.tooFewMethodArgumentsException();
-      }
-      addCommand(opCode, arguments);
-
-    } else {
-
-      addCommand(OperationCode.ArgNum, calcParams(paramList));
-      processMethodCall(globalMethodCall.methodName(), true);
-
-    }
+  @Override
+  public ParseTree visitExpression(BSLParser.ExpressionContext expression) {
+    processExpression(expression, new ArrayDeque<>());
+    return expression;
   }
 
-  private int calcParams(BSLParser.CallParamListContext callParamListContext) {
-    var count = 0;
-    for (var callParam : callParamListContext.callParam()) {
-      if (callParam.getChildCount() > 0) {
-        count++;
-      }
-    }
-    return count;
-  }
-
-  private void processMethodCall(BSLParser.MethodNameContext methodNameContext, boolean isFunction) {
-    var methodName = methodNameContext.getText();
-    var address = compiler.findMethodInContext(methodName);
-    if (address == null) {
-      // todo: кричать
-      throw new RuntimeException("Метод не найден");
-    }
-    if (!imageCache.getMethodRefs().contains(address)) {
-      imageCache.getMethodRefs().add(address);
-    }
-    var refs = imageCache.getMethodRefs().indexOf(address);
-    if (isFunction) {
-      addCommand(OperationCode.CallFunc, refs);
-    } else {
-      addCommand(OperationCode.CallProc, refs);
-    }
-  }
-
-  private void processParamList(BSLParser.CallParamListContext paramList) {
-    paramList.callParam().forEach(callParamContext -> {
-      if (callParamContext.expression() == null) {
-        return;
-      }
-      processExpression(callParamContext.expression(), new ArrayDeque<>());
-    });
-
-  }
-
-  private void processComplexIdentifier(BSLParser.ComplexIdentifierContext complexIdentifierContext) {
-    if (complexIdentifierContext.globalMethodCall() != null) {
-      processGlobalStatement(complexIdentifierContext.globalMethodCall());
-      return;
-    } else if (complexIdentifierContext.newExpression() != null) {
-      processNewExpression(complexIdentifierContext.newExpression());
-      return;
-    }
-
-    processIdentifier(complexIdentifierContext.IDENTIFIER().getText());
-
-    // проверим, что идет дальше
-    if (complexIdentifierContext.modifier() != null) {
-      for (var modifier : complexIdentifierContext.modifier()) {
-
-        if (modifier.accessCall() != null) {
-          processAccessCall(modifier.accessCall(), true);
-        } else if (modifier.accessProperty() != null) {
-          throw new RuntimeException("accessProperty");
-        } else if (modifier.accessIndex() != null) {
-          processExpression(modifier.accessIndex().expression(), new ArrayDeque<>());
-          addCommand(OperationCode.PushIndexed, 0);
-        } else {
-          throw new RuntimeException("Обработка modifier не поддерживается");
-        }
-
-      }
-    }
-
-  }
-
-  private void processNewExpression(BSLParser.NewExpressionContext newExpressionContext) {
-    // TODO: хранить в отдельной стопке, не в контантах?
-    var typeName = newExpressionContext.typeName().getText();
-    var constant = new ConstantDefinition(ValueFactory.create(typeName));
-    if (!imageCache.getConstants().contains(constant)) {
-      imageCache.getConstants().add(constant);
-    }
-    addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
-
-    // TODO:
-    var argumentCount = 0;
-
-    addCommand(OperationCode.NewInstance, argumentCount);
-  }
-
-  private void processConstValue(BSLParser.ConstValueContext constValue) {
+  @Override
+  public ParseTree visitConstValue(BSLParser.ConstValueContext constValue) {
     var constant = getConstantDefinitionByConstValue(constValue, false);
     if (!imageCache.getConstants().contains(constant)) {
       imageCache.getConstants().add(constant);
     }
     addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
+    return constValue;
   }
 
-  private void processSubCodeBlock(BSLParser.CodeBlockContext ctx) {
-    currentCommandReturnInMethod = new ArrayList<>();
+  @Override
+  public ParseTree visitComplexIdentifier(BSLParser.ComplexIdentifierContext complexIdentifier) {
+    processComplexIdentifier(complexIdentifier);
+    return complexIdentifier;
+  }
 
-    var subContext = ctx.parent.parent;
-    if (subContext.getRuleIndex() == BSLParser.RULE_procedure) {
-      processProcedure(subContext);
+  private MethodDescriptor createMethodDescriptor(BSLParser.SubContext subContext) {
+    boolean isFunction;
+    String methodName;
+    BSLParser.ParamListContext parametersList;
+
+    if (subContext.function() != null) {
+      isFunction = true;
+      methodName = getMethodName(subContext.function());
+      parametersList = getMethodParamListContext(subContext.function());
     } else {
-      processFunction(subContext);
+      isFunction = false;
+      methodName = getMethodName(subContext.procedure());
+      parametersList = getMethodParamListContext(subContext.procedure());
     }
 
-    if (ctx.statement() != null) {
-      processStatements(ctx.statement());
-    }
+    var parameterInfos = buildParameterInfos(parametersList);
+    var methodInfo = new MethodInfo(methodName, methodName, isFunction, parameterInfos);
 
-    if (currentMethodDescriptor.getSignature().isFunction()) {
-      // скрытый возврат
-      var constant = new ConstantDefinition(ValueFactory.create());
-      imageCache.getConstants().add(constant);
-      addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
-    }
-
-    var indexEndMethod = addReturn();
-    currentCommandReturnInMethod.forEach(index -> correctCommandArgument(index, indexEndMethod));
-
-    if (currentMethodDescriptor.getEntry() < 0) {
-      currentMethodDescriptor.setEntry(imageCache.getCode().size() - 1);
-    }
+    var methodDescriptor = new MethodDescriptor();
+    methodDescriptor.setSignature(methodInfo);
+    return methodDescriptor;
   }
 
-  private void processCodeBlock(BSLParser.CodeBlockContext ctx) {
-    if (ctx.statement() != null) {
-      processStatements(ctx.statement());
-    }
+  private MethodDescriptor createMethodDescriptorFromBody() {
+    var methodInfo = new MethodInfo(ENTRY_METHOD_NAME, ENTRY_METHOD_NAME, false, new ParameterInfo[0]);
+
+    var methodDescriptor = new MethodDescriptor();
+    methodDescriptor.setSignature(methodInfo);
+    return methodDescriptor;
+  }
+
+  private String getMethodName(BSLParser.FunctionContext function) {
+    return function.funcDeclaration().subName().getText();
+  }
+
+  private String getMethodName(BSLParser.ProcedureContext procedure) {
+    return procedure.procDeclaration().subName().getText();
+  }
+
+  private BSLParser.ParamListContext getMethodParamListContext(BSLParser.FunctionContext function) {
+    return function.funcDeclaration().paramList();
+  }
+
+  private BSLParser.ParamListContext getMethodParamListContext(BSLParser.ProcedureContext procedure) {
+    return procedure.procDeclaration().paramList();
   }
 
   private ParameterInfo[] buildParameterInfos(BSLParser.ParamListContext paramList) {
@@ -580,28 +456,14 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     return parameterInfos;
   }
 
-  private void processFunction(RuleContext ruleContext) {
-    var function = (BSLParser.FunctionContext) ruleContext;
-    var name = function.funcDeclaration().subName().getText();
-    var paramList = function.funcDeclaration().paramList();
-    var parameterInfos = buildParameterInfos(paramList);
+  private MethodDescriptor getMethodDescriptor(String name) {
+    // TODO: поиск в локальной мапе
 
-    addParametersToCurrentScope(parameterInfos);
-
-    var info = new MethodInfo(name, name, true, parameterInfos, null);
-    currentMethodDescriptor.setSignature(info);
-  }
-
-  private void processProcedure(RuleContext ruleContext) {
-    var procedure = (BSLParser.ProcedureContext) ruleContext;
-    var name = procedure.procDeclaration().subName().getText();
-    var paramList = procedure.procDeclaration().paramList();
-    var parameterInfos = buildParameterInfos(paramList);
-
-    addParametersToCurrentScope(parameterInfos);
-
-    var info = new MethodInfo(name, name, false, parameterInfos, null);
-    currentMethodDescriptor.setSignature(info);
+    //noinspection OptionalGetWithoutIsPresent
+    return imageCache.getMethods().stream()
+      .filter(methodDescriptor -> methodDescriptor.getSignature().getName().equals(name))
+      .findAny()
+      .get();
   }
 
   private int addCommand(OperationCode operationCode, int argument) {
@@ -614,55 +476,37 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     return addCommand(OperationCode.Return, 0);
   }
 
-  private void fillMethodDescriptorFromScope(MethodDescriptor methodDescriptor, SymbolScope scope) {
-    methodDescriptor.getVariables().addAll(scope.getVariables());
-  }
-
-  private void addParametersToCurrentScope(ParameterInfo[] parameterInfos) {
-    for (var parameterInfo : parameterInfos) {
-      var variableInfo = new VariableInfo(parameterInfo.getName());
-      var upperName = parameterInfo.getName().toUpperCase(Locale.ENGLISH);
-      localScope.getVariables().add(variableInfo);
-      localScope.getVariableNumbers().put(upperName, localScope.getVariables().indexOf(variableInfo));
+  private void processExpression(BSLParser.ExpressionContext expression, Deque<ExpressionOperator> operators) {
+    var booleanExpression = false;
+    List<Integer> booleanCommands = new ArrayList<>();
+    for (var index = 0; index < expression.getChildCount(); index++) {
+      var child = (BSLParserRuleContext) expression.getChild(index);
+      if (child.getRuleIndex() == BSLParser.RULE_member) {
+        processMember((BSLParser.MemberContext) child, operators);
+      } else if (child.getRuleIndex() == BSLParser.RULE_operation) {
+        var operation = getOperatorByChild((BSLParser.OperationContext) child);
+        if (isLogicOperator(operation)) {
+          booleanExpression = true;
+          var indexCommand = addOperator(operation);
+          booleanCommands.add(indexCommand);
+        } else {
+          processOperator(operation, operators);
+        }
+      } else {
+        throw CompilerException.notSupportedException();
+      }
     }
-  }
 
-  private int addOperator(ExpressionOperator operator) {
-    OperationCode operationCode;
-    if (operator == ExpressionOperator.ADD) {
-      operationCode = OperationCode.Add;
-    } else if (operator == ExpressionOperator.SUB) {
-      operationCode = OperationCode.Sub;
-    } else if (operator == ExpressionOperator.MUL) {
-      operationCode = OperationCode.Mul;
-    } else if (operator == ExpressionOperator.DIV) {
-      operationCode = OperationCode.Div;
-    } else if (operator == ExpressionOperator.UNARY_PLUS) {
-      operationCode = OperationCode.Number;
-    } else if (operator == ExpressionOperator.UNARY_MINUS) {
-      operationCode = OperationCode.Neg;
-    } else if (operator == ExpressionOperator.NOT) {
-      operationCode = OperationCode.Not;
-    } else if (operator == ExpressionOperator.OR) {
-      operationCode = OperationCode.Or;
-    } else if (operator == ExpressionOperator.AND) {
-      operationCode = OperationCode.And;
-    } else if (operator == ExpressionOperator.EQUAL) {
-      operationCode = OperationCode.Equals;
-    } else if (operator == ExpressionOperator.LESS) {
-      operationCode = OperationCode.Less;
-    } else if (operator == ExpressionOperator.LESS_OR_EQUAL) {
-      operationCode = OperationCode.LessOrEqual;
-    } else if (operator == ExpressionOperator.GREATER) {
-      operationCode = OperationCode.Greater;
-    } else if (operator == ExpressionOperator.GREATER_OR_EQUAL) {
-      operationCode = OperationCode.GreaterOrEqual;
-    } else if (operator == ExpressionOperator.NOT_EQUAL) {
-      operationCode = OperationCode.NotEqual;
-    } else {
-      throw new RuntimeException("Operator not supported");
+    while (!operators.isEmpty()) {
+      var indexCommand = addOperator(operators.pop());
+      booleanCommands.add(indexCommand);
     }
-    return addCommand(operationCode, 0);
+
+    if (booleanExpression) {
+      var lastIndexCommand = addCommand(OperationCode.MakeBool, 0);
+      booleanCommands.forEach(commandId -> correctCommandArgument(commandId, lastIndexCommand));
+    }
+
   }
 
   private ExpressionOperator getOperatorByChild(BSLParser.OperationContext operationContext) {
@@ -682,7 +526,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       } else if (bool.OR_KEYWORD() != null) {
         operator = ExpressionOperator.OR;
       } else {
-        throw new RuntimeException("Not supported operator");
+        throw CompilerException.notNotSupportedExpressionOperator(bool.getText());
       }
     } else if (operationContext.compareOperation() != null) {
       var compare = operationContext.compareOperation();
@@ -699,16 +543,108 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       } else if (compare.NOT_EQUAL() != null) {
         operator = ExpressionOperator.NOT_EQUAL;
       } else {
-        throw new RuntimeException("Not supported operator");
+        throw CompilerException.notNotSupportedExpressionOperator(compare.getText());
       }
     } else {
-      throw new RuntimeException("Not supported operator");
+      throw CompilerException.notNotSupportedExpressionOperator(operationContext.getText());
     }
     return operator;
   }
 
+  private void processMember(BSLParser.MemberContext memberContext, Deque<ExpressionOperator> operators) {
+    if (memberContext.constValue() != null) {
+      visitConstValue(memberContext.constValue());
+    } else if (memberContext.expression() != null) {
+      // тут скобки `(` \ `)`
+      visitExpression(memberContext.expression());
+    } else if (memberContext.complexIdentifier() != null) {
+      processComplexIdentifier(memberContext.complexIdentifier());
+    } else {
+      throw CompilerException.notSupportedException();
+    }
+
+    if (memberContext.unaryModifier() != null) {
+      processUnaryModifier(memberContext.unaryModifier(), operators);
+    }
+
+  }
+
+  private int addOperator(ExpressionOperator operator) {
+    OperationCode operationCode;
+    switch (operator) {
+      case ADD:
+        operationCode = OperationCode.Add;
+        break;
+      case SUB:
+        operationCode = OperationCode.Sub;
+        break;
+      case MUL:
+        operationCode = OperationCode.Mul;
+        break;
+      case DIV:
+        operationCode = OperationCode.Div;
+        break;
+      case UNARY_PLUS:
+        operationCode = OperationCode.Number;
+        break;
+      case UNARY_MINUS:
+        operationCode = OperationCode.Neg;
+        break;
+      case NOT:
+        operationCode = OperationCode.Not;
+        break;
+      case OR:
+        operationCode = OperationCode.Or;
+        break;
+      case AND:
+        operationCode = OperationCode.And;
+        break;
+      case EQUAL:
+        operationCode = OperationCode.Equals;
+        break;
+      case LESS:
+        operationCode = OperationCode.Less;
+        break;
+      case LESS_OR_EQUAL:
+        operationCode = OperationCode.LessOrEqual;
+        break;
+      case GREATER:
+        operationCode = OperationCode.Greater;
+        break;
+      case GREATER_OR_EQUAL:
+        operationCode = OperationCode.GreaterOrEqual;
+        break;
+      case NOT_EQUAL:
+        operationCode = OperationCode.NotEqual;
+        break;
+      default:
+        throw CompilerException.notNotSupportedExpressionOperator(operator.getText());
+    }
+    return addCommand(operationCode, 0);
+  }
+
   private boolean isLogicOperator(ExpressionOperator operator) {
     return operator == ExpressionOperator.OR || operator == ExpressionOperator.AND;
+  }
+
+  private void correctCommandArgument(int index, int newValue) {
+    var cmd = imageCache.getCode().get(index);
+    cmd.setArgument(newValue);
+  }
+
+  private void processOperator(ExpressionOperator operation, Deque<ExpressionOperator> operators) {
+    if (!operators.isEmpty()) {
+      ExpressionOperator operatorFromDeque;
+      while (!operators.isEmpty()) {
+        operatorFromDeque = operators.peek();
+        if (operatorFromDeque.getPriority() >= operation.getPriority()) {
+          addOperator(operators.pop());
+        } else {
+          break;
+        }
+      }
+    }
+    operators.push(operation);
   }
 
   private ConstantDefinition getConstantDefinitionByConstValue(BSLParser.ConstValueContext constValue,
@@ -733,9 +669,225 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     } else if (constValue.UNDEFINED() != null) {
       constant = new ConstantDefinition(ValueFactory.create());
     } else {
-      throw new RuntimeException("Constant value not supported");
+      throw CompilerException.notSupportedException();
     }
     return constant;
+  }
+
+  private void processComplexIdentifier(BSLParser.ComplexIdentifierContext complexIdentifierContext) {
+    if (complexIdentifierContext.globalMethodCall() != null) {
+      processGlobalStatement(complexIdentifierContext.globalMethodCall());
+      return;
+    } else if (complexIdentifierContext.newExpression() != null) {
+      processNewExpression(complexIdentifierContext.newExpression());
+      return;
+    }
+
+    processIdentifier(complexIdentifierContext.IDENTIFIER().getText());
+
+    // проверим, что идет дальше
+    if (complexIdentifierContext.modifier() != null) {
+      for (var modifier : complexIdentifierContext.modifier()) {
+
+        if (modifier.accessCall() != null) {
+          processAccessCall(modifier.accessCall(), true);
+        } else if (modifier.accessProperty() != null) {
+          throw CompilerException.notImplementedException("accessProperty");
+        } else if (modifier.accessIndex() != null) {
+          processExpression(modifier.accessIndex().expression(), new ArrayDeque<>());
+          addCommand(OperationCode.PushIndexed, 0);
+        } else {
+          throw CompilerException.notSupportedException();
+        }
+
+      }
+    }
+
+  }
+
+  private void processUnaryModifier(BSLParser.UnaryModifierContext child, Deque<ExpressionOperator> operators) {
+    if (child.NOT_KEYWORD() != null) {
+      operators.push(ExpressionOperator.NOT);
+    } else if (child.PLUS() != null) {
+      operators.push(ExpressionOperator.UNARY_PLUS);
+    } else if (child.MINUS() != null) {
+      operators.push(ExpressionOperator.UNARY_MINUS);
+    } else {
+      throw CompilerException.notNotSupportedExpressionOperator(child.getText());
+    }
+  }
+
+  private void processGlobalStatement(BSLParser.GlobalMethodCallContext globalMethodCall) {
+    var paramList = globalMethodCall.doCall().callParamList();
+    processParamList(paramList);
+
+    var identifier = globalMethodCall.methodName().getText();
+    var optionalOperationCode = NativeGlobalMethod.getOperationCode(identifier);
+    if (optionalOperationCode.isPresent()) {
+      var opCode = optionalOperationCode.get();
+      int arguments = NativeGlobalMethod.getArgumentsByOperationCode(opCode);
+
+      int paramsCount = calcParams(paramList);
+      if (paramsCount > arguments) {
+        throw CompilerException.tooManyMethodArgumentsException();
+      } else if (paramsCount < arguments) {
+        throw CompilerException.tooFewMethodArgumentsException();
+      }
+      addCommand(opCode, arguments);
+
+    } else {
+
+      addCommand(OperationCode.ArgNum, calcParams(paramList));
+      processMethodCall(globalMethodCall.methodName(), true);
+
+    }
+  }
+
+  private void processNewExpression(BSLParser.NewExpressionContext newExpressionContext) {
+    // TODO: хранить в отдельной стопке, не в контантах?
+    var typeName = newExpressionContext.typeName().getText();
+    var constant = new ConstantDefinition(ValueFactory.create(typeName));
+    if (!imageCache.getConstants().contains(constant)) {
+      imageCache.getConstants().add(constant);
+    }
+    addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
+
+    // TODO:
+    var argumentCount = 0;
+
+    addCommand(OperationCode.NewInstance, argumentCount);
+  }
+
+  private void processParamList(BSLParser.CallParamListContext paramList) {
+    paramList.callParam().forEach(callParamContext -> {
+      if (callParamContext.expression() == null) {
+        return;
+      }
+      processExpression(callParamContext.expression(), new ArrayDeque<>());
+    });
+  }
+
+  private void processIdentifier(String identifier) {
+    var address = compiler.findVariableInContext(identifier);
+    if (address == null) {
+      throw CompilerException.symbolNotFoundException(identifier);
+    }
+
+    if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
+      addCommand(OperationCode.PushLoc, address.getSymbolId());
+    } else {
+      imageCache.getVariableRefs().add(address);
+      addCommand(OperationCode.PushVar, imageCache.getVariableRefs().indexOf(address));
+    }
+  }
+
+  private void processAccessCall(BSLParser.AccessCallContext accessCallContext, boolean ifFunction) {
+    var paramList = accessCallContext.methodCall().doCall().callParamList();
+    processParamList(paramList);
+    addCommand(OperationCode.ArgNum, calcParams(paramList));
+
+    var constant = new ConstantDefinition(ValueFactory.create(accessCallContext.methodCall().methodName().getText()));
+    if (!imageCache.getConstants().contains(constant)) {
+      imageCache.getConstants().add(constant);
+    }
+    var index = imageCache.getConstants().indexOf(constant);
+
+    if (ifFunction) {
+      addCommand(OperationCode.ResolveMethodFunc, index);
+    } else {
+      addCommand(OperationCode.ResolveMethodProc, index);
+    }
+  }
+
+  private int calcParams(BSLParser.CallParamListContext callParamListContext) {
+    var count = 0;
+    for (var callParam : callParamListContext.callParam()) {
+      if (callParam.getChildCount() > 0) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  private void processMethodCall(BSLParser.MethodNameContext methodNameContext, boolean isFunction) {
+    var methodName = methodNameContext.getText();
+    var address = compiler.findMethodInContext(methodName);
+    if (address == null) {
+      throw CompilerException.methodNotFound(methodName);
+    }
+    if (!imageCache.getMethodRefs().contains(address)) {
+      imageCache.getMethodRefs().add(address);
+    }
+    var refs = imageCache.getMethodRefs().indexOf(address);
+    if (isFunction) {
+      addCommand(OperationCode.CallFunc, refs);
+    } else {
+      addCommand(OperationCode.CallProc, refs);
+    }
+  }
+
+  private void correctBreakStatements(Compiler.NestedLoopInfo loop, int endLoop) {
+    for (var breakCmdIndex : loop.breakStatements) {
+      correctCommandArgument(breakCmdIndex, endLoop);
+    }
+  }
+
+  private void exitTryBlocks() {
+    assert nestedLoops.peek() != null;
+    var tryBlocks = nestedLoops.peek().getTryNesting();
+    if (tryBlocks > 0) {
+      addCommand(OperationCode.ExitTry, tryBlocks);
+    }
+  }
+
+  private void addParametersToCurrentScope(ParameterInfo[] parameterInfos) {
+    for (var parameterInfo : parameterInfos) {
+      var variableInfo = new VariableInfo(parameterInfo.getName());
+      var upperName = parameterInfo.getName().toUpperCase(Locale.ENGLISH);
+      localScope.getVariables().add(variableInfo);
+      localScope.getVariableNumbers().put(upperName, localScope.getVariables().indexOf(variableInfo));
+    }
+  }
+
+  private void prepareModuleMethod(String methodName, boolean isBodyMethod) {
+    currentMethodDescriptor = getMethodDescriptor(methodName);
+
+    localScope = new SymbolScope();
+    compiler.getModuleContext().pushScope(localScope);
+
+    if (!isBodyMethod) {
+      addParametersToCurrentScope(currentMethodDescriptor.getSignature().getParameters());
+    }
+  }
+
+  private void pruneContextModuleMethod() {
+    currentCommandReturnInMethod.clear();
+    currentMethodDescriptor = null;
+    compiler.getModuleContext().popScope(localScope);
+    localScope = null;
+  }
+
+  private void processMethodEnd(boolean isBody) {
+    if (isBody) {
+      if (currentMethodDescriptor.getEntry() >= 0) {
+        imageCache.setEntryPoint(imageCache.getMethods().size() - 1);
+      }
+    } else {
+      var indexEndMethod = addReturn();
+      currentCommandReturnInMethod.forEach(index -> correctCommandArgument(index, indexEndMethod));
+      if (currentMethodDescriptor.getEntry() == DUMMY_ADDRESS) {
+        currentMethodDescriptor.setEntry(indexEndMethod);
+      }
+    }
+
+    currentMethodDescriptor.getVariables().addAll(localScope.getVariables());
+  }
+
+  private void addHiddenReturnForMethod() {
+    // скрытый возврат Неопределено
+    var constant = new ConstantDefinition(ValueFactory.create());
+    imageCache.getConstants().add(constant);
+    addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
   }
 
 }

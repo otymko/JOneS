@@ -12,11 +12,13 @@ import com.github.otymko.jos.runtime.machine.OperationCode;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class CompilerTest {
 
@@ -72,6 +74,16 @@ class CompilerTest {
 
     var continueCommandIndex = findCommand(code, OperationCode.Jmp, falseCondition, line);
     assertThat(continueCommandIndex).isNotEqualTo(-1);
+  }
+
+  @Test
+  void testCodeBlocks() throws IOException {
+    var pathToScript = Path.of("src/test/resources/code-blocks.os");
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(out));
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    assertThatCode(() -> compiler.compile(pathToScript, UserScriptContext.class)).doesNotThrowAnyException();
   }
 
   private int findCommand(List<Command> commands, OperationCode code, int start) {

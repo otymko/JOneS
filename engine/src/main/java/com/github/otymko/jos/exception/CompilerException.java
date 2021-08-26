@@ -24,8 +24,23 @@ public class CompilerException extends EngineException {
     return new CompilerException(message);
   }
 
-  public static CompilerException notImplementedException() {
-    var message = "Не реализовано";
+  public static CompilerException notSupportedException() {
+    var message = "Не поддерживается";
+    return new CompilerException(message);
+  }
+
+  public static CompilerException notImplementedException(String what) {
+    var message = String.format("'%s' не реализовано", what);
+    return new CompilerException(message);
+  }
+
+  public static CompilerException notNotSupportedExpressionOperator(String operator) {
+    var message = String.format("Оператор %s не поддерживается", operator);
+    return new CompilerException(message);
+  }
+
+  public static CompilerException methodNotFound(String methodName) {
+    var message = String.format("Метод '%s' не найден", methodName);
     return new CompilerException(message);
   }
 
