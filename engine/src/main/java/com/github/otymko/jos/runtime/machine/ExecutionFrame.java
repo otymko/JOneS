@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.machine;
 
+import com.github.otymko.jos.exception.EngineException;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Variable;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class ExecutionFrame {
   private int moduleLoadIndex;
   private ModuleImage image;
   private String methodName;
+  private EngineException lastException;
 
   private boolean discardReturnValue;
 

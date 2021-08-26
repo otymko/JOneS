@@ -44,4 +44,9 @@ public class CompilerException extends EngineException {
     return new CompilerException(message);
   }
 
+  public static CompilerException mismatchedRaiseExpression() {
+    var message = String.format("Оператор \"ВызватьИсключение\" без параметров может использоваться только в блоке \"Исключение\"");
+    return new CompilerException(message);
+  }
+
 }
