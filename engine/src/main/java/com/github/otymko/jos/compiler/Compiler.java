@@ -224,7 +224,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   @Override
   public ParseTree visitIfStatement(BSLParser.IfStatementContext ifStatement) {
     // TODO
-    throw CompilerException.notImplementedException();
+    throw CompilerException.notImplementedException("ifStatement");
   }
 
   @Override
@@ -252,19 +252,19 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   @Override
   public ParseTree visitForStatement(BSLParser.ForStatementContext forStatement) {
     // TODO
-    throw CompilerException.notImplementedException();
+    throw CompilerException.notImplementedException("forStatement");
   }
 
   @Override
   public ParseTree visitForEachStatement(BSLParser.ForEachStatementContext forEachStatement) {
     // TODO
-    throw CompilerException.notImplementedException();
+    throw CompilerException.notImplementedException("forEachStatement");
   }
 
   @Override
   public ParseTree visitTryStatement(BSLParser.TryStatementContext tryStatement) {
     // TODO
-    throw CompilerException.notImplementedException();
+    throw CompilerException.notImplementedException("tryStatement");
   }
 
   @Override
@@ -302,37 +302,37 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   @Override
   public ParseTree visitRaiseStatement(BSLParser.RaiseStatementContext raiseStatement) {
     // TODO
-    throw CompilerException.notImplementedException();
+    throw CompilerException.notImplementedException("raiseStatement");
   }
 
   @Override
   public ParseTree visitExecuteStatement(BSLParser.ExecuteStatementContext executeStatement) {
     // TODO
-    throw CompilerException.notImplementedException();
+    throw CompilerException.notImplementedException("executeStatement");
   }
 
   @Override
   public ParseTree visitGotoStatement(BSLParser.GotoStatementContext gotoStatement) {
     // TODO
-    throw CompilerException.notImplementedException();
+    throw CompilerException.notImplementedException("gotoStatement");
   }
 
   @Override
   public ParseTree visitAddHandlerStatement(BSLParser.AddHandlerStatementContext addHandlerStatement) {
     // TODO
-    throw CompilerException.notImplementedException();
+    throw CompilerException.notSupportedException();
   }
 
   @Override
   public ParseTree visitRemoveHandlerStatement(BSLParser.RemoveHandlerStatementContext removeHandlerStatement) {
     // TODO
-    throw CompilerException.notImplementedException();
+    throw CompilerException.notSupportedException();
   }
 
   @Override
   public ParseTree visitWaitStatement(BSLParser.WaitStatementContext waitStatement) {
     // TODO
-    throw CompilerException.notImplementedException();
+    throw CompilerException.notSupportedException();
   }
 
   @Override
@@ -493,7 +493,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
           processOperator(operation, operators);
         }
       } else {
-        throw new RuntimeException("Не поддерживается");
+        throw CompilerException.notSupportedException();
       }
     }
 
@@ -526,7 +526,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       } else if (bool.OR_KEYWORD() != null) {
         operator = ExpressionOperator.OR;
       } else {
-        throw new RuntimeException("Not supported operator");
+        throw CompilerException.notNotSupportedExpressionOperator(bool.getText());
       }
     } else if (operationContext.compareOperation() != null) {
       var compare = operationContext.compareOperation();
@@ -543,10 +543,10 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       } else if (compare.NOT_EQUAL() != null) {
         operator = ExpressionOperator.NOT_EQUAL;
       } else {
-        throw new RuntimeException("Not supported operator");
+        throw CompilerException.notNotSupportedExpressionOperator(compare.getText());
       }
     } else {
-      throw new RuntimeException("Not supported operator");
+      throw CompilerException.notNotSupportedExpressionOperator(operationContext.getText());
     }
     return operator;
   }
@@ -554,15 +554,13 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   private void processMember(BSLParser.MemberContext memberContext, Deque<ExpressionOperator> operators) {
     if (memberContext.constValue() != null) {
       visitConstValue(memberContext.constValue());
-      //processConstValue(memberContext.constValue());
     } else if (memberContext.expression() != null) {
       // тут скобки `(` \ `)`
       visitExpression(memberContext.expression());
-      //processExpression(memberContext.expression(), new ArrayDeque<>());
     } else if (memberContext.complexIdentifier() != null) {
       processComplexIdentifier(memberContext.complexIdentifier());
     } else {
-      throw new RuntimeException("Member not supported");
+      throw CompilerException.notSupportedException();
     }
 
     if (memberContext.unaryModifier() != null) {
@@ -573,38 +571,54 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   private int addOperator(ExpressionOperator operator) {
     OperationCode operationCode;
-    if (operator == ExpressionOperator.ADD) {
-      operationCode = OperationCode.Add;
-    } else if (operator == ExpressionOperator.SUB) {
-      operationCode = OperationCode.Sub;
-    } else if (operator == ExpressionOperator.MUL) {
-      operationCode = OperationCode.Mul;
-    } else if (operator == ExpressionOperator.DIV) {
-      operationCode = OperationCode.Div;
-    } else if (operator == ExpressionOperator.UNARY_PLUS) {
-      operationCode = OperationCode.Number;
-    } else if (operator == ExpressionOperator.UNARY_MINUS) {
-      operationCode = OperationCode.Neg;
-    } else if (operator == ExpressionOperator.NOT) {
-      operationCode = OperationCode.Not;
-    } else if (operator == ExpressionOperator.OR) {
-      operationCode = OperationCode.Or;
-    } else if (operator == ExpressionOperator.AND) {
-      operationCode = OperationCode.And;
-    } else if (operator == ExpressionOperator.EQUAL) {
-      operationCode = OperationCode.Equals;
-    } else if (operator == ExpressionOperator.LESS) {
-      operationCode = OperationCode.Less;
-    } else if (operator == ExpressionOperator.LESS_OR_EQUAL) {
-      operationCode = OperationCode.LessOrEqual;
-    } else if (operator == ExpressionOperator.GREATER) {
-      operationCode = OperationCode.Greater;
-    } else if (operator == ExpressionOperator.GREATER_OR_EQUAL) {
-      operationCode = OperationCode.GreaterOrEqual;
-    } else if (operator == ExpressionOperator.NOT_EQUAL) {
-      operationCode = OperationCode.NotEqual;
-    } else {
-      throw new RuntimeException("Operator not supported");
+    switch (operator) {
+      case ADD:
+        operationCode = OperationCode.Add;
+        break;
+      case SUB:
+        operationCode = OperationCode.Sub;
+        break;
+      case MUL:
+        operationCode = OperationCode.Mul;
+        break;
+      case DIV:
+        operationCode = OperationCode.Div;
+        break;
+      case UNARY_PLUS:
+        operationCode = OperationCode.Number;
+        break;
+      case UNARY_MINUS:
+        operationCode = OperationCode.Neg;
+        break;
+      case NOT:
+        operationCode = OperationCode.Not;
+        break;
+      case OR:
+        operationCode = OperationCode.Or;
+        break;
+      case AND:
+        operationCode = OperationCode.And;
+        break;
+      case EQUAL:
+        operationCode = OperationCode.Equals;
+        break;
+      case LESS:
+        operationCode = OperationCode.Less;
+        break;
+      case LESS_OR_EQUAL:
+        operationCode = OperationCode.LessOrEqual;
+        break;
+      case GREATER:
+        operationCode = OperationCode.Greater;
+        break;
+      case GREATER_OR_EQUAL:
+        operationCode = OperationCode.GreaterOrEqual;
+        break;
+      case NOT_EQUAL:
+        operationCode = OperationCode.NotEqual;
+        break;
+      default:
+        throw CompilerException.notNotSupportedExpressionOperator(operator.getText());
     }
     return addCommand(operationCode, 0);
   }
@@ -655,7 +669,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     } else if (constValue.UNDEFINED() != null) {
       constant = new ConstantDefinition(ValueFactory.create());
     } else {
-      throw new RuntimeException("Constant value not supported");
+      throw CompilerException.notSupportedException();
     }
     return constant;
   }
@@ -678,12 +692,12 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         if (modifier.accessCall() != null) {
           processAccessCall(modifier.accessCall(), true);
         } else if (modifier.accessProperty() != null) {
-          throw new RuntimeException("accessProperty");
+          throw CompilerException.notImplementedException("accessProperty");
         } else if (modifier.accessIndex() != null) {
           processExpression(modifier.accessIndex().expression(), new ArrayDeque<>());
           addCommand(OperationCode.PushIndexed, 0);
         } else {
-          throw new RuntimeException("Обработка modifier не поддерживается");
+          throw CompilerException.notSupportedException();
         }
 
       }
@@ -699,7 +713,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     } else if (child.MINUS() != null) {
       operators.push(ExpressionOperator.UNARY_MINUS);
     } else {
-      throw new RuntimeException("Not supported");
+      throw CompilerException.notNotSupportedExpressionOperator(child.getText());
     }
   }
 
@@ -799,8 +813,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var methodName = methodNameContext.getText();
     var address = compiler.findMethodInContext(methodName);
     if (address == null) {
-      // todo: кричать
-      throw new RuntimeException("Метод не найден");
+      throw CompilerException.methodNotFound(methodName);
     }
     if (!imageCache.getMethodRefs().contains(address)) {
       imageCache.getMethodRefs().add(address);
