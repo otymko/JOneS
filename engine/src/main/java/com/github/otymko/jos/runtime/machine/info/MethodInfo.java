@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.machine.info;
 
+import lombok.AllArgsConstructor;
 import lombok.Value;
 
 import java.lang.reflect.Method;
@@ -13,10 +14,20 @@ import java.lang.reflect.Method;
  * Информация о методе для выполнения
  */
 @Value
+@AllArgsConstructor
 public class MethodInfo {
   String name;
   String alias;
   boolean function;
   ParameterInfo[] parameters;
   Method method;
+
+  public MethodInfo(String name, String alias, boolean function, ParameterInfo[] parameters) {
+    this.name = name;
+    this.alias = alias;
+    this.function = function;
+    this.parameters = parameters;
+    this.method = null;
+  }
+
 }
