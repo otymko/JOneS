@@ -87,4 +87,10 @@ class ScriptEngineTest {
     TestHelper.checkCode("Сообщить(ТипЗнч(Новый Массив));", "Массив");
   }
 
+  @Test
+  void testSimpleReference() throws Exception {
+    Path script = Path.of("src/test/resources/test-var-reference.os");
+    TestHelper.checkScript(script, "101");
+  }
+
 }

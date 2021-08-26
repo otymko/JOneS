@@ -17,7 +17,7 @@ import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class Variable extends ContextValue {
+public class Variable extends ContextValue implements IVariable {
   private String name;
   private IValue value;
   private DataType dataType;
@@ -29,8 +29,8 @@ public class Variable extends ContextValue {
 
   @Override
   public ContextInfo getContextInfo() {
-    if (value instanceof ContextValue) {
-      return ((ContextValue) value).getContextInfo();
+    if (getValue() instanceof ContextValue) {
+      return ((ContextValue) getValue()).getContextInfo();
     }
     throw MachineException.operationNotImplementedException();
   }
@@ -66,4 +66,5 @@ public class Variable extends ContextValue {
     variable.setValue(value);
     return variable;
   }
+
 }

@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.machine;
 
+import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
@@ -18,12 +19,12 @@ import lombok.Value;
 @RequiredArgsConstructor
 public class Scope {
   RuntimeContext instance;
-  Variable[] variables;
+  IVariable[] variables;
   MethodInfo[] methods;
 
   public Scope(RuntimeContext instance) {
     this.instance = instance;
-    variables = new Variable[0];
+    variables = new IVariable[0];
     methods = new MethodInfo[0];
   }
 }
