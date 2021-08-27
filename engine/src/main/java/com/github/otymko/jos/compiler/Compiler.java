@@ -195,27 +195,44 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   @Override
   public ParseTree visitAssignment(BSLParser.AssignmentContext assignment) {
     var lValue = assignment.lValue();
+    var variableName = lValue.IDENTIFIER().getText();
+
+    boolean acceptor = false;
+    if (lValue.acceptor() != null) {
+      processIdentifier(variableName);
+      visitAcceptor(lValue.acceptor());
+
+      acceptor = true;
+    }
+
     var expression = assignment.expression();
     visitExpression(expression);
 
-    var variableName = lValue.getText();
-    var address = compiler.findVariableInContext(variableName);
-    if (address != null) {
+    if (acceptor) {
 
-      if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
-        addCommand(OperationCode.LoadLoc, address.getSymbolId());
-      } else {
-        addCommand(OperationCode.LoadVar, address.getSymbolId());
-      }
+      addCommand(OperationCode.AssignRef, 0);
 
     } else {
 
-      var variableInfo = new VariableInfo(variableName);
-      localScope.getVariables().add(variableInfo);
-      localScope.getVariableNumbers().put(variableName.toUpperCase(Locale.ENGLISH), localScope.getVariables().indexOf(variableInfo));
-      var index = localScope.getVariables().size() - 1;
-      addCommand(OperationCode.LoadLoc, index);
+      // simple assigment
+      var address = compiler.findVariableInContext(variableName);
+      if (address != null) {
 
+        if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
+          addCommand(OperationCode.LoadLoc, address.getSymbolId());
+        } else {
+          addCommand(OperationCode.LoadVar, address.getSymbolId());
+        }
+
+      } else {
+
+        var variableInfo = new VariableInfo(variableName);
+        localScope.getVariables().add(variableInfo);
+        localScope.getVariableNumbers().put(variableName.toUpperCase(Locale.ENGLISH), localScope.getVariables().indexOf(variableInfo));
+        var index = localScope.getVariables().size() - 1;
+        addCommand(OperationCode.LoadLoc, index);
+
+      }
     }
 
     return assignment;
@@ -376,6 +393,23 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   public ParseTree visitComplexIdentifier(BSLParser.ComplexIdentifierContext complexIdentifier) {
     processComplexIdentifier(complexIdentifier);
     return complexIdentifier;
+  }
+
+  @Override
+  public ParseTree visitAcceptor(BSLParser.AcceptorContext acceptor) {
+    if (acceptor.accessIndex() != null) {
+      visitAccessIndex(acceptor.accessIndex());
+    } else {
+      throw CompilerException.notImplementedException("accessProperty");
+    }
+    return acceptor;
+  }
+
+  @Override
+  public ParseTree visitAccessIndex(BSLParser.AccessIndexContext ctx) {
+    visitExpression(ctx.expression());
+    addCommand(OperationCode.PushIndexed, 0);
+    return ctx;
   }
 
   private MethodDescriptor createMethodDescriptor(BSLParser.SubContext subContext) {

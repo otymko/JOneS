@@ -7,7 +7,7 @@ package com.github.otymko.jos.runtime.context.type;
 
 import com.github.otymko.jos.runtime.context.ContextType;
 import com.github.otymko.jos.runtime.context.type.collection.ArrayImpl;
-import com.github.otymko.jos.runtime.context.type.collection.StructureImpl;
+import com.github.otymko.jos.runtime.context.type.collection.V8Structure;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
@@ -59,8 +59,8 @@ public class StandardTypeInitializer {
     typeManager.registerType("Массив", ArrayImpl.class);
     typeManager.registerType("Array", ArrayImpl.class);
 
-    typeManager.registerType("Структура", StructureImpl.class);
-    typeManager.registerType("Structure", StructureImpl.class);
+    typeManager.registerType("Структура", V8Structure.class);
+    typeManager.registerType("Structure", V8Structure.class);
   }
 
 }
