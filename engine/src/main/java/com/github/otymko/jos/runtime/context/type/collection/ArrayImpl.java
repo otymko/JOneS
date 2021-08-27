@@ -105,6 +105,16 @@ public class ArrayImpl extends ContextValue implements IndexAccessor {
     values.set(index, value);
   }
 
+  public IValue getIndexedValue(IValue index) {
+    return get((int) index.asNumber());
+  }
+
+  @Override
+  public void setIndexedValue(IValue index, IValue value) {
+    set((int) index.asNumber(), value);
+  }
+
+
   private void extend(int count) {
     for (var index = 0; index < count; index++) {
       values.add(ValueFactory.create());

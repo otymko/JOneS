@@ -7,6 +7,7 @@ package com.github.otymko.jos.runtime.machine;
 
 import com.github.otymko.jos.exception.EngineException;
 import com.github.otymko.jos.module.ModuleImage;
+import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.Variable;
 import lombok.Data;
 
@@ -14,7 +15,7 @@ import lombok.Data;
 public class ExecutionFrame {
   private int instructionPointer;
   private int lineNumber;
-  private Variable[] localVariables;
+  private IVariable[] localVariables;
 
   private Scope moduleScope;
   private int moduleLoadIndex;

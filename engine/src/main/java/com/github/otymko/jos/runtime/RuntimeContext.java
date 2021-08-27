@@ -53,5 +53,8 @@ public interface RuntimeContext {
     return getContextInfo().getMethods()[methodId];
   }
 
+  default int findProperty(String propertyName) {
+    return -1;
+  }
 
 }
