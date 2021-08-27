@@ -281,6 +281,8 @@ public class MachineInstance {
     map.put(OperationCode.EndTry, this::endTry);
     map.put(OperationCode.RaiseException, this::raiseException);
 
+    map.put(OperationCode.AssignRef, this::assignReference);
+
     // Функции работы с типами
     map.put(OperationCode.Type, this::callType);
     map.put(OperationCode.ValType, this::callTypeOf);
@@ -396,14 +398,28 @@ public class MachineInstance {
     nextInstruction();
   }
 
+  private void assignReference(int argument) {
+    var value = breakVariableLink(operationStack.pop());
+
+    var variable = operationStack.pop();
+    if (variable instanceof IVariable) {
+      var reference = (IVariable) variable;
+      reference.setValue(value);
+    } else {
+      throw MachineException.wrongStackConditionException();
+    }
+
+    nextInstruction();
+  }
+
   private void resolveMethodCall(int argument) {
     int argumentCount = (int) operationStack.pop().asNumber();
-    var argumentValues = new IValue[argumentCount];
 
+    var factArgumentValues = new IValue[argumentCount];
     for (var index = argumentCount - 1; index >= 0; index--) {
       var value = operationStack.pop();
       // если по значению BreakVariableLink
-      argumentValues[index] = value;
+      factArgumentValues[index] = value;
     }
 
     var instance = (operationStack.pop()).getRawValue();
@@ -416,6 +432,9 @@ public class MachineInstance {
     var methodName = currentImage.getConstants().get(argument).getValue().asString();
     var methodId = context.findMethodId(methodName);
     var methodInfo = context.getMethodById(methodId);
+
+    var argumentValues = new IValue[methodInfo.getParameters().length];
+    fillArgumentValueFromFact(methodInfo, factArgumentValues, argumentValues);
 
     callContext(context, methodId, methodInfo, argumentValues);
 
@@ -781,6 +800,19 @@ public class MachineInstance {
 
     frame.setInstructionPointer(methodDescriptor.getEntry());
     pushFrame(frame);
+  }
+
+  private void fillArgumentValueFromFact(MethodInfo methodInfo, IValue[] factArguments, IValue[] arguments) {
+    // FIXME: проверять сигнатуру
+    for (var index = 0; index < factArguments.length; index++) {
+      var argumentValue = factArguments[index];
+      var parameter = methodInfo.getParameters()[index];
+      if (parameter.isByValue()) {
+        arguments[index] = breakVariableLink(argumentValue);
+      } else {
+        arguments[index] = argumentValue;
+      }
+    }
   }
 
 }

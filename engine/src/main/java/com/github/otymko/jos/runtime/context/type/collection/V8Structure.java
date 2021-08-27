@@ -12,26 +12,30 @@ import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 @ContextClass(name = "Структура", alias = "Structure")
-public class StructureImpl extends ContextValue {
-  public static final ContextInfo INFO = ContextInfo.createByClass(StructureImpl.class);
+public class V8Structure extends ContextValue implements IndexAccessor {
+  public static final ContextInfo INFO = ContextInfo.createByClass(V8Structure.class);
 
   private final Map<IValue, IValue> values;
+  private final Map<String, IValue> views;
 
-  private StructureImpl() {
+  private V8Structure() {
     values = new HashMap<>();
+    views = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   }
 
   @ContextConstructor
-  public static StructureImpl constructor() {
-    return new StructureImpl();
+  public static V8Structure constructor() {
+    return new V8Structure();
   }
 
   @ContextMethod(name = "Вставить", alias = "Insert")
@@ -40,10 +44,14 @@ public class StructureImpl extends ContextValue {
       throw MachineException.invalidPropertyNameStructureException(key.asString());
     }
 
-    if (value == null) {
-      values.put(key, ValueFactory.create());
+    var keyValue = key.asString();
+    var addingValue = value == null ? ValueFactory.create() : value;
+    if (views.containsKey(keyValue)) {
+      var objectKey = views.get(keyValue);
+      values.put(objectKey, addingValue);
     } else {
-      values.put(key, value);
+      views.put(keyValue, key);
+      values.put(key, addingValue);
     }
   }
 
@@ -63,6 +71,8 @@ public class StructureImpl extends ContextValue {
       throw MachineException.invalidPropertyNameStructureException(key.asString());
     }
 
+    var keyValue = key.asString();
+    views.remove(keyValue);
     values.remove(key);
   }
 
@@ -72,9 +82,11 @@ public class StructureImpl extends ContextValue {
       throw MachineException.invalidPropertyNameStructureException(key.asString());
     }
 
-    if (values.containsKey(key)) {
+    var keyValue = key.asString();
+    if (views.containsKey(keyValue)) {
+      var objectKey = views.get(keyValue);
       if (value != null) {
-        value.setValue(values.get(key));
+        value.setValue(values.get(objectKey));
       }
       return ValueFactory.create(true);
     }
@@ -87,4 +99,24 @@ public class StructureImpl extends ContextValue {
     return INFO;
   }
 
+  @Override
+  public IValue getIndexedValue(IValue index) {
+    // TODO: проверить ключ на валидность
+    var key = index.asString();
+    if (!views.containsKey(key)) {
+      throw MachineException.getPropertyNotFoundException(key);
+    }
+    var keyObject = views.get(key);
+    return values.get(keyObject);
+  }
+
+  @Override
+  public void setIndexedValue(IValue index, IValue value) {
+    // TODO: проверить ключ на валидность
+    var key = index.asString();
+    if (!views.containsKey(key)) {
+      throw MachineException.getPropertyNotFoundException(key);
+    }
+    insert(index, value);
+  }
 }

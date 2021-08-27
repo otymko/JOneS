@@ -123,4 +123,14 @@ public class MachineException extends EngineException {
     return new MachineException(message);
   }
 
+  public static MachineException wrongStackConditionException() {
+    var message = "Внутренняя ошибка - неверное состояние стека. Ожидалась переменная";
+    return new MachineException(message);
+  }
+
+  public static MachineException getPropertyNotFoundException(String propertyName) {
+    var message = String.format("Свойство объекта не обнаружено (%s)", propertyName);
+    return new MachineException(message);
+  }
+
 }
