@@ -93,6 +93,12 @@ class CompilerTest {
     TestHelper.checkScript(pathToScript, "1\r\n2\r\n3");
   }
 
+  @Test
+  void testFor() throws Exception {
+    var pathToScript = Path.of("src/test/resources/for.os");
+    TestHelper.checkScript(pathToScript, "1\r\n2\r\n3");
+  }
+
   private int findCommand(List<Command> commands, OperationCode code, int start) {
     return findCommand(commands, code, start, -1);
   }

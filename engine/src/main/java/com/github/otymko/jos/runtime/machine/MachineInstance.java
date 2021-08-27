@@ -300,7 +300,42 @@ public class MachineInstance {
     map.put(OperationCode.IteratorNext, this::iteratorNext);
     map.put(OperationCode.StopIterator, this::stopIterator);
 
+    map.put(OperationCode.PushTmp, this::pushTmp);
+    map.put(OperationCode.Inc, this::increment);
+    map.put(OperationCode.JmpCounter, this::jmpCounter);
+    map.put(OperationCode.PopTmp, this::popTmp);
+
     return map;
+  }
+
+  private void pushTmp(int argument) {
+    var value = operationStack.pop();
+    currentFrame.getLocalFrameStack().push(value);
+    nextInstruction();
+  }
+
+  private void increment(int argument) {
+    var operand = operationStack.pop().asNumber();
+    operationStack.push(ValueFactory.create(++operand));
+    nextInstruction();
+  }
+
+  private void jmpCounter(int argument) {
+    var counter = operationStack.pop().getRawValue();
+    var limit = currentFrame.getLocalFrameStack().peek();
+    if (counter.compareTo(limit) <= 0) {
+      nextInstruction();
+    } else {
+      jmp(argument);
+    }
+  }
+
+  private void popTmp(int argument) {
+    var value = currentFrame.getLocalFrameStack().pop();
+    if (argument == 0) {
+      operationStack.push(value);
+    }
+    nextInstruction();
   }
 
   private void beginTry(int argument) {

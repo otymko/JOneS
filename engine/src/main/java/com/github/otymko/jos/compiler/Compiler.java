@@ -247,8 +247,43 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   @Override
   public ParseTree visitForStatement(BSLParser.ForStatementContext forStatement) {
-    // TODO
-    throw CompilerException.notImplementedException("forStatement");
+    visitExpression(forStatement.expression().get(0));
+
+    var identifier = forStatement.IDENTIFIER().getText();
+    buildLocalVariable(identifier);
+
+    visitExpression(forStatement.expression().get(1));
+
+    addCommand(OperationCode.MakeRawValue);
+    addCommand(OperationCode.PushTmp);
+
+    var jumpIndex = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+    var loopStart = addCommand(OperationCode.LineNum, forStatement.getStart().getLine());
+
+    // инкремент
+    processIdentifier(identifier);
+    addCommand(OperationCode.Inc);
+    buildLocalVariable(identifier);
+
+    var counterIndex = imageCache.getCode().size();
+    processIdentifier(identifier);
+    correctCommandArgument(jumpIndex, counterIndex);
+
+    var conditionIndex = addCommand(OperationCode.JmpCounter, DUMMY_ADDRESS);
+
+    var loop = new NestedLoopInfo();
+    loop.setStartPoint(loopStart);
+    nestedLoops.push(loop);
+
+    visitCodeBlock(forStatement.codeBlock());
+
+    addCommand(OperationCode.Jmp, loopStart);
+
+    var loopEnd = addCommand(OperationCode.PopTmp, 1);
+    correctCommandArgument(conditionIndex, loopEnd);
+    correctBreakStatements(nestedLoops.pop(), loopEnd);
+
+    return forStatement;
   }
 
   @Override
