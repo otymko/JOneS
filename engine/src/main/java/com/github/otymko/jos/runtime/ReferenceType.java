@@ -5,6 +5,24 @@
  */
 package com.github.otymko.jos.runtime;
 
+/**
+ * Тип ссылки на значение
+ */
 public enum ReferenceType {
-  SIMPLE, CONTEXT_PROPERTY, INDEXED_PROPERTY;
+  /**
+   * Ссылка на локальную переменную
+   */
+  SIMPLE,
+  /**
+   * Ссылка на свойство типа
+   */
+  CONTEXT_PROPERTY,
+  /**
+   * Ссылка на динамическое свойство типа
+   */
+  DYNAMIC_PROPERTY,
+  /**
+   * Ссылка на свойство по индексу
+   */
+  INDEXED_PROPERTY;
 }

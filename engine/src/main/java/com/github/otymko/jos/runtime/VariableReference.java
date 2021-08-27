@@ -9,6 +9,7 @@ import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
+import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Data;
@@ -43,6 +44,24 @@ public class VariableReference extends ContextValue implements IVariable {
     return reference;
   }
 
+  public static VariableReference createDynamicPropertyNameReference(RuntimeContext context, IValue index, String referenceName) {
+    var reference = new VariableReference();
+    reference.setReferenceType(ReferenceType.DYNAMIC_PROPERTY);
+    reference.setContext(context);
+    reference.setIndex(index);
+    reference.setName(referenceName);
+    return reference;
+  }
+
+  public static VariableReference createContextPropertyReference(RuntimeContext context, int propertyNumber, String referenceName) {
+    var reference = new VariableReference();
+    reference.setReferenceType(ReferenceType.CONTEXT_PROPERTY);
+    reference.setContext(context);
+    reference.setContextPropertyNumber(propertyNumber);
+    reference.setName(referenceName);
+    return reference;
+  }
+
   @Override
   public DataType getDataType() {
     return getValue().getDataType();
@@ -53,8 +72,11 @@ public class VariableReference extends ContextValue implements IVariable {
     if (referenceType == ReferenceType.SIMPLE) {
       return referencedValue.getValue();
     } else if (referenceType == ReferenceType.INDEXED_PROPERTY) {
-      var indexAccessor = (IndexAccessor) context;
-      return indexAccessor.getIndexedValue(index);
+      var accessor = (IndexAccessor) context;
+      return accessor.getIndexedValue(index);
+    } else if (referenceType == ReferenceType.DYNAMIC_PROPERTY) {
+      var accessor = (PropertyNameAccessor) context;
+      return accessor.getPropertyValue(index);
     } else {
       throw MachineException.operationNotImplementedException();
     }
@@ -65,8 +87,11 @@ public class VariableReference extends ContextValue implements IVariable {
     if (referenceType == ReferenceType.SIMPLE) {
       referencedValue.setValue(value);
     } else if (referenceType == ReferenceType.INDEXED_PROPERTY) {
-      var indexAccessor = (IndexAccessor) context;
-      indexAccessor.setIndexedValue(index, value);
+      var accessor = (IndexAccessor) context;
+      accessor.setIndexedValue(index, value);
+    } else if (referenceType == ReferenceType.DYNAMIC_PROPERTY) {
+      var accessor = (PropertyNameAccessor) context;
+      accessor.setPropertyValue(index, value);
     } else {
       throw MachineException.operationNotImplementedException();
     }

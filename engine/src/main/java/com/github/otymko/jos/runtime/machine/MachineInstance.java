@@ -18,6 +18,7 @@ import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
+import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.type.TypeFactory;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
@@ -221,6 +222,8 @@ public class MachineInstance {
 
     map.put(OperationCode.AssignRef, this::assignReference);
 
+    map.put(OperationCode.ResolveProp, this::resolveProp);
+
     // Функции работы с типами
     map.put(OperationCode.Type, this::callType);
     map.put(OperationCode.ValType, this::callTypeOf);
@@ -282,6 +285,33 @@ public class MachineInstance {
       throw MachineException.wrongStackConditionException();
     }
 
+    nextInstruction();
+  }
+
+  private void resolveProp(int argument) {
+    var runtimeContext = (RuntimeContext) operationStack.pop().getRawValue();
+    var propertyName = currentImage.getConstants().get(argument).getValue();
+
+    VariableReference reference = null;
+    if (runtimeContext instanceof PropertyNameAccessor) {
+      var propertyNameAccessor = (PropertyNameAccessor) runtimeContext;
+      if (propertyNameAccessor.hasProperty(propertyName)) {
+        reference = VariableReference.createDynamicPropertyNameReference(runtimeContext, propertyName, VARIABLE_STACK_NAME);
+      }
+    }
+
+    if (reference == null) {
+      var indexProperty = runtimeContext.findProperty(propertyName.asString());
+      if (indexProperty >= 0) {
+        reference = VariableReference.createContextPropertyReference(runtimeContext, indexProperty, VARIABLE_STACK_NAME);
+      }
+    }
+
+    if (reference == null) {
+      throw MachineException.getPropertyNotFoundException(propertyName.asString());
+    }
+
+    operationStack.push(reference);
     nextInstruction();
   }
 
