@@ -263,8 +263,30 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   @Override
   public ParseTree visitTryStatement(BSLParser.TryStatementContext tryStatement) {
-    // TODO
-    throw CompilerException.notImplementedException("tryStatement");
+    var beginTryIndex = addCommand(OperationCode.BeginTry, DUMMY_ADDRESS);
+    visitTryCodeBlock(tryStatement.tryCodeBlock());
+    var jmpIndex = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+
+    var beginHandler = addCommand(OperationCode.LineNum, tryStatement.exceptCodeBlock().getStart().getLine());
+
+    correctCommandArgument(beginTryIndex, beginHandler);
+
+    visitExceptCodeBlock(tryStatement.exceptCodeBlock());
+
+    var endIndex = addCommand(OperationCode.LineNum, tryStatement.getStop().getLine());
+
+    addCommand(OperationCode.EndTry, 0);
+    correctCommandArgument(jmpIndex, endIndex);
+
+    return tryStatement;
+  }
+
+  @Override
+  public ParseTree visitTryCodeBlock(BSLParser.TryCodeBlockContext tryCodeBlock) {
+    pushTryNesting();
+    super.visitTryCodeBlock(tryCodeBlock);
+    popTryNesting();
+    return tryCodeBlock;
   }
 
   @Override
@@ -301,8 +323,33 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   @Override
   public ParseTree visitRaiseStatement(BSLParser.RaiseStatementContext raiseStatement) {
-    // TODO
-    throw CompilerException.notImplementedException("raiseStatement");
+
+    var expression = raiseStatement.expression();
+    if (expression == null) {
+      var parent = raiseStatement.getParent();
+      var isValidRaise = false;
+      while (parent != null
+        && parent.getRuleIndex() != BSLParser.RULE_subCodeBlock
+        && parent.getRuleIndex() != BSLParser.RULE_fileCodeBlock) {
+
+        if (parent.getRuleIndex() == BSLParser.RULE_exceptCodeBlock) {
+          isValidRaise = true;
+          break;
+        }
+      }
+
+      if (!isValidRaise) {
+        throw CompilerException.mismatchedRaiseExpression();
+      }
+
+      addCommand(OperationCode.RaiseException, -1);
+
+    } else {
+      visitExpression(expression);
+      addCommand(OperationCode.RaiseException, 0);
+    }
+
+    return raiseStatement;
   }
 
   @Override
@@ -837,6 +884,18 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var tryBlocks = nestedLoops.peek().getTryNesting();
     if (tryBlocks > 0) {
       addCommand(OperationCode.ExitTry, tryBlocks);
+    }
+  }
+
+  private void pushTryNesting() {
+    if (!nestedLoops.isEmpty()) {
+      nestedLoops.peek().setTryNesting(nestedLoops.peek().getTryNesting() + 1);
+    }
+  }
+
+  private void popTryNesting() {
+    if (!nestedLoops.isEmpty()) {
+      nestedLoops.peek().setTryNesting(nestedLoops.peek().getTryNesting() - 1);
     }
   }
 

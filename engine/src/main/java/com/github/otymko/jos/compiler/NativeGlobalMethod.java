@@ -36,6 +36,8 @@ public class NativeGlobalMethod {
   private static void initNativeMethods() {
     addNativeMethod("Тип", "Type", OperationCode.Type, 1);
     addNativeMethod("ТипЗнч", "TypeOf", OperationCode.ValType, 1);
+    addNativeMethod("ОписаниеОшибки", "ErrorDescription", OperationCode.ExceptionDescr, 0);
+    addNativeMethod("ИнформацияОбОшибке", "ErrorDescription", OperationCode.ExceptionDescr, 0);
   }
 
   private static void addNativeMethod(String name, String alias, OperationCode code, int arguments) {

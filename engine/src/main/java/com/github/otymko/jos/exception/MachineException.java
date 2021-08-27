@@ -1,6 +1,11 @@
 package com.github.otymko.jos.exception;
 
+import com.github.otymko.jos.runtime.machine.StackTraceRecord;
 import lombok.Getter;
+
+import java.util.Collections;
+import java.util.List;
+
 
 /**
  * Исключение при выполнении в стековой машине
@@ -9,11 +14,30 @@ public class MachineException extends EngineException {
   @Getter
   private final ErrorInfo errorInfo;
 
+  private List<StackTraceRecord> stackTrace;
+
   public MachineException(String message) {
     super(message);
 
     errorInfo = new ErrorInfo();
     errorInfo.setLine(-1);
+  }
+
+  public MachineException(String message, Throwable cause) {
+    super(message, cause);
+    errorInfo = new ErrorInfo();
+    errorInfo.setLine(-1);
+  }
+
+  public void setBslStackTrace(List<StackTraceRecord> stackTrace) {
+    this.stackTrace = Collections.unmodifiableList(stackTrace);
+  }
+
+  public List<StackTraceRecord> getBslStackTrace() {
+    if (stackTrace == null) {
+      return Collections.emptyList();
+    }
+    return stackTrace;
   }
 
   @Override
@@ -28,6 +52,10 @@ public class MachineException extends EngineException {
       message += "\n" + errorInfo.getCode();
     }
     return message;
+  }
+
+  public String getMessageWithoutCodeFragment() {
+    return super.getMessage();
   }
 
   public static MachineException typeNotSupportedException(String typeName) {

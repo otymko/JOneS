@@ -7,13 +7,16 @@ package com.github.otymko.jos.runtime.machine;
 
 import com.github.otymko.jos.compiler.MethodDescriptor;
 import com.github.otymko.jos.compiler.SymbolAddress;
+import com.github.otymko.jos.exception.EngineException;
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.exception.WrappedJavaException;
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Arithmetic;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
+import com.github.otymko.jos.runtime.context.ExceptionInfoContext;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
@@ -27,12 +30,14 @@ import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import com.github.otymko.jos.util.Common;
 import lombok.Getter;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Экземпляр стековой машины
@@ -45,9 +50,10 @@ public class MachineInstance {
   @Getter
   private final List<Scope> scopes = new ArrayList<>();
 
-  private final Stack<IValue> operationStack = new Stack<>();
+  private final Deque<IValue> operationStack = new ArrayDeque<>();
+  private final Deque<ExecutionFrame> callStack = new ArrayDeque<>();
+  private final Deque<ExceptionJumpInfo> exceptionsStack = new ArrayDeque<>();
 
-  private final Stack<ExecutionFrame> callStack = new Stack<>();
   private ExecutionFrame currentFrame;
 
   private ModuleImage currentImage;
@@ -147,32 +153,85 @@ public class MachineInstance {
 
   private void executeCode() {
 
-    try {
+    while (true) {
+      try {
 
-      startExecuting();
+        mainCommandLoop();
+        break;
 
-    } catch (MachineException exception) {
+      } catch (MachineException exception) {
 
-      var errorInfo = exception.getErrorInfo();
-      errorInfo.setLine(currentFrame.getLineNumber());
-      errorInfo.setSource(Common.getAbsolutPath(currentImage.getSource().getPath()));
-      Common.fillCodePositionInErrorInfo(errorInfo, currentImage, currentFrame.getLineNumber());
+        var errorInfo = exception.getErrorInfo();
+        if (errorInfo.getLine() < 0) {
+          errorInfo.setLine(currentFrame.getLineNumber());
+          errorInfo.setSource(Common.getAbsolutPath(currentImage.getSource().getPath()));
+          Common.fillCodePositionInErrorInfo(errorInfo, currentImage, currentFrame.getLineNumber());
+        }
 
-      throw exception;
+        if (shouldRethrowException(exception))
+          throw exception;
+      }
     }
-
   }
 
-  private void startExecuting() {
-
-    while (currentFrame.getInstructionPointer() >= 0
-      && currentFrame.getInstructionPointer() < currentImage.getCode().size()) {
-
-      var command = currentImage.getCode().get(currentFrame.getInstructionPointer());
-      commands.get(command.getCode()).accept(command.getArgument());
-
+  private boolean shouldRethrowException(MachineException exception) {
+    if (exceptionsStack.isEmpty()) {
+      return true;
     }
 
+    var callStackFrames = exception.getBslStackTrace();
+
+    if (callStackFrames.isEmpty()) {
+      callStackFrames = createCallstack();
+      exception.setBslStackTrace(callStackFrames);
+    }
+
+    var handler = exceptionsStack.pop();
+
+    // Раскрутка стека вызовов
+    while (currentFrame != handler.getHandlerFrame()) {
+      if (currentFrame.isOneTimeCall()) {
+        exceptionsStack.push(handler);
+        popFrame();
+        return true;
+      }
+
+      popFrame();
+    }
+
+    currentFrame.setInstructionPointer(handler.getHandlerAddress());
+    currentFrame.setLastException(exception);
+
+    // При возникновении исключения посредине выражения
+    // некому почистить стек операндов.
+    // Сделаем это
+    while (operationStack.size() > handler.getStackSize()) {
+      operationStack.pop();
+    }
+
+    return false;
+  }
+
+  private List<StackTraceRecord> createCallstack() {
+    return callStack.stream()
+      .map(StackTraceRecord::new)
+      .collect(Collectors.toList());
+  }
+
+  private void mainCommandLoop() {
+
+    try {
+      while (currentFrame.getInstructionPointer() >= 0
+        && currentFrame.getInstructionPointer() < currentImage.getCode().size()) {
+
+        var command = currentImage.getCode().get(currentFrame.getInstructionPointer());
+        commands.get(command.getCode()).accept(command.getArgument());
+      }
+    } catch (EngineException exception) {
+      throw exception;
+    } catch (Exception exception) {
+      throw new WrappedJavaException(exception);
+    }
   }
 
   private Map<OperationCode, Consumer<Integer>> createMachineCommands() {
@@ -215,12 +274,80 @@ public class MachineInstance {
     map.put(OperationCode.ResolveMethodFunc, this::resolveMethodFunc);
 
     map.put(OperationCode.PushIndexed, this::pushIndexed);
+    map.put(OperationCode.BeginTry, this::beginTry);
+    map.put(OperationCode.EndTry, this::endTry);
+    map.put(OperationCode.RaiseException, this::raiseException);
 
     // Функции работы с типами
     map.put(OperationCode.Type, this::callType);
     map.put(OperationCode.ValType, this::callTypeOf);
 
+    map.put(OperationCode.ExceptionDescr, this::exceptionDescr);
+    map.put(OperationCode.ExceptionInfo, this::exceptionInfo);
+
     return map;
+  }
+
+  private void beginTry(int argument) {
+    var info = new ExceptionJumpInfo();
+    info.setHandlerAddress(argument);
+    info.setHandlerFrame(currentFrame);
+    info.setStackSize(operationStack.size());
+
+    exceptionsStack.push(info);
+    nextInstruction();
+  }
+
+  private void endTry(int argument) {
+    if (exceptionsStack.size() > 0 && exceptionsStack.peek().getHandlerFrame() == currentFrame) {
+      exceptionsStack.pop();
+    }
+    currentFrame.setLastException(null);
+    nextInstruction();
+  }
+
+  private void raiseException(int argument) {
+    if (argument < 0) {
+      if (currentFrame.getLastException() == null) {
+        // Если в блоке Исключение была еще одна Попытка, то она затерла lastException
+        // 1С в этом случае бросает новое пустое исключение
+        throw new MachineException("");
+      }
+
+      throw currentFrame.getLastException();
+    } else {
+      var exceptionValue = operationStack.pop().getRawValue();
+
+      throw new MachineException(exceptionValue.asString());
+    }
+  }
+
+  private void exceptionDescr(int integer) {
+    if (currentFrame.getLastException() != null) {
+      var exceptionInfo = currentFrame.getLastException();
+      String message;
+      if (exceptionInfo instanceof MachineException) {
+        // TODO: варианты текстов исключений привести к иерархии классов 1Script
+        var machineExc = (MachineException) exceptionInfo;
+        message = machineExc.getMessageWithoutCodeFragment();
+      } else {
+        message = exceptionInfo.getMessage();
+      }
+      operationStack.push(ValueFactory.create(message));
+    } else {
+      operationStack.push(ValueFactory.create(""));
+    }
+    nextInstruction();
+  }
+
+  private void exceptionInfo(int integer) {
+    if (currentFrame.getLastException() != null) {
+      var excInfo = new ExceptionInfoContext(currentFrame.getLastException());
+      operationStack.push(excInfo);
+    } else {
+      operationStack.push(ValueFactory.create());
+    }
+    nextInstruction();
   }
 
   private void neg(int argument) {
