@@ -13,6 +13,7 @@ import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
+import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
@@ -22,7 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @ContextClass(name = "Структура", alias = "Structure")
-public class V8Structure extends ContextValue implements IndexAccessor {
+public class V8Structure extends ContextValue implements IndexAccessor, PropertyNameAccessor {
   public static final ContextInfo INFO = ContextInfo.createByClass(V8Structure.class);
 
   private final Map<IValue, IValue> values;
@@ -101,6 +102,32 @@ public class V8Structure extends ContextValue implements IndexAccessor {
 
   @Override
   public IValue getIndexedValue(IValue index) {
+    return getValueInternal(index);
+  }
+
+  @Override
+  public void setIndexedValue(IValue index, IValue value) {
+    setValueInternal(index, value);
+  }
+
+  @Override
+  public IValue getPropertyValue(IValue index) {
+    return getValueInternal(index);
+  }
+
+  @Override
+  public void setPropertyValue(IValue index, IValue value) {
+    setValueInternal(index, value);
+  }
+
+  @Override
+  public boolean hasProperty(IValue index) {
+    // TODO: проверить ключ на валидность
+    var key = index.asString();
+    return views.containsKey(key);
+  }
+
+  private IValue getValueInternal(IValue index) {
     // TODO: проверить ключ на валидность
     var key = index.asString();
     if (!views.containsKey(key)) {
@@ -110,8 +137,7 @@ public class V8Structure extends ContextValue implements IndexAccessor {
     return values.get(keyObject);
   }
 
-  @Override
-  public void setIndexedValue(IValue index, IValue value) {
+  private void setValueInternal(IValue index, IValue value) {
     // TODO: проверить ключ на валидность
     var key = index.asString();
     if (!views.containsKey(key)) {
@@ -119,4 +145,5 @@ public class V8Structure extends ContextValue implements IndexAccessor {
     }
     insert(index, value);
   }
+
 }

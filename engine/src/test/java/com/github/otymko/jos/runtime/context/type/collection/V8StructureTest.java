@@ -24,6 +24,18 @@ class V8StructureTest {
   }
 
   @Test
+  void testResolveProperty() throws Exception {
+    var code = "Коллекция = Новый Структура;\n" +
+      "Коллекция.Вставить(\"Ключ\", \"Значение\");\n" +
+      "Сообщить(Коллекция.Ключ);\n" +
+      "\n" +
+      "Коллекция.Ключ = \"Новое значение\";\n" +
+      "Сообщить(Коллекция.Ключ);";
+    TestHelper.checkCode(code, "Значение\r\n" +
+      "Новое значение");
+  }
+
+  @Test
   void testBase() throws Exception {
     var code = "Структура = Новый Структура;\n" +
       "Структура.Вставить(\"Ключ1\", 1);\n" +

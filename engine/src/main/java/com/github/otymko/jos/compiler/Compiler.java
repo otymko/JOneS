@@ -447,7 +447,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     if (acceptor.accessIndex() != null) {
       visitAccessIndex(acceptor.accessIndex());
     } else {
-      throw CompilerException.notImplementedException("accessProperty");
+      visitAccessProperty(acceptor.accessProperty());
     }
     return acceptor;
   }
@@ -457,6 +457,18 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     visitExpression(ctx.expression());
     addCommand(OperationCode.PushIndexed, 0);
     return ctx;
+  }
+
+  @Override
+  public ParseTree visitAccessProperty(BSLParser.AccessPropertyContext accessProperty) {
+    var propertyName = accessProperty.IDENTIFIER().getText();
+    var constant = new ConstantDefinition(ValueFactory.create(propertyName));
+    if (!imageCache.getConstants().contains(constant)) {
+      imageCache.getConstants().add(constant);
+    }
+    var indexConstant = imageCache.getConstants().indexOf(constant);
+    addCommand(OperationCode.ResolveProp, indexConstant);
+    return accessProperty;
   }
 
   private MethodDescriptor createMethodDescriptor(BSLParser.SubContext subContext) {
@@ -773,7 +785,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         if (modifier.accessCall() != null) {
           processAccessCall(modifier.accessCall(), true);
         } else if (modifier.accessProperty() != null) {
-          throw CompilerException.notImplementedException("accessProperty");
+          visitAccessProperty(modifier.accessProperty());
         } else if (modifier.accessIndex() != null) {
           processExpression(modifier.accessIndex().expression(), new ArrayDeque<>());
           addCommand(OperationCode.PushIndexed, 0);
