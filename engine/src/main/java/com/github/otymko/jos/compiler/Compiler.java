@@ -219,8 +219,44 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   @Override
   public ParseTree visitIfStatement(BSLParser.IfStatementContext ifStatement) {
-    // TODO
-    throw CompilerException.notImplementedException("ifStatement");
+    List<Integer> exits = new ArrayList<>();
+
+    visitExpression(ifStatement.ifBranch().expression());
+    var jumpFalse = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+    visitCodeBlock(ifStatement.ifBranch().codeBlock());
+    exits.add(addCommand(OperationCode.Jmp, DUMMY_ADDRESS));
+
+    var alternativeBranches = false;
+    for (var elseIfBranches : ifStatement.elsifBranch()) {
+      correctCommandArgument(jumpFalse, imageCache.getCode().size());
+      addCommand(OperationCode.LineNum, elseIfBranches.getStart().getLine());
+
+      visitExpression(elseIfBranches.expression());
+
+      jumpFalse = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+
+      visitCodeBlock(elseIfBranches.codeBlock());
+      exits.add(addCommand(OperationCode.Jmp, DUMMY_ADDRESS));
+    }
+
+    if (ifStatement.elseBranch() != null) {
+      alternativeBranches = true;
+      correctCommandArgument(jumpFalse, imageCache.getCode().size());
+      addCommand(OperationCode.LineNum, ifStatement.elseBranch().getStart().getLine());
+
+      visitCodeBlock(ifStatement.elseBranch().codeBlock());
+    }
+
+    var endIndex = addCommand(OperationCode.LineNum, ifStatement.getStop().getLine());
+    if (!alternativeBranches) {
+      correctCommandArgument(jumpFalse, endIndex);
+    }
+
+    for (var exitIndex : exits) {
+      correctCommandArgument(exitIndex, endIndex);
+    }
+
+    return ifStatement;
   }
 
   @Override

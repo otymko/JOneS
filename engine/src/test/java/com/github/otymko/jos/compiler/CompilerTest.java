@@ -99,6 +99,24 @@ class CompilerTest {
     TestHelper.checkScript(pathToScript, "1\r\n2\r\n3");
   }
 
+  @Test
+  void testSimpleCondition() throws Exception {
+    var pathToScript = Path.of("src/test/resources/simple-if.os");
+    TestHelper.checkScript(pathToScript, "Истина");
+  }
+
+  @Test
+  void testConditionWithElse() throws Exception {
+    var pathToScript = Path.of("src/test/resources/if-with-else.os");
+    TestHelper.checkScript(pathToScript, "Вторая ветка");
+  }
+
+  @Test
+  void testConditionIfElifElse() throws Exception {
+    var pathToScript = Path.of("src/test/resources/if-elif-else.os");
+    TestHelper.checkScript(pathToScript, "1.1\r\n2.2\r\n3.3");
+  }
+
   private int findCommand(List<Command> commands, OperationCode code, int start) {
     return findCommand(commands, code, start, -1);
   }

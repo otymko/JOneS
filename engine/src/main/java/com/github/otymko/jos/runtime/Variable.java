@@ -52,7 +52,7 @@ public class Variable extends ContextValue implements IVariable {
 
   @Override
   public boolean asBoolean() {
-    return super.asBoolean();
+    return value.asBoolean();
   }
 
   @Override
