@@ -209,30 +209,9 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     visitExpression(expression);
 
     if (acceptor) {
-
       addCommand(OperationCode.AssignRef, 0);
-
     } else {
-
-      // simple assigment
-      var address = compiler.findVariableInContext(variableName);
-      if (address != null) {
-
-        if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
-          addCommand(OperationCode.LoadLoc, address.getSymbolId());
-        } else {
-          addCommand(OperationCode.LoadVar, address.getSymbolId());
-        }
-
-      } else {
-
-        var variableInfo = new VariableInfo(variableName);
-        localScope.getVariables().add(variableInfo);
-        localScope.getVariableNumbers().put(variableName.toUpperCase(Locale.ENGLISH), localScope.getVariables().indexOf(variableInfo));
-        var index = localScope.getVariables().size() - 1;
-        addCommand(OperationCode.LoadLoc, index);
-
-      }
+      buildLocalVariable(variableName);
     }
 
     return assignment;
@@ -268,14 +247,69 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   @Override
   public ParseTree visitForStatement(BSLParser.ForStatementContext forStatement) {
-    // TODO
-    throw CompilerException.notImplementedException("forStatement");
+    visitExpression(forStatement.expression().get(0));
+
+    var identifier = forStatement.IDENTIFIER().getText();
+    buildLocalVariable(identifier);
+
+    visitExpression(forStatement.expression().get(1));
+
+    addCommand(OperationCode.MakeRawValue);
+    addCommand(OperationCode.PushTmp);
+
+    var jumpIndex = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+    var loopStart = addCommand(OperationCode.LineNum, forStatement.getStart().getLine());
+
+    // инкремент
+    processIdentifier(identifier);
+    addCommand(OperationCode.Inc);
+    buildLocalVariable(identifier);
+
+    var counterIndex = imageCache.getCode().size();
+    processIdentifier(identifier);
+    correctCommandArgument(jumpIndex, counterIndex);
+
+    var conditionIndex = addCommand(OperationCode.JmpCounter, DUMMY_ADDRESS);
+
+    var loop = new NestedLoopInfo();
+    loop.setStartPoint(loopStart);
+    nestedLoops.push(loop);
+
+    visitCodeBlock(forStatement.codeBlock());
+
+    addCommand(OperationCode.Jmp, loopStart);
+
+    var loopEnd = addCommand(OperationCode.PopTmp, 1);
+    correctCommandArgument(conditionIndex, loopEnd);
+    correctBreakStatements(nestedLoops.pop(), loopEnd);
+
+    return forStatement;
   }
 
   @Override
   public ParseTree visitForEachStatement(BSLParser.ForEachStatementContext forEachStatement) {
-    // TODO
-    throw CompilerException.notImplementedException("forEachStatement");
+    visitExpression(forEachStatement.expression());
+
+    addCommand(OperationCode.PushIterator);
+
+    var loopStart = addCommand(OperationCode.LineNum, forEachStatement.getStart().getLine());
+
+    addCommand(OperationCode.IteratorNext);
+
+    var condition = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+
+    buildLocalVariable(forEachStatement.IDENTIFIER().getText());
+
+    var loop = new NestedLoopInfo();
+    loop.setStartPoint(loopStart);
+    nestedLoops.push(loop);
+    visitCodeBlock(forEachStatement.codeBlock());
+    addCommand(OperationCode.Jmp, loopStart);
+
+    var loopEnd = addCommand(OperationCode.StopIterator);
+    correctCommandArgument(condition, loopEnd);
+    correctBreakStatements(nestedLoops.pop(), loopEnd);
+    return forEachStatement;
   }
 
   @Override
@@ -563,6 +597,10 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var index = imageCache.getCode().size();
     imageCache.getCode().add(new Command(operationCode, argument));
     return index;
+  }
+
+  private int addCommand(OperationCode operationCode) {
+    return addCommand(operationCode, 0);
   }
 
   private int addReturn() {
@@ -995,4 +1033,22 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
   }
 
+  private void buildLocalVariable(String variableName) {
+    var address = compiler.findVariableInContext(variableName);
+    if (address == null) {
+
+      var variableInfo = new VariableInfo(variableName);
+      localScope.getVariables().add(variableInfo);
+      localScope.getVariableNumbers().put(variableName.toUpperCase(Locale.ENGLISH), localScope.getVariables().indexOf(variableInfo));
+      var index = localScope.getVariables().size() - 1;
+      addCommand(OperationCode.LoadLoc, index);
+
+    } else {
+      if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
+        addCommand(OperationCode.LoadLoc, address.getSymbolId());
+      } else {
+        addCommand(OperationCode.LoadVar, address.getSymbolId());
+      }
+    }
+  }
 }

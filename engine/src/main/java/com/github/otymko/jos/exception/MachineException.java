@@ -1,3 +1,8 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 package com.github.otymko.jos.exception;
 
 import com.github.otymko.jos.runtime.machine.StackTraceRecord;
@@ -130,6 +135,11 @@ public class MachineException extends EngineException {
 
   public static MachineException getPropertyNotFoundException(String propertyName) {
     var message = String.format("Свойство объекта не обнаружено (%s)", propertyName);
+    return new MachineException(message);
+  }
+
+  public static MachineException iteratorIsNotDefined() {
+    var message = "Итератор для значения не определен";
     return new MachineException(message);
   }
 
