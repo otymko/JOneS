@@ -267,8 +267,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     visitTryCodeBlock(tryStatement.tryCodeBlock());
     var jmpIndex = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
 
-    var beginHandler = addCommand(OperationCode.LineNum,
-      tryStatement.exceptCodeBlock().getStart().getLine());
+    var beginHandler = addCommand(OperationCode.LineNum, tryStatement.exceptCodeBlock().getStart().getLine());
 
     correctCommandArgument(beginTryIndex, beginHandler);
 
@@ -283,11 +282,11 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   }
 
   @Override
-  public ParseTree visitTryCodeBlock(BSLParser.TryCodeBlockContext ctx) {
+  public ParseTree visitTryCodeBlock(BSLParser.TryCodeBlockContext tryCodeBlock) {
     pushTryNesting();
-    super.visitTryCodeBlock(ctx);
+    super.visitTryCodeBlock(tryCodeBlock);
     popTryNesting();
-    return ctx;
+    return tryCodeBlock;
   }
 
   @Override
@@ -890,13 +889,13 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   private void pushTryNesting() {
     if (!nestedLoops.isEmpty()) {
-      nestedLoops.peek().tryNesting++;
+      nestedLoops.peek().setTryNesting(nestedLoops.peek().getTryNesting() + 1);
     }
   }
 
   private void popTryNesting() {
     if (!nestedLoops.isEmpty()) {
-      nestedLoops.peek().tryNesting--;
+      nestedLoops.peek().setTryNesting(nestedLoops.peek().getTryNesting() - 1);
     }
   }
 

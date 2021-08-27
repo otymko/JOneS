@@ -1,21 +1,19 @@
 package com.github.otymko.jos.runtime.machine;
 
-import lombok.Getter;
+import lombok.Value;
 
 import java.nio.file.Path;
 
+@Value
 public class StackTraceRecord {
-
-  @Getter
-  private String methodName;
-  @Getter
-  private int lineNumber;
-  @Getter
-  private Path source;
+  String methodName;
+  int lineNumber;
+  Path source;
 
   StackTraceRecord(ExecutionFrame frame) {
     methodName = frame.getMethodName();
     source = frame.getImage().getSource().getPath();
     lineNumber = frame.getLineNumber();
   }
+
 }

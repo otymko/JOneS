@@ -174,16 +174,16 @@ public class MachineInstance {
     }
   }
 
-  private boolean shouldRethrowException(MachineException exc) {
+  private boolean shouldRethrowException(MachineException exception) {
     if (exceptionsStack.isEmpty()) {
       return true;
     }
 
-    var callStackFrames = exc.getBslStackTrace();
+    var callStackFrames = exception.getBslStackTrace();
 
     if (callStackFrames.isEmpty()) {
       callStackFrames = createCallstack();
-      exc.setBslStackTrace(callStackFrames);
+      exception.setBslStackTrace(callStackFrames);
     }
 
     var handler = exceptionsStack.pop();
@@ -200,13 +200,14 @@ public class MachineInstance {
     }
 
     currentFrame.setInstructionPointer(handler.getHandlerAddress());
-    currentFrame.setLastException(exc);
+    currentFrame.setLastException(exception);
 
     // При возникновении исключения посредине выражения
     // некому почистить стек операндов.
     // Сделаем это
-    while (operationStack.size() > handler.getStackSize())
+    while (operationStack.size() > handler.getStackSize()) {
       operationStack.pop();
+    }
 
     return false;
   }
@@ -226,10 +227,10 @@ public class MachineInstance {
         var command = currentImage.getCode().get(currentFrame.getInstructionPointer());
         commands.get(command.getCode()).accept(command.getArgument());
       }
-    } catch (EngineException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new WrappedJavaException(e);
+    } catch (EngineException exception) {
+      throw exception;
+    } catch (Exception exception) {
+      throw new WrappedJavaException(exception);
     }
   }
 
@@ -305,8 +306,8 @@ public class MachineInstance {
     nextInstruction();
   }
 
-  private void raiseException(int arg) {
-    if (arg < 0) {
+  private void raiseException(int argument) {
+    if (argument < 0) {
       if (currentFrame.getLastException() == null) {
         // Если в блоке Исключение была еще одна Попытка, то она затерла lastException
         // 1С в этом случае бросает новое пустое исключение
@@ -323,14 +324,14 @@ public class MachineInstance {
 
   private void exceptionDescr(int integer) {
     if (currentFrame.getLastException() != null) {
-      var excInfo = currentFrame.getLastException();
+      var exceptionInfo = currentFrame.getLastException();
       String message;
-      if (excInfo instanceof MachineException) {
+      if (exceptionInfo instanceof MachineException) {
         // TODO: варианты текстов исключений привести к иерархии классов 1Script
-        var machineExc = (MachineException) excInfo;
+        var machineExc = (MachineException) exceptionInfo;
         message = machineExc.getMessageWithoutCodeFragment();
       } else {
-        message = excInfo.getMessage();
+        message = exceptionInfo.getMessage();
       }
       operationStack.push(ValueFactory.create(message));
     } else {

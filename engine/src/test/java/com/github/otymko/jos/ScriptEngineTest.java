@@ -89,6 +89,7 @@ class ScriptEngineTest {
 
   @Test
   void testExceptionsBehavior() throws Exception {
+    // TODO: проверить вложенные попытки с исключениями
     var script = Path.of("src/test/resources/exceptions.os");
     TestHelper.checkScript(script, "РучноеИсключение\r\nНеВызывайМеня");
   }
