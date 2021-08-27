@@ -133,4 +133,9 @@ public class MachineException extends EngineException {
     return new MachineException(message);
   }
 
+  public static MachineException iteratorIsNotDefined() {
+    var message = "Итератор для значения не определен";
+    return new MachineException(message);
+  }
+
 }

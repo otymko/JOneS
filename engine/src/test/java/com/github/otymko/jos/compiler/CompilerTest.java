@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.compiler;
 
+import com.github.otymko.jos.TestHelper;
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.machine.Command;
@@ -84,6 +85,12 @@ class CompilerTest {
     var engine = new ScriptEngine();
     var compiler = new ScriptCompiler(engine);
     assertThatCode(() -> compiler.compile(pathToScript, UserScriptContext.class)).doesNotThrowAnyException();
+  }
+
+  @Test
+  void testForEach() throws Exception {
+    var pathToScript = Path.of("src/test/resources/foreach.os");
+    TestHelper.checkScript(pathToScript, "1\r\n2\r\n3");
   }
 
   private int findCommand(List<Command> commands, OperationCode code, int start) {

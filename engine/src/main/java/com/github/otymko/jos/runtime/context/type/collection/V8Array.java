@@ -6,12 +6,14 @@
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
+import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
@@ -19,12 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ContextClass(name = "Массив", alias = "Array")
-public class ArrayImpl extends ContextValue implements IndexAccessor {
-  public static final ContextInfo INFO = ContextInfo.createByClass(ArrayImpl.class);
+public class V8Array extends ContextValue implements IndexAccessor, CollectionIterable {
+  public static final ContextInfo INFO = ContextInfo.createByClass(V8Array.class);
 
   private final List<IValue> values;
 
-  public ArrayImpl() {
+  public V8Array() {
     values = new ArrayList<>();
   }
 
@@ -36,8 +38,8 @@ public class ArrayImpl extends ContextValue implements IndexAccessor {
   // TODO: конструктор
 
   @ContextConstructor
-  public static ArrayImpl constructor() {
-    return new ArrayImpl();
+  public static V8Array constructor() {
+    return new V8Array();
   }
 
   @ContextMethod(name = "Количество", alias = "Count")
@@ -105,6 +107,7 @@ public class ArrayImpl extends ContextValue implements IndexAccessor {
     values.set(index, value);
   }
 
+  @Override
   public IValue getIndexedValue(IValue index) {
     return get((int) index.asNumber());
   }
@@ -114,6 +117,10 @@ public class ArrayImpl extends ContextValue implements IndexAccessor {
     set((int) index.asNumber(), value);
   }
 
+  @Override
+  public IteratorValue iterator() {
+    return new IteratorValue(values.iterator());
+  }
 
   private void extend(int count) {
     for (var index = 0; index < count; index++) {

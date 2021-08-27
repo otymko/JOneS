@@ -9,13 +9,19 @@ import com.github.otymko.jos.exception.EngineException;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.Variable;
+import com.github.otymko.jos.runtime.context.IValue;
 import lombok.Data;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 @Data
 public class ExecutionFrame {
   private int instructionPointer;
   private int lineNumber;
   private IVariable[] localVariables;
+
+  private Deque<IValue> localFrameStack = new ArrayDeque<>();
 
   private Scope moduleScope;
   private int moduleLoadIndex;

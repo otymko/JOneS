@@ -17,10 +17,12 @@ import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.VariableReference;
+import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.ExceptionInfoContext;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
+import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.type.TypeFactory;
@@ -260,6 +262,7 @@ public class MachineInstance {
     map.put(OperationCode.Or, this::or);
     map.put(OperationCode.MakeBool, this::makeBool);
     map.put(OperationCode.Jmp, this::jmp);
+    map.put(OperationCode.JmpFalse, this::jmpFalse);
 
     map.put(OperationCode.Greater, this::greater);
     map.put(OperationCode.GreaterOrEqual, this::greaterOrEqual);
@@ -292,6 +295,10 @@ public class MachineInstance {
 
     map.put(OperationCode.ExceptionDescr, this::exceptionDescr);
     map.put(OperationCode.ExceptionInfo, this::exceptionInfo);
+
+    map.put(OperationCode.PushIterator, this::pushIterator);
+    map.put(OperationCode.IteratorNext, this::iteratorNext);
+    map.put(OperationCode.StopIterator, this::stopIterator);
 
     return map;
   }
@@ -355,6 +362,52 @@ public class MachineInstance {
     } else {
       operationStack.push(ValueFactory.create());
     }
+    nextInstruction();
+  }
+
+  private void iteratorNext(int argument) {
+    if (currentFrame.getLocalFrameStack().isEmpty()) {
+      throw MachineException.wrongStackConditionException();
+    }
+
+    var iteratorValue = currentFrame.getLocalFrameStack().peek().getRawValue();
+    if (!(iteratorValue instanceof IteratorValue)) {
+      throw MachineException.iteratorIsNotDefined();
+    }
+
+    var iterator = ((IteratorValue) iteratorValue).iterator();
+    var hasNext = iterator.hasNext();
+    if (hasNext) {
+      operationStack.push(iterator.next());
+    }
+    operationStack.push(ValueFactory.create(hasNext));
+    nextInstruction();
+  }
+
+  private void pushIterator(int argument) {
+    var collection = operationStack.pop().getRawValue();
+    if (!(collection instanceof CollectionIterable)) {
+      throw MachineException.iteratorIsNotDefined();
+    }
+
+    var iterable = (CollectionIterable) collection;
+    IValue iterator = iterable.iterator();
+    currentFrame.getLocalFrameStack().push(iterator);
+    nextInstruction();
+  }
+
+  private void stopIterator(int argument) {
+    if (currentFrame.getLocalFrameStack().isEmpty()) {
+      throw MachineException.wrongStackConditionException();
+    }
+
+    var iteratorValue = currentFrame.getLocalFrameStack().peek().getRawValue();
+    if (!(iteratorValue instanceof IteratorValue)) {
+      throw MachineException.iteratorIsNotDefined();
+    }
+
+    var iterator = ((IteratorValue) iteratorValue).iterator();
+    iterator.remove();
     nextInstruction();
   }
 
@@ -631,6 +684,15 @@ public class MachineInstance {
 
   private void jmp(int argument) {
     currentFrame.setInstructionPointer(argument);
+  }
+
+  private void jmpFalse(int argument) {
+    var condition = operationStack.pop();
+    if (condition.asBoolean()) {
+      nextInstruction();
+    } else {
+      currentFrame.setInstructionPointer(argument);
+    }
   }
 
   private void makeBool(int argument) {
