@@ -99,6 +99,12 @@ class CompilerTest {
     TestHelper.checkScript(pathToScript, "1\r\n2\r\n3");
   }
 
+  @Test
+  void testSimpleIf() throws Exception {
+    var pathToScript = Path.of("src/test/resources/simple-if.os");
+    TestHelper.checkScript(pathToScript, "Истина");
+  }
+
   private int findCommand(List<Command> commands, OperationCode code, int start) {
     return findCommand(commands, code, start, -1);
   }
