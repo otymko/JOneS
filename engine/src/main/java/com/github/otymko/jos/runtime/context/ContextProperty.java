@@ -15,4 +15,5 @@ import java.lang.annotation.Target;
 public @interface ContextProperty {
   String name();
   String alias();
+  PropertyAccessMode accessMode() default PropertyAccessMode.READ_AND_WRITE;
 }

@@ -7,12 +7,14 @@ package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.Variable;
+import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
+import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
@@ -21,9 +23,12 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @ContextClass(name = "Структура", alias = "Structure")
-public class V8Structure extends ContextValue implements IndexAccessor, PropertyNameAccessor {
+public class V8Structure extends ContextValue implements IndexAccessor, PropertyNameAccessor,
+  CollectionIterable<V8KeyAndValue> {
+
   public static final ContextInfo INFO = ContextInfo.createByClass(V8Structure.class);
 
   private final Map<IValue, IValue> values;
@@ -146,4 +151,13 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
     insert(index, value);
   }
 
+  @Override
+  public IteratorValue iterator() {
+    var iterator = values.entrySet().stream()
+      .sorted((valueOne, valueTwo) -> valueOne.getValue().compareTo(valueTwo.getValue()))
+      .map(entity -> new V8KeyAndValue(entity.getKey(), entity.getValue()))
+      .map(IValue.class::cast) // ???
+      .collect(Collectors.toList()).iterator();
+    return new IteratorValue(iterator);
+  }
 }

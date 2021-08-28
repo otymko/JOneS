@@ -77,6 +77,11 @@ public class VariableReference extends ContextValue implements IVariable {
     } else if (referenceType == ReferenceType.DYNAMIC_PROPERTY) {
       var accessor = (PropertyNameAccessor) context;
       return accessor.getPropertyValue(index);
+    } else if (referenceType == ReferenceType.CONTEXT_PROPERTY) {
+      if (context.isPropertyWriteOnly(contextPropertyNumber)) {
+        throw MachineException.getPropertyIsNotReadableException("");
+      }
+      return context.getPropertyValue(contextPropertyNumber);
     } else {
       throw MachineException.operationNotImplementedException();
     }
@@ -92,6 +97,11 @@ public class VariableReference extends ContextValue implements IVariable {
     } else if (referenceType == ReferenceType.DYNAMIC_PROPERTY) {
       var accessor = (PropertyNameAccessor) context;
       accessor.setPropertyValue(index, value);
+    } else if (referenceType == ReferenceType.CONTEXT_PROPERTY) {
+      if (context.isPropertyReadOnly(contextPropertyNumber)) {
+        throw MachineException.getPropertyIsNotWritableException("");
+      }
+      context.setPropertyValue(contextPropertyNumber, value);
     } else {
       throw MachineException.operationNotImplementedException();
     }

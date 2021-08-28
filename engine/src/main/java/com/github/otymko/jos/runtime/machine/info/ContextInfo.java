@@ -15,23 +15,43 @@ import lombok.Value;
 @Builder
 public class ContextInfo {
   public static final ContextInfo EMPTY = createEmptyInfo();
+  /**
+   * Имя тип на русском
+   */
   String name;
+  /**
+   * Имя типа на английском
+   */
   String alias;
+  /**
+   * Класс контекста
+   */
   Class<? extends RuntimeContext> typeClass;
+  /**
+   * Список методов
+   */
   MethodInfo[] methods;
-  // свойства
+  /**
+   * Список свойств
+   */
+  PropertyInfo[] properties;
+  /**
+   * Список конструкторов
+   */
   ConstructorInfo[] constructors;
 
   public static ContextInfo createByClass(Class<? extends RuntimeContext> typeClass) {
     var contextType = typeClass.getAnnotation(ContextClass.class);
     var methods = ContextInitializer.getContextMethods(typeClass);
     var constructors = ContextInitializer.getConstructors(typeClass);
+    var properties = ContextInitializer.getProperties(typeClass);
 
     var builder = ContextInfo.builder();
     builder.name(contextType.name());
     builder.alias(contextType.alias());
     builder.typeClass(typeClass);
     builder.methods(methods);
+    builder.properties(properties);
     builder.constructors(constructors);
 
     return builder.build();
@@ -43,7 +63,9 @@ public class ContextInfo {
     builder.alias("");
     builder.typeClass(null);
     builder.methods(new MethodInfo[0]);
+    builder.properties(new PropertyInfo[0]);
     builder.constructors(new ConstructorInfo[0]);
+
     return builder.build();
   }
 

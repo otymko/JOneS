@@ -133,6 +133,16 @@ public class MachineException extends EngineException {
     return new MachineException(message);
   }
 
+  public static MachineException getPropertyIsNotReadableException(String propertyName) {
+    var message = String.format("Свойство %s недоступно для чтения", propertyName);
+    return new MachineException(message);
+  }
+
+  public static MachineException getPropertyIsNotWritableException(String propertyName) {
+    var message = String.format("Свойство %s недоступно для записи", propertyName);
+    return new MachineException(message);
+  }
+
   public static MachineException getPropertyNotFoundException(String propertyName) {
     var message = String.format("Свойство объекта не обнаружено (%s)", propertyName);
     return new MachineException(message);

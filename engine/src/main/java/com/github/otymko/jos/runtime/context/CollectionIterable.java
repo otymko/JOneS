@@ -5,6 +5,6 @@
  */
 package com.github.otymko.jos.runtime.context;
 
-public interface CollectionIterable {
+public interface CollectionIterable<T extends IValue> {
   IteratorValue iterator();
 }
