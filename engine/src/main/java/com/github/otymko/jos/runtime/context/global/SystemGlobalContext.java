@@ -9,6 +9,7 @@ import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 @ContextClass(name = "ГлобальныйКонтекст", alias = "GlobalContext")
@@ -27,6 +28,11 @@ public class SystemGlobalContext implements AttachableContext {
   @ContextMethod(name = "Сообщить", alias = "Message")
   public static void message(IValue message) {
     System.out.println(message.asString());
+  }
+
+  @ContextMethod(name = "ТекущаяУниверсальнаяДатаВМиллисекундах", alias = "CurrentUniversalDateInMilliseconds")
+  public static IValue currentUniversalDateInMilliseconds() {
+    return ValueFactory.create(System.nanoTime() / 1000000);
   }
 
 }

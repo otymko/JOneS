@@ -16,6 +16,7 @@ import java.io.PrintStream;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 @UtilityClass
 public class TestHelper {
@@ -31,6 +32,16 @@ public class TestHelper {
     assertThat(result).isEqualTo(model);
   }
 
+  public void checkScriptWithoutException(Path pathToScript) throws Exception {
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(out));
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
+    assertThatCode(() -> engine.newObject(moduleImage)).doesNotThrowAnyException();
+    var result = out.toString().trim();
+    assertThat(result).isEmpty();
+  }
 
   public void checkCode(String code, String model) throws Exception {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();

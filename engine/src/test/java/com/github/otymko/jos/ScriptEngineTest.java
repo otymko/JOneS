@@ -100,4 +100,10 @@ class ScriptEngineTest {
     TestHelper.checkScript(script, "101");
   }
 
+  @Test
+  void testEratosfen() throws Exception {
+    Path script = Path.of("src/test/resources/Eratosfen.os");
+    TestHelper.checkScriptWithoutException(script);
+  }
+
 }
