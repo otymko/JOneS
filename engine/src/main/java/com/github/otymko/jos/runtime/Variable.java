@@ -60,6 +60,11 @@ public class Variable extends ContextValue implements IVariable {
     return value;
   }
 
+  @Override
+  public int compareTo(IValue o) {
+    return getValue().compareTo(o);
+  }
+
   public static Variable create(IValue value, String name) {
     var variable = new Variable();
     variable.setName(name);

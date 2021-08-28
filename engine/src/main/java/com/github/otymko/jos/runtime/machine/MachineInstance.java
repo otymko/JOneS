@@ -305,7 +305,13 @@ public class MachineInstance {
     map.put(OperationCode.JmpCounter, this::jmpCounter);
     map.put(OperationCode.PopTmp, this::popTmp);
 
+    map.put(OperationCode.Nop, this::nop);
+
     return map;
+  }
+
+  private void nop(int argument) {
+    nextInstruction();
   }
 
   private void pushTmp(int argument) {
