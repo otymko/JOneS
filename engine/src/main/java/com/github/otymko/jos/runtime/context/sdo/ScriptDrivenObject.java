@@ -7,8 +7,11 @@ package com.github.otymko.jos.runtime.context.sdo;
 
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
+import com.github.otymko.jos.runtime.IVariable;
+import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import lombok.Getter;
 
 /**
@@ -17,9 +20,12 @@ import lombok.Getter;
 public abstract class ScriptDrivenObject extends ContextValue {
   @Getter
   private final ModuleImage moduleImage;
+  @Getter
+  private IVariable[] state;
 
   protected ScriptDrivenObject(ModuleImage moduleImage) {
     this.moduleImage = moduleImage;
+    init();
   }
 
   public void initialize(ScriptEngine engine) {
@@ -43,6 +49,13 @@ public abstract class ScriptDrivenObject extends ContextValue {
   @Override
   public int compareTo(IValue o) {
     return 0;
+  }
+
+  private void init() {
+    state = new IVariable[moduleImage.getVariables().size()];
+    for (var index = 0; index < state.length; index++) {
+      state[index] = Variable.create(ValueFactory.create(), moduleImage.getVariables().get(index).getName());
+    }
   }
 
 }

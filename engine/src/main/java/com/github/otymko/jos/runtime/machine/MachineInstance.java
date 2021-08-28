@@ -128,7 +128,7 @@ public class MachineInstance {
   private Scope createModuleScope(ScriptDrivenObject sdo) {
     var image = sdo.getModuleImage();
 
-    IVariable[] variables = createVariables(image.getVariables());
+    IVariable[] variables = sdo.getState();
     var methodSize = image.getMethods().size() + sdo.getContextInfo().getMethods().length;
     MethodInfo[] methods = new MethodInfo[methodSize];
     var position = 0;
