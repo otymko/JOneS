@@ -7,6 +7,7 @@ package com.github.otymko.jos.runtime.context.type;
 
 import com.github.otymko.jos.runtime.context.ContextType;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
+import com.github.otymko.jos.runtime.context.type.collection.V8KeyAndValue;
 import com.github.otymko.jos.runtime.context.type.collection.V8Structure;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
@@ -56,8 +57,12 @@ public class StandardTypeInitializer {
   }
 
   private void initCollections(TypeManager typeManager) {
+    // TODO: name и alias из contextType
     typeManager.registerType("Массив", V8Array.class);
     typeManager.registerType("Array", V8Array.class);
+
+    typeManager.registerType("КлючИЗначение", V8KeyAndValue.class);
+    typeManager.registerType("KeyAndValue", V8KeyAndValue.class);
 
     typeManager.registerType("Структура", V8Structure.class);
     typeManager.registerType("Structure", V8Structure.class);

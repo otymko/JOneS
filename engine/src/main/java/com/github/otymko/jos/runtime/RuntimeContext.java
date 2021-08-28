@@ -7,6 +7,7 @@ package com.github.otymko.jos.runtime;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 
@@ -54,7 +55,46 @@ public interface RuntimeContext {
   }
 
   default int findProperty(String propertyName) {
+    int position = 0;
+    for (var property : getContextInfo().getProperties()) {
+      if (property.getName().equalsIgnoreCase(propertyName) || property.getAlias().equalsIgnoreCase(propertyName)) {
+        return position;
+      }
+      position++;
+    }
     return -1;
+  }
+
+  default IValue getPropertyValue(int index) {
+    var property = getContextInfo().getProperties()[index];
+    var field = property.getField();
+    Object result;
+    try {
+      result = field.get(this);
+    } catch (IllegalAccessException exception) {
+      throw new MachineException("Ошибка при получении свойства");
+    }
+    return (IValue) result;
+  }
+
+  default void setPropertyValue(int index, IValue value) {
+    var property = getContextInfo().getProperties()[index];
+    var field = property.getField();
+    try {
+      field.set(this, value);
+    } catch (IllegalAccessException e) {
+      throw new MachineException("Ошибка при установке значения свойства");
+    }
+  }
+
+  default boolean isPropertyReadOnly(int index) {
+    var property = getContextInfo().getProperties()[index];
+    return property.getAccessMode() == PropertyAccessMode.READ_ONLY;
+  }
+
+  default boolean isPropertyWriteOnly(int index) {
+    var property = getContextInfo().getProperties()[index];
+    return property.getAccessMode() == PropertyAccessMode.WRITE_ONLY;
   }
 
 }

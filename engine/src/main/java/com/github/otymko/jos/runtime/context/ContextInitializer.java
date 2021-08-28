@@ -11,6 +11,7 @@ import com.github.otymko.jos.runtime.machine.MachineInstance;
 import com.github.otymko.jos.runtime.machine.info.ConstructorInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
+import com.github.otymko.jos.runtime.machine.info.PropertyInfo;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.Method;
@@ -74,4 +75,20 @@ public class ContextInitializer {
 
     return constructors.toArray(new ConstructorInfo[0]);
   }
+
+  public PropertyInfo[] getProperties(Class<? extends RuntimeContext> targetClass) {
+    List<PropertyInfo> properties = new ArrayList<>();
+    for (var field : targetClass.getFields()) {
+      var contextProperty = field.getAnnotation(ContextProperty.class);
+      if (contextProperty == null) {
+        continue;
+      }
+
+      var property = new PropertyInfo(contextProperty.name(), contextProperty.alias(),
+        contextProperty.accessMode(), field);
+      properties.add(property);
+    }
+    return properties.toArray(new PropertyInfo[0]);
+  }
+
 }
