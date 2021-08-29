@@ -27,30 +27,30 @@ class V8StructureTest {
   @Test
   void testResolveProperty() throws Exception {
     var pathToScript = Path.of("src/test/resources/structures/property-access.os");
-    TestHelper.checkScript(pathToScript, "Значение\r\n" +
+    TestHelper.checkScript(pathToScript, "Значение\n" +
       "Новое значение");
   }
 
   @Test
   void testStress() throws Exception {
     var pathToScript = Path.of("src/test/resources/structures/stress.os");
-    TestHelper.checkScript(pathToScript, "3\r\n" +
-      "1\r\n" +
-      "2\r\n" +
-      "Свойство есть: Да\r\n" +
-      "2\r\n" +
-      "Свойство есть: Нет\r\n" +
+    TestHelper.checkScript(pathToScript, "3\n" +
+      "1\n" +
+      "2\n" +
+      "Свойство есть: Да\n" +
+      "2\n" +
+      "Свойство есть: Нет\n" +
       "0");
   }
 
   @Test
   void testIterable() throws Exception {
     var pathToScript = Path.of("src/test/resources/structures/iterable.os");
-    var model = "Ключ: Ключ1, Значение: Значение 1\r\n" +
-      "Ключ: Ключ1, Значение: Значение 1\r\n" +
-      "Ключ: Ключ2, Значение: Значение 2\r\n" +
-      "Ключ: Ключ2, Значение: Значение 2\r\n" +
-      "Ключ: Ключ3, Значение: Значение 3\r\n" +
+    var model = "Ключ: Ключ1, Значение: Значение 1\n" +
+      "Ключ: Ключ1, Значение: Значение 1\n" +
+      "Ключ: Ключ2, Значение: Значение 2\n" +
+      "Ключ: Ключ2, Значение: Значение 2\n" +
+      "Ключ: Ключ3, Значение: Значение 3\n" +
       "Ключ: Ключ3, Значение: Значение 3";
     TestHelper.checkScript(pathToScript, model);
   }

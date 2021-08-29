@@ -1,3 +1,2 @@
-rootProject.name = "OneScript4J"
+rootProject.name = "JOneS"
 include("engine")
-include("check-example")

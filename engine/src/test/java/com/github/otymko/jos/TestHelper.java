@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 @UtilityClass
 public class TestHelper {
+  private static final String IN_LINE_SEPARATOR = "\n";
 
   public void checkScript(Path pathToScript, String model) throws Exception {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -29,6 +30,7 @@ public class TestHelper {
     var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
     engine.newObject(moduleImage);
     var result = out.toString().trim();
+    result = result.replaceAll(System.lineSeparator(), IN_LINE_SEPARATOR);
     assertThat(result).isEqualTo(model);
   }
 
@@ -40,6 +42,7 @@ public class TestHelper {
     var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
     assertThatCode(() -> engine.newObject(moduleImage)).doesNotThrowAnyException();
     var result = out.toString().trim();
+    result = result.replaceAll(System.lineSeparator(), IN_LINE_SEPARATOR);
     assertThat(result).isEmpty();
   }
 
@@ -51,6 +54,7 @@ public class TestHelper {
     var moduleImage = compiler.compile(code, UserScriptContext.class);
     engine.newObject(moduleImage);
     var result = out.toString().trim();
+    result = result.replaceAll(System.lineSeparator(), IN_LINE_SEPARATOR);
     assertThat(result).isEqualTo(model);
   }
 
@@ -66,6 +70,7 @@ public class TestHelper {
     sdo.callScriptMethod(engine, methodId, new IValue[0]);
 
     var result = out.toString().trim();
+    result = result.replaceAll(System.lineSeparator(), IN_LINE_SEPARATOR);
     assertThat(result).isEqualTo(model);
   }
 
