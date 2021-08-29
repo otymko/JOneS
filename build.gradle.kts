@@ -2,9 +2,20 @@ import java.net.URI
 
 plugins {
     `java-library`
+    jacoco
     id("io.freefair.lombok") version "6.0.0-m2"
     id("com.github.johnrengelman.shadow") version "7.0.0"
     id("net.kyori.indra.license-header") version "2.0.6"
+    id("org.sonarqube") version "3.3"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
 }
 
 allprojects {
@@ -15,12 +26,25 @@ allprojects {
         mavenCentral()
         maven { url = URI("https://jitpack.io") }
     }
+
+    sonarqube {
+        properties {
+            property("sonar.sourceEncoding", "UTF-8")
+            property("sonar.host.url", "https://sonarcloud.io")
+            property("sonar.organization", "otymko")
+            property("sonar.projectKey", "otymko_JOneS")
+            property("sonar.projectName", "JOneS")
+            property("sonar.exclusions", "**/gen/**/*.*")
+            property("sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco/test/jacoco.xml")
+        }
+    }
 }
 
 subprojects {
     apply(plugin = "java-library")
     apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "net.kyori.indra.license-header")
+    apply(plugin = "jacoco")
 
     dependencies {
         // https://github.com/1c-syntax/bsl-parser
@@ -45,13 +69,20 @@ subprojects {
         testImplementation("org.assertj:assertj-core:3.20.2")
     }
 
-    tasks.withType<JavaCompile> {
-        options.encoding = "UTF-8"
-    }
-
     val test by tasks.getting(Test::class) {
         // Use junit platform for unit tests
         useJUnitPlatform()
+    }
+
+    tasks.check {
+        dependsOn(tasks.jacocoTestReport)
+    }
+
+    tasks.jacocoTestReport {
+        reports {
+            xml.isEnabled = true
+            xml.destination = File("$buildDir/reports/jacoco/test/jacoco.xml")
+        }
     }
 
     license {
