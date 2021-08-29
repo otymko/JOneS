@@ -8,6 +8,7 @@ package com.github.otymko.jos.compiler;
 import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github._1c_syntax.bsl.parser.BSLParserBaseVisitor;
 import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
+import com.github.otymko.jos.compiler.helper.AnnotationProcessing;
 import com.github.otymko.jos.exception.CompilerException;
 import com.github.otymko.jos.module.ModuleImageCache;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
@@ -35,6 +36,11 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   private final ScriptCompiler compiler;
   private final ModuleImageCache imageCache;
+  /**
+   * Обработка аннотаций
+   */
+  private final AnnotationProcessing annotationProcessing;
+
   private final List<Integer> currentCommandReturnInMethod = new ArrayList<>();
   private final Deque<Compiler.NestedLoopInfo> nestedLoops = new ArrayDeque<>();
 
@@ -65,6 +71,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   public Compiler(ModuleImageCache imageCache, ScriptCompiler compiler) {
     this.imageCache = imageCache;
     this.compiler = compiler;
+    this.annotationProcessing = new AnnotationProcessing(this);
   }
 
   @Override
@@ -545,19 +552,23 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     boolean isFunction;
     String methodName;
     BSLParser.ParamListContext parametersList;
+    List<? extends BSLParser.AnnotationContext> annotations;
 
     if (subContext.function() != null) {
       isFunction = true;
       methodName = getMethodName(subContext.function());
       parametersList = getMethodParamListContext(subContext.function());
+      annotations = subContext.function().funcDeclaration().annotation();
     } else {
       isFunction = false;
       methodName = getMethodName(subContext.procedure());
       parametersList = getMethodParamListContext(subContext.procedure());
+      annotations = subContext.procedure().procDeclaration().annotation();
     }
 
     var parameterInfos = buildParameterInfos(parametersList);
-    var methodInfo = new MethodInfo(methodName, methodName, isFunction, parameterInfos);
+    var annotationDefinitions = annotationProcessing.getAnnotationsFromContext(annotations);
+    var methodInfo = new MethodInfo(methodName, methodName, isFunction, parameterInfos, annotationDefinitions);
 
     var methodDescriptor = new MethodDescriptor();
     methodDescriptor.setSignature(methodInfo);
@@ -565,7 +576,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   }
 
   private MethodDescriptor createMethodDescriptorFromBody() {
-    var methodInfo = new MethodInfo(ENTRY_METHOD_NAME, ENTRY_METHOD_NAME, false, new ParameterInfo[0]);
+    var methodInfo = new MethodInfo(ENTRY_METHOD_NAME, ENTRY_METHOD_NAME, false, new ParameterInfo[0],
+      new AnnotationDefinition[0]);
 
     var methodDescriptor = new MethodDescriptor();
     methodDescriptor.setSignature(methodInfo);
@@ -1087,4 +1099,23 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       }
     }
   }
+
+  // TODO: вынести в хелпер
+  public int getConstantIndexByValue(BSLParser.ConstValueContext constValue, boolean isDefaultValue) {
+    var constant = getConstantDefinitionByConstValue(constValue, isDefaultValue);
+    return addConstant(constant);
+  }
+
+  public int getConstantIndexByIdentifier(String identifier) {
+    var constant = new ConstantDefinition(ValueFactory.create(identifier));
+    return addConstant(constant);
+  }
+
+  public int addConstant(ConstantDefinition constant) {
+    if (!imageCache.getConstants().contains(constant)) {
+      imageCache.getConstants().add(constant);
+    }
+    return imageCache.getConstants().indexOf(constant);
+  }
+
 }

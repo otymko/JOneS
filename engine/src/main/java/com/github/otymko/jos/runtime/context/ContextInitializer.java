@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.compiler.AnnotationDefinition;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.context.global.SystemGlobalContext;
 import com.github.otymko.jos.runtime.machine.MachineInstance;
@@ -34,7 +35,7 @@ public class ContextInitializer {
       }
       var parameters = getMethodParameters(method);
       var info = new MethodInfo(contextMethod.name(), contextMethod.alias(),
-        method.getReturnType() != void.class, parameters, method);
+        method.getReturnType() != void.class, parameters, new AnnotationDefinition[0], method);
 
       methods.add(info);
     }
