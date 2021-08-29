@@ -12,8 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         java_version: [ '11' ]
-        os: [ 'windows-latest' ]
-    #        os: [ 'ubuntu-latest', 'windows-latest', 'macOS-latest' ]
+        os: [ 'ubuntu-latest', 'windows-latest', 'macOS-latest' ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2.3.4
@@ -27,9 +26,10 @@ jobs:
           distribution: 'adopt-hotspot'
 
       - name: Build
-        run: ./gradlew check --stacktrace
+        run: ./gradlew check -s
 
       - name: Archive test results
+        if: failure()
         uses: actions/upload-artifact@v2.2.4
         with:
           name: junit_${{ matrix.os }}_${{ matrix.java_version }}

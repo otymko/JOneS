@@ -14,7 +14,7 @@ class ScriptEngineTest {
   @Test
   void testCompileSample() throws Exception {
     var script = Path.of("src/test/resources/sample.os");
-    var model = "Проверка 1\r\nПеременнаяБоди";
+    var model = "Проверка 1\nПеременнаяБоди";
     TestHelper.checkScript(script, model);
   }
 
@@ -77,7 +77,7 @@ class ScriptEngineTest {
   void testCheckType() throws Exception {
     var code = "Сообщить(Тип(\"Массив\"));\n" +
       "Сообщить(Тип(\"Число\"));";
-    TestHelper.checkCode(code, "Массив\r\nЧисло");
+    TestHelper.checkCode(code, "Массив\nЧисло");
   }
 
   @Test
@@ -91,7 +91,7 @@ class ScriptEngineTest {
   void testExceptionsBehavior() throws Exception {
     // TODO: проверить вложенные попытки с исключениями
     var script = Path.of("src/test/resources/exceptions.os");
-    TestHelper.checkScript(script, "РучноеИсключение\r\nНеВызывайМеня");
+    TestHelper.checkScript(script, "РучноеИсключение\nНеВызывайМеня");
   }
 
   @Test

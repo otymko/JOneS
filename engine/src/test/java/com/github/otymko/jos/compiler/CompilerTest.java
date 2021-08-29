@@ -90,13 +90,13 @@ class CompilerTest {
   @Test
   void testForEach() throws Exception {
     var pathToScript = Path.of("src/test/resources/foreach.os");
-    TestHelper.checkScript(pathToScript, "1\r\n2\r\n3");
+    TestHelper.checkScript(pathToScript, "1\n2\n3");
   }
 
   @Test
   void testFor() throws Exception {
     var pathToScript = Path.of("src/test/resources/for.os");
-    TestHelper.checkScript(pathToScript, "1\r\n2\r\n3");
+    TestHelper.checkScript(pathToScript, "1\n2\n3");
   }
 
   @Test
@@ -114,7 +114,7 @@ class CompilerTest {
   @Test
   void testConditionIfElifElse() throws Exception {
     var pathToScript = Path.of("src/test/resources/if-elif-else.os");
-    TestHelper.checkScript(pathToScript, "1.1\r\n2.2\r\n3.3");
+    TestHelper.checkScript(pathToScript, "1.1\n2.2\n3.3");
   }
 
   private int findCommand(List<Command> commands, OperationCode code, int start) {
