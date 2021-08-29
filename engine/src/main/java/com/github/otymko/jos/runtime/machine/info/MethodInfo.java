@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.machine.info;
 
+import com.github.otymko.jos.compiler.AnnotationDefinition;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -20,14 +21,19 @@ public class MethodInfo {
   String alias;
   boolean function;
   ParameterInfo[] parameters;
+  AnnotationDefinition[] annotations;
   Method method;
 
-  public MethodInfo(String name, String alias, boolean function, ParameterInfo[] parameters) {
+  public MethodInfo(String name, String alias, boolean function, ParameterInfo[] parameters,
+                    AnnotationDefinition[] annotations) {
+
     this.name = name;
     this.alias = alias;
     this.function = function;
     this.parameters = parameters;
+    this.annotations = annotations;
     this.method = null;
+
   }
 
 }
