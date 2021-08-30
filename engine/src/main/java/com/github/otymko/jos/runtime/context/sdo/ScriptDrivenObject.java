@@ -9,6 +9,7 @@ import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.Variable;
+import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
@@ -17,7 +18,7 @@ import lombok.Getter;
 /**
  * Абстрактная реализация объекта скрипта
  */
-public abstract class ScriptDrivenObject extends ContextValue {
+public abstract class ScriptDrivenObject extends ContextValue implements AttachableContext {
   @Getter
   private final ModuleImage moduleImage;
   @Getter

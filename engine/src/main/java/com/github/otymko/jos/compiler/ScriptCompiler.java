@@ -12,8 +12,10 @@ import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.module.ModuleImageCache;
 import com.github.otymko.jos.module.ModuleSource;
+import com.github.otymko.jos.runtime.SymbolType;
 import com.github.otymko.jos.runtime.context.global.SystemGlobalContext;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
+import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import com.github.otymko.jos.util.Common;
 import lombok.Getter;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -21,6 +23,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 
 public class ScriptCompiler {
   @Getter
@@ -51,7 +54,7 @@ public class ScriptCompiler {
   }
 
   private void initContext() {
-    outerContext.implementContext(SystemGlobalContext.class);
+    initOuterContext();
     moduleContext = new CompilerContext(outerContext.getMaxScopeIndex());
   }
 
@@ -61,6 +64,18 @@ public class ScriptCompiler {
       address = outerContext.getMethodByName(name);
     }
     return address;
+  }
+
+  public VariableBinding findVariableBindingInContext(String name) {
+    var address = moduleContext.getVariableByName(name);
+    if (address != null) {
+      return new VariableBinding(SymbolType.VARIABLE, address);
+    }
+    address = outerContext.getVariableByName(name);
+    if (address != null) {
+      return new VariableBinding(SymbolType.CONTEXT_PROPERTY, address);
+    }
+    return null;
   }
 
   public SymbolAddress findVariableInContext(String name) {
@@ -99,6 +114,25 @@ public class ScriptCompiler {
     var walker = new ParseTreeWalker();
     var listener = new ParseErrorListener();
     walker.walk(listener, fileContext);
+  }
+
+  private void initOuterContext() {
+    addGlobalContext();
+    outerContext.implementContext(SystemGlobalContext.class);
+  }
+
+  private void addGlobalContext() {
+    var scope = new SymbolScope();
+    var contexts = ContextDiscovery.getEnumerationContext();
+    for (var context : contexts) {
+      var variableInfo = new VariableInfo(context.getContextInfo().getName(),
+        context.getContextInfo().getAlias(), SymbolType.CONTEXT_PROPERTY);
+      scope.getVariables().add(variableInfo);
+      var index = scope.getVariables().indexOf(variableInfo);
+      scope.getVariableNumbers().put(variableInfo.getName().toUpperCase(Locale.ENGLISH), index);
+      scope.getVariableNumbers().put(variableInfo.getAlias().toUpperCase(Locale.ENGLISH), index);
+    }
+    outerContext.getScopes().add(scope);
   }
 
 }

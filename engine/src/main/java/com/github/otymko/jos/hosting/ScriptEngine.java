@@ -9,6 +9,7 @@ import com.github.otymko.jos.compiler.ScriptCompiler;
 import com.github.otymko.jos.exception.EngineException;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.module.ModuleImage;
+import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
@@ -81,7 +82,7 @@ public class ScriptEngine {
     } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
       throw new MachineException("Не удалось создай экземпляр объекта");
     }
-    getMachine().implementContext(scriptContext);
+    getMachine().implementContext((AttachableContext) scriptContext);
     initializeScriptObject(scriptContext);
     return scriptContext;
   }

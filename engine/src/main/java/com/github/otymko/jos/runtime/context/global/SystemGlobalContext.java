@@ -6,19 +6,17 @@
 package com.github.otymko.jos.runtime.context.global;
 
 import com.github.otymko.jos.runtime.context.AttachableContext;
-import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextMethod;
+import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.NoArgsConstructor;
 
-@ContextClass(name = "ГлобальныйКонтекст", alias = "GlobalContext")
+@GlobalContextClass
+@NoArgsConstructor
 public class SystemGlobalContext implements AttachableContext {
   public static final ContextInfo INFO = ContextInfo.createByClass(SystemGlobalContext.class);
-
-  public SystemGlobalContext() {
-    // none
-  }
 
   @Override
   public ContextInfo getContextInfo() {
