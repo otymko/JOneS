@@ -122,6 +122,11 @@ public class ScriptCompiler {
   }
 
   private void addGlobalContext() {
+    var scope = getGlobalSymbolScope();
+    outerContext.getScopes().add(scope);
+  }
+
+  private SymbolScope getGlobalSymbolScope() {
     var scope = new SymbolScope();
     var contexts = ContextDiscovery.getEnumerationContext();
     for (var context : contexts) {
@@ -132,7 +137,7 @@ public class ScriptCompiler {
       scope.getVariableNumbers().put(variableInfo.getName().toUpperCase(Locale.ENGLISH), index);
       scope.getVariableNumbers().put(variableInfo.getAlias().toUpperCase(Locale.ENGLISH), index);
     }
-    outerContext.getScopes().add(scope);
+    return scope;
   }
 
 }

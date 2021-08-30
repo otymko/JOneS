@@ -19,13 +19,11 @@ import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
-import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.ExceptionInfoContext;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
-import com.github.otymko.jos.runtime.context.global.GlobalContext;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.type.TypeFactory;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
@@ -71,18 +69,8 @@ public class MachineInstance {
   }
 
   public void implementContext(AttachableContext context) {
-    var methods = ContextInitializer.getContextMethods(context.getClass());
-
-    IVariable[] variables;
-    if (context instanceof GlobalContext) {
-      variables = ((GlobalContext) context).getVariables().toArray(new IVariable[0]);
-    } else {
-      variables = new IVariable[0];
-
-    }
-//    //var variables = ContextInitializer.getContextVariables(context.getClass());
-//    // FIXME: this
-//    var variables = new IVariable[0];
+    var methods = context.getMethods();
+    var variables = context.getVariables();
     var scope = new Scope(context, variables, methods);
     scopes.add(scope);
   }

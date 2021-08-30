@@ -14,7 +14,6 @@ import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +21,7 @@ import java.util.List;
 @GlobalContextClass
 public class GlobalContext implements AttachableContext {
   private final ContextInfo info;
-  @Getter
-  private final List<IVariable> variables = new ArrayList<>();
+  private final IVariable[] variables;
   private final List<EnumerationContext> enumerationContexts;
 
   public GlobalContext() {
@@ -32,12 +30,14 @@ public class GlobalContext implements AttachableContext {
     var contexts = ContextDiscovery.getEnumerationContext();
     this.enumerationContexts = contexts;
     var index = 0;
+    List<IVariable> variables = new ArrayList<>();
     for (var enumContext : contexts) {
       var variable = VariableReference.createContextPropertyReference(this, index,
         enumContext.getContextInfo().getName());
       variables.add(variable);
       index++;
     }
+    this.variables = variables.toArray(new IVariable[0]);
   }
 
   @Override
@@ -68,5 +68,10 @@ public class GlobalContext implements AttachableContext {
   @Override
   public boolean isPropertyWriteOnly(int index) {
     return false;
+  }
+
+  @Override
+  public IVariable[] getVariables() {
+    return variables;
   }
 }

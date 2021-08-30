@@ -11,21 +11,28 @@ import com.github.otymko.jos.runtime.context.EnumValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.Getter;
 
 import java.util.Date;
 
 public class EnumerationValue implements ContextType, IValue {
+  @Getter
   private final EnumerationContext owner;
-  private final ContextInfo info;
+  @Getter
+  private final String name;
+  @Getter
+  private final String alias;
 
   public EnumerationValue(EnumerationContext owner, EnumValue enumValue) {
     this.owner = owner;
-    this.info = ContextInfo.createByEnumValue(enumValue);
+    var info = ContextInfo.createByEnumValue(enumValue);
+    name = info.getName();
+    alias = info.getAlias();
   }
 
   @Override
   public ContextInfo getContextInfo() {
-    return info;
+    return owner.getContextInfo();
   }
 
   @Override
@@ -45,7 +52,7 @@ public class EnumerationValue implements ContextType, IValue {
 
   @Override
   public String asString() {
-    return getContextInfo().getName();
+    return getName();
   }
 
   @Override

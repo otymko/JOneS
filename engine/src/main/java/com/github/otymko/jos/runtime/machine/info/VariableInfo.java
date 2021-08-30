@@ -18,11 +18,10 @@ public class VariableInfo {
   String name;
   String alias;
   SymbolType type;
-  // тип переменной: переменная / свойство типа
 
   public VariableInfo(String name) {
     this.name = name;
-    this.alias = "";
+    this.alias = name;
     this.type = SymbolType.VARIABLE;
   }
 

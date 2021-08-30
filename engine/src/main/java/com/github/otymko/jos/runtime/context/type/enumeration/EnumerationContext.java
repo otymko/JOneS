@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnumerationContext extends ContextValue implements PropertyNameAccessor {
+  private static final String ENUM_PREFIX = "Перечисление";
   private final ContextInfo info;
+  private final String preview;
 
   @Getter
   private final List<EnumerationValue> values = new ArrayList<>();
@@ -30,8 +32,9 @@ public class EnumerationContext extends ContextValue implements PropertyNameAcce
     if (enumClass == null) {
       throw MachineException.operationNotSupportedException();
     }
-
     this.info = ContextInfo.createByEnumClass(enumClass);
+    this.preview = ENUM_PREFIX + info.getName();
+
     for (var field : enumTargetClass.getFields()) {
       var enumValue = field.getAnnotation(EnumValue.class);
       if (enumValue == null) {
@@ -44,8 +47,7 @@ public class EnumerationContext extends ContextValue implements PropertyNameAcce
 
   @Override
   public String asString() {
-    // TODO: вынести в конструктор
-    return "Перечисление" + info.getName();
+    return preview;
   }
 
   @Override
@@ -53,7 +55,7 @@ public class EnumerationContext extends ContextValue implements PropertyNameAcce
     // todo: проверить ключ на валидность
     var key = index.asString();
     for (var value : values) {
-      if (value.getContextInfo().getName().equalsIgnoreCase(key) || value.getContextInfo().getAlias().equalsIgnoreCase(key)) {
+      if (value.getName().equalsIgnoreCase(key) || value.getAlias().equalsIgnoreCase(key)) {
         return value;
       }
     }
@@ -70,7 +72,7 @@ public class EnumerationContext extends ContextValue implements PropertyNameAcce
     // todo: проверить ключ на валидность
     var key = index.asString();
     for (var value : values) {
-      if (value.getContextInfo().getName().equalsIgnoreCase(key) || value.getContextInfo().getAlias().equalsIgnoreCase(key)) {
+      if (value.getName().equalsIgnoreCase(key) || value.getAlias().equalsIgnoreCase(key)) {
         return true;
       }
     }
