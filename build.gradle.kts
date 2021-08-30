@@ -59,6 +59,8 @@ subprojects {
         testCompileOnly("org.projectlombok:lombok:1.18.20")
         testAnnotationProcessor("org.projectlombok:lombok:1.18.20")
 
+        implementation("io.github.classgraph:classgraph:4.8.110")
+
 
         // Use JUnit Jupiter
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
