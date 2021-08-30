@@ -30,14 +30,14 @@ public class GlobalContext implements AttachableContext {
     var contexts = ContextDiscovery.getEnumerationContext();
     this.enumerationContexts = contexts;
     var index = 0;
-    List<IVariable> variables = new ArrayList<>();
+    List<IVariable> localVariables = new ArrayList<>();
     for (var enumContext : contexts) {
       var variable = VariableReference.createContextPropertyReference(this, index,
         enumContext.getContextInfo().getName());
-      variables.add(variable);
+      localVariables.add(variable);
       index++;
     }
-    this.variables = variables.toArray(new IVariable[0]);
+    this.variables = localVariables.toArray(new IVariable[0]);
   }
 
   @Override

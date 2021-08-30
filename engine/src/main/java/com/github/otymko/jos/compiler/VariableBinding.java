@@ -12,13 +12,6 @@ import lombok.Value;
 @Value
 @RequiredArgsConstructor
 public class VariableBinding {
-  //public static final VariableBinding EMPTY = new VariableBinding();
   SymbolType type;
   SymbolAddress address;
-
-  public VariableBinding() {
-    type = null;
-    address = null;
-  }
-
 }
