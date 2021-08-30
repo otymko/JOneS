@@ -5,12 +5,11 @@
  */
 package com.github.otymko.jos.compiler;
 
-import com.github.otymko.jos.runtime.context.EnumClass;
 import com.github.otymko.jos.runtime.context.EnumType;
 import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
-import io.github.classgraph.ClassGraph;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.reflections.Reflections;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,18 +27,10 @@ public class ContextDiscovery {
 
   // fixme: рефлексия это долго
   private List<EnumerationContext> calcSystemEnums() {
-    try (var scanResult = new ClassGraph()
-      .enableAnnotationInfo()
-      .acceptPackages("com.github.otymko.jos.runtime.context.type.enumeration")
-      .scan()) {
-
-      var classes = scanResult.getAllClasses();
-      return classes.stream()
-        .filter(classInfo -> classInfo.hasAnnotation(EnumClass.class.getName()))
-        .map(classInfo -> classInfo.loadClass(EnumType.class))
-        .map(EnumerationContext::new)
-        .collect(Collectors.toList());
-    }
+    var reflections = new Reflections("com.github.otymko.jos.runtime.context.type.enumeration");
+    return reflections.getSubTypesOf(EnumType.class).stream()
+      .map(EnumerationContext::new)
+      .collect(Collectors.toList());
   }
 
 }
