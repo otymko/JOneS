@@ -909,11 +909,20 @@ public class MachineInstance {
   private void methodSdoCall(Scope scope, SymbolAddress address) {
     var method = scope.getMethods()[address.getSymbolId()];
     int argumentCount = (int) operationStack.pop().asNumber();
-    var argumentValues = new IValue[argumentCount];
+
+    var factArgumentValues = new IValue[argumentCount];
     for (var index = argumentCount - 1; index >= 0; index--) {
       var value = operationStack.pop();
-      argumentValues[index] = value;
+//      if (value instanceof VariableReference) { // ???
+//        factArgumentValues[index] = breakVariableLink(value);
+//      } else {
+        factArgumentValues[index] = value;
+//      }
     }
+
+    var argumentValues = new IValue[method.getParameters().length];
+    fillArgumentValueFromFact(method, factArgumentValues, argumentValues);
+
     callContext(scope.getInstance(), address.getSymbolId(), method, argumentValues);
     nextInstruction();
   }

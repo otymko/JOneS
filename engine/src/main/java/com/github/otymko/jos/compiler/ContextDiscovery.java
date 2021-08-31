@@ -12,6 +12,7 @@ import lombok.experimental.UtilityClass;
 import org.reflections.Reflections;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 // FIXME: некрасиво, это должно быть частью компоненты typeManager
@@ -23,6 +24,13 @@ public class ContextDiscovery {
   public void implementEnumeration(Class<? extends EnumType> enumType) {
     var context = new EnumerationContext(enumType);
     getEnumerationContext().add(context);
+  }
+
+  public EnumerationContext getEnumByClass(Class<? extends EnumType> enumClass) {
+    return getEnumerationContext().stream()
+      .filter(context -> context.getEnumType() == enumClass)
+      .findAny()
+      .get();
   }
 
   // fixme: рефлексия это долго

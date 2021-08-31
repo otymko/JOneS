@@ -7,6 +7,7 @@ package com.github.otymko.jos.runtime.context.type;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextType;
+import com.github.otymko.jos.runtime.context.EnumType;
 import com.github.otymko.jos.runtime.context.EnumValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
@@ -22,12 +23,16 @@ public class EnumerationValue implements ContextType, IValue {
   private final String name;
   @Getter
   private final String alias;
+  @Getter
+  private final EnumType value;
 
-  public EnumerationValue(EnumerationContext owner, EnumValue enumValue) {
+  public EnumerationValue(EnumerationContext owner, EnumValue enumValue, EnumType value) {
     this.owner = owner;
     var info = ContextInfo.createByEnumValue(enumValue);
-    name = info.getName();
-    alias = info.getAlias();
+
+    this.name = info.getName();
+    this.alias = info.getAlias();
+    this.value = value;
   }
 
   @Override

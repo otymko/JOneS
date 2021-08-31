@@ -22,6 +22,8 @@ import java.util.List;
 public class EnumerationContext extends ContextValue implements PropertyNameAccessor {
   private static final String ENUM_PREFIX = "Перечисление";
   private final ContextInfo info;
+  @Getter
+  private final Class<? extends EnumType> enumType;
   private final String preview;
 
   @Getter
@@ -33,14 +35,23 @@ public class EnumerationContext extends ContextValue implements PropertyNameAcce
       throw MachineException.operationNotSupportedException();
     }
     this.info = ContextInfo.createByEnumClass(enumClass);
+    this.enumType = enumTargetClass;
     this.preview = ENUM_PREFIX + info.getName();
 
     for (var field : enumTargetClass.getFields()) {
-      var enumValue = field.getAnnotation(EnumValue.class);
-      if (enumValue == null) {
+      var enumValueClass = field.getAnnotation(EnumValue.class);
+      if (enumValueClass == null) {
         continue;
       }
-      var value = new EnumerationValue(this, enumValue);
+
+      EnumType enumValue = null;
+      try {
+        enumValue = (EnumType) field.get(null);
+      } catch (IllegalAccessException e) {
+        throw MachineException.operationNotSupportedException();
+      }
+
+      var value = new EnumerationValue(this, enumValueClass, enumValue);
       values.add(value);
     }
   }
@@ -82,6 +93,13 @@ public class EnumerationContext extends ContextValue implements PropertyNameAcce
   @Override
   public ContextInfo getContextInfo() {
     return info;
+  }
+
+  public EnumerationValue getEnumValueType(EnumType enumType) {
+    return getValues().stream()
+      .filter(enumerationValue -> enumerationValue.getValue() == enumType)
+      .findAny()
+      .get();
   }
 
 }
