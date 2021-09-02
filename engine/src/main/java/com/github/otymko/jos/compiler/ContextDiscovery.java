@@ -12,7 +12,6 @@ import lombok.experimental.UtilityClass;
 import org.reflections.Reflections;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 // FIXME: некрасиво, это должно быть частью компоненты typeManager

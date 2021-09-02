@@ -75,6 +75,20 @@ public class ScriptEngine {
   }
 
   public ScriptDrivenObject newObject(ModuleImage image, Class<? extends ScriptDrivenObject> targetClass) throws MachineException {
+    var scriptContext = getInstanceSdoByClass(image, targetClass);
+    getMachine().implementContext((AttachableContext) scriptContext);
+    initializeScriptObject(scriptContext);
+    return scriptContext;
+  }
+
+  public ScriptDrivenObject newObject(MachineInstance machine, ModuleImage image, Class<? extends ScriptDrivenObject> targetClass) throws MachineException {
+    var scriptContext = getInstanceSdoByClass(image, targetClass);
+    machine.implementContext(scriptContext);
+    initializeScriptObject(scriptContext, machine);
+    return scriptContext;
+  }
+
+  private ScriptDrivenObject getInstanceSdoByClass(ModuleImage image, Class<? extends ScriptDrivenObject> targetClass) {
     ScriptDrivenObject scriptContext;
     try {
       var constructor = targetClass.getConstructor(ModuleImage.class);
@@ -82,13 +96,15 @@ public class ScriptEngine {
     } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
       throw new MachineException("Не удалось создай экземпляр объекта");
     }
-    getMachine().implementContext((AttachableContext) scriptContext);
-    initializeScriptObject(scriptContext);
     return scriptContext;
   }
 
   private void initializeScriptObject(ScriptDrivenObject sdo) {
     sdo.initialize(this);
+  }
+
+  private void initializeScriptObject(ScriptDrivenObject sdo, MachineInstance machine) {
+    sdo.initialize(machine);
   }
 
 }

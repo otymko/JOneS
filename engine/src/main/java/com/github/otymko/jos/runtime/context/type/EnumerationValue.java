@@ -71,8 +71,16 @@ public class EnumerationValue implements ContextType, IValue {
   }
 
   @Override
-  public int compareTo(IValue o) {
-    throw MachineException.operationNotSupportedException();
+  public int compareTo(IValue inValue) {
+    // FIXME: кидать исключение при сравнении разных типов (не EnumerationValue)
+    if (inValue == null || !(inValue.getRawValue() instanceof EnumerationValue)) {
+      return 1;
+    }
+    var value = (EnumerationValue) inValue.getRawValue();
+    if (value.getValue() == getValue()) {
+      return 0;
+    }
+    return 1;
   }
 
   @Override
@@ -82,6 +90,9 @@ public class EnumerationValue implements ContextType, IValue {
 
   @Override
   public boolean equals(Object obj) {
-    return super.equals(obj);
+    if (obj instanceof IValue) {
+      return ((IValue) obj).getRawValue().equals(this);
+    }
+    return false;
   }
 }

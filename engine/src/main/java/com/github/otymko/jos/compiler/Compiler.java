@@ -1103,7 +1103,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
         addCommand(OperationCode.LoadLoc, address.getSymbolId());
       } else {
-        addCommand(OperationCode.LoadVar, address.getSymbolId());
+        imageCache.getVariableRefs().add(address);
+        addCommand(OperationCode.LoadVar, imageCache.getVariableRefs().indexOf(address));
       }
     }
   }

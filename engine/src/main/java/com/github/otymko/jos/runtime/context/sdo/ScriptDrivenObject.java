@@ -13,6 +13,7 @@ import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.machine.MachineInstance;
 import lombok.Getter;
 
 /**
@@ -33,6 +34,11 @@ public abstract class ScriptDrivenObject extends ContextValue implements Attacha
     engine.getMachine().executeModuleBody(this);
   }
 
+  /* Вариант с отдельной стековой машиной */
+  public void initialize(MachineInstance machine) {
+    machine.executeModuleBody(this);
+  }
+
   public int getScriptMethod(String name) {
     for (var index = 0; index < moduleImage.getMethods().size(); index++) {
       var methodDescription = moduleImage.getMethods().get(index);
@@ -47,9 +53,15 @@ public abstract class ScriptDrivenObject extends ContextValue implements Attacha
     return engine.getMachine().executeMethod(this, methodId, parameters);
   }
 
+  /* Вариант с отдельной стековой машиной */
+  public IValue callScriptMethod(MachineInstance machine, int methodId, IValue[] parameters) {
+    return machine.executeMethod(this, methodId, parameters);
+  }
+
   @Override
   public int compareTo(IValue o) {
-    return 0;
+    // TODO: реализовать сравнение sdo
+    return 1;
   }
 
   private void init() {

@@ -94,6 +94,9 @@ public class ScriptCompiler {
     findError(ast);
     var moduleVisitor = new Compiler(imageCache, this);
     moduleVisitor.visitFile(ast);
+
+    moduleContext.getScopes().clear();
+
     return buildImage(imageCache);
   }
 
