@@ -1,2 +1,2 @@
-rootProject.name = "JOneS"
+rootProject.name = "jones"
 include("engine")
