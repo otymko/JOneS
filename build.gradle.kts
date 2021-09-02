@@ -102,7 +102,6 @@ subprojects {
         publications {
             create<MavenPublication>("maven") {
                 from(components["java"])
-                artifact(tasks["shadowJar"])
                 pom {
                     description.set("Java OneScript Engine")
                     url.set("https://github.com/otymko/JOneS")

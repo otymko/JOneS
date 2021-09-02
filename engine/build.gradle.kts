@@ -5,14 +5,15 @@ tasks.jar {
         attributes["Main-Class"] = "com.github.otymko.jos.ScriptApplication"
         attributes["Implementation-Version"] = archiveVersion.get()
     }
-    enabled = false
+    enabled = true
+    archiveClassifier.set("")
     dependsOn(tasks.shadowJar)
 }
 
 tasks.shadowJar {
     project.configurations.implementation.get().isCanBeResolved = true
     configurations = listOf(project.configurations["implementation"])
-    archiveClassifier.set("")
+    archiveClassifier.set("exec")
 }
 
 tasks.withType<JavaCompile> {
