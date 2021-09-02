@@ -15,6 +15,7 @@ import com.github.otymko.jos.module.ModuleSource;
 import com.github.otymko.jos.runtime.SymbolType;
 import com.github.otymko.jos.runtime.context.global.SystemGlobalContext;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
+import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import com.github.otymko.jos.util.Common;
 import lombok.Getter;
@@ -131,7 +132,7 @@ public class ScriptCompiler {
 
   private SymbolScope getGlobalSymbolScope() {
     var scope = new SymbolScope();
-    var contexts = ContextDiscovery.getEnumerationContext();
+    var contexts = TypeManager.getInstance().getEnumerationContext();
     for (var context : contexts) {
       var variableInfo = new VariableInfo(context.getContextInfo().getName(),
         context.getContextInfo().getAlias(), SymbolType.CONTEXT_PROPERTY);

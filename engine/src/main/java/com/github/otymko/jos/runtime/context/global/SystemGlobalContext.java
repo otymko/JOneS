@@ -5,7 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.global;
 
-import com.github.otymko.jos.compiler.ContextDiscovery;
+import com.github.otymko.jos.compiler.EnumerationHelper;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
@@ -29,7 +29,7 @@ public class SystemGlobalContext implements AttachableContext {
   @ContextMethod(name = "Сообщить", alias = "Message")
   // TODO: для null аргументов можно ввести @ContextMethodArgument(defaultValue = MessageStatus.ORDINARY)
   public static void message(IValue message, IValue status) {
-    var context = ContextDiscovery.getEnumByClass(MessageStatus.class);
+    var context = EnumerationHelper.getEnumByClass(MessageStatus.class);
     var rawStatus = status == null ? context.getEnumValueType(MessageStatus.ORDINARY)
       : (EnumerationValue) status.getRawValue();
 

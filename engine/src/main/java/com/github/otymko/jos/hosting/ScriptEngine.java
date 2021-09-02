@@ -13,7 +13,6 @@ import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
-import com.github.otymko.jos.runtime.context.type.StandardTypeInitializer;
 import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.machine.MachineInstance;
 import lombok.Getter;
@@ -29,7 +28,7 @@ public class ScriptEngine {
   private final MachineInstance machine;
 
   public ScriptEngine() {
-    typeManager = new TypeManager();
+    typeManager = TypeManager.getInstance();
     machine = new MachineInstance(this);
     // RuntimeEnvironment
     // SystemGlobalContext
@@ -63,7 +62,6 @@ public class ScriptEngine {
   }
 
   private void initialize() {
-    StandardTypeInitializer.initialize(typeManager);
     ContextInitializer.initialize(machine);
   }
 

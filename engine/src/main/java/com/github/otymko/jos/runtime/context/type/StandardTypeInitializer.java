@@ -5,7 +5,6 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
-import com.github.otymko.jos.compiler.ContextDiscovery;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.context.type.collection.V8KeyAndValue;
 import com.github.otymko.jos.runtime.context.type.collection.V8Structure;
@@ -64,8 +63,7 @@ public class StandardTypeInitializer {
   }
 
   private void initSystemEnumerations(TypeManager typeManager) {
-    ContextDiscovery.getEnumerationContext()
-      .forEach(context -> implementTypeByInfo(typeManager, context.getContextInfo()));
+    typeManager.getEnumerationContext().forEach(context -> implementTypeByInfo(typeManager, context.getContextInfo()));
   }
 
 }

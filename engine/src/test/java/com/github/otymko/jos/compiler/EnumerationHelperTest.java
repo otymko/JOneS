@@ -8,6 +8,7 @@ package com.github.otymko.jos.compiler;
 import com.github.otymko.jos.CustomEnum;
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
+import com.github.otymko.jos.runtime.context.type.TypeManager;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -16,7 +17,7 @@ import java.io.PrintStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-class ContextDiscoveryTest {
+class EnumerationHelperTest {
   private static final String IN_LINE_SEPARATOR = "\n";
 
   @Test
@@ -27,7 +28,7 @@ class ContextDiscoveryTest {
     System.setOut(new PrintStream(out));
 
     // FIXME: некрасиво
-    ContextDiscovery.implementEnumeration(CustomEnum.class);
+    TypeManager.getInstance().implementEnumeration(CustomEnum.class);
 
     var engine = new ScriptEngine();
     var compiler = new ScriptCompiler(engine);

@@ -5,13 +5,13 @@
  */
 package com.github.otymko.jos.runtime.context.global;
 
-import com.github.otymko.jos.compiler.ContextDiscovery;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
@@ -27,7 +27,7 @@ public class GlobalContext implements AttachableContext {
   public GlobalContext() {
     this.info = ContextInfo.EMPTY;
 
-    var contexts = ContextDiscovery.getEnumerationContext();
+    var contexts = TypeManager.getInstance().getEnumerationContext();
     this.enumerationContexts = contexts;
     var index = 0;
     List<IVariable> localVariables = new ArrayList<>();

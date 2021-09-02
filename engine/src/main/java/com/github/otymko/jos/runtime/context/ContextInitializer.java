@@ -6,12 +6,12 @@
 package com.github.otymko.jos.runtime.context;
 
 import com.github.otymko.jos.compiler.AnnotationDefinition;
-import com.github.otymko.jos.compiler.ContextDiscovery;
 import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.global.GlobalContext;
 import com.github.otymko.jos.runtime.context.global.SystemGlobalContext;
+import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.machine.MachineInstance;
 import com.github.otymko.jos.runtime.machine.info.ConstructorInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
@@ -97,9 +97,10 @@ public class ContextInitializer {
     return properties.toArray(new PropertyInfo[0]);
   }
 
+  // TODO: удалить?
   public IVariable[] getGlobalContextVariables(AttachableContext context) {
     List<IVariable> variables = new ArrayList<>();
-    var contexts = ContextDiscovery.getEnumerationContext();
+    var contexts = TypeManager.getInstance().getEnumerationContext();
     var index = 0;
     for (var enumContext : contexts) {
       var variable = VariableReference.createContextPropertyReference(context, index, enumContext.getContextInfo().getName());
