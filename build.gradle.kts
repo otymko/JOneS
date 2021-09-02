@@ -2,6 +2,7 @@ import java.net.URI
 
 plugins {
     `java-library`
+    `maven-publish`
     jacoco
     id("io.freefair.lombok") version "6.0.0-m2"
     id("com.github.johnrengelman.shadow") version "7.0.0"
@@ -45,6 +46,7 @@ subprojects {
     apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "net.kyori.indra.license-header")
     apply(plugin = "jacoco")
+    apply(plugin = "maven-publish")
 
     dependencies {
         // https://github.com/1c-syntax/bsl-parser
@@ -59,7 +61,7 @@ subprojects {
         testCompileOnly("org.projectlombok:lombok:1.18.20")
         testAnnotationProcessor("org.projectlombok:lombok:1.18.20")
 
-        implementation("org.reflections:reflections:0.9.11")
+        implementation("org.reflections:reflections:0.9.12")
 
         // Use JUnit Jupiter
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
@@ -94,6 +96,45 @@ subprojects {
         exclude("**/*.txt")
         exclude("**/*.java.orig")
         exclude("**/*.impl")
+    }
+
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                from(components["java"])
+                artifact(tasks["shadowJar"])
+                pom {
+                    description.set("Java OneScript Engine")
+                    url.set("https://github.com/otymko/JOneS")
+                    licenses {
+                        license {
+                            name.set("Mozilla Public License Version 2.0")
+                            url.set("https://www.mozilla.org/en-US/MPL/2.0/")
+                            distribution.set("repo")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("otymko")
+                            name.set("Oleg Tymko")
+                            email.set("olegtymko@yandex.ru")
+                            url.set("https://github.com/otymko")
+                        }
+                        developer {
+                            id.set("evilbeaver")
+                            name.set("Andrey Ovsiankin")
+                            email.set("ovsiankin.aa@gmail.com")
+                            url.set("https://github.com/EvilBeaver")
+                        }
+                    }
+                    scm {
+                        connection.set("scm:git:https://github.com/otymko/JOneS.git")
+                        developerConnection.set("scm:git:git@github.com:otymko/JOneS.git")
+                        url.set("https://github.com/otymko/JOneS")
+                    }
+                }
+            }
+        }
     }
 
 }
