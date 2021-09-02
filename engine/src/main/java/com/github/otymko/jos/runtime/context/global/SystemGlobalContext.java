@@ -5,20 +5,21 @@
  */
 package com.github.otymko.jos.runtime.context.global;
 
+import com.github.otymko.jos.compiler.EnumerationHelper;
 import com.github.otymko.jos.runtime.context.AttachableContext;
-import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextMethod;
+import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.EnumerationValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.NoArgsConstructor;
 
-@ContextClass(name = "ГлобальныйКонтекст", alias = "GlobalContext")
+@GlobalContextClass
+@NoArgsConstructor
 public class SystemGlobalContext implements AttachableContext {
   public static final ContextInfo INFO = ContextInfo.createByClass(SystemGlobalContext.class);
-
-  public SystemGlobalContext() {
-    // none
-  }
 
   @Override
   public ContextInfo getContextInfo() {
@@ -26,8 +27,24 @@ public class SystemGlobalContext implements AttachableContext {
   }
 
   @ContextMethod(name = "Сообщить", alias = "Message")
-  public static void message(IValue message) {
-    System.out.println(message.asString());
+  // TODO: для null аргументов можно ввести @ContextMethodArgument(defaultValue = MessageStatus.ORDINARY)
+  public static void message(IValue message, IValue status) {
+    var context = EnumerationHelper.getEnumByClass(MessageStatus.class);
+    var rawStatus = status == null ? context.getEnumValueType(MessageStatus.ORDINARY)
+      : (EnumerationValue) status.getRawValue();
+
+    String rawMessage;
+    switch ((MessageStatus) rawStatus.getValue()) {
+      case WITHOUT_STATUS:
+      case ORDINARY:
+        rawMessage = message.asString();
+        break;
+      default:
+        rawMessage = String.format("%s: %s", rawStatus.getName(), message.asString());
+        break;
+    }
+
+    System.out.println(rawMessage);
   }
 
   @ContextMethod(name = "ТекущаяУниверсальнаяДатаВМиллисекундах", alias = "CurrentUniversalDateInMilliseconds")

@@ -156,7 +156,7 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
     var iterator = values.entrySet().stream()
       .sorted((valueOne, valueTwo) -> valueOne.getValue().compareTo(valueTwo.getValue()))
       .map(entity -> new V8KeyAndValue(entity.getKey(), entity.getValue()))
-      .map(IValue.class::cast) // ???
+      .map(IValue.class::cast) // FIXME: ??
       .collect(Collectors.toList()).iterator();
     return new IteratorValue(iterator);
   }

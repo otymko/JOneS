@@ -30,6 +30,7 @@ public class TypeValue extends PrimitiveValue {
 
   @Override
   public String asString() {
+    // FIXME: для перечисления выводится без `Перечисление`
     return value.getName();
   }
 

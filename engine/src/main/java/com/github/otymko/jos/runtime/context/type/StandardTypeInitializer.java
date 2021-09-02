@@ -5,7 +5,6 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
-import com.github.otymko.jos.runtime.context.ContextType;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.context.type.collection.V8KeyAndValue;
 import com.github.otymko.jos.runtime.context.type.collection.V8Structure;
@@ -24,6 +23,7 @@ public class StandardTypeInitializer {
 
   public void initialize(TypeManager typeManager) {
     initPrimitives(typeManager);
+    initSystemEnumerations(typeManager);
     initCollections(typeManager);
   }
 
@@ -31,41 +31,39 @@ public class StandardTypeInitializer {
     for (var type : DataType.values()) {
 
       if (type == DataType.UNDEFINED) {
-        implementTypeByInfo(typeManager, UndefinedValue.INFO, UndefinedValue.class);
+        implementTypeByInfo(typeManager, UndefinedValue.INFO);
       } else if (type == DataType.GENERIC_VALUE) {
-        implementTypeByInfo(typeManager, NullValue.INFO, NullValue.class);
+        implementTypeByInfo(typeManager, NullValue.INFO);
       } else if (type == DataType.BOOLEAN) {
-        implementTypeByInfo(typeManager, BooleanValue.INFO, BooleanValue.class);
+        implementTypeByInfo(typeManager, BooleanValue.INFO);
       } else if (type == DataType.STRING) {
-        implementTypeByInfo(typeManager, StringValue.INFO, StringValue.class);
+        implementTypeByInfo(typeManager, StringValue.INFO);
       } else if (type == DataType.NUMBER) {
-        implementTypeByInfo(typeManager, NumberValue.INFO, NumberValue.class);
+        implementTypeByInfo(typeManager, NumberValue.INFO);
       } else if (type == DataType.DATE) {
-        implementTypeByInfo(typeManager, DateValue.INFO, DateValue.class);
+        implementTypeByInfo(typeManager, DateValue.INFO);
       } else if (type == DataType.TYPE) {
-        implementTypeByInfo(typeManager, TypeValue.INFO, TypeValue.class);
+        implementTypeByInfo(typeManager, TypeValue.INFO);
       }
       // object
       // + алиас?
     }
   }
 
-  private void implementTypeByInfo(TypeManager typeManager, ContextInfo info,
-                                   Class<? extends ContextType> implementClass) {
-    typeManager.registerType(info.getName(), implementClass);
-    typeManager.registerType(info.getAlias(), implementClass);
+  private void implementTypeByInfo(TypeManager typeManager, ContextInfo info) {
+    typeManager.registerType(info.getName(), info);
+    typeManager.registerType(info.getAlias(), info);
   }
 
   private void initCollections(TypeManager typeManager) {
     // TODO: name и alias из contextType
-    typeManager.registerType("Массив", V8Array.class);
-    typeManager.registerType("Array", V8Array.class);
+    implementTypeByInfo(typeManager, V8Array.INFO);
+    implementTypeByInfo(typeManager, V8KeyAndValue.INFO);
+    implementTypeByInfo(typeManager, V8Structure.INFO);
+  }
 
-    typeManager.registerType("КлючИЗначение", V8KeyAndValue.class);
-    typeManager.registerType("KeyAndValue", V8KeyAndValue.class);
-
-    typeManager.registerType("Структура", V8Structure.class);
-    typeManager.registerType("Structure", V8Structure.class);
+  private void initSystemEnumerations(TypeManager typeManager) {
+    typeManager.getEnumerationContext().forEach(context -> implementTypeByInfo(typeManager, context.getContextInfo()));
   }
 
 }

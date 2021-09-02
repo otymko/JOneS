@@ -106,4 +106,21 @@ class ScriptEngineTest {
     TestHelper.checkScriptWithoutException(script);
   }
 
+  @Test
+  void testEnum() throws Exception {
+    var script = Path.of("src/test/resources/global-enum.os");
+    TestHelper.checkScript(script, "ПеречислениеСтатусСообщения\nВажное");
+  }
+
+  @Test
+  void testMessageShow() throws Exception {
+    var script = Path.of("src/test/resources/message-show.os");
+    TestHelper.checkScript(script, "Текст?\n" +
+      "Важное: Текст?\n" +
+      "Внимание: Текст?\n" +
+      "Информация: Текст?\n" +
+      "Текст?\n" +
+      "ОченьВажное: Текст?");
+  }
+
 }

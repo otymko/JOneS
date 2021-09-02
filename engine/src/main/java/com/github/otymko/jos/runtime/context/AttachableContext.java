@@ -5,8 +5,18 @@
  */
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.RuntimeContext;
+import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 
 public interface AttachableContext extends RuntimeContext, ContextType {
-  // FIXME: маркер?
+
+  default MethodInfo[] getMethods() {
+    return getContextInfo().getMethods();
+  }
+
+  default IVariable[] getVariables() {
+    return new IVariable[0];
+  }
+
 }

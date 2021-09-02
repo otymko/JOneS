@@ -6,6 +6,7 @@
 package com.github.otymko.jos.runtime;
 
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.runtime.context.ContextType;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
@@ -114,8 +115,9 @@ public class VariableReference extends ContextValue implements IVariable {
 
   @Override
   public ContextInfo getContextInfo() {
-    if (getValue() instanceof ContextValue) {
-      return ((ContextValue) getValue()).getContextInfo();
+    var value = getValue();
+    if (value instanceof ContextType) {
+      return ((ContextType) value).getContextInfo();
     }
     throw MachineException.operationNotImplementedException();
   }

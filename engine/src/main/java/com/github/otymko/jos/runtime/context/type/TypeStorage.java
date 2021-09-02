@@ -5,13 +5,18 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
-import com.github.otymko.jos.runtime.context.ContextType;
+import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
+import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TypeStorage {
   @Getter
-  private final Map<String, Class<? extends ContextType>> types = new HashMap<>();
+  private final Map<String, ContextInfo> types = new HashMap<>();
+  @Getter
+  private final List<EnumerationContext> enumerationContext = new ArrayList<>();
 }

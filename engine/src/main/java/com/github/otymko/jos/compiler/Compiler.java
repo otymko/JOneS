@@ -11,6 +11,7 @@ import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
 import com.github.otymko.jos.compiler.helper.AnnotationProcessing;
 import com.github.otymko.jos.exception.CompilerException;
 import com.github.otymko.jos.module.ModuleImageCache;
+import com.github.otymko.jos.runtime.SymbolType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.OperationCode;
@@ -947,16 +948,23 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   }
 
   private void processIdentifier(String identifier) {
-    var address = compiler.findVariableInContext(identifier);
-    if (address == null) {
+    var binding = compiler.findVariableBindingInContext(identifier);
+    if (binding == null) {
       throw CompilerException.symbolNotFoundException(identifier);
     }
-
-    if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
-      addCommand(OperationCode.PushLoc, address.getSymbolId());
-    } else {
+    var address = binding.getAddress();
+    if (binding.getType() == SymbolType.VARIABLE) {
+      if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
+        addCommand(OperationCode.PushLoc, address.getSymbolId());
+      } else {
+        imageCache.getVariableRefs().add(address);
+        addCommand(OperationCode.PushVar, imageCache.getVariableRefs().indexOf(address));
+      }
+    } else if (binding.getType() == SymbolType.CONTEXT_PROPERTY) {
       imageCache.getVariableRefs().add(address);
-      addCommand(OperationCode.PushVar, imageCache.getVariableRefs().indexOf(address));
+      addCommand(OperationCode.PushRef, imageCache.getVariableRefs().indexOf(address));
+    } else {
+      throw CompilerException.notSupportedException();
     }
   }
 
@@ -1095,7 +1103,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
         addCommand(OperationCode.LoadLoc, address.getSymbolId());
       } else {
-        addCommand(OperationCode.LoadVar, address.getSymbolId());
+        imageCache.getVariableRefs().add(address);
+        addCommand(OperationCode.LoadVar, imageCache.getVariableRefs().indexOf(address));
       }
     }
   }

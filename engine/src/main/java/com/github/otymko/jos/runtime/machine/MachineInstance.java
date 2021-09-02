@@ -17,8 +17,8 @@ import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.VariableReference;
+import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
-import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.context.ExceptionInfoContext;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
@@ -68,10 +68,9 @@ public class MachineInstance {
     this.engine = engine;
   }
 
-  public void implementContext(RuntimeContext context) {
-    var methods = ContextInitializer.getContextMethods(context.getClass());
-    // FIXME: this
-    var variables = new IVariable[0];
+  public void implementContext(AttachableContext context) {
+    var methods = context.getMethods();
+    var variables = context.getVariables();
     var scope = new Scope(context, variables, methods);
     scopes.add(scope);
   }
@@ -248,6 +247,7 @@ public class MachineInstance {
     map.put(OperationCode.CallProc, this::callProc);
     map.put(OperationCode.LoadLoc, this::loadLoc);
     map.put(OperationCode.PushLoc, this::pushLoc);
+    map.put(OperationCode.PushRef, this::pushRef);
     map.put(OperationCode.PushVar, this::pushVar);
     map.put(OperationCode.LoadVar, this::loadVar);
     map.put(OperationCode.Return, this::toReturn);
@@ -482,7 +482,7 @@ public class MachineInstance {
 
   private void pushIndexed(int argument) {
     var index = operationStack.pop();
-    var context = breakVariableLink(operationStack.pop()); // ???
+    var context = breakVariableLink(operationStack.pop()); // FIXME: ??
 
     if (!(context instanceof IndexAccessor)) {
       throw MachineException.objectNotSupportAccessByIndexException();
@@ -848,6 +848,15 @@ public class MachineInstance {
     nextInstruction();
   }
 
+  private void pushRef(int argument) {
+    var address = currentImage.getVariableRefs().get(argument);
+    var scope = scopes.get(address.getContextId());
+    var reference = VariableReference.createContextPropertyReference(scope.getInstance(),
+      address.getSymbolId(), VARIABLE_STACK_NAME);
+    operationStack.push(reference);
+    nextInstruction();
+  }
+
   private void pushVar(int argument) {
     var address = currentImage.getVariableRefs().get(argument);
     Scope scope;
@@ -900,11 +909,16 @@ public class MachineInstance {
   private void methodSdoCall(Scope scope, SymbolAddress address) {
     var method = scope.getMethods()[address.getSymbolId()];
     int argumentCount = (int) operationStack.pop().asNumber();
-    var argumentValues = new IValue[argumentCount];
+
+    var factArgumentValues = new IValue[argumentCount];
     for (var index = argumentCount - 1; index >= 0; index--) {
       var value = operationStack.pop();
-      argumentValues[index] = value;
+      factArgumentValues[index] = value;
     }
+
+    var argumentValues = new IValue[method.getParameters().length];
+    fillArgumentValueFromFact(method, factArgumentValues, argumentValues);
+
     callContext(scope.getInstance(), address.getSymbolId(), method, argumentValues);
     nextInstruction();
   }

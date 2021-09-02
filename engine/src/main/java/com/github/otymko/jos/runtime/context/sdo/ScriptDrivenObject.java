@@ -9,15 +9,17 @@ import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.Variable;
+import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.machine.MachineInstance;
 import lombok.Getter;
 
 /**
  * Абстрактная реализация объекта скрипта
  */
-public abstract class ScriptDrivenObject extends ContextValue {
+public abstract class ScriptDrivenObject extends ContextValue implements AttachableContext {
   @Getter
   private final ModuleImage moduleImage;
   @Getter
@@ -30,6 +32,11 @@ public abstract class ScriptDrivenObject extends ContextValue {
 
   public void initialize(ScriptEngine engine) {
     engine.getMachine().executeModuleBody(this);
+  }
+
+  /* Вариант с отдельной стековой машиной */
+  public void initialize(MachineInstance machine) {
+    machine.executeModuleBody(this);
   }
 
   public int getScriptMethod(String name) {
@@ -46,9 +53,15 @@ public abstract class ScriptDrivenObject extends ContextValue {
     return engine.getMachine().executeMethod(this, methodId, parameters);
   }
 
+  /* Вариант с отдельной стековой машиной */
+  public IValue callScriptMethod(MachineInstance machine, int methodId, IValue[] parameters) {
+    return machine.executeMethod(this, methodId, parameters);
+  }
+
   @Override
   public int compareTo(IValue o) {
-    return 0;
+    // TODO: реализовать сравнение sdo
+    return 1;
   }
 
   private void init() {

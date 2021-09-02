@@ -5,34 +5,61 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
-import com.github.otymko.jos.runtime.context.ContextType;
+import com.github.otymko.jos.runtime.context.EnumType;
+import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.Singular;
+import org.reflections.Reflections;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TypeManager {
+  private static final TypeManager INSTANCE = new TypeManager();
+
+  private static final String ENUM_PACKAGE_NAME = "com.github.otymko.jos.runtime.context.type.enumeration";
+
   private final TypeStorage storage = new TypeStorage();
 
-  public void registerType(String name, Class<? extends ContextType> implementingClass) {
-    storage.getTypes().put(name, implementingClass);
+  private TypeManager() {
+    storage.getEnumerationContext().addAll(getSystemEnums());
+    StandardTypeInitializer.initialize(this);
+  }
+
+  public static TypeManager getInstance() {
+    return INSTANCE;
+  }
+
+  public void registerType(String name, ContextInfo info) {
+    storage.getTypes().put(name, info);
+  }
+
+  public void implementEnumeration(Class<? extends EnumType> enumType) {
+    var context = new EnumerationContext(enumType);
+    storage.getEnumerationContext().add(context);
+  }
+
+  public EnumerationContext getEnumByClass(Class<? extends EnumType> enumClass) {
+    return storage.getEnumerationContext().stream()
+      .filter(context -> context.getEnumType() == enumClass)
+      .findAny()
+      .get();
   }
 
   public Optional<ContextInfo> getContextInfoByName(String name) {
-    var type = storage.getTypes().getOrDefault(name, null);
-    if (type == null) {
-      return Optional.empty();
-    }
+    return Optional.ofNullable(storage.getTypes().getOrDefault(name, null));
+  }
 
-    // FIXME: долго и больно
-    ContextInfo contextInfo;
-    try {
-      contextInfo = (ContextInfo) type.getField("INFO").get(null);
-    } catch (IllegalAccessException | NoSuchFieldException e) {
-      e.printStackTrace();
-      return Optional.empty();
-    }
+  public List<EnumerationContext> getEnumerationContext() {
+    return storage.getEnumerationContext();
+  }
 
-    return Optional.of(contextInfo);
+  private static List<EnumerationContext> getSystemEnums() {
+    var reflections = new Reflections(ENUM_PACKAGE_NAME);
+    return reflections.getSubTypesOf(EnumType.class).stream()
+      .map(EnumerationContext::new)
+      .collect(Collectors.toList());
   }
 
 }
