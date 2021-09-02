@@ -482,7 +482,7 @@ public class MachineInstance {
 
   private void pushIndexed(int argument) {
     var index = operationStack.pop();
-    var context = breakVariableLink(operationStack.pop()); // ???
+    var context = breakVariableLink(operationStack.pop()); // FIXME: ??
 
     if (!(context instanceof IndexAccessor)) {
       throw MachineException.objectNotSupportAccessByIndexException();
@@ -913,11 +913,7 @@ public class MachineInstance {
     var factArgumentValues = new IValue[argumentCount];
     for (var index = argumentCount - 1; index >= 0; index--) {
       var value = operationStack.pop();
-//      if (value instanceof VariableReference) { // ???
-//        factArgumentValues[index] = breakVariableLink(value);
-//      } else {
-        factArgumentValues[index] = value;
-//      }
+      factArgumentValues[index] = value;
     }
 
     var argumentValues = new IValue[method.getParameters().length];

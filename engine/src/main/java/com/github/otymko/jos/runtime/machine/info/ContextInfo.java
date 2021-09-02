@@ -108,7 +108,7 @@ public class ContextInfo {
     var builder = ContextInfo.builder();
     builder.name("");
     builder.alias("");
-    builder.typeClass(null); // ????
+    builder.typeClass(null); // FIXME: ??
     builder.methods(new MethodInfo[0]);
     builder.properties(new PropertyInfo[0]);
     builder.constructors(new ConstructorInfo[0]);
