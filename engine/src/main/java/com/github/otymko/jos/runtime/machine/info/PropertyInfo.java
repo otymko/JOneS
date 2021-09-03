@@ -6,9 +6,12 @@
 package com.github.otymko.jos.runtime.machine.info;
 
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
+import lombok.Getter;
 import lombok.Value;
+import lombok.experimental.Accessors;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 @Value
 public class PropertyInfo {
@@ -16,4 +19,12 @@ public class PropertyInfo {
   String alias;
   PropertyAccessMode accessMode;
   Field field;
+
+  @Accessors(fluent = true)
+  boolean hasSetter;
+  Method setter;
+
+  @Accessors(fluent = true)
+  boolean hasGetter;
+  Method getter;
 }
