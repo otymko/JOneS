@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -307,7 +308,22 @@ public class MachineInstance {
 
     map.put(OperationCode.Nop, this::nop);
 
+    map.put(OperationCode.UCase, this::upperCase);
+    map.put(OperationCode.LCase, this::lowerCase);
+
     return map;
+  }
+
+  private void upperCase(int argument) {
+    var value = operationStack.pop().asString().toUpperCase(Locale.ENGLISH);
+    operationStack.push(ValueFactory.create(value));
+    nextInstruction();
+  }
+
+  private void lowerCase(int argument) {
+    var value = operationStack.pop().asString().toLowerCase(Locale.ENGLISH);
+    operationStack.push(ValueFactory.create(value));
+    nextInstruction();
   }
 
   private void nop(int argument) {
