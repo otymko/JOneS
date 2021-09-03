@@ -905,15 +905,16 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var optionalOperationCode = NativeGlobalMethod.getOperationCode(identifier);
     if (optionalOperationCode.isPresent()) {
       var opCode = optionalOperationCode.get();
-      int arguments = NativeGlobalMethod.getArgumentsByOperationCode(opCode);
-
-      int paramsCount = calcParams(paramList);
-      if (paramsCount > arguments) {
-        throw CompilerException.tooManyMethodArgumentsException();
-      } else if (paramsCount < arguments) {
-        throw CompilerException.tooFewMethodArgumentsException();
+      var factArguments = calcParams(paramList);
+      if (opCode == OperationCode.Min || opCode == OperationCode.Max) {
+        if (factArguments == 0) {
+          throw CompilerException.tooFewMethodArgumentsException();
+        }
+      } else {
+        var parameters = NativeGlobalMethod.getMethodParameters(opCode);
+        checkFactNativeMethodArguments(parameters, factArguments);
       }
-      addCommand(opCode, arguments);
+      addCommand(opCode, factArguments);
 
     } else {
 
@@ -1125,6 +1126,19 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       imageCache.getConstants().add(constant);
     }
     return imageCache.getConstants().indexOf(constant);
+  }
+
+  private static void checkFactNativeMethodArguments(ParameterInfo[] parameters, int factArguments) {
+    if (factArguments > parameters.length) {
+      throw CompilerException.tooManyMethodArgumentsException();
+    }
+
+    for (var position = factArguments; position < parameters.length; position++) {
+      var parameter = parameters[factArguments];
+      if (!parameter.hasDefaultValue()) {
+        throw CompilerException.tooFewMethodArgumentsException();
+      }
+    }
   }
 
 }

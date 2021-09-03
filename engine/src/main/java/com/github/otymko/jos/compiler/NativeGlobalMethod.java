@@ -6,6 +6,7 @@
 package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.runtime.machine.OperationCode;
+import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -13,9 +14,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Описание методов платформы, которые выполняются нативно на стековой машине
+ */
 public class NativeGlobalMethod {
+  private static final ParameterInfo REQUIRED_PARAMETER = createParameterInfo(true);
+  private static final ParameterInfo OPTIONAL_PARAMETER = createParameterInfo(false);
   private static final Map<String, OperationCode> methods = new HashMap<>();
-  private static final Map<OperationCode, Integer> methodsArgument = new EnumMap<>(OperationCode.class);
+  private static final Map<OperationCode, ParameterInfo[]> methodParameters = new EnumMap<>(OperationCode.class);
 
   static {
     initNativeMethods();
@@ -29,26 +35,33 @@ public class NativeGlobalMethod {
     return Optional.ofNullable(methods.get(name.toUpperCase(Locale.ENGLISH)));
   }
 
-  public static int getArgumentsByOperationCode(OperationCode code) {
-    return methodsArgument.getOrDefault(code, 0);
+  public static ParameterInfo[] getMethodParameters(OperationCode code) {
+    return methodParameters.get(code);
   }
 
   private static void initNativeMethods() {
-    addNativeMethod("Тип", "Type", OperationCode.Type, 1);
-    addNativeMethod("ТипЗнч", "TypeOf", OperationCode.ValType, 1);
-    addNativeMethod("ОписаниеОшибки", "ErrorDescription", OperationCode.ExceptionDescr, 0);
-    addNativeMethod("ИнформацияОбОшибке", "ErrorDescription", OperationCode.ExceptionDescr, 0);
-    addNativeMethod("ВРег", "Upper", OperationCode.UCase, 1);
-    addNativeMethod("НРег", "Lower", OperationCode.LCase, 1);
-    addNativeMethod("СтрДлина", "StrLen", OperationCode.StrLen, 1);
-    addNativeMethod("Лев", "Left", OperationCode.Left, 2);
-    addNativeMethod("Прав", "Right", OperationCode.Right, 2);
+    addNativeMethod("Тип", "Type", OperationCode.Type, REQUIRED_PARAMETER);
+    addNativeMethod("ТипЗнч", "TypeOf", OperationCode.ValType, REQUIRED_PARAMETER);
+    addNativeMethod("ОписаниеОшибки", "ErrorDescription", OperationCode.ExceptionDescr);
+    addNativeMethod("ИнформацияОбОшибке", "ErrorDescription", OperationCode.ExceptionDescr);
+    addNativeMethod("ВРег", "Upper", OperationCode.UCase, REQUIRED_PARAMETER);
+    addNativeMethod("НРег", "Lower", OperationCode.LCase, REQUIRED_PARAMETER);
+    addNativeMethod("СтрДлина", "StrLen", OperationCode.StrLen, REQUIRED_PARAMETER);
+    addNativeMethod("Лев", "Left", OperationCode.Left, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
+    addNativeMethod("Прав", "Right", OperationCode.Right, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
+    addNativeMethod("Сред", "Mid", OperationCode.Mid, REQUIRED_PARAMETER, REQUIRED_PARAMETER, OPTIONAL_PARAMETER);
   }
 
-  private static void addNativeMethod(String name, String alias, OperationCode code, int arguments) {
+  private static void addNativeMethod(String name, String alias, OperationCode code, ParameterInfo... params) {
     methods.put(name.toUpperCase(Locale.ENGLISH), code);
     methods.put(alias.toUpperCase(Locale.ENGLISH), code);
-    methodsArgument.put(code, arguments);
+    methodParameters.put(code, params);
+  }
+
+  private static ParameterInfo createParameterInfo(boolean required) {
+    var builder = ParameterInfo.builder();
+    builder.hasDefaultValue(!required);
+    return builder.build();
   }
 
 }

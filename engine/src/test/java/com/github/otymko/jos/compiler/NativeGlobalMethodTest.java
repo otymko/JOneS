@@ -61,4 +61,27 @@ class NativeGlobalMethodTest {
     TestHelper.checkCode(code, "");
   }
 
+  @Test
+  void testMiddle() throws Exception {
+    String code;
+
+    code = "Сообщить(Сред(\"Значение\", 2, 0));";
+    TestHelper.checkCode(code, "");
+
+    code = "Сообщить(Сред(\"Значение\", 2));";
+    TestHelper.checkCode(code, "начение");
+
+    code = "Сообщить(Сред(\"Значение\", 2, 3));";
+    TestHelper.checkCode(code, "нач");
+
+    code = "Сообщить(Сред(\"Значение\", 2, 6));";
+    TestHelper.checkCode(code, "начени");
+
+    code = "Сообщить(Сред(\"Значение\", 2, 7));";
+    TestHelper.checkCode(code, "начение");
+
+    code = "Сообщить(Сред(\"Значение\", 2, 11));";
+    TestHelper.checkCode(code, "начение");
+  }
+
 }

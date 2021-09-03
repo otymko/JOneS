@@ -314,6 +314,7 @@ public class MachineInstance {
 
     map.put(OperationCode.Left, this::left);
     map.put(OperationCode.Right, this::right);
+    map.put(OperationCode.Mid, this::middle);
 
     return map;
   }
@@ -370,6 +371,40 @@ public class MachineInstance {
       operationStack.push(ValueFactory.create(newValue));
     }
 
+    nextInstruction();
+  }
+
+  private void middle(int argument) {
+    String value;
+    int start;
+    int length;
+    if (argument == 2) {
+      start = (int) operationStack.pop().asNumber();
+      value = operationStack.pop().asString();
+      length = value.length() - start + 1;
+    } else {
+      length = (int) operationStack.pop().asNumber();
+      start = (int) operationStack.pop().asNumber();
+      value = operationStack.pop().asString();
+    }
+
+    if (start < 1) {
+      start = 1;
+    }
+
+    int end = start - 1 + length;
+    if (end > value.length()) {
+      end = value.length();
+    }
+
+    String result;
+    if (start > value.length() || length == 0) {
+      result = "";
+    } else {
+      result = value.substring(start - 1, end);
+    }
+
+    operationStack.push(ValueFactory.create(result));
     nextInstruction();
   }
 
