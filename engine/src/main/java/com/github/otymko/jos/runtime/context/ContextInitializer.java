@@ -92,8 +92,16 @@ public class ContextInitializer {
         continue;
       }
 
+      var setter = getMethodByName(targetClass, "set" + field.getName());
+      var hasSetter = setter != null;
+
+      var getter = getMethodByName(targetClass, "get" + field.getName());
+      var hasGetter = setter != null;
+
+      // FIXME: нужен билдер
       var property = new PropertyInfo(contextProperty.name(), contextProperty.alias(),
-        contextProperty.accessMode(), field);
+        contextProperty.accessMode(), field, hasSetter, setter, hasGetter, getter);
+
       properties.add(property);
     }
     return properties.toArray(new PropertyInfo[0]);
@@ -110,6 +118,16 @@ public class ContextInitializer {
       index++;
     }
     return variables.toArray(new IVariable[0]);
+  }
+
+  // FIXME: перенести в подходящий класс
+  private static Method getMethodByName(Class<? extends RuntimeContext> targetClass, String name) {
+    for (var method : targetClass.getMethods()) {
+      if (method.getName().equalsIgnoreCase(name)) {
+        return method;
+      }
+    }
+    return null;
   }
 
 }

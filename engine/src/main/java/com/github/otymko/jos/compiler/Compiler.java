@@ -949,8 +949,12 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     }
     addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
 
-    // TODO:
     var argumentCount = 0;
+    if (newExpressionContext.doCall() != null) {
+      var paramList = newExpressionContext.doCall().callParamList();
+      argumentCount = calcParams(paramList);
+      processParamList(paramList);
+    }
 
     addCommand(OperationCode.NewInstance, argumentCount);
   }
