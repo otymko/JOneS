@@ -7,14 +7,17 @@ package com.github.otymko.jos.runtime.context.type.primitive;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.ValueParser;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import com.github.otymko.jos.localization.Resources;
 
 import java.util.Date;
+
+import static com.github.otymko.jos.localization.MessageResource.NULL_VALUE_NOT_SUPPORTED;
 
 @ContextClass(name = "Строка", alias = "String")
 public final class StringValue extends PrimitiveValue {
@@ -34,7 +37,7 @@ public final class StringValue extends PrimitiveValue {
   private StringValue(String value) {
     if (value == null) {
       // FIXME
-      throw new MachineException("Запрещено использовать null");
+      throw new MachineException(Resources.getResourceString(NULL_VALUE_NOT_SUPPORTED));
     }
     this.value = value;
     setDataType(DataType.STRING);

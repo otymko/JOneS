@@ -434,7 +434,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       }
 
       if (!isValidRaise) {
-        throw CompilerException.mismatchedRaiseExpression();
+        throw CompilerException.mismatchedRaiseExpressionException();
       }
 
       addCommand(OperationCode.RaiseException, -1);
@@ -706,7 +706,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       } else if (bool.OR_KEYWORD() != null) {
         operator = ExpressionOperator.OR;
       } else {
-        throw CompilerException.notNotSupportedExpressionOperator(bool.getText());
+        throw CompilerException.notSupportedExpressionOperatorException(bool.getText());
       }
     } else if (operationContext.compareOperation() != null) {
       var compare = operationContext.compareOperation();
@@ -723,10 +723,10 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       } else if (compare.NOT_EQUAL() != null) {
         operator = ExpressionOperator.NOT_EQUAL;
       } else {
-        throw CompilerException.notNotSupportedExpressionOperator(compare.getText());
+        throw CompilerException.notSupportedExpressionOperatorException(compare.getText());
       }
     } else {
-      throw CompilerException.notNotSupportedExpressionOperator(operationContext.getText());
+      throw CompilerException.notSupportedExpressionOperatorException(operationContext.getText());
     }
     return operator;
   }
@@ -798,7 +798,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         operationCode = OperationCode.NotEqual;
         break;
       default:
-        throw CompilerException.notNotSupportedExpressionOperator(operator.getText());
+        throw CompilerException.notSupportedExpressionOperatorException(operator.getText());
     }
     return addCommand(operationCode, 0);
   }
@@ -893,7 +893,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     } else if (child.MINUS() != null) {
       operators.push(ExpressionOperator.UNARY_MINUS);
     } else {
-      throw CompilerException.notNotSupportedExpressionOperator(child.getText());
+      throw CompilerException.notSupportedExpressionOperatorException(child.getText());
     }
   }
 
@@ -1000,7 +1000,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var methodName = methodNameContext.getText();
     var address = compiler.findMethodInContext(methodName);
     if (address == null) {
-      throw CompilerException.methodNotFound(methodName);
+      throw CompilerException.methodNotFoundException(methodName);
     }
     if (!imageCache.getMethodRefs().contains(address)) {
       imageCache.getMethodRefs().add(address);

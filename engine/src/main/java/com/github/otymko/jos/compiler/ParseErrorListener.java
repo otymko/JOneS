@@ -9,6 +9,7 @@ import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github._1c_syntax.bsl.parser.BSLParserBaseListener;
 import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
 import com.github.otymko.jos.exception.CompilerException;
+import com.github.otymko.jos.localization.Resources;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
@@ -18,13 +19,16 @@ import org.antlr.v4.runtime.tree.Trees;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import static com.github.otymko.jos.localization.MessageResource.ERROR_PARSING_SOURCE_CODE;
+import static com.github.otymko.jos.localization.MessageResource.ERROR_PARSING_SOURCE_CODE_AT;
+
 public class ParseErrorListener extends BSLParserBaseListener {
 
   @Override
   public void visitErrorNode(ErrorNode node) {
     var errorNode = (ErrorNodeImpl) node;
     if (errorNode.symbol.getTokenIndex() == -1) {
-      var message = String.format("Ошибка разбора исходного кода. %s", node.getText());
+      var message = String.format(Resources.getResourceString(ERROR_PARSING_SOURCE_CODE), node.getText());
       throw new CompilerException(message);
     }
   }
@@ -45,7 +49,7 @@ public class ParseErrorListener extends BSLParserBaseListener {
   }
 
   private void throwCompileException(Token token) {
-    var message = String.format("Ошибка разбора исходного кода в [%d:%d]",
+    var message = String.format(Resources.getResourceString(ERROR_PARSING_SOURCE_CODE_AT),
       token.getLine(), token.getCharPositionInLine() + 1);
     throw new CompilerException(message);
   }

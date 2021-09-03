@@ -10,8 +10,11 @@ import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
+import com.github.otymko.jos.localization.Resources;
 
 import java.lang.reflect.InvocationTargetException;
+
+import static com.github.otymko.jos.localization.MessageResource.*;
 
 public interface RuntimeContext {
 
@@ -34,7 +37,7 @@ public interface RuntimeContext {
     try {
       result = callMethod.invoke(this, arguments);
     } catch (IllegalAccessException | InvocationTargetException e) {
-      throw new MachineException("Ошибка при вызове функции");
+      throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD));
     }
     return (IValue) result;
   }
@@ -72,7 +75,7 @@ public interface RuntimeContext {
     try {
       result = field.get(this);
     } catch (IllegalAccessException exception) {
-      throw new MachineException("Ошибка при получении свойства");
+      throw new MachineException(Resources.getResourceString(ERROR_GET_PROPERTY_VALUE));
     }
     return (IValue) result;
   }
@@ -83,7 +86,7 @@ public interface RuntimeContext {
     try {
       field.set(this, value);
     } catch (IllegalAccessException e) {
-      throw new MachineException("Ошибка при установке значения свойства");
+      throw new MachineException(Resources.getResourceString(ERROR_SET_PROPERTY_VALUE));
     }
   }
 

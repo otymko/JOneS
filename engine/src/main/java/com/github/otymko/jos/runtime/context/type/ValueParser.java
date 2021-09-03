@@ -12,7 +12,10 @@ import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
 import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
 import com.github.otymko.jos.runtime.context.type.primitive.StringValue;
+import com.github.otymko.jos.localization.Resources;
 import lombok.experimental.UtilityClass;
+
+import static com.github.otymko.jos.localization.MessageResource.PRIMITIVE_DATA_TYPE_NOT_SUPPORTED;
 
 @UtilityClass
 public class ValueParser {
@@ -39,7 +42,7 @@ public class ValueParser {
         result = NullValue.parse(view);
         break;
       default:
-        var message = String.format("Тип %s не поддерживается для констант", dataType);
+        var message = String.format(Resources.getResourceString(PRIMITIVE_DATA_TYPE_NOT_SUPPORTED), dataType);
         throw new MachineException(message);
     }
 

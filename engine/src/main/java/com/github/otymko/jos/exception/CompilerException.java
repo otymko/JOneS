@@ -5,6 +5,10 @@
  */
 package com.github.otymko.jos.exception;
 
+import com.github.otymko.jos.localization.Resources;
+
+import static com.github.otymko.jos.localization.MessageResource.*;
+
 /**
  * Исключение при компиляции
  */
@@ -15,42 +19,42 @@ public class CompilerException extends EngineException {
   }
 
   public static CompilerException symbolNotFoundException(String identifier) {
-    var message = String.format("Неизвестный символ: %s", identifier);
+    var message = String.format(Resources.getResourceString(SYMBOL_NOT_FOUND), identifier);
     return new CompilerException(message);
   }
 
   public static CompilerException tooManyMethodArgumentsException() {
-    var message = "Слишком много фактических параметров";
+    var message = Resources.getResourceString(TOO_MANY_METHOD_ARGUMENTS);
     return new CompilerException(message);
   }
 
   public static CompilerException tooFewMethodArgumentsException() {
-    var message = "Недостаточно фактических параметров";
+    var message = Resources.getResourceString(TOO_FEW_METHOD_ARGUMENTS);
     return new CompilerException(message);
   }
 
   public static CompilerException notSupportedException() {
-    var message = "Не поддерживается";
+    var message = Resources.getResourceString(NOT_SUPPORTED);
     return new CompilerException(message);
   }
 
   public static CompilerException notImplementedException(String what) {
-    var message = String.format("'%s' не реализовано", what);
+    var message = String.format(Resources.getResourceString(NOT_IMPLEMENTED), what);
     return new CompilerException(message);
   }
 
-  public static CompilerException notNotSupportedExpressionOperator(String operator) {
-    var message = String.format("Оператор %s не поддерживается", operator);
+  public static CompilerException notSupportedExpressionOperatorException(String operator) {
+    var message = String.format(Resources.getResourceString(NOT_SUPPORTED_EXPRESSION), operator);
     return new CompilerException(message);
   }
 
-  public static CompilerException methodNotFound(String methodName) {
-    var message = String.format("Метод '%s' не найден", methodName);
+  public static CompilerException methodNotFoundException(String methodName) {
+    var message = String.format(Resources.getResourceString(METHOD_NOT_FOUND), methodName);
     return new CompilerException(message);
   }
 
-  public static CompilerException mismatchedRaiseExpression() {
-    var message = "Оператор 'ВызватьИсключение' без параметров может использоваться только в блоке 'Исключение'";
+  public static CompilerException mismatchedRaiseExpressionException() {
+    var message = Resources.getResourceString(MISMATCHED_RAISE_EXPRESSION);
     return new CompilerException(message);
   }
 
