@@ -677,12 +677,10 @@ public class MachineInstance {
 
   private void newInstance(int argument) {
     var argumentValues = new IValue[argument];
-    // TODO: заполнить аргументы для передачи
 
-    // получим описание типа
-    // определим конструктор
-    // создадим новый экземпляр
-    // закинем в стопку
+    for (var position = 0; position < argument; position++) {
+      argumentValues[position] = breakVariableLink(operationStack.pop());
+    }
 
     var typeName = operationStack.pop().asString();
     var contextInfoOptional = engine.getTypeManager().getContextInfoByName(typeName);
