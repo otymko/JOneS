@@ -34,13 +34,13 @@ public class Arithmetic {
     }
 
     if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.NUMBER) {
-      // TODO
-      throw new MachineException("Сложение `Дата` и `Число` не реализовано");
+      // TODO: реализовать сложение даты и числа
+      throw MachineException.operationNotImplementedException();
     }
 
     if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.DATE) {
-      // TODO
-      throw new MachineException("Сложение `Дата` и `Дата` не реализовано");
+      // TODO реализовать сложение дат
+      throw MachineException.operationNotImplementedException();
     }
 
     return ValueFactory.create(one.asNumber() - two.asNumber());

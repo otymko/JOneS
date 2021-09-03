@@ -5,18 +5,20 @@
  */
 package com.github.otymko.jos.exception;
 
+import com.github.otymko.jos.localization.Resources;
 import lombok.Data;
+
+import static com.github.otymko.jos.localization.MessageResource.SOURCE_CODE_NOT_AVAILABLE;
 
 @Data
 public class ErrorInfo {
-  private static final String DEFAULT_PATH = "<Исходный код недоступен>";
   private int line;
   private String source = "";
   private String code = "";
 
   public String getSource() {
     if (source == null || source.isEmpty()) {
-      return DEFAULT_PATH;
+      return Resources.getResourceString(SOURCE_CODE_NOT_AVAILABLE);
     }
     return source;
   }

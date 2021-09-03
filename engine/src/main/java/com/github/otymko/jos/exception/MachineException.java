@@ -6,10 +6,13 @@
 package com.github.otymko.jos.exception;
 
 import com.github.otymko.jos.runtime.machine.StackTraceRecord;
+import com.github.otymko.jos.localization.Resources;
 import lombok.Getter;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.github.otymko.jos.localization.MessageResource.*;
 
 
 /**
@@ -48,7 +51,7 @@ public class MachineException extends EngineException {
   @Override
   public String getMessage() {
     var message = String.format(
-      "{Модуль: %s / Ошибка в строке: %d / %s}",
+      Resources.getResourceString(ERROR_IN_MODULE_TEMPLATE),
       errorInfo.getSource(),
       errorInfo.getLine(),
       super.getMessage()
@@ -64,92 +67,97 @@ public class MachineException extends EngineException {
   }
 
   public static MachineException typeNotSupportedException(String typeName) {
-    var message = String.format("Тип не поддерживается (%s)", typeName);
+    var message = String.format(Resources.getResourceString(TYPE_NOT_SUPPORTED), typeName);
     return new MachineException(message);
   }
 
   public static MachineException typeNotRegisteredException(String typeName) {
-    var message = String.format("Тип не зарегистрирован (%s)", typeName);
+    var message = String.format(Resources.getResourceString(TYPE_NOT_REGISTERED), typeName);
     return new MachineException(message);
   }
 
   public static MachineException objectNotSupportAccessByIndexException() {
-    var message = "Объект не поддерживает доступ по индексу";
+    var message = Resources.getResourceString(OBJECT_NOT_SUPPORT_ACCESS_BY_INDEX);
     return new MachineException(message);
   }
 
   public static MachineException constructorNotFoundException(String typeName) {
-    var message = String.format("Конструктор не найден (%s)", typeName);
+    var message = String.format(Resources.getResourceString(CONSTRUCTOR_NOT_FOUND), typeName);
     return new MachineException(message);
   }
 
   public static MachineException objectIsNotContextTypeException() {
-    var message = "Объект не является ContextType";
+    var message = Resources.getResourceString(OBJECT_IS_NOT_CONTEXT_TYPE);
     return new MachineException(message);
   }
 
   public static MachineException operationNotSupportedException() {
-    var message = "Операция не поддерживается";
+    var message = Resources.getResourceString(OPERATION_NOT_SUPPORTED);
     return new MachineException(message);
   }
 
   public static MachineException operationNotImplementedException() {
-    var message = "Операция не реализована";
+    var message = Resources.getResourceString(OPERATION_NOT_IMPLEMENTED);
     return new MachineException(message);
   }
 
   public static MachineException divideByZeroException() {
-    var message = "Деление на ноль";
+    var message = Resources.getResourceString(DIVIDE_BY_ZERO);
     return new MachineException(message);
   }
 
   public static MachineException indexValueOutOfRangeException() {
-    var message = "Значение индекса выходит за пределы диапазона";
+    var message = Resources.getResourceString(INDEX_VALUE_OUT_OF_RANGE);
     return new MachineException(message);
   }
 
   public static MachineException convertToNumberException() {
-    var message = "Преобразование к типу 'Число' не поддерживается";
+    var message = Resources.getResourceString(CONVERT_TO_NUMBER);
     return new MachineException(message);
   }
 
   public static MachineException convertToBooleanException() {
-    var message = "Преобразование к типу 'Булево' не поддерживается";
+    var message = Resources.getResourceString(CONVERT_TO_BOOLEAN);
     return new MachineException(message);
   }
 
   public static MachineException convertToDateException() {
-    var message = "Преобразование к типу 'Дата' не поддерживается";
+    var message = Resources.getResourceString(CONVERT_TO_DATE);
     return new MachineException(message);
   }
 
   public static MachineException invalidPropertyNameStructureException(String propertyName) {
-    var message = String.format("Задано неправильное имя атрибута структуры `%s`", propertyName);
+    var message = String.format(Resources.getResourceString(INVALID_PROPERTY_NAME_STRUCTURE), propertyName);
     return new MachineException(message);
   }
 
   public static MachineException wrongStackConditionException() {
-    var message = "Внутренняя ошибка - неверное состояние стека. Ожидалась переменная";
+    var message = Resources.getResourceString(WRONG_STACK_CONDITION);
     return new MachineException(message);
   }
 
   public static MachineException getPropertyIsNotReadableException(String propertyName) {
-    var message = String.format("Свойство %s недоступно для чтения", propertyName);
+    var message = String.format(Resources.getResourceString(GET_PROPERTY_IS_NOT_READABLE), propertyName);
     return new MachineException(message);
   }
 
   public static MachineException getPropertyIsNotWritableException(String propertyName) {
-    var message = String.format("Свойство %s недоступно для записи", propertyName);
+    var message = String.format(Resources.getResourceString(GET_PROPERTY_IS_NOT_WRITABLE), propertyName);
     return new MachineException(message);
   }
 
   public static MachineException getPropertyNotFoundException(String propertyName) {
-    var message = String.format("Свойство объекта не обнаружено (%s)", propertyName);
+    var message = String.format(Resources.getResourceString(GET_PROPERTY_NOT_FOUND), propertyName);
     return new MachineException(message);
   }
 
-  public static MachineException iteratorIsNotDefined() {
-    var message = "Итератор для значения не определен";
+  public static MachineException iteratorIsNotDefinedException() {
+    var message = Resources.getResourceString(ITERATOR_IS_NOT_DEFINED);
+    return new MachineException(message);
+  }
+
+  public static MachineException failedToInstantiateSdo() {
+    var message = Resources.getResourceString(FAILED_TO_INSTANTIATE_SDO);
     return new MachineException(message);
   }
 

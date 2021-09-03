@@ -15,11 +15,14 @@ import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.machine.MachineInstance;
+import com.github.otymko.jos.localization.Resources;
 import lombok.Getter;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
+
+import static com.github.otymko.jos.localization.MessageResource.ERROR_READING_FILE_SCRIPT;
 
 public class ScriptEngine {
   @Getter
@@ -40,14 +43,18 @@ public class ScriptEngine {
   }
 
   public int execute(Path pathToScript) {
-    int exitCode = 0;
+    int exitCode;
     try {
       exitCode = executeInternal(pathToScript);
     } catch (IOException exception) {
-      System.out.println("Ошибка при чтении " + pathToScript + ". Причина: " + exception.getMessage());
+      var errorMessage = String.format(Resources.getResourceString(ERROR_READING_FILE_SCRIPT),
+        pathToScript, exception.getMessage());
+      System.out.println(errorMessage);
+
       exitCode = 1;
     } catch (EngineException exception) {
       System.out.println(exception.getMessage());
+
       exitCode = 1;
     }
     return exitCode;
@@ -92,7 +99,7 @@ public class ScriptEngine {
       var constructor = targetClass.getConstructor(ModuleImage.class);
       scriptContext = constructor.newInstance(image);
     } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      throw new MachineException("Не удалось создай экземпляр объекта");
+      throw MachineException.failedToInstantiateSdo();
     }
     return scriptContext;
   }

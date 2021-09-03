@@ -413,7 +413,7 @@ public class MachineInstance {
 
     var iteratorValue = currentFrame.getLocalFrameStack().peek().getRawValue();
     if (!(iteratorValue instanceof IteratorValue)) {
-      throw MachineException.iteratorIsNotDefined();
+      throw MachineException.iteratorIsNotDefinedException();
     }
 
     var iterator = ((IteratorValue) iteratorValue).iterator();
@@ -428,7 +428,7 @@ public class MachineInstance {
   private void pushIterator(int argument) {
     var collection = operationStack.pop().getRawValue();
     if (!(collection instanceof CollectionIterable)) {
-      throw MachineException.iteratorIsNotDefined();
+      throw MachineException.iteratorIsNotDefinedException();
     }
 
     var iterable = (CollectionIterable) collection;
@@ -444,7 +444,7 @@ public class MachineInstance {
 
     var iteratorValue = currentFrame.getLocalFrameStack().peek().getRawValue();
     if (!(iteratorValue instanceof IteratorValue)) {
-      throw MachineException.iteratorIsNotDefined();
+      throw MachineException.iteratorIsNotDefinedException();
     }
 
     var iterator = ((IteratorValue) iteratorValue).iterator();

@@ -6,21 +6,24 @@
 package com.github.otymko.jos;
 
 import com.github.otymko.jos.hosting.ScriptEngine;
+import com.github.otymko.jos.localization.Resources;
 
 import java.io.File;
 import java.nio.file.Path;
+
+import static com.github.otymko.jos.localization.MessageResource.*;
 
 public class ScriptApplication {
 
   public static void main(String[] args) throws Exception {
 
     if (args.length == 0) {
-      throw new RuntimeException("Должен быть передан хотя бы один аргумент");
+      throw new RuntimeException(Resources.getResourceString(EXPECTED_AT_LEAST_ONE_ARGUMENT));
     }
 
     final var pathToScriptFromArgument = args[0];
     if (pathToScriptFromArgument.isEmpty()) {
-      throw new RuntimeException("Путь к скрипту не должен быть пустой");
+      throw new RuntimeException(Resources.getResourceString(PATH_TO_SCRIPT_IS_NOT_SPECIFIED));
     }
 
     Path pathToScript;
@@ -31,7 +34,7 @@ public class ScriptApplication {
     } else {
       var otherPathToScript = Path.of(pwd.toString(), pathToScriptFromArgument);
       if (otherPathToScript.toFile().exists()) {
-        throw new RuntimeException("Path to script must not be empty");
+        throw new RuntimeException(Resources.getResourceString(SCRIPT_FILE_NOT_FOUND));
       }
       pathToScript = otherPathToScript.toAbsolutePath();
     }

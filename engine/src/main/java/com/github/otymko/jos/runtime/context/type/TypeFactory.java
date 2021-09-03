@@ -8,9 +8,12 @@ package com.github.otymko.jos.runtime.context.type;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import com.github.otymko.jos.localization.Resources;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.InvocationTargetException;
+
+import static com.github.otymko.jos.localization.MessageResource.ERROR_CALL_CONSTRUCTOR;
 
 @UtilityClass
 public class TypeFactory {
@@ -23,7 +26,7 @@ public class TypeFactory {
     try {
       result = methodCall.invoke(null, arguments);
     } catch (IllegalAccessException | InvocationTargetException e) {
-      throw new MachineException("Не удалось вызвать конструктор типа");
+      throw new MachineException(Resources.getResourceString(ERROR_CALL_CONSTRUCTOR));
     }
     return (IValue) result;
   }
