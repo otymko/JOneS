@@ -478,6 +478,26 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   }
 
   @Override
+  public ParseTree visitCallStatement(BSLParser.CallStatementContext ctx) {
+    if (ctx.IDENTIFIER() != null) {
+      processIdentifier(ctx.IDENTIFIER().getText());
+    }
+
+    if (ctx.modifier() != null) {
+      for (var modifier : ctx.modifier()) {
+        visitModifier(modifier);
+      }
+    }
+
+    if (ctx.globalMethodCall() != null) {
+      visitGlobalMethodCall(ctx.globalMethodCall());
+    } else if (ctx.accessCall() != null) {
+      visitAccessCall(ctx.accessCall());
+    }
+    return ctx;
+  }
+
+  @Override
   public ParseTree visitGlobalMethodCall(BSLParser.GlobalMethodCallContext globalMethodCall) {
     var callStatement = (BSLParser.CallStatementContext) globalMethodCall.getParent();
 
@@ -490,10 +510,6 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   @Override
   public ParseTree visitAccessCall(BSLParser.AccessCallContext accessCall) {
-    var callStatement = (BSLParser.CallStatementContext) accessCall.getParent();
-
-    var identifier = callStatement.IDENTIFIER().getText();
-    processIdentifier(identifier);
     processAccessCall(accessCall, false);
     return accessCall;
   }
