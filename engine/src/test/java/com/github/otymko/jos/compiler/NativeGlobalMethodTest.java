@@ -31,4 +31,34 @@ class NativeGlobalMethodTest {
     TestHelper.checkCode(code, model);
   }
 
+  @Test
+  void testLeft() throws Exception {
+    var code = "Сообщить(Лев(\"Значение\", 3));";
+    TestHelper.checkCode(code, "Зна");
+
+    code = "Сообщить(Лев(\"Значение\", 10));";
+    TestHelper.checkCode(code, "Значение");
+
+    code = "Сообщить(Лев(\"Значение\", 0));";
+    TestHelper.checkCode(code, "");
+
+    code = "Сообщить(Лев(\"Значение\", -1));";
+    TestHelper.checkCode(code, "");
+  }
+
+  @Test
+  void testRight() throws Exception {
+    var code = "Сообщить(Прав(\"Значение\", 3));";
+    TestHelper.checkCode(code, "ние");
+
+    code = "Сообщить(Прав(\"Значение\", 10));";
+    TestHelper.checkCode(code, "Значение");
+
+    code = "Сообщить(Прав(\"Значение\", 0));";
+    TestHelper.checkCode(code, "");
+
+    code = "Сообщить(Прав(\"Значение\", -1));";
+    TestHelper.checkCode(code, "");
+  }
+
 }

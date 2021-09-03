@@ -312,6 +312,9 @@ public class MachineInstance {
     map.put(OperationCode.UCase, this::upperCase);
     map.put(OperationCode.LCase, this::lowerCase);
 
+    map.put(OperationCode.Left, this::left);
+    map.put(OperationCode.Right, this::right);
+
     return map;
   }
 
@@ -330,6 +333,43 @@ public class MachineInstance {
   private void stringLength(int argument) {
     var value = operationStack.pop().asString();
     operationStack.push(ValueFactory.create(value.length()));
+    nextInstruction();
+  }
+
+  private void left(int argument) {
+    var length = (int) operationStack.pop().asNumber();
+    var value = operationStack.pop().asString();
+
+    if (length > value.length()) {
+      length = value.length();
+    }
+
+    if (length < 0) {
+      operationStack.push(ValueFactory.create(""));
+    } else {
+      var newValue = value.substring(0, length);
+      operationStack.push(ValueFactory.create(newValue));
+    }
+
+    nextInstruction();
+  }
+
+  private void right(int argument) {
+    var length = (int) operationStack.pop().asNumber();
+    var value = operationStack.pop().asString();
+
+    if (length > value.length()) {
+      length = value.length();
+    }
+
+    if (length < 0) {
+      operationStack.push(ValueFactory.create(""));
+    } else {
+      var startPosition = value.length() - length;
+      var newValue = value.substring(startPosition);
+      operationStack.push(ValueFactory.create(newValue));
+    }
+
     nextInstruction();
   }
 

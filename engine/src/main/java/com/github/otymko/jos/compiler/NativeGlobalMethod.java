@@ -41,6 +41,8 @@ public class NativeGlobalMethod {
     addNativeMethod("ВРег", "Upper", OperationCode.UCase, 1);
     addNativeMethod("НРег", "Lower", OperationCode.LCase, 1);
     addNativeMethod("СтрДлина", "StrLen", OperationCode.StrLen, 1);
+    addNativeMethod("Лев", "Left", OperationCode.Left, 2);
+    addNativeMethod("Прав", "Right", OperationCode.Right, 2);
   }
 
   private static void addNativeMethod(String name, String alias, OperationCode code, int arguments) {
