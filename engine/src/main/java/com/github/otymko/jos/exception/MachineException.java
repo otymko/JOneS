@@ -161,4 +161,9 @@ public class MachineException extends EngineException {
     return new MachineException(message);
   }
 
+  public static MachineException invalidArgumentValueException() {
+    var message = Resources.getResourceString(INVALID_ARGUMENT_VALUE);
+    return new MachineException(message);
+  }
+
 }
