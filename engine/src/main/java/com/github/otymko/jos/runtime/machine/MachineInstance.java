@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -307,7 +308,104 @@ public class MachineInstance {
 
     map.put(OperationCode.Nop, this::nop);
 
+    map.put(OperationCode.StrLen, this::stringLength);
+    map.put(OperationCode.UCase, this::upperCase);
+    map.put(OperationCode.LCase, this::lowerCase);
+
+    map.put(OperationCode.Left, this::left);
+    map.put(OperationCode.Right, this::right);
+    map.put(OperationCode.Mid, this::middle);
+
     return map;
+  }
+
+  private void upperCase(int argument) {
+    var value = operationStack.pop().asString().toUpperCase(Locale.ENGLISH);
+    operationStack.push(ValueFactory.create(value));
+    nextInstruction();
+  }
+
+  private void lowerCase(int argument) {
+    var value = operationStack.pop().asString().toLowerCase(Locale.ENGLISH);
+    operationStack.push(ValueFactory.create(value));
+    nextInstruction();
+  }
+
+  private void stringLength(int argument) {
+    var value = operationStack.pop().asString();
+    operationStack.push(ValueFactory.create(value.length()));
+    nextInstruction();
+  }
+
+  private void left(int argument) {
+    var length = (int) operationStack.pop().asNumber();
+    var value = operationStack.pop().asString();
+
+    if (length > value.length()) {
+      length = value.length();
+    }
+
+    if (length < 0) {
+      operationStack.push(ValueFactory.create(""));
+    } else {
+      var newValue = value.substring(0, length);
+      operationStack.push(ValueFactory.create(newValue));
+    }
+
+    nextInstruction();
+  }
+
+  private void right(int argument) {
+    var length = (int) operationStack.pop().asNumber();
+    var value = operationStack.pop().asString();
+
+    if (length > value.length()) {
+      length = value.length();
+    }
+
+    if (length < 0) {
+      operationStack.push(ValueFactory.create(""));
+    } else {
+      var startPosition = value.length() - length;
+      var newValue = value.substring(startPosition);
+      operationStack.push(ValueFactory.create(newValue));
+    }
+
+    nextInstruction();
+  }
+
+  private void middle(int argument) {
+    String value;
+    int start;
+    int length;
+    if (argument == 2) {
+      start = (int) operationStack.pop().asNumber();
+      value = operationStack.pop().asString();
+      length = value.length() - start + 1;
+    } else {
+      length = (int) operationStack.pop().asNumber();
+      start = (int) operationStack.pop().asNumber();
+      value = operationStack.pop().asString();
+    }
+
+    if (start < 1) {
+      start = 1;
+    }
+
+    int end = start - 1 + length;
+    if (end > value.length()) {
+      end = value.length();
+    }
+
+    String result;
+    if (start > value.length() || length == 0) {
+      result = "";
+    } else {
+      result = value.substring(start - 1, end);
+    }
+
+    operationStack.push(ValueFactory.create(result));
+    nextInstruction();
   }
 
   private void nop(int argument) {

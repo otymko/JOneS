@@ -6,11 +6,11 @@
 package com.github.otymko.jos.runtime;
 
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.localization.Resources;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
-import com.github.otymko.jos.localization.Resources;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -36,7 +36,7 @@ public interface RuntimeContext {
     Object result;
     try {
       result = callMethod.invoke(this, arguments);
-    } catch (IllegalAccessException | InvocationTargetException e) {
+    } catch (IllegalAccessException | InvocationTargetException exception) {
       throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD));
     }
     return (IValue) result;
