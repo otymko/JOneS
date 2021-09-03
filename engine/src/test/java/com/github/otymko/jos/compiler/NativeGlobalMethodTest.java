@@ -24,4 +24,11 @@ class NativeGlobalMethodTest {
     TestHelper.checkCode(code, model);
   }
 
+  @Test
+  void testStringLength() throws Exception {
+    var code = "Сообщить(СтрДлина(\"З наЧен $ ие\"));";
+    var model = "12";
+    TestHelper.checkCode(code, model);
+  }
+
 }

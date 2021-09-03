@@ -40,6 +40,7 @@ public class NativeGlobalMethod {
     addNativeMethod("ИнформацияОбОшибке", "ErrorDescription", OperationCode.ExceptionDescr, 0);
     addNativeMethod("ВРег", "Upper", OperationCode.UCase, 1);
     addNativeMethod("НРег", "Lower", OperationCode.LCase, 1);
+    addNativeMethod("СтрДлина", "StrLen", OperationCode.StrLen, 1);
   }
 
   private static void addNativeMethod(String name, String alias, OperationCode code, int arguments) {

@@ -308,6 +308,7 @@ public class MachineInstance {
 
     map.put(OperationCode.Nop, this::nop);
 
+    map.put(OperationCode.StrLen, this::stringLength);
     map.put(OperationCode.UCase, this::upperCase);
     map.put(OperationCode.LCase, this::lowerCase);
 
@@ -323,6 +324,12 @@ public class MachineInstance {
   private void lowerCase(int argument) {
     var value = operationStack.pop().asString().toLowerCase(Locale.ENGLISH);
     operationStack.push(ValueFactory.create(value));
+    nextInstruction();
+  }
+
+  private void stringLength(int argument) {
+    var value = operationStack.pop().asString();
+    operationStack.push(ValueFactory.create(value.length()));
     nextInstruction();
   }
 
