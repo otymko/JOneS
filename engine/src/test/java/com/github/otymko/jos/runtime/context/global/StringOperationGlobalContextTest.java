@@ -13,11 +13,19 @@ import java.nio.file.Path;
 class StringOperationGlobalContextTest {
 
   @Test
-  void test() throws Exception {
-    var script = Path.of("src/test/resources/global/StringOperation/case.os");
+  void testFind() throws Exception {
+    var script = Path.of("src/test/resources/global/StringOperation/find.os");
     var model = "8\n1\n23";
     TestHelper.checkScript(script, model);
     // TODO: протестировать индекс начала поиска и порядок срабатывания
+  }
+
+  @Test
+  void testStartsWith() throws Exception {
+    var script = Path.of("src/test/resources/global/StringOperation/startsWith.os");
+    var model = "Да\nНет\nНет";
+    TestHelper.checkScript(script, model);
+    // TODO: проверить СтрНачинаетсяС(ГдеИскать, "")
   }
 
 }

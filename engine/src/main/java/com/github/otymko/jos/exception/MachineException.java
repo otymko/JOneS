@@ -166,4 +166,9 @@ public class MachineException extends EngineException {
     return new MachineException(message);
   }
 
+  public static MachineException errorStringStartWithException() {
+    var message = Resources.getResourceString(ERROR_STRING_STARTS_WITH);
+    return new MachineException(message);
+  }
+
 }

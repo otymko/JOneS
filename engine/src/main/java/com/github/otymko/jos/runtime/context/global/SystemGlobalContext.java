@@ -10,7 +10,6 @@ import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.EnumerationValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
@@ -29,18 +28,16 @@ public class SystemGlobalContext implements AttachableContext {
   @ContextMethod(name = "Сообщить", alias = "Message")
   // TODO: для null аргументов можно ввести @ContextMethodArgument(defaultValue = MessageStatus.ORDINARY)
   public static void message(IValue message, IValue status) {
-    var context = EnumerationHelper.getEnumByClass(MessageStatus.class);
-    var rawStatus = status == null ? context.getEnumValueType(MessageStatus.ORDINARY)
-      : (EnumerationValue) status.getRawValue();
+    var statusValue = EnumerationHelper.getEnumValueOrDefault(status, MessageStatus.ORDINARY);
 
     String rawMessage;
-    switch ((MessageStatus) rawStatus.getValue()) {
+    switch ((MessageStatus) statusValue.getValue()) {
       case WITHOUT_STATUS:
       case ORDINARY:
         rawMessage = message.asString();
         break;
       default:
-        rawMessage = String.format("%s: %s", rawStatus.getName(), message.asString());
+        rawMessage = String.format("%s: %s", statusValue.getName(), message.asString());
         break;
     }
 

@@ -9,16 +9,12 @@ import com.github.otymko.jos.compiler.EnumerationHelper;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.EnumType;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.EnumerationValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.SearchDirection;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
-
-import java.util.Optional;
 
 @GlobalContextClass
 @NoArgsConstructor
@@ -38,7 +34,7 @@ public class StringOperationGlobalContext implements AttachableContext {
   public static IValue find(IValue where, IValue what, IValue direction, IValue start, IValue occurrence) {
     var whereValue = where.getRawValue().asString();
     var whatValue = what.getRawValue().asString();
-    var directionValue = getEnumValueOrDefault(direction, SearchDirection.FROM_BEGIN);
+    var directionValue = EnumerationHelper.getEnumValueOrDefault(direction, SearchDirection.FROM_BEGIN);
     var startValue = start == null ? 0 : (int) start.getRawValue().asNumber();
     var occurrenceValue = occurrence == null ? 1 : (int) occurrence.getRawValue().asNumber();
 
@@ -65,7 +61,7 @@ public class StringOperationGlobalContext implements AttachableContext {
     var index = length + 1;
 
     if (fromBegin) {
-      while (foundTimes < occurrenceValue & index >= 0) {
+      while (foundTimes < occurrenceValue && index >= 0) {
         index = whereValue.indexOf(whatValue);
         if (index >= 0) {
           startIndex = index + 1;
@@ -76,7 +72,7 @@ public class StringOperationGlobalContext implements AttachableContext {
         }
       }
     } else {
-      while (foundTimes < occurrenceValue & index >= 0) {
+      while (foundTimes < occurrenceValue && index >= 0) {
         index = whereValue.lastIndexOf(whatValue);
         if (index >= 0) {
           startIndex = index - 1;
@@ -94,15 +90,22 @@ public class StringOperationGlobalContext implements AttachableContext {
     return ValueFactory.create(0);
   }
 
-  private static EnumerationValue getEnumValueOrDefault(IValue value, EnumType defaultValue) {
-    var context = EnumerationHelper.getEnumByClass(defaultValue.getClass());
-    return Optional.ofNullable(value)
-      .map(em -> (EnumerationValue) value.getRawValue())
-      .orElse(context.getEnumValueType(defaultValue));
+  @ContextMethod(name = "СтрНачинаетсяС", alias = "StrStartsWith")
+  public static IValue startsWith(IValue inputString, IValue searchString) {
+    var inputValue = inputString == null ? "" : inputString.getRawValue().asString();
+    var searchValue = searchString == null ? "" : searchString.getRawValue().asString();
 
-//    var rawStatus = value == null ? context.getEnumValueType(defaultValue)
-//      : (EnumerationValue) value.getRawValue();
-//    return rawStatus;
+    boolean result;
+    if (!inputValue.isEmpty()) {
+      if (!searchValue.isEmpty()) {
+        result = inputValue.startsWith(searchValue);
+      } else {
+        throw MachineException.errorStringStartWithException();
+      }
+    } else {
+      result = false;
+    }
+    return ValueFactory.create(result);
   }
 
 }
