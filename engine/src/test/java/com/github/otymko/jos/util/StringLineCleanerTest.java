@@ -20,6 +20,10 @@ class StringLineCleanerTest {
     string = "\"\"\"Test\"\"\"";
     string = StringLineCleaner.clean(string);
     assertThat(string).isEqualTo("\"Test\"");
+
+    string = "Test";
+    string = StringLineCleaner.clean(string);
+    assertThat(string).isEqualTo("Test");
   }
 
 }
