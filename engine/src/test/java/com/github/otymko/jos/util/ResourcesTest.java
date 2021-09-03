@@ -37,7 +37,7 @@ class ResourcesTest {
   @SneakyThrows
   @Test
   void testMessageKeys() {
-    for (var field: MessageResource.class.getFields()) {
+    for (var field : MessageResource.class.getFields()) {
       if (Modifier.isFinal(field.getModifiers())) {
         var value = (String) field.get(null);
         assertThat(Resources.getResourceString(value)).isNotNull().isNotEmpty();
@@ -49,7 +49,7 @@ class ResourcesTest {
     var delta = values.stream()
       .filter(Predicate.not(values2::contains))
       .collect(Collectors.toList());
-    assertThat(delta).hasSize(0);
+    assertThat(delta).isEmpty();
   }
 
 }

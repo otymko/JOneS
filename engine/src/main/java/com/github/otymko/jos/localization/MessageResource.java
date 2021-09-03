@@ -48,6 +48,7 @@ public class MessageResource {
   public static final String ERROR_CALL_CONSTRUCTOR = "errorCallConstructor";
   public static final String PRIMITIVE_DATA_TYPE_NOT_SUPPORTED = "primitiveDataTypeNotSupported";
   public static final String NULL_VALUE_NOT_SUPPORTED = "nullValueNotSupported";
+  public static final String ENUM_TYPE_NOT_FOUND = "enumTypeNotFound";
 
   private MessageResource() {
     // none

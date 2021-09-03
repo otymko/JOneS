@@ -71,13 +71,13 @@ public class EnumerationValue implements ContextType, IValue {
   }
 
   @Override
-  public int compareTo(IValue inValue) {
+  public int compareTo(IValue inputValue) {
     // FIXME: кидать исключение при сравнении разных типов (не EnumerationValue)
-    if (inValue == null || !(inValue.getRawValue() instanceof EnumerationValue)) {
+    if (inputValue == null || !(inputValue.getRawValue() instanceof EnumerationValue)) {
       return 1;
     }
-    var value = (EnumerationValue) inValue.getRawValue();
-    if (value.getValue() == getValue()) {
+    var rawValue = (EnumerationValue) inputValue.getRawValue();
+    if (rawValue.getValue() == getValue()) {
       return 0;
     }
     return 1;

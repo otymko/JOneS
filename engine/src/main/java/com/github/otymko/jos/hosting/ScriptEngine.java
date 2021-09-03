@@ -8,6 +8,7 @@ package com.github.otymko.jos.hosting;
 import com.github.otymko.jos.compiler.ScriptCompiler;
 import com.github.otymko.jos.exception.EngineException;
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.localization.Resources;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
@@ -15,8 +16,8 @@ import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.machine.MachineInstance;
-import com.github.otymko.jos.localization.Resources;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 
 import static com.github.otymko.jos.localization.MessageResource.ERROR_READING_FILE_SCRIPT;
 
+@Slf4j
 public class ScriptEngine {
   @Getter
   private final TypeManager typeManager;
@@ -53,7 +55,7 @@ public class ScriptEngine {
 
       exitCode = 1;
     } catch (EngineException exception) {
-      System.out.println(exception.getMessage());
+      LOGGER.error(exception.getMessage());
 
       exitCode = 1;
     }

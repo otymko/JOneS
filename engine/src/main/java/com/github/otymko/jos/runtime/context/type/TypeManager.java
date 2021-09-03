@@ -5,15 +5,18 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.localization.Resources;
 import com.github.otymko.jos.runtime.context.EnumType;
 import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-import lombok.Singular;
 import org.reflections.Reflections;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.github.otymko.jos.localization.MessageResource.ENUM_TYPE_NOT_FOUND;
 
 public class TypeManager {
   private static final TypeManager INSTANCE = new TypeManager();
@@ -41,10 +44,13 @@ public class TypeManager {
   }
 
   public EnumerationContext getEnumByClass(Class<? extends EnumType> enumClass) {
-    return storage.getEnumerationContext().stream()
+    var enumContext = storage.getEnumerationContext().stream()
       .filter(context -> context.getEnumType() == enumClass)
-      .findAny()
-      .get();
+      .findAny();
+    if (enumContext.isEmpty()) {
+      throw new MachineException(Resources.getResourceString(ENUM_TYPE_NOT_FOUND));
+    }
+    return enumContext.get();
   }
 
   public Optional<ContextInfo> getContextInfoByName(String name) {
