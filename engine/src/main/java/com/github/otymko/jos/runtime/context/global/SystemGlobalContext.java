@@ -62,20 +62,12 @@ public class SystemGlobalContext implements AttachableContext {
     }
 
     final var value = pValue.getRawValue();
-    if (value.getDataType() == DataType.UNDEFINED) {
-      return false;
-    }
-    if (value.getDataType() == DataType.STRING) {
-      return !value.asString().isBlank();
-    }
-    if (value.getDataType() == DataType.NUMBER) {
-      return value.asNumber() != 0;
-    }
-    if (value.getDataType() == DataType.DATE) {
-      return value.asDate().equals(EMPTY_DATE);
-    }
-    if (value.getDataType() == DataType.BOOLEAN) {
-      return value.asBoolean();
+    switch (value.getDataType()) {
+      case UNDEFINED: return false;
+      case STRING: return !value.asString().isBlank();
+      case NUMBER: return value.asNumber() != 0;
+      case DATE: return value.asDate().equals(EMPTY_DATE);
+      case BOOLEAN: return value.asBoolean();
     }
 
     throw new IllegalStateException("Проверка значения на заполненность не предусмотрена: " + value.getDataType());
