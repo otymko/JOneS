@@ -58,6 +58,14 @@ public class Arithmetic {
     return ValueFactory.create(one.asNumber() / two.asNumber());
   }
 
+  public IValue mod(IValue one, IValue two) {
+    if (two.asNumber() == 0) {
+      throw MachineException.divideByZeroException();
+    }
+    // TODO тесты
+    return ValueFactory.create(one.asNumber() % two.asNumber());
+  }
+
   public IValue negative(IValue value) {
     return ValueFactory.create(value.asNumber() * -1);
   }

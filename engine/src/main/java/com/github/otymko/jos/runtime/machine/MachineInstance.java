@@ -256,6 +256,7 @@ public class MachineInstance {
     map.put(OperationCode.Sub, this::sub);
     map.put(OperationCode.Mul, this::mul);
     map.put(OperationCode.Div, this::div);
+    map.put(OperationCode.Mod, this::mod);
     map.put(OperationCode.Not, this::not);
     map.put(OperationCode.Neg, this::neg);
 
@@ -778,6 +779,13 @@ public class MachineInstance {
     var valueOne = operationStack.pop();
     var valueTwo = operationStack.pop();
     operationStack.push(Arithmetic.div(valueTwo, valueOne));
+    nextInstruction();
+  }
+
+  private void mod(int argument) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    operationStack.push(Arithmetic.mod(valueTwo, valueOne));
     nextInstruction();
   }
 

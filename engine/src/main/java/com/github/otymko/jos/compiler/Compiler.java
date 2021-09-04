@@ -715,6 +715,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       operator = ExpressionOperator.MUL;
     } else if (operationContext.QUOTIENT() != null) {
       operator = ExpressionOperator.DIV;
+    } else if (operationContext.MODULO() != null) {
+      operator = ExpressionOperator.MOD;
     } else if (operationContext.boolOperation() != null) {
       var bool = operationContext.boolOperation();
       if (bool.AND_KEYWORD() != null) {
@@ -779,6 +781,9 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         break;
       case DIV:
         operationCode = OperationCode.Div;
+        break;
+      case MOD:
+        operationCode = OperationCode.Mod;
         break;
       case UNARY_PLUS:
         operationCode = OperationCode.Number;
