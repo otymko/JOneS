@@ -60,6 +60,7 @@ public class StandardTypeInitializer {
     implementTypeByInfo(typeManager, V8Array.INFO);
     implementTypeByInfo(typeManager, V8KeyAndValue.INFO);
     implementTypeByInfo(typeManager, V8Structure.INFO);
+    implementTypeByInfo(typeManager, V8Regex.INFO);
   }
 
   private void initSystemEnumerations(TypeManager typeManager) {
