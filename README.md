@@ -80,6 +80,9 @@ ScriptCompiler compiler = new ScriptCompiler(engine);
 // Компиляция скрипта с базовым типом "Сценарий"(UserScriptContext)
 ModuleImage moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
 
+// Создаём экземпляр объекта Сценарий из скомпилированного скрипта
+ScriptDrivenObject sdo = engine.newObject(moduleImage);
+
 // Получаем индекс метода по его ммени
 int methodId = sdo.getScriptMethod("ВывестиЧисло");
 // Вызываем метод
