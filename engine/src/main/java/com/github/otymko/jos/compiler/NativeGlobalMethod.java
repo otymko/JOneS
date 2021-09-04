@@ -40,6 +40,7 @@ public class NativeGlobalMethod {
   }
 
   private static void initNativeMethods() {
+    addNativeMethod("Формат", "Format", OperationCode.Format, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
     addNativeMethod("Тип", "Type", OperationCode.Type, REQUIRED_PARAMETER);
     addNativeMethod("ТипЗнч", "TypeOf", OperationCode.ValType, REQUIRED_PARAMETER);
     addNativeMethod("ОписаниеОшибки", "ErrorDescription", OperationCode.ExceptionDescr);
