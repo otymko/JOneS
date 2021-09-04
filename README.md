@@ -71,13 +71,19 @@ implementation("com.github.otymko", "JOneS", "develop-SNAPSHOT")
 Добавляем в приложение на Java:
 
 ```java
-Path pathToScript=Path.of("/path/to/my-script.os");
-  ScriptEngine engine=new ScriptEngine();
-  ScriptCompiler compiler=new ScriptCompiler(engine);
-  ModuleImage moduleImage=compiler.compile(pathToScript,UserScriptContext.class);
+// Путь к скрипту на Jones
+Path pathToScript = Path.of("/path/to/my-script.os");
+// Инициализация движка
+ScriptEngine engine = new ScriptEngine();
+// Инициализация компилятора
+ScriptCompiler compiler = new ScriptCompiler(engine);
+// Компиляция скрипта с базовым типом "Сценарий"(UserScriptContext)
+ModuleImage moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
 
-  int methodId=sdo.getScriptMethod("ВывестиЧисло");
-  sdo.callScriptMethod(engine,methodId,new IValue[0]);
+// Получаем индекс метода по его ммени
+int methodId = sdo.getScriptMethod("ВывестиЧисло");
+// Вызываем метод
+sdo.callScriptMethod(engine, methodId, new IValue[0]);
 ```
 
 После выполнения кода, будет выведено сообщение:
