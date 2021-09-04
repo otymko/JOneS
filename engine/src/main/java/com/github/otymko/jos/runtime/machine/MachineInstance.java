@@ -546,7 +546,6 @@ public class MachineInstance {
     }
 
     var iterator = ((IteratorValue) iteratorValue).iterator();
-    iterator.remove();
     nextInstruction();
   }
 
