@@ -312,6 +312,9 @@ public class MachineInstance {
     map.put(OperationCode.StrLen, this::stringLength);
     map.put(OperationCode.UCase, this::upperCase);
     map.put(OperationCode.LCase, this::lowerCase);
+    map.put(OperationCode.TrimL, this::trimL);
+    map.put(OperationCode.TrimR, this::trimR);
+    map.put(OperationCode.TrimLR, this::trimLR);
 
     map.put(OperationCode.Left, this::left);
     map.put(OperationCode.Right, this::right);
@@ -329,6 +332,24 @@ public class MachineInstance {
   private void lowerCase(int argument) {
     var value = operationStack.pop().asString().toLowerCase(Locale.ENGLISH);
     operationStack.push(ValueFactory.create(value));
+    nextInstruction();
+  }
+
+  private void trimL(int argument) {
+    var value = operationStack.pop().asString();
+    operationStack.push(ValueFactory.create(value.stripLeading()));
+    nextInstruction();
+  }
+
+  private void trimR(int argument) {
+    var value = operationStack.pop().asString();
+    operationStack.push(ValueFactory.create(value.stripTrailing()));
+    nextInstruction();
+  }
+
+  private void trimLR(int argument) {
+    var value = operationStack.pop().asString();
+    operationStack.push(ValueFactory.create(value.strip()));
     nextInstruction();
   }
 
