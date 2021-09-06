@@ -35,4 +35,9 @@ public class Resources {
     return ResourceBundle.getBundle(PROPERTIES_NAME, DEFAULT_LOCALE).getString(key).intern();
   }
 
+  public String getResourceString(String key, Object... args) {
+    var template = ResourceBundle.getBundle(PROPERTIES_NAME, DEFAULT_LOCALE).getString(key).intern();
+    return String.format(template, args);
+  }
+
 }

@@ -50,7 +50,7 @@ public class MessageResource {
   public static final String NULL_VALUE_NOT_SUPPORTED = "nullValueNotSupported";
   public static final String ENUM_TYPE_NOT_FOUND = "enumTypeNotFound";
   public static final String INVALID_ARGUMENT_VALUE = "invalidArgumentValue";
-  public static final String ERROR_STRING_STARTS_WITH = "errorStringStartsWith";
+  public static final String METHOD_CALL_WRONG_ARG_VALUE = "methodCallWrongArgValue";
 
   private MessageResource() {
     // none
