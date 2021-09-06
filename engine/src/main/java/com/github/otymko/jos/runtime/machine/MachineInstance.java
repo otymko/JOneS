@@ -320,6 +320,11 @@ public class MachineInstance {
     map.put(OperationCode.Right, this::right);
     map.put(OperationCode.Mid, this::middle);
 
+    map.put(OperationCode.EmptyStr, this::emptyStr);
+    map.put(OperationCode.Chr, this::chr);
+    map.put(OperationCode.ChrCode, this::chrCode);
+    map.put(OperationCode.StrReplace, this::strReplace);
+
     return map;
   }
 
@@ -350,6 +355,59 @@ public class MachineInstance {
   private void trimLR(int argument) {
     var value = operationStack.pop().asString();
     operationStack.push(ValueFactory.create(value.strip()));
+    nextInstruction();
+  }
+
+  private void emptyStr(int argument) {
+    var value = operationStack.pop().asString().isBlank();
+    operationStack.push(ValueFactory.create(value));
+    nextInstruction();
+  }
+
+  private void chr(int argument) {
+    var value = operationStack.pop().asNumber().intValue();
+    var stringFromChar = new String(new int[]{value}, 0, 0);
+
+    operationStack.push(ValueFactory.create(stringFromChar));
+    nextInstruction();
+  }
+
+  private void chrCode(int argCount) {
+
+    String string;
+    int position;
+
+    if(argCount == 1) {
+      string = operationStack.pop().asString();
+      position = 0;
+    } else if (argCount == 2) {
+      position = operationStack.pop().asNumber().intValue()-1;
+      string = operationStack.pop().asString();
+    } else {
+      throw new IllegalStateException("argCount = " + argCount);
+    }
+
+    int result;
+    if (string.length() == 0)
+      result = 0;
+    else if (position >= 0 && position < string.length())
+      result = string.charAt(position);
+    else
+      throw MachineException.invalidArgumentValueException();
+
+    operationStack.push(ValueFactory.create(result));
+
+    nextInstruction();
+  }
+
+  private void strReplace(int argument) {
+    var newVal = operationStack.pop().asString();
+    var searchVal = operationStack.pop().asString();
+    var sourceString = operationStack.pop().asString();
+
+    var result = sourceString.replace(searchVal, newVal);
+    operationStack.push(ValueFactory.create(result));
+
     nextInstruction();
   }
 
