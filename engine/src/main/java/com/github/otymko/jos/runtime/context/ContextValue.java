@@ -9,12 +9,13 @@ import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.context.type.DataType;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public abstract class ContextValue implements IValue, ContextType, RuntimeContext {
 
   @Override
-  public float asNumber() {
+  public BigDecimal asNumber() {
     throw MachineException.operationNotSupportedException();
   }
 

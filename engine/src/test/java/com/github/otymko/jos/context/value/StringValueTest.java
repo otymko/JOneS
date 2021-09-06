@@ -32,7 +32,7 @@ class StringValueTest {
     assertThat(dateString.asDate()).isEqualTo(dateExample);
 
     var numberString = ValueFactory.create("012.12");
-    assertThat(numberString.asNumber()).isEqualTo(12.12f);
+    assertThat(numberString.asNumber().floatValue()).isEqualTo(12.12f);
 
     // TODO: date -> object && true -> number
   }

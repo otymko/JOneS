@@ -47,6 +47,9 @@ public class NativeGlobalMethod {
     addNativeMethod("ВРег", "Upper", OperationCode.UCase, REQUIRED_PARAMETER);
     addNativeMethod("НРег", "Lower", OperationCode.LCase, REQUIRED_PARAMETER);
     addNativeMethod("СтрДлина", "StrLen", OperationCode.StrLen, REQUIRED_PARAMETER);
+    addNativeMethod("СокрП", "TrimR", OperationCode.TrimR, REQUIRED_PARAMETER);
+    addNativeMethod("СокрЛ", "TrimL", OperationCode.TrimL, REQUIRED_PARAMETER);
+    addNativeMethod("СокрЛП", "TrimLR", OperationCode.TrimLR, REQUIRED_PARAMETER);
     addNativeMethod("Лев", "Left", OperationCode.Left, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
     addNativeMethod("Прав", "Right", OperationCode.Right, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
     addNativeMethod("Сред", "Mid", OperationCode.Mid, REQUIRED_PARAMETER, REQUIRED_PARAMETER, OPTIONAL_PARAMETER);

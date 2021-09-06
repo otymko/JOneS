@@ -15,6 +15,7 @@ import com.github.otymko.jos.runtime.context.type.ValueParser;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.localization.Resources;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import static com.github.otymko.jos.localization.MessageResource.NULL_VALUE_NOT_SUPPORTED;
@@ -53,7 +54,7 @@ public final class StringValue extends PrimitiveValue {
   }
 
   @Override
-  public float asNumber() {
+  public BigDecimal asNumber() {
     return ValueParser.parse(value, DataType.NUMBER).asNumber();
   }
 

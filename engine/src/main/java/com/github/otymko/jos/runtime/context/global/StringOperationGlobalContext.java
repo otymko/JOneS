@@ -35,8 +35,8 @@ public class StringOperationGlobalContext implements AttachableContext {
     var whereValue = where.getRawValue().asString();
     var whatValue = what.getRawValue().asString();
     var directionValue = EnumerationHelper.getEnumValueOrDefault(direction, SearchDirection.FROM_BEGIN);
-    var startValue = start == null ? 0 : (int) start.getRawValue().asNumber();
-    var occurrenceValue = occurrence == null ? 1 : (int) occurrence.getRawValue().asNumber();
+    var startValue = start == null ? 0 : start.getRawValue().asNumber().intValue();
+    var occurrenceValue = occurrence == null ? 1 : occurrence.getRawValue().asNumber().intValue();
 
     var length = whereValue.length();
     if (length == 0 || whatValue.length() == 0) {
