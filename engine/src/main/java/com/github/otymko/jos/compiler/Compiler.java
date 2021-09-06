@@ -851,7 +851,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       value = StringLineCleaner.clean(value);
       constant = new ConstantDefinition(ValueFactory.create(value));
     } else if (constValue.numeric() != null) {
-      var value = Integer.parseInt(constValue.numeric().getText());
+      var value = Float.parseFloat(constValue.numeric().getText());
       if (isDefaultValue) {
         if (constValue.MINUS() != null) {
           value *= -1;
