@@ -56,11 +56,11 @@ public class Arithmetic {
   }
 
   public IValue mod(IValue one, IValue two) {
-    if (two.asNumber() == 0) {
+    if (two.asNumber().equals(BigDecimal.ZERO)) {
       throw MachineException.divideByZeroException();
     }
     // TODO тесты
-    return ValueFactory.create(one.asNumber() % two.asNumber());
+    return ValueFactory.create(one.asNumber().remainder(two.asNumber()));
   }
 
   public IValue negative(IValue value) {
