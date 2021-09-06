@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public abstract class PrimitiveValue implements IValue, ContextType, Comparable<IValue> {
@@ -19,7 +20,7 @@ public abstract class PrimitiveValue implements IValue, ContextType, Comparable<
   @Setter(AccessLevel.PROTECTED)
   private DataType dataType;
 
-  public float asNumber() {
+  public BigDecimal asNumber() {
     throw MachineException.operationNotSupportedException();
   }
 

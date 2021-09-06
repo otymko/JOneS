@@ -14,6 +14,7 @@ import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class EnumerationValue implements ContextType, IValue {
@@ -41,7 +42,7 @@ public class EnumerationValue implements ContextType, IValue {
   }
 
   @Override
-  public float asNumber() {
+  public BigDecimal asNumber() {
     throw MachineException.operationNotSupportedException();
   }
 

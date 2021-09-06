@@ -35,6 +35,7 @@ import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import com.github.otymko.jos.util.Common;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -338,7 +339,7 @@ public class MachineInstance {
   }
 
   private void left(int argument) {
-    var length = (int) operationStack.pop().asNumber();
+    var length = operationStack.pop().asNumber().intValue();
     var value = operationStack.pop().asString();
 
     if (length > value.length()) {
@@ -356,7 +357,7 @@ public class MachineInstance {
   }
 
   private void right(int argument) {
-    var length = (int) operationStack.pop().asNumber();
+    var length = operationStack.pop().asNumber().intValue();
     var value = operationStack.pop().asString();
 
     if (length > value.length()) {
@@ -379,12 +380,12 @@ public class MachineInstance {
     int start;
     int length;
     if (argument == 2) {
-      start = (int) operationStack.pop().asNumber();
+      start = operationStack.pop().asNumber().intValue();
       value = operationStack.pop().asString();
       length = value.length() - start + 1;
     } else {
-      length = (int) operationStack.pop().asNumber();
-      start = (int) operationStack.pop().asNumber();
+      length = operationStack.pop().asNumber().intValue();
+      start = operationStack.pop().asNumber().intValue();
       value = operationStack.pop().asString();
     }
 
@@ -419,7 +420,7 @@ public class MachineInstance {
   }
 
   private void increment(int argument) {
-    var operand = operationStack.pop().asNumber();
+    var operand = operationStack.pop().asNumber().intValue();
     operationStack.push(ValueFactory.create(++operand));
     nextInstruction();
   }
@@ -634,7 +635,7 @@ public class MachineInstance {
   }
 
   private void resolveMethodCall(int argument) {
-    int argumentCount = (int) operationStack.pop().asNumber();
+    int argumentCount = operationStack.pop().asNumber().intValue();
 
     var factArgumentValues = new IValue[argumentCount];
     for (var index = argumentCount - 1; index >= 0; index--) {
@@ -1003,7 +1004,7 @@ public class MachineInstance {
 
   private void methodSdoCall(Scope scope, SymbolAddress address) {
     var method = scope.getMethods()[address.getSymbolId()];
-    int argumentCount = (int) operationStack.pop().asNumber();
+    int argumentCount = operationStack.pop().asNumber().intValue();
 
     var factArgumentValues = new IValue[argumentCount];
     for (var index = argumentCount - 1; index >= 0; index--) {
@@ -1025,7 +1026,7 @@ public class MachineInstance {
     // FIXME: под общую гребенку: хранить в sdo сколько методов из модели, сколько из кода
     var methodDescriptor = currentImage.getMethods().get(address.getSymbolId() - methodIndexOffset);
 
-    int argumentCount = (int) operationStack.pop().asNumber();
+    int argumentCount = operationStack.pop().asNumber().intValue();
     var argumentValues = new IValue[argumentCount];
     for (var index = argumentCount - 1; index >= 0; index--) {
       var value = operationStack.pop();

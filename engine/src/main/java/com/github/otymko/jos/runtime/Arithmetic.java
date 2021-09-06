@@ -11,6 +11,7 @@ import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import lombok.experimental.UtilityClass;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @UtilityClass
@@ -22,17 +23,13 @@ public class Arithmetic {
     }
     if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.NUMBER) {
       var date = one.asDate();
-      var newValue = new Date(date.getTime() + (long) two.asNumber());
+      var newValue = new Date(date.getTime() + two.asNumber().longValue());
       return ValueFactory.create(newValue);
     }
-    return ValueFactory.create(one.asNumber() + two.asNumber());
+    return ValueFactory.create(one.asNumber().add(two.asNumber()));
   }
 
   public IValue sub(IValue one, IValue two) {
-    if (one.getDataType() == DataType.NUMBER) {
-      return ValueFactory.create(one.asNumber() - two.asNumber());
-    }
-
     if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.NUMBER) {
       // TODO: реализовать сложение даты и числа
       throw MachineException.operationNotImplementedException();
@@ -43,23 +40,23 @@ public class Arithmetic {
       throw MachineException.operationNotImplementedException();
     }
 
-    return ValueFactory.create(one.asNumber() - two.asNumber());
+    return ValueFactory.create(one.asNumber().subtract(two.asNumber()));
   }
 
   public IValue mul(IValue one, IValue two) {
-    return ValueFactory.create(one.asNumber() * two.asNumber());
+    return ValueFactory.create(one.asNumber().multiply(two.asNumber()));
   }
 
   public IValue div(IValue one, IValue two) {
-    if (two.asNumber() == 0) {
+    if (two.asNumber().equals(BigDecimal.ZERO)) {
       throw MachineException.divideByZeroException();
     }
     // TODO тесты
-    return ValueFactory.create(one.asNumber() / two.asNumber());
+    return ValueFactory.create(one.asNumber().divide(two.asNumber()));
   }
 
   public IValue negative(IValue value) {
-    return ValueFactory.create(value.asNumber() * -1);
+    return ValueFactory.create(value.asNumber().negate());
   }
 
 }

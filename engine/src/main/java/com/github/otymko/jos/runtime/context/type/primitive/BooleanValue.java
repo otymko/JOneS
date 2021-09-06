@@ -13,6 +13,7 @@ import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
+import java.math.BigDecimal;
 import java.util.function.Predicate;
 
 @ContextClass(name = "Булево", alias = "Boolean")
@@ -57,11 +58,11 @@ public class BooleanValue extends PrimitiveValue {
   }
 
   @Override
-  public float asNumber() {
+  public BigDecimal asNumber() {
     if (value) {
-      return 1;
+      return BigDecimal.ONE;
     }
-    return 0;
+    return BigDecimal.ZERO;
   }
 
   @Override
@@ -73,7 +74,7 @@ public class BooleanValue extends PrimitiveValue {
   @Override
   public int compareTo(IValue other) {
     if (other.getDataType() == DataType.BOOLEAN || other.getDataType() == DataType.NUMBER) {
-      return Float.compare(asNumber(), other.asNumber());
+      return asNumber().compareTo(other.asNumber());
     }
     return super.compareTo(other);
   }

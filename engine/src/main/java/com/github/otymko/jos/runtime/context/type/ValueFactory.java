@@ -13,6 +13,7 @@ import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
 import com.github.otymko.jos.runtime.context.type.primitive.StringValue;
 import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class ValueFactory {
@@ -30,11 +31,15 @@ public class ValueFactory {
   }
 
   public static IValue create(float value) {
+    return NumberValue.create(BigDecimal.valueOf(value));
+  }
+
+  public static IValue create(BigDecimal value) {
     return NumberValue.create(value);
   }
 
   public static IValue create(int value) {
-    return NumberValue.create(value);
+    return NumberValue.create(BigDecimal.valueOf(value));
   }
 
   public static IValue create(Date value) {
