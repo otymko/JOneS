@@ -31,7 +31,7 @@ public class UndefinedValue extends PrimitiveValue {
     if (object.getDataType() == getDataType()) {
       return 0;
     }
-    return super.compareTo(object);
+    return 1;
   }
 
   @Override
