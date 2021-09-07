@@ -44,22 +44,28 @@ public class ScriptTester implements ContextType, IValue {
 
   @ContextMethod(name = "ПроверитьРавенство", alias = "CheckEquals")
   public static void checkEquals(IValue oneValue, IValue twoValue, IValue additionalErrorMessage) {
-    if (oneValue.compareTo(twoValue) != 0) {
+    var oneValueRaw = oneValue.getRawValue();
+    var twoValueRaw = twoValue.getRawValue();
+
+    if (oneValueRaw.compareTo(twoValueRaw) != 0) {
       // TODO: локализация
       // TODO: использование additionalErrorMessage
       final var errorMessage = String.format("Сравниваемые значения (%s; %s) не равны, а хотели, чтобы были равны.",
-        oneValue.asString(), twoValue.asString());
+        oneValueRaw.asString(), twoValueRaw.asString());
       throw new MachineException(errorMessage);
     }
   }
 
   @ContextMethod(name = "ПроверитьНеРавенство", alias = "CheckNotEquals")
   public static void checkNotEquals(IValue oneValue, IValue twoValue, IValue additionalErrorMessage) {
-    if (oneValue.compareTo(twoValue) == 0) {
+    var oneValueRaw = oneValue.getRawValue();
+    var twoValueRaw = twoValue.getRawValue();
+
+    if (oneValueRaw.compareTo(twoValueRaw) == 0) {
       // TODO: локализация
       // TODO: использование additionalErrorMessage
       final var errorMessage = String.format("Сравниваемые значения (%s; %s) равны, а хотели, чтобы были не равны.",
-        oneValue.asString(), twoValue.asString());
+        oneValueRaw.asString(), twoValueRaw.asString());
       throw new MachineException(errorMessage);
     }
   }
