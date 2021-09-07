@@ -16,6 +16,7 @@ import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -65,7 +66,7 @@ public class SystemGlobalContext implements AttachableContext {
     switch (value.getDataType()) {
       case UNDEFINED: return false;
       case STRING: return !value.asString().isBlank();
-      case NUMBER: return value.asNumber() != 0;
+      case NUMBER: return !value.asNumber().equals(BigDecimal.ZERO);
       case DATE: return value.asDate().equals(EMPTY_DATE);
       case BOOLEAN: return value.asBoolean();
     }
