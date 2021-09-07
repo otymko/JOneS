@@ -80,6 +80,7 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
       if (value.equals(inValue)) {
         return ValueFactory.create(index);
       }
+      index++;
     }
     return ValueFactory.create();
   }
