@@ -35,7 +35,6 @@ import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import com.github.otymko.jos.util.Common;
 import lombok.Getter;
 
-import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -377,11 +376,11 @@ public class MachineInstance {
     String string;
     int position;
 
-    if(argCount == 1) {
+    if (argCount == 1) {
       string = operationStack.pop().asString();
       position = 0;
     } else if (argCount == 2) {
-      position = operationStack.pop().asNumber().intValue()-1;
+      position = operationStack.pop().asNumber().intValue() - 1;
       string = operationStack.pop().asString();
     } else {
       throw new IllegalStateException("argCount = " + argCount);
@@ -732,8 +731,11 @@ public class MachineInstance {
 
     var methodName = currentImage.getConstants().get(argument).getValue().asString();
     var methodId = context.findMethodId(methodName);
-    var methodInfo = context.getMethodById(methodId);
+    if (methodId < 0) {
+      throw MachineException.methodNotFoundException(methodName);
+    }
 
+    var methodInfo = context.getMethodById(methodId);
     var argumentValues = new IValue[methodInfo.getParameters().length];
     fillArgumentValueFromFact(methodInfo, factArgumentValues, argumentValues);
 
