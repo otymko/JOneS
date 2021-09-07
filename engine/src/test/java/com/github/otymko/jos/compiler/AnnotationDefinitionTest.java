@@ -68,7 +68,7 @@ class AnnotationDefinitionTest {
 
   private static float getConstantNumericValue(ModuleImage image, AnnotationParameter parameter) {
     var constant = image.getConstants().get(parameter.getValueIndex());
-    return constant.getValue().asNumber();
+    return constant.getValue().asNumber().floatValue();
   }
 
   private static void checkEmptyMethod(ModuleImage moduleImage, int index, String name) {

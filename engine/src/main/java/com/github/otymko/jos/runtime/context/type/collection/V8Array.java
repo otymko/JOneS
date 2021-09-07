@@ -80,6 +80,7 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
       if (value.equals(inValue)) {
         return ValueFactory.create(index);
       }
+      index++;
     }
     return ValueFactory.create();
   }
@@ -109,12 +110,12 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
 
   @Override
   public IValue getIndexedValue(IValue index) {
-    return get((int) index.asNumber());
+    return get(index.asNumber().intValue());
   }
 
   @Override
   public void setIndexedValue(IValue index, IValue value) {
-    set((int) index.asNumber(), value);
+    set(index.asNumber().intValue(), value);
   }
 
   @Override

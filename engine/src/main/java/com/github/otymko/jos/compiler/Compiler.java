@@ -12,6 +12,7 @@ import com.github.otymko.jos.compiler.helper.AnnotationProcessing;
 import com.github.otymko.jos.exception.CompilerException;
 import com.github.otymko.jos.module.ModuleImageCache;
 import com.github.otymko.jos.runtime.SymbolType;
+import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.OperationCode;
@@ -22,6 +23,7 @@ import com.github.otymko.jos.util.StringLineCleaner;
 import lombok.Data;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -851,10 +853,10 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       value = StringLineCleaner.clean(value);
       constant = new ConstantDefinition(ValueFactory.create(value));
     } else if (constValue.numeric() != null) {
-      var value = Integer.parseInt(constValue.numeric().getText());
+      var value = new BigDecimal(constValue.numeric().getText());
       if (isDefaultValue) {
         if (constValue.MINUS() != null) {
-          value *= -1;
+          value = value.negate();
         }
       }
       constant = new ConstantDefinition(ValueFactory.create(value));

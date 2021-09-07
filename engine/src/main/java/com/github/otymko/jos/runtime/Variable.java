@@ -13,6 +13,7 @@ import com.github.otymko.jos.runtime.context.IValue;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
@@ -41,7 +42,7 @@ public class Variable extends ContextValue implements IVariable {
   }
 
   @Override
-  public float asNumber() {
+  public BigDecimal asNumber() {
     return value.asNumber();
   }
 

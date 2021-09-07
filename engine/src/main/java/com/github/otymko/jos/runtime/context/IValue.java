@@ -7,11 +7,12 @@ package com.github.otymko.jos.runtime.context;
 
 import com.github.otymko.jos.runtime.context.type.DataType;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public interface IValue {
 
-  float asNumber();
+  BigDecimal asNumber();
 
   Date asDate();
 

@@ -5,8 +5,8 @@
  */
 package com.github.otymko.jos.exception;
 
-import com.github.otymko.jos.runtime.machine.StackTraceRecord;
 import com.github.otymko.jos.localization.Resources;
+import com.github.otymko.jos.runtime.machine.StackTraceRecord;
 import lombok.Getter;
 
 import java.util.Collections;
@@ -166,8 +166,13 @@ public class MachineException extends EngineException {
     return new MachineException(message);
   }
 
-  public static MachineException errorStringStartWithException() {
-    var message = Resources.getResourceString(ERROR_STRING_STARTS_WITH);
+  public static MachineException methodCallWrongArgValue(String methodName, int argPosition) {
+    var message = Resources.getResourceString(METHOD_CALL_WRONG_ARG_VALUE);
+    return new MachineException(message);
+  }
+
+  public static MachineException methodNotFoundException(String methodName) {
+    var message = String.format(Resources.getResourceString(METHOD_NOT_FOUND), methodName);
     return new MachineException(message);
   }
 

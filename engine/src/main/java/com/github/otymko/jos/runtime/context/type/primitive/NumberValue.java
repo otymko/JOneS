@@ -13,57 +13,56 @@ import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
+import java.math.BigDecimal;
+import java.util.Objects;
+
 @ContextClass(name = "Число", alias = "Number")
 public class NumberValue extends PrimitiveValue {
   public static final ContextInfo INFO = ContextInfo.createByClass(NumberValue.class);
 
-  private final float value;
+  private final BigDecimal value;
 
-  private NumberValue(float value) {
+  private NumberValue(BigDecimal value) {
+    if(value == null) {
+      throw new IllegalArgumentException();
+    }
+
     this.value = value;
     setDataType(DataType.NUMBER);
   }
 
-  public static NumberValue create(float value) {
+  public static NumberValue create(BigDecimal value) {
     return new NumberValue(value);
-  }
-
-  public static NumberValue create(int value) {
-    return create((float) value);
   }
 
   @Override
   public boolean asBoolean() {
-    return value != 0;
+    return value.intValue() != 0;
   }
 
   @Override
-  public float asNumber() {
+  public BigDecimal asNumber() {
     return value;
   }
 
   @Override
   public String asString() {
     var number = asNumber();
-    var longNumber = (long) number;
-    if (number == longNumber) {
-      return String.format("%d", longNumber);
-    }
-    return String.format("%s", number);
+    return number.toPlainString();
   }
 
   @Override
   public int compareTo(IValue object) {
     if (object.getDataType() == DataType.BOOLEAN || object.getDataType() == DataType.NUMBER) {
-      return Float.compare(value, object.asNumber());
+      return value.compareTo(object.asNumber());
     }
     return super.compareTo(object);
   }
 
   public static IValue parse(String view) {
-    float value;
+    BigDecimal value;
     try {
-      value = Float.parseFloat(view);
+      value = new BigDecimal(view);
     } catch (NumberFormatException exception) {
       throw MachineException.convertToNumberException();
     }
@@ -80,9 +79,14 @@ public class NumberValue extends PrimitiveValue {
     }
     var baseValue = (IValue) obj;
     if (baseValue.getDataType() == DataType.BOOLEAN || baseValue.getDataType() == DataType.NUMBER) {
-      return value == baseValue.asNumber();
+      return value.equals(baseValue.asNumber());
     }
     return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(value);
   }
 
   @Override

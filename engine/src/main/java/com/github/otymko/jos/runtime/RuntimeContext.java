@@ -25,8 +25,10 @@ public interface RuntimeContext {
     var callMethod = methodInfo.getMethod();
     try {
       callMethod.invoke(this, arguments);
-    } catch (IllegalAccessException | InvocationTargetException e) {
-      e.printStackTrace();
+    } catch (MachineException exception) {
+      throw exception;
+    } catch (IllegalAccessException | InvocationTargetException exception) {
+      throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
     }
   }
 
@@ -36,8 +38,10 @@ public interface RuntimeContext {
     Object result;
     try {
       result = callMethod.invoke(this, arguments);
+    } catch (MachineException exception) {
+      throw exception;
     } catch (IllegalAccessException | InvocationTargetException exception) {
-      throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD));
+      throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
     }
     return (IValue) result;
   }

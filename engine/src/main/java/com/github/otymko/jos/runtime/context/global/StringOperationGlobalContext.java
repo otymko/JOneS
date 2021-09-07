@@ -35,8 +35,8 @@ public class StringOperationGlobalContext implements AttachableContext {
     var whereValue = where.getRawValue().asString();
     var whatValue = what.getRawValue().asString();
     var directionValue = EnumerationHelper.getEnumValueOrDefault(direction, SearchDirection.FROM_BEGIN);
-    var startValue = start == null ? 0 : (int) start.getRawValue().asNumber();
-    var occurrenceValue = occurrence == null ? 1 : (int) occurrence.getRawValue().asNumber();
+    var startValue = start == null ? 0 : start.getRawValue().asNumber().intValue();
+    var occurrenceValue = occurrence == null ? 1 : occurrence.getRawValue().asNumber().intValue();
 
     var length = whereValue.length();
     if (length == 0 || whatValue.length() == 0) {
@@ -92,20 +92,42 @@ public class StringOperationGlobalContext implements AttachableContext {
 
   @ContextMethod(name = "СтрНачинаетсяС", alias = "StrStartsWith")
   public static IValue startsWith(IValue inputString, IValue searchString) {
-    var inputValue = inputString == null ? "" : inputString.getRawValue().asString();
-    var searchValue = searchString == null ? "" : searchString.getRawValue().asString();
+    var inputValue = getStringArgument(inputString);
+    var searchValue = getStringArgument(searchString);
 
     boolean result;
     if (!inputValue.isEmpty()) {
       if (!searchValue.isEmpty()) {
         result = inputValue.startsWith(searchValue);
       } else {
-        throw MachineException.errorStringStartWithException();
+        throw MachineException.methodCallWrongArgValue("СтрНачинаетсяС", 2);
       }
     } else {
       result = false;
     }
     return ValueFactory.create(result);
+  }
+
+  @ContextMethod(name = "СтрЗаканчиваетсяНа", alias = "StrEndsWith")
+  public static IValue endsWith(IValue inputString, IValue searchString) {
+    var inputValue = getStringArgument(inputString);
+    var searchValue = getStringArgument(searchString);
+
+    boolean result;
+    if (!inputValue.isEmpty()) {
+      if (!searchValue.isEmpty()) {
+        result = inputValue.endsWith(searchValue);
+      } else {
+        throw MachineException.methodCallWrongArgValue("СтрЗаканчиваетсяНа", 2);
+      }
+    } else {
+      result = false;
+    }
+    return ValueFactory.create(result);
+  }
+
+  private static String getStringArgument(IValue argument) {
+    return argument == null ? "" : argument.asString();
   }
 
 }

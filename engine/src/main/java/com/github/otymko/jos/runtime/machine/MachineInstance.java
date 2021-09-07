@@ -311,10 +311,18 @@ public class MachineInstance {
     map.put(OperationCode.StrLen, this::stringLength);
     map.put(OperationCode.UCase, this::upperCase);
     map.put(OperationCode.LCase, this::lowerCase);
+    map.put(OperationCode.TrimL, this::trimL);
+    map.put(OperationCode.TrimR, this::trimR);
+    map.put(OperationCode.TrimLR, this::trimLR);
 
     map.put(OperationCode.Left, this::left);
     map.put(OperationCode.Right, this::right);
     map.put(OperationCode.Mid, this::middle);
+
+    map.put(OperationCode.EmptyStr, this::emptyStr);
+    map.put(OperationCode.Chr, this::chr);
+    map.put(OperationCode.ChrCode, this::chrCode);
+    map.put(OperationCode.StrReplace, this::strReplace);
 
     return map;
   }
@@ -331,6 +339,77 @@ public class MachineInstance {
     nextInstruction();
   }
 
+  private void trimL(int argument) {
+    var value = operationStack.pop().asString();
+    operationStack.push(ValueFactory.create(value.stripLeading()));
+    nextInstruction();
+  }
+
+  private void trimR(int argument) {
+    var value = operationStack.pop().asString();
+    operationStack.push(ValueFactory.create(value.stripTrailing()));
+    nextInstruction();
+  }
+
+  private void trimLR(int argument) {
+    var value = operationStack.pop().asString();
+    operationStack.push(ValueFactory.create(value.strip()));
+    nextInstruction();
+  }
+
+  private void emptyStr(int argument) {
+    var value = operationStack.pop().asString().isBlank();
+    operationStack.push(ValueFactory.create(value));
+    nextInstruction();
+  }
+
+  private void chr(int argument) {
+    var value = operationStack.pop().asNumber().intValue();
+    var stringFromChar = new String(new int[]{value}, 0, 0);
+
+    operationStack.push(ValueFactory.create(stringFromChar));
+    nextInstruction();
+  }
+
+  private void chrCode(int argCount) {
+
+    String string;
+    int position;
+
+    if (argCount == 1) {
+      string = operationStack.pop().asString();
+      position = 0;
+    } else if (argCount == 2) {
+      position = operationStack.pop().asNumber().intValue() - 1;
+      string = operationStack.pop().asString();
+    } else {
+      throw new IllegalStateException("argCount = " + argCount);
+    }
+
+    int result;
+    if (string.length() == 0)
+      result = 0;
+    else if (position >= 0 && position < string.length())
+      result = string.charAt(position);
+    else
+      throw MachineException.invalidArgumentValueException();
+
+    operationStack.push(ValueFactory.create(result));
+
+    nextInstruction();
+  }
+
+  private void strReplace(int argument) {
+    var newVal = operationStack.pop().asString();
+    var searchVal = operationStack.pop().asString();
+    var sourceString = operationStack.pop().asString();
+
+    var result = sourceString.replace(searchVal, newVal);
+    operationStack.push(ValueFactory.create(result));
+
+    nextInstruction();
+  }
+
   private void stringLength(int argument) {
     var value = operationStack.pop().asString();
     operationStack.push(ValueFactory.create(value.length()));
@@ -338,7 +417,7 @@ public class MachineInstance {
   }
 
   private void left(int argument) {
-    var length = (int) operationStack.pop().asNumber();
+    var length = operationStack.pop().asNumber().intValue();
     var value = operationStack.pop().asString();
 
     if (length > value.length()) {
@@ -356,7 +435,7 @@ public class MachineInstance {
   }
 
   private void right(int argument) {
-    var length = (int) operationStack.pop().asNumber();
+    var length = operationStack.pop().asNumber().intValue();
     var value = operationStack.pop().asString();
 
     if (length > value.length()) {
@@ -379,12 +458,12 @@ public class MachineInstance {
     int start;
     int length;
     if (argument == 2) {
-      start = (int) operationStack.pop().asNumber();
+      start = operationStack.pop().asNumber().intValue();
       value = operationStack.pop().asString();
       length = value.length() - start + 1;
     } else {
-      length = (int) operationStack.pop().asNumber();
-      start = (int) operationStack.pop().asNumber();
+      length = operationStack.pop().asNumber().intValue();
+      start = operationStack.pop().asNumber().intValue();
       value = operationStack.pop().asString();
     }
 
@@ -419,7 +498,7 @@ public class MachineInstance {
   }
 
   private void increment(int argument) {
-    var operand = operationStack.pop().asNumber();
+    var operand = operationStack.pop().asNumber().intValue();
     operationStack.push(ValueFactory.create(++operand));
     nextInstruction();
   }
@@ -634,7 +713,7 @@ public class MachineInstance {
   }
 
   private void resolveMethodCall(int argument) {
-    int argumentCount = (int) operationStack.pop().asNumber();
+    int argumentCount = operationStack.pop().asNumber().intValue();
 
     var factArgumentValues = new IValue[argumentCount];
     for (var index = argumentCount - 1; index >= 0; index--) {
@@ -652,8 +731,11 @@ public class MachineInstance {
 
     var methodName = currentImage.getConstants().get(argument).getValue().asString();
     var methodId = context.findMethodId(methodName);
-    var methodInfo = context.getMethodById(methodId);
+    if (methodId < 0) {
+      throw MachineException.methodNotFoundException(methodName);
+    }
 
+    var methodInfo = context.getMethodById(methodId);
     var argumentValues = new IValue[methodInfo.getParameters().length];
     fillArgumentValueFromFact(methodInfo, factArgumentValues, argumentValues);
 
@@ -1003,7 +1085,7 @@ public class MachineInstance {
 
   private void methodSdoCall(Scope scope, SymbolAddress address) {
     var method = scope.getMethods()[address.getSymbolId()];
-    int argumentCount = (int) operationStack.pop().asNumber();
+    int argumentCount = operationStack.pop().asNumber().intValue();
 
     var factArgumentValues = new IValue[argumentCount];
     for (var index = argumentCount - 1; index >= 0; index--) {
@@ -1025,7 +1107,7 @@ public class MachineInstance {
     // FIXME: под общую гребенку: хранить в sdo сколько методов из модели, сколько из кода
     var methodDescriptor = currentImage.getMethods().get(address.getSymbolId() - methodIndexOffset);
 
-    int argumentCount = (int) operationStack.pop().asNumber();
+    int argumentCount = operationStack.pop().asNumber().intValue();
     var argumentValues = new IValue[argumentCount];
     for (var index = argumentCount - 1; index >= 0; index--) {
       var value = operationStack.pop();
