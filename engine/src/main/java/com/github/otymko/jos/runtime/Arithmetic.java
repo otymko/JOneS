@@ -59,7 +59,6 @@ public class Arithmetic {
     if (two.asNumber().equals(BigDecimal.ZERO)) {
       throw MachineException.divideByZeroException();
     }
-    // TODO тесты
     return ValueFactory.create(one.asNumber().remainder(two.asNumber()));
   }
 
