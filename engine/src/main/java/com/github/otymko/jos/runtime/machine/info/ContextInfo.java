@@ -12,10 +12,12 @@ import com.github.otymko.jos.runtime.context.EnumClass;
 import com.github.otymko.jos.runtime.context.EnumValue;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 @Value
 @Builder
+@EqualsAndHashCode
 public class ContextInfo {
   public static final ContextInfo EMPTY = createEmptyInfo();
   /**

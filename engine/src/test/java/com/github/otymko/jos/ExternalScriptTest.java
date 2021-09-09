@@ -25,4 +25,9 @@ class ExternalScriptTest extends BaseExternalScriptTest {
     return getTestsFromScript(Path.of("src/test/resources/tests/StringFunctions.os"));
   }
 
+  @TestFactory
+  Collection<DynamicTest> testArrays() throws IOException {
+    return getTestsFromScript(Path.of("src/test/resources/tests/arrays.os"));
+  }
+
 }
