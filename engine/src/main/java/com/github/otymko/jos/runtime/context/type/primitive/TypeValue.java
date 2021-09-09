@@ -48,7 +48,10 @@ public class TypeValue extends PrimitiveValue {
 
   @Override
   public int compareTo(IValue object) {
-    // TODO:
-    return super.compareTo(object);
+    if (object.getDataType() != DataType.TYPE) {
+      return 1;
+    }
+    var inputValue = (TypeValue) object;
+    return getValue().equals(inputValue.getValue()) ? 0 : 1;
   }
 }
