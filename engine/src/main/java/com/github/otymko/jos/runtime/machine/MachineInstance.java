@@ -323,6 +323,7 @@ public class MachineInstance {
     map.put(OperationCode.Format, this::format);
     map.put(OperationCode.CurrentDate, this::currentDate);
     map.put(OperationCode.Number, this::number);
+    map.put(OperationCode.Str, this::str);
 
     return map;
   }
@@ -345,6 +346,12 @@ public class MachineInstance {
   private void number(int argument) {
     final var source = operationStack.pop();
     operationStack.push(ValueFactory.create(source.asNumber()));
+    nextInstruction();
+  }
+
+  private void str(int argument) {
+    final var source = operationStack.pop();
+    operationStack.push(ValueFactory.create(source.asString()));
     nextInstruction();
   }
 
