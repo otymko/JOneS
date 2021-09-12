@@ -58,7 +58,8 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
   }
 
   @ContextMethod(name = "Вставить", alias = "Insert")
-  public void insert(int index, IValue value) {
+  public void insert(IValue inputIndex, IValue value) {
+    var index = inputIndex.getRawValue().asNumber().intValue();
     if (index < 0) {
       throw MachineException.indexValueOutOfRangeException();
     }
@@ -86,22 +87,25 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
   }
 
   @ContextMethod(name = "Удалить", alias = "Delete")
-  public void delete(int index) {
+  public void delete(IValue inputIndex) {
+    var index = inputIndex.getRawValue().asNumber().intValue();
     values.remove(index);
   }
 
   @ContextMethod(name = "ВГраница", alias = "UBound")
-  public int upperBound() {
-    return values.size() - 1;
+  public IValue upperBound() {
+    return ValueFactory.create(values.size() - 1);
   }
 
   @ContextMethod(name = "Получить", alias = "Get")
-  public IValue get(int index) {
+  public IValue get(IValue inputIndex) {
+    var index = inputIndex.getRawValue().asNumber().intValue();
     return values.get(index);
   }
 
   @ContextMethod(name = "Установить", alias = "Set")
-  public void set(int index, IValue value) {
+  public void set(IValue inputIndex, IValue value) {
+    var index = inputIndex.getRawValue().asNumber().intValue();
     if (index < 0 || index >= values.size()) {
       throw MachineException.indexValueOutOfRangeException();
     }
@@ -110,12 +114,12 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
 
   @Override
   public IValue getIndexedValue(IValue index) {
-    return get(index.asNumber().intValue());
+    return get(index);
   }
 
   @Override
   public void setIndexedValue(IValue index, IValue value) {
-    set(index.asNumber().intValue(), value);
+    set(index, value);
   }
 
   @Override
@@ -124,7 +128,7 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
   }
 
   private void extend(int count) {
-    for (var index = 0; index < count; index++) {
+    for (var index = 0; index <= count; index++) {
       values.add(ValueFactory.create());
     }
   }

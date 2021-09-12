@@ -6,11 +6,14 @@
 package com.github.otymko.jos.common;
 
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextType;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.runtime.context.type.TypeManager;
+import com.github.otymko.jos.runtime.context.type.primitive.TypeValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.math.BigDecimal;
@@ -44,22 +47,28 @@ public class ScriptTester implements ContextType, IValue {
 
   @ContextMethod(name = "ПроверитьРавенство", alias = "CheckEquals")
   public static void checkEquals(IValue oneValue, IValue twoValue, IValue additionalErrorMessage) {
-    if (oneValue.compareTo(twoValue) != 0) {
+    var oneValueRaw = oneValue.getRawValue();
+    var twoValueRaw = twoValue.getRawValue();
+
+    if (oneValueRaw.compareTo(twoValueRaw) != 0) {
       // TODO: локализация
       // TODO: использование additionalErrorMessage
       final var errorMessage = String.format("Сравниваемые значения (%s; %s) не равны, а хотели, чтобы были равны.",
-        oneValue.asString(), twoValue.asString());
+        oneValueRaw.asString(), twoValueRaw.asString());
       throw new MachineException(errorMessage);
     }
   }
 
   @ContextMethod(name = "ПроверитьНеРавенство", alias = "CheckNotEquals")
   public static void checkNotEquals(IValue oneValue, IValue twoValue, IValue additionalErrorMessage) {
-    if (oneValue.compareTo(twoValue) == 0) {
+    var oneValueRaw = oneValue.getRawValue();
+    var twoValueRaw = twoValue.getRawValue();
+
+    if (oneValueRaw.compareTo(twoValueRaw) == 0) {
       // TODO: локализация
       // TODO: использование additionalErrorMessage
       final var errorMessage = String.format("Сравниваемые значения (%s; %s) равны, а хотели, чтобы были не равны.",
-        oneValue.asString(), twoValue.asString());
+        oneValueRaw.asString(), twoValueRaw.asString());
       throw new MachineException(errorMessage);
     }
   }
@@ -81,6 +90,24 @@ public class ScriptTester implements ContextType, IValue {
   // ПроверитьКодСОшибкой
 
   // ПроверитьТип
+
+  @ContextMethod(name = "ПроверитьТип", alias = "CheckType")
+  public static void CheckType(IValue inputValue, IValue inputType, IValue additionalErrorMessage) {
+    var rawValue = inputValue.getRawValue();
+    var rawEqualsType = inputType.getRawValue();
+
+    var type = new TypeValue((((RuntimeContext) rawValue).getContextInfo())); // FIXME
+    var typeEquals = getTypeValueFromByValue(rawEqualsType);
+
+    if (type.compareTo(typeEquals) != 0) {
+      var errorMessage = String.format(
+        // TODO: локализация
+        // TODO: использование additionalErrorMessage
+        "Типом значения <%s> является <%s>, а ожидался тип <%s>",
+        rawValue.asString(), type.asString(), typeEquals.asString());
+      throw new MachineException(errorMessage);
+    }
+  }
 
   @Override
   public ContextInfo getContextInfo() {
@@ -122,4 +149,19 @@ public class ScriptTester implements ContextType, IValue {
     return 1;
   }
 
+  private static TypeValue getTypeValueFromByValue(IValue value) {
+    if (value.getDataType() == DataType.STRING) {
+      var typeInfo = TypeManager.getInstance().getContextInfoByName(value.asString());
+      if (typeInfo.isEmpty()) {
+        throw MachineException.typeNotRegisteredException(value.asString());
+      }
+      return new TypeValue(typeInfo.get());
+    } else if (value.getDataType() == DataType.TYPE) {
+      return (TypeValue) value;
+    }
+    // TODO: локализация
+    var errorMessage = String.format(
+      "Тип значения параметра ТипИлиИмяТипа должен быть <Тип> или <Строка>, а получили <%s>", value.getDataType());
+    throw new MachineException(errorMessage);
+  }
 }
