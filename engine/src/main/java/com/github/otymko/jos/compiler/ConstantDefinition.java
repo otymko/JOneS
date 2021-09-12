@@ -16,9 +16,9 @@ public class ConstantDefinition {
   DataType dataType;
   IValue value;
 
-  public ConstantDefinition(IValue pValue) {
-    value = pValue;
-    dataType = value.getDataType();
+  public ConstantDefinition(IValue value) {
+    this.value = value;
+    this.dataType = this.value.getDataType();
   }
 
   public String toString() {
