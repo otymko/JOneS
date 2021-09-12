@@ -6,11 +6,11 @@
 package com.github.otymko.jos.runtime.context.global;
 
 import com.github.otymko.jos.compiler.EnumerationHelper;
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
@@ -19,14 +19,13 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 @GlobalContextClass
 @NoArgsConstructor
 public class SystemGlobalContext implements AttachableContext {
   public static final ContextInfo INFO = ContextInfo.createByClass(SystemGlobalContext.class);
+
+  private static final String CHECK_IS_FILLED_NOT_IMPLEMENTED_FOR_TYPE = "CheckIsFilledNotImplementedForType";
 
   @Override
   public ContextInfo getContextInfo() {
@@ -73,10 +72,16 @@ public class SystemGlobalContext implements AttachableContext {
       case STRING: return !value.asString().isBlank();
       case NUMBER: return !value.asNumber().equals(BigDecimal.ZERO);
       case DATE: return !value.asDate().equals(DateValue.EMPTY_DATE);
+      case TYPE:
+      case GENERIC_VALUE:
       case BOOLEAN: return true;
+      case OBJECT: {
+        // TODO: Коллекции
+        throw MachineException.operationNotImplementedException();
+      }
     }
 
-    throw new IllegalStateException("Проверка значения на заполненность не предусмотрена: " + value.getDataType());
+    throw MachineException.operationNotSupportedException();
   }
 
   @ContextMethod(name = "ЗначениеЗаполнено", alias = "ValueIsFilled")
