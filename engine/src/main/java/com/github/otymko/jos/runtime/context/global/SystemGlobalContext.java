@@ -13,9 +13,11 @@ import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
+import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -62,20 +64,17 @@ public class SystemGlobalContext implements AttachableContext {
     }
 
     final var value = pValue.getRawValue();
-    if (value.getDataType() == DataType.UNDEFINED) {
+
+    if (value instanceof NullValue) {
       return false;
     }
-    if (value.getDataType() == DataType.STRING) {
-      return !value.asString().isBlank();
-    }
-    if (value.getDataType() == DataType.NUMBER) {
-      return value.asNumber() != 0;
-    }
-    if (value.getDataType() == DataType.DATE) {
-      return value.asDate().equals(EMPTY_DATE);
-    }
-    if (value.getDataType() == DataType.BOOLEAN) {
-      return value.asBoolean();
+
+    switch (value.getDataType()) {
+      case UNDEFINED: return false;
+      case STRING: return !value.asString().isBlank();
+      case NUMBER: return !value.asNumber().equals(BigDecimal.ZERO);
+      case DATE: return !value.asDate().equals(EMPTY_DATE);
+      case BOOLEAN: return true;
     }
 
     throw new IllegalStateException("Проверка значения на заполненность не предусмотрена: " + value.getDataType());
