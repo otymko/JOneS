@@ -28,4 +28,30 @@ class ConstantDefinitionTest {
     assertThat(list.contains(value2)).isTrue();
   }
 
+  @Test
+  void testDiffers_false_zero() {
+    List<ConstantDefinition> list = new ArrayList<>();
+
+    var value1 = new ConstantDefinition(ValueFactory.create(false));
+    var value2 = new ConstantDefinition(ValueFactory.create(0));
+
+    list.add(value1);
+
+    assertThat(value1).isNotEqualTo(value2);
+    assertThat(list.contains(value2)).isFalse();
+  }
+
+  @Test
+  void testDiffers_zero_false() {
+    List<ConstantDefinition> list = new ArrayList<>();
+
+    var value1 = new ConstantDefinition(ValueFactory.create(0));
+    var value2 = new ConstantDefinition(ValueFactory.create(false));
+
+    list.add(value1);
+
+    assertThat(value1).isNotEqualTo(value2);
+    assertThat(list.contains(value2)).isFalse();
+  }
+
 }
