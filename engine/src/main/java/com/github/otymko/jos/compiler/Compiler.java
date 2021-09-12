@@ -866,6 +866,10 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       constant = new ConstantDefinition(ValueFactory.create(true));
     } else if (constValue.UNDEFINED() != null) {
       constant = new ConstantDefinition(ValueFactory.create());
+    } else if (constValue.DATETIME() != null) {
+      constant = new ConstantDefinition(ValueFactory.parse(constValue.DATETIME().getText(), DataType.DATE));
+    } else if (constValue.NULL() != null) {
+      constant = new ConstantDefinition(ValueFactory.createNullValue());
     } else {
       throw CompilerException.notSupportedException();
     }
