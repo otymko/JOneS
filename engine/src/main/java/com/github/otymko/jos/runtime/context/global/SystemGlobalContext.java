@@ -13,6 +13,7 @@ import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
+import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
 
@@ -63,12 +64,17 @@ public class SystemGlobalContext implements AttachableContext {
     }
 
     final var value = pValue.getRawValue();
+
+    if (value instanceof NullValue) {
+      return false;
+    }
+
     switch (value.getDataType()) {
       case UNDEFINED: return false;
       case STRING: return !value.asString().isBlank();
       case NUMBER: return !value.asNumber().equals(BigDecimal.ZERO);
-      case DATE: return value.asDate().equals(EMPTY_DATE);
-      case BOOLEAN: return value.asBoolean();
+      case DATE: return !value.asDate().equals(EMPTY_DATE);
+      case BOOLEAN: return true;
     }
 
     throw new IllegalStateException("Проверка значения на заполненность не предусмотрена: " + value.getDataType());
