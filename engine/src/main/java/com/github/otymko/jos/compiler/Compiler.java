@@ -19,6 +19,7 @@ import com.github.otymko.jos.runtime.machine.OperationCode;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
+import com.github.otymko.jos.util.DateLineCleaner;
 import com.github.otymko.jos.util.StringLineCleaner;
 import lombok.Data;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -871,6 +872,11 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       constant = new ConstantDefinition(ValueFactory.create(true));
     } else if (constValue.UNDEFINED() != null) {
       constant = new ConstantDefinition(ValueFactory.create());
+    } else if (constValue.DATETIME() != null) {
+      var value = DateLineCleaner.clean(constValue.DATETIME().getText());
+      constant = new ConstantDefinition(ValueFactory.parse(value, DataType.DATE));
+    } else if (constValue.NULL() != null) {
+      constant = new ConstantDefinition(ValueFactory.createNullValue());
     } else {
       throw CompilerException.notSupportedException();
     }
