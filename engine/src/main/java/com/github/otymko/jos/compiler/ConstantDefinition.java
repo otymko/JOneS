@@ -6,13 +6,20 @@
 package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.DataType;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 @Value
 @EqualsAndHashCode
 public class ConstantDefinition {
+  DataType dataType;
   IValue value;
+
+  public ConstantDefinition(IValue pValue) {
+    value = pValue;
+    dataType = value.getDataType();
+  }
 
   public String toString() {
     return String.format("%s:%s", value.getDataType(), value.asString());
