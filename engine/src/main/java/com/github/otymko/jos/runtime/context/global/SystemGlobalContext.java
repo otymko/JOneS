@@ -57,7 +57,7 @@ public class SystemGlobalContext implements AttachableContext {
     return ValueFactory.create(System.nanoTime() / 1000000);
   }
 
-  private static boolean valueIsFilled(IValue pValue) {
+  private static boolean valueIsFilledInternal(IValue pValue) {
     if (pValue == null) {
       return false;
     }
@@ -80,7 +80,7 @@ public class SystemGlobalContext implements AttachableContext {
   }
 
   @ContextMethod(name = "ЗначениеЗаполнено", alias = "ValueIsFilled")
-  public static IValue ValueIsFilled(IValue pValue) {
-      return ValueFactory.create(valueIsFilled(pValue));
+  public static IValue valueIsFilled(IValue pValue) {
+      return ValueFactory.create(valueIsFilledInternal(pValue));
   }
 }
