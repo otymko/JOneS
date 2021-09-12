@@ -12,11 +12,7 @@ import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.exception.WrappedJavaException;
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
-import com.github.otymko.jos.runtime.Arithmetic;
-import com.github.otymko.jos.runtime.IVariable;
-import com.github.otymko.jos.runtime.RuntimeContext;
-import com.github.otymko.jos.runtime.Variable;
-import com.github.otymko.jos.runtime.VariableReference;
+import com.github.otymko.jos.runtime.*;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ExceptionInfoContext;
@@ -329,12 +325,9 @@ public class MachineInstance {
   }
 
   private void format(int argument) {
-    final var value = operationStack.pop().getRawValue();
     final var formatString = operationStack.pop().asString();
-
-    // TODO: Формат()
-
-    operationStack.push(ValueFactory.create(""));
+    final var value = operationStack.pop().getRawValue();
+    operationStack.push(ValueFactory.create(ValueFormatter.format(value, formatString)));
     nextInstruction();
   }
 
