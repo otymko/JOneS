@@ -13,6 +13,7 @@ import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
+import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
@@ -26,8 +27,6 @@ import java.util.GregorianCalendar;
 @NoArgsConstructor
 public class SystemGlobalContext implements AttachableContext {
   public static final ContextInfo INFO = ContextInfo.createByClass(SystemGlobalContext.class);
-
-  private static final Date EMPTY_DATE = new GregorianCalendar(1, Calendar.JANUARY, 1).getTime();
 
   @Override
   public ContextInfo getContextInfo() {
@@ -73,7 +72,7 @@ public class SystemGlobalContext implements AttachableContext {
       case UNDEFINED: return false;
       case STRING: return !value.asString().isBlank();
       case NUMBER: return !value.asNumber().equals(BigDecimal.ZERO);
-      case DATE: return !value.asDate().equals(EMPTY_DATE);
+      case DATE: return !value.asDate().equals(DateValue.EMPTY_DATE);
       case BOOLEAN: return true;
     }
 

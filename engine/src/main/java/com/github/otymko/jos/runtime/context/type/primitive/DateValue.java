@@ -16,12 +16,15 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.function.Predicate;
 
 @ContextClass(name = "Дата", alias = "Date")
 public class DateValue extends PrimitiveValue {
   public static final ContextInfo INFO = ContextInfo.createByClass(DateValue.class);
+  public static final Date EMPTY_DATE = new GregorianCalendar(1, Calendar.JANUARY, 1).getTime();
 
   private static final Predicate<String> IS_EMPTY_DATE = view -> view.equals("00000000") || view.equals("000000000000")
     || view.equals("00000000000000");
@@ -70,7 +73,7 @@ public class DateValue extends PrimitiveValue {
       throw MachineException.convertToDateException();
     }
     if (IS_EMPTY_DATE.test(view)) {
-      result = ValueFactory.create(new Date());
+      result = ValueFactory.create(EMPTY_DATE);
     } else {
       Date date;
       try {
