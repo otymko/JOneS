@@ -59,6 +59,9 @@ public class ValueFactory {
   // object
 
   public static IValue parse(String view, DataType type) {
+    switch (type) {
+      case DATE: return DateValue.parse(view);
+    }
     return null;
   }
 
