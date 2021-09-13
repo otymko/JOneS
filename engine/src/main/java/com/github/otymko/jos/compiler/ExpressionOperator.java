@@ -26,6 +26,7 @@ public enum ExpressionOperator {
   SUB(5, "-"),
   MUL(6, "*"),
   DIV(6, "/"),
+  MOD(6, "%"),
 
   UNARY_PLUS(7, "+"),
   UNARY_MINUS(7, "-"),
