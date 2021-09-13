@@ -73,6 +73,8 @@ public final class StringValue extends PrimitiveValue {
   public int compareTo(IValue other) {
     if (other.getDataType() == getDataType()) {
       return value.compareTo(other.asString());
+    } else if (other.getDataType() == DataType.UNDEFINED) {
+      return 1;
     }
     throw MachineException.operationNotSupportedException();
   }

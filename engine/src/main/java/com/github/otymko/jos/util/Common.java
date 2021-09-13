@@ -7,6 +7,8 @@ package com.github.otymko.jos.util;
 
 import com.github.otymko.jos.exception.ErrorInfo;
 import com.github.otymko.jos.module.ModuleImage;
+import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.DataType;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
 
@@ -30,6 +32,32 @@ public class Common {
     if (source.length >= numberLine) {
       errorInfo.setCode(source[numberLine - 1]);
     }
+  }
+
+  public static boolean isValidStringIdentifier(IValue name) {
+    if (name.getDataType() == DataType.STRING) {
+      return isValidStringIdentifier(name.asString());
+    }
+    return false;
+  }
+
+  public static boolean isValidStringIdentifier(String name) {
+    if (name == null || name.isEmpty()) {
+      return false;
+    }
+
+    var chars = name.toCharArray();
+    if (!(Character.isLetter(chars[0]) || chars[0] == '_')) {
+      return false;
+    }
+
+    for (var index = 1; index < name.length(); index++) {
+      if (!(Character.isLetterOrDigit(chars[index]) || chars[index] == '_')) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
 }
