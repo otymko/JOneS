@@ -16,7 +16,6 @@ import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.regex.Pattern;
 
@@ -61,7 +60,6 @@ public class V8Regex extends ContextValue implements PropertyNameAccessor {
   //endregion
 
   @Getter
-  @Setter
   @ContextProperty(name = "ИгнорироватьРегистр", alias = "IgnoreCase")
   public BooleanValue ignoreCase = (BooleanValue) ValueFactory.create(false);
 
@@ -93,7 +91,8 @@ public class V8Regex extends ContextValue implements PropertyNameAccessor {
   @ContextMethod(name = "Совпадает", alias = "IsMatch")
   public IValue isMatch(IValue inputString, IValue startAt) {
     var value = inputString.asString();
-    var startAtValue = startAt == null ? 0 : (int) startAt.asNumber();
+
+    var startAtValue = startAt == null ? 0 : startAt.asNumber().intValue();
     if (startAtValue > 0) {
       return ValueFactory.create(regex.matcher(value).find(startAtValue));
     }
@@ -109,7 +108,7 @@ public class V8Regex extends ContextValue implements PropertyNameAccessor {
   @ContextMethod(name = "Разделить", alias = "Split")
   public IValue split(IValue inputString, IValue count, IValue startAt) {
     var inputValue = inputString.getRawValue().asString();
-    var countValue = count == null ? 0 : (int) count.getRawValue().asNumber();
+    var countValue = count == null ? 0 : count.getRawValue().asNumber().intValue();
 
     // TODO: startAt не используется
 
