@@ -71,7 +71,7 @@ subprojects {
 
         // Use JUnit Jupiter
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.0")
 
         testImplementation("com.ginsberg:junit5-system-exit:1.1.1")
 
