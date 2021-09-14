@@ -37,6 +37,7 @@ import lombok.Getter;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.List;
@@ -325,7 +326,28 @@ public class MachineInstance {
     map.put(OperationCode.ChrCode, this::chrCode);
     map.put(OperationCode.StrReplace, this::strReplace);
 
+    map.put(OperationCode.CurrentDate, this::currentDate);
+    map.put(OperationCode.Number, this::number);
+    map.put(OperationCode.Str, this::str);
+
     return map;
+  }
+
+  private void currentDate(int argument) {
+    operationStack.push(ValueFactory.create(new Date()));
+    nextInstruction();
+  }
+
+  private void number(int argument) {
+    final var source = operationStack.pop();
+    operationStack.push(ValueFactory.create(source.asNumber()));
+    nextInstruction();
+  }
+
+  private void str(int argument) {
+    final var source = operationStack.pop();
+    operationStack.push(ValueFactory.create(source.asString()));
+    nextInstruction();
   }
 
   private void upperCase(int argument) {
@@ -647,7 +669,7 @@ public class MachineInstance {
   }
 
   private void callTypeOf(int argument) {
-    var value = operationStack.pop();
+    final var value = operationStack.pop().getRawValue();
     if (!(value instanceof RuntimeContext)) {
       throw MachineException.typeNotSupportedException(value.getClass().getSimpleName());
     }
