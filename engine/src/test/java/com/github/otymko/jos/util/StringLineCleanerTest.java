@@ -26,4 +26,19 @@ class StringLineCleanerTest {
     assertThat(string).isEqualTo("Test");
   }
 
+  @Test
+  void testSingleQuote() {
+    var string = "'Test'";
+    string = StringLineCleaner.cleanSingleQuote(string);
+    assertThat(string).isEqualTo("Test");
+
+    string = "'''Test'''";
+    string = StringLineCleaner.cleanSingleQuote(string);
+    assertThat(string).isEqualTo("'Test'");
+
+    string = "Test";
+    string = StringLineCleaner.cleanSingleQuote(string);
+    assertThat(string).isEqualTo("Test");
+  }
+
 }

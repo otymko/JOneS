@@ -9,10 +9,19 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class StringLineCleaner {
-  private final String QUOTE = "\"";
-  private final String DOUBLE_QUOTE = QUOTE + QUOTE;
 
   public String clean(String inValue) {
+    return clean(inValue, "\"");
+  }
+
+  public String cleanSingleQuote(String inValue) {
+    return clean(inValue, "'");
+  }
+
+  public String clean(String inValue, String quote) {
+    final String QUOTE = quote;
+    final String DOUBLE_QUOTE = QUOTE + QUOTE;
+
     String value;
     if (inValue.startsWith(QUOTE)) {
       value = inValue.substring(1, inValue.length() - 1);
