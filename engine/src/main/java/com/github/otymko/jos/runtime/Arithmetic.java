@@ -55,6 +55,13 @@ public class Arithmetic {
     return ValueFactory.create(one.asNumber().divide(two.asNumber()));
   }
 
+  public IValue mod(IValue one, IValue two) {
+    if (two.asNumber().equals(BigDecimal.ZERO)) {
+      throw MachineException.divideByZeroException();
+    }
+    return ValueFactory.create(one.asNumber().remainder(two.asNumber()));
+  }
+
   public IValue negative(IValue value) {
     return ValueFactory.create(value.asNumber().negate());
   }

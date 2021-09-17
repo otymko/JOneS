@@ -51,7 +51,7 @@ class CompilerTest {
     var engine = new ScriptEngine();
     var compiler = new ScriptCompiler(engine);
     var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
-    assertThat(moduleImage.getConstants()).hasSize(2);
+    assertThat(moduleImage.getConstants()).hasSize(4);
   }
 
   @Test

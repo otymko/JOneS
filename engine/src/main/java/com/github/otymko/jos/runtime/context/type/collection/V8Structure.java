@@ -16,9 +16,9 @@ import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
-import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import com.github.otymko.jos.util.Common;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,11 +46,11 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
 
   @ContextMethod(name = "Вставить", alias = "Insert")
   public void insert(IValue key, IValue value) {
-    if (!(key.getDataType() == DataType.STRING)) {
-      throw MachineException.invalidPropertyNameStructureException(key.asString());
+    var keyValue = key.asString();
+    if (!Common.isValidStringIdentifier(key)) {
+      throw MachineException.invalidPropertyNameStructureException(keyValue);
     }
 
-    var keyValue = key.asString();
     var addingValue = value == null ? ValueFactory.create() : value;
     if (views.containsKey(keyValue)) {
       var objectKey = views.get(keyValue);
@@ -73,7 +73,7 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
 
   @ContextMethod(name = "Удалить", alias = "Delete")
   public void remove(IValue key) {
-    if (!(key.getDataType() == DataType.STRING)) {
+    if (!Common.isValidStringIdentifier(key)) {
       throw MachineException.invalidPropertyNameStructureException(key.asString());
     }
 
@@ -84,7 +84,7 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
 
   @ContextMethod(name = "Свойство", alias = "Property")
   public IValue hasProperty(IValue key, Variable value) {
-    if (!(key.getDataType() == DataType.STRING)) {
+    if (!Common.isValidStringIdentifier(key)) {
       throw MachineException.invalidPropertyNameStructureException(key.asString());
     }
 
@@ -95,6 +95,10 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
         value.setValue(values.get(objectKey));
       }
       return ValueFactory.create(true);
+    } else {
+      if (value != null) {
+        value.setValue(ValueFactory.create());
+      }
     }
 
     return ValueFactory.create(false);
@@ -127,14 +131,19 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
 
   @Override
   public boolean hasProperty(IValue index) {
-    // TODO: проверить ключ на валидность
     var key = index.asString();
+    if (!Common.isValidStringIdentifier(index)) {
+      throw MachineException.invalidPropertyNameStructureException(key);
+    }
     return views.containsKey(key);
   }
 
   private IValue getValueInternal(IValue index) {
-    // TODO: проверить ключ на валидность
     var key = index.asString();
+    if (!Common.isValidStringIdentifier(index)) {
+      throw MachineException.invalidPropertyNameStructureException(key);
+    }
+
     if (!views.containsKey(key)) {
       throw MachineException.getPropertyNotFoundException(key);
     }
@@ -143,8 +152,11 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
   }
 
   private void setValueInternal(IValue index, IValue value) {
-    // TODO: проверить ключ на валидность
     var key = index.asString();
+    if (!Common.isValidStringIdentifier(index)) {
+      throw MachineException.invalidPropertyNameStructureException(key);
+    }
+
     if (!views.containsKey(key)) {
       throw MachineException.getPropertyNotFoundException(key);
     }

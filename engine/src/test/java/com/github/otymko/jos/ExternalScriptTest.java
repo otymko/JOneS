@@ -31,6 +31,26 @@ class ExternalScriptTest extends BaseExternalScriptTest {
   }
 
   @TestFactory
+  Collection<DynamicTest> testStructures() throws IOException {
+    return getTestsFromScript(Path.of("src/test/resources/tests/structures.os"));
+  }
+
+  @TestFactory
+  Collection<DynamicTest> testArithmetic() throws IOException {
+    return getTestsFromScript(Path.of("src/test/resources/tests/arithmetic.os"));
+  }
+
+  @TestFactory
+  Collection<DynamicTest> testDateFunctions() throws IOException {
+    return getTestsFromScript(Path.of("src/test/resources/tests/DateFunctions.os"));
+  }
+
+  @TestFactory
+  Collection<DynamicTest> testTypeConversions() throws IOException {
+    return getTestsFromScript(Path.of("src/test/resources/tests/TypeConversions.os"));
+  }
+
+  @TestFactory
   Collection<DynamicTest> testValueIsFilled() throws IOException {
     return getTestsFromScript(Path.of("src/test/resources/tests/ValueIsFilled.os"));
   }

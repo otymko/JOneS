@@ -12,7 +12,11 @@ import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.exception.WrappedJavaException;
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
-import com.github.otymko.jos.runtime.*;
+import com.github.otymko.jos.runtime.Arithmetic;
+import com.github.otymko.jos.runtime.IVariable;
+import com.github.otymko.jos.runtime.RuntimeContext;
+import com.github.otymko.jos.runtime.Variable;
+import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ExceptionInfoContext;
@@ -23,8 +27,6 @@ import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.type.TypeFactory;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
-import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
-import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
 import com.github.otymko.jos.runtime.context.type.primitive.TypeValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
@@ -33,7 +35,14 @@ import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import com.github.otymko.jos.util.Common;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Deque;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -248,6 +257,7 @@ public class MachineInstance {
     map.put(OperationCode.Sub, this::sub);
     map.put(OperationCode.Mul, this::mul);
     map.put(OperationCode.Div, this::div);
+    map.put(OperationCode.Mod, this::mod);
     map.put(OperationCode.Not, this::not);
     map.put(OperationCode.Neg, this::neg);
 
@@ -316,19 +326,13 @@ public class MachineInstance {
     map.put(OperationCode.ChrCode, this::chrCode);
     map.put(OperationCode.StrReplace, this::strReplace);
 
-    map.put(OperationCode.Format, this::format);
     map.put(OperationCode.CurrentDate, this::currentDate);
     map.put(OperationCode.Number, this::number);
     map.put(OperationCode.Str, this::str);
 
-    return map;
-  }
+    map.put(OperationCode.Format, this::format);
 
-  private void format(int argument) {
-    final var formatString = operationStack.pop().asString();
-    final var value = operationStack.pop().getRawValue();
-    operationStack.push(ValueFactory.create(ValueFormatter.format(value, formatString)));
-    nextInstruction();
+    return map;
   }
 
   private void currentDate(int argument) {
@@ -345,6 +349,13 @@ public class MachineInstance {
   private void str(int argument) {
     final var source = operationStack.pop();
     operationStack.push(ValueFactory.create(source.asString()));
+    nextInstruction();
+  }
+
+  private void format(int argument) {
+    final var formatString = operationStack.pop().asString();
+    final var value = operationStack.pop().getRawValue();
+    operationStack.push(ValueFactory.create(ValueFormatter.format(value, formatString)));
     nextInstruction();
   }
 
@@ -667,7 +678,7 @@ public class MachineInstance {
   }
 
   private void callTypeOf(int argument) {
-    var value = operationStack.pop();
+    final var value = operationStack.pop().getRawValue();
     if (!(value instanceof RuntimeContext)) {
       throw MachineException.typeNotSupportedException(value.getClass().getSimpleName());
     }
@@ -881,6 +892,13 @@ public class MachineInstance {
     var valueOne = operationStack.pop();
     var valueTwo = operationStack.pop();
     operationStack.push(Arithmetic.div(valueTwo, valueOne));
+    nextInstruction();
+  }
+
+  private void mod(int argument) {
+    var valueOne = operationStack.pop();
+    var valueTwo = operationStack.pop();
+    operationStack.push(Arithmetic.mod(valueTwo, valueOne));
     nextInstruction();
   }
 

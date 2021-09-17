@@ -61,6 +61,9 @@ public class NativeGlobalMethod {
     addNativeMethod("Символ", "Chr", OperationCode.Chr, REQUIRED_PARAMETER);
     addNativeMethod("КодСимвола", "ChrCode", OperationCode.ChrCode, REQUIRED_PARAMETER, OPTIONAL_PARAMETER);
     addNativeMethod("СтрЗаменить", "StrReplace", OperationCode.StrReplace, REQUIRED_PARAMETER, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
+    addNativeMethod("ТекущаяДата", "CurrentDate", OperationCode.CurrentDate);
+    addNativeMethod("Число", "Number", OperationCode.Number, REQUIRED_PARAMETER);
+    addNativeMethod("Строка", "String", OperationCode.Str, REQUIRED_PARAMETER);
   }
 
   private static void addNativeMethod(String name, String alias, OperationCode code, ParameterInfo... params) {
