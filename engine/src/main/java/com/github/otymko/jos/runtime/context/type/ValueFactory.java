@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
@@ -59,7 +60,10 @@ public class ValueFactory {
   // object
 
   public static IValue parse(String view, DataType type) {
-    return null;
+    if (type == DataType.DATE) {
+      return DateValue.parse(view);
+    }
+    throw MachineException.operationNotImplementedException();
   }
 
 }
