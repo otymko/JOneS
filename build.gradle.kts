@@ -75,7 +75,7 @@ subprojects {
 
         testImplementation("com.ginsberg:junit5-system-exit:1.1.1")
 
-        testImplementation("org.assertj:assertj-core:3.20.2")
+        testImplementation("org.assertj:assertj-core:3.21.0")
     }
 
     val test by tasks.getting(Test::class) {
