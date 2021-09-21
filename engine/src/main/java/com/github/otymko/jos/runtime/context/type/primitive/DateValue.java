@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 public class DateValue extends PrimitiveValue {
   public static final ContextInfo INFO = ContextInfo.createByClass(DateValue.class);
 
-  public static final Date EMPTY_DATE = new GregorianCalendar(1, Calendar.JANUARY, 1).getTime();
+  private static final Date EMPTY_DATE = new GregorianCalendar(1, Calendar.JANUARY, 1).getTime();
   private static final Predicate<String> IS_EMPTY_DATE = view -> view.equals("00000000") || view.equals("000000000000")
     || view.equals("00000000000000");
   private static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -58,6 +58,10 @@ public class DateValue extends PrimitiveValue {
       return value.compareTo(object.asDate());
     }
     return super.compareTo(object);
+  }
+
+  public boolean isEmpty() {
+    return value.equals(EMPTY_DATE);
   }
 
   public static IValue parse(String view) {
