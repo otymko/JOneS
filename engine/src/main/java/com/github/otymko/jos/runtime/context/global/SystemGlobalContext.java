@@ -6,6 +6,7 @@
 package com.github.otymko.jos.runtime.context.global;
 
 import com.github.otymko.jos.compiler.EnumerationHelper;
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
@@ -73,9 +74,9 @@ public class SystemGlobalContext implements AttachableContext {
       case NUMBER: return !value.asNumber().equals(BigDecimal.ZERO);
       case DATE: return !((DateValue)value).isEmpty();
       case BOOLEAN: return true;
+      default:
+        throw MachineException.checkIsFilledNotSupportedForType(value.getDataType().toString());
     }
-
-    throw new IllegalStateException("Проверка значения на заполненность не предусмотрена: " + value.getDataType());
   }
 
   @ContextMethod(name = "ЗначениеЗаполнено", alias = "ValueIsFilled")
