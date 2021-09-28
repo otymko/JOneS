@@ -6,14 +6,19 @@
 package com.github.otymko.jos.runtime.context.global;
 
 import com.github.otymko.jos.compiler.EnumerationHelper;
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
+import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
+import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @GlobalContextClass
 @NoArgsConstructor
@@ -49,4 +54,30 @@ public class SystemGlobalContext implements AttachableContext {
     return ValueFactory.create(System.nanoTime() / 1000000);
   }
 
+  private static boolean valueIsFilledInternal(IValue pValue) {
+    if (pValue == null) {
+      return false;
+    }
+
+    final var value = pValue.getRawValue();
+
+    if (value instanceof NullValue) {
+      return false;
+    }
+
+    switch (value.getDataType()) {
+      case UNDEFINED: return false;
+      case STRING: return !value.asString().isBlank();
+      case NUMBER: return !value.asNumber().equals(BigDecimal.ZERO);
+      case DATE: return !((DateValue)value).isEmpty();
+      case BOOLEAN: return true;
+      default:
+        throw MachineException.checkIsFilledNotSupportedForType(value.getDataType().toString());
+    }
+  }
+
+  @ContextMethod(name = "ЗначениеЗаполнено", alias = "ValueIsFilled")
+  public static IValue valueIsFilled(IValue pValue) {
+      return ValueFactory.create(valueIsFilledInternal(pValue));
+  }
 }
