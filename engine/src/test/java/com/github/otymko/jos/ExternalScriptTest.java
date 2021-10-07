@@ -34,7 +34,7 @@ class ExternalScriptTest extends BaseExternalScriptTest {
   Collection<DynamicTest> testStructures() throws IOException {
     return getTestsFromScript(Path.of("src/test/resources/tests/structures.os"));
   }
-
+  
   @TestFactory
   Collection<DynamicTest> testArithmetic() throws IOException {
     return getTestsFromScript(Path.of("src/test/resources/tests/arithmetic.os"));

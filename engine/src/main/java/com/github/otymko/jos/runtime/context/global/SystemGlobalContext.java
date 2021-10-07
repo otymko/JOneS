@@ -25,8 +25,6 @@ import java.math.BigDecimal;
 public class SystemGlobalContext implements AttachableContext {
   public static final ContextInfo INFO = ContextInfo.createByClass(SystemGlobalContext.class);
 
-  private static final String CHECK_IS_FILLED_NOT_IMPLEMENTED_FOR_TYPE = "CheckIsFilledNotImplementedForType";
-
   @Override
   public ContextInfo getContextInfo() {
     return INFO;
@@ -71,17 +69,11 @@ public class SystemGlobalContext implements AttachableContext {
       case UNDEFINED: return false;
       case STRING: return !value.asString().isBlank();
       case NUMBER: return !value.asNumber().equals(BigDecimal.ZERO);
-      case DATE: return !value.asDate().equals(DateValue.EMPTY_DATE);
-      case TYPE:
-      case GENERIC_VALUE:
+      case DATE: return !((DateValue)value).isEmpty();
       case BOOLEAN: return true;
-      case OBJECT: {
-        // TODO: Коллекции
-        throw MachineException.operationNotImplementedException();
-      }
+      default:
+        throw MachineException.checkIsFilledNotSupportedForType(value.getDataType().toString());
     }
-
-    throw MachineException.operationNotSupportedException();
   }
 
   @ContextMethod(name = "ЗначениеЗаполнено", alias = "ValueIsFilled")
