@@ -12,6 +12,8 @@ import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -21,6 +23,14 @@ public class ValueFormatter {
   private static final String[] BOOLEAN_FALSE = {"БЛ", "BF"};
   private static final String[] BOOLEAN_TRUE = {"БИ", "BT"};
   private static final String[] LOCALE = { "Л", "L" };
+  private static final String[] NUM_MAX_SIZE = { "ЧЦ", "ND" };
+  private static final String[] NUM_DECIMAL_SIZE = { "ЧДЦ", "NFD" };
+  private static final String[] NUM_FRACTION_DELIMITER = { "ЧРД", "NDS" };
+  private static final String[] NUM_GROUPS_DELIMITER = { "ЧРГ", "NGS" };
+  private static final String[] NUM_ZERO_APPEARANCE = { "ЧН", "NZ" };
+  private static final String[] NUM_GROUPING = { "ЧГ", "NG" };
+  private static final String[] NUM_LEADING_ZERO = { "ЧВН", "NLZ" };
+  private static final String[] NUM_NEGATIVE_APPEARANCE = { "ЧО", "NN" };
   private static final String[] DATE_EMPTY = { "ДП", "DE" };
   private static final String[] DATE_FORMAT = { "ДФ", "DF" };
   private static final String[] DATE_LOCAL_FORMAT = { "ДЛФ", "DLF" };
@@ -174,7 +184,84 @@ public class ValueFormatter {
   }
 
   private static String numberFormat(BigDecimal value, FormatParametersList params) {
-    throw MachineException.operationNotImplementedException();
+
+    if (value.equals(BigDecimal.ZERO)) {
+      final var nz = params.get(NUM_ZERO_APPEARANCE);
+      if (nz != null) {
+        return !nz.equals("") ? nz : "0";
+      }
+      return "";
+    }
+
+    final var locale = params.get(LOCALE);
+    final var nf = locale == null
+            ? (DecimalFormat)DecimalFormat.getInstance()
+            : (DecimalFormat)DecimalFormat.getInstance(getLocale(locale));
+    final var nfd = params.get(NUM_DECIMAL_SIZE);
+    if (nfd != null) {
+      final var i_nfd = Integer.parseInt(nfd);
+      nf.setMinimumFractionDigits(i_nfd);
+      nf.setMaximumFractionDigits(i_nfd);
+    }
+
+    final boolean leadingZeroes = params.get(NUM_LEADING_ZERO) != null;
+
+    boolean hasDigitLimits = false;
+    int totalDigits = 0;
+
+    final var nd = params.get(NUM_MAX_SIZE);
+    if (nd != null) {
+      hasDigitLimits = true;
+      totalDigits = Integer.parseInt(nd);
+      nf.setMaximumFractionDigits(totalDigits);
+      if (leadingZeroes) {
+        nf.setMinimumIntegerDigits(totalDigits);
+      }
+    }
+
+    final var nds = params.get(NUM_FRACTION_DELIMITER);
+    if (nds != null) {
+    }
+
+    final var ng = params.get(NUM_GROUPING);
+    if (ng != null) {
+      // TODO: список размеров групп
+      final var i_ng = ng.equals("") ? 0 : Integer.parseInt(ng);
+      nf.setGroupingSize(i_ng);
+    }
+
+    final var nn = params.get(NUM_NEGATIVE_APPEARANCE);
+    if (nn != null) {
+      final var i_nn = Integer.parseInt(nn);
+      switch (i_nn) {
+        case 0: {
+          nf.setNegativePrefix("(");
+          nf.setNegativeSuffix(")");
+          break;
+        }
+        case 2: {
+          nf.setNegativePrefix("- ");
+          break;
+        }
+        case 3: {
+          nf.setNegativePrefix("");
+          nf.setNegativeSuffix("-");
+          break;
+        }
+        case 4: {
+          nf.setNegativePrefix("");
+          nf.setNegativeSuffix(" -");
+          break;
+        }
+        default:
+        case 1: {
+          nf.setNegativePrefix("-");
+          break;
+        }
+      }
+    }
+
+    return nf.format(value);
   }
 
 }
