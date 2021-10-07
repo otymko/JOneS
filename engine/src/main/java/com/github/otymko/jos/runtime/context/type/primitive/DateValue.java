@@ -24,7 +24,6 @@ import java.util.function.Predicate;
 @ContextClass(name = "Дата", alias = "Date")
 public class DateValue extends PrimitiveValue {
   public static final ContextInfo INFO = ContextInfo.createByClass(DateValue.class);
-  public static final Date EMPTY_DATE = new GregorianCalendar(1, Calendar.JANUARY, 1).getTime();
 
   private static final Date EMPTY_DATE = new GregorianCalendar(1, Calendar.JANUARY, 1).getTime();
   private static final Predicate<String> IS_EMPTY_DATE = view -> view.equals("00000000") || view.equals("000000000000")
@@ -59,6 +58,10 @@ public class DateValue extends PrimitiveValue {
       return value.compareTo(object.asDate());
     }
     return super.compareTo(object);
+  }
+
+  public static boolean isEmpty(Date date) {
+    return date.equals(EMPTY_DATE);
   }
 
   public boolean isEmpty() {

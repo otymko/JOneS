@@ -49,7 +49,7 @@ public class ValueFormatter {
   }
 
   private static String dateFormat(Date value, FormatParametersList params) {
-    if (value.equals(DateValue.EMPTY_DATE)) {
+    if (DateValue.isEmpty(value)) {
       final var emptyDatePresentation = params.get(DATE_EMPTY);
       if (emptyDatePresentation == null) {
         return "";
