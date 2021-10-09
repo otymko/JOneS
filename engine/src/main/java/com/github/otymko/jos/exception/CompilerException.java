@@ -5,7 +5,6 @@
  */
 package com.github.otymko.jos.exception;
 
-import com.github.otymko.jos.compiler.Compiler;
 import com.github.otymko.jos.localization.Resources;
 
 import static com.github.otymko.jos.localization.MessageResource.*;
