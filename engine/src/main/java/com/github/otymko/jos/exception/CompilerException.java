@@ -58,4 +58,9 @@ public class CompilerException extends EngineException {
     return new CompilerException(message);
   }
 
+  public static CompilerException errorInExpression() {
+    var message = Resources.getResourceString(ERROR_IN_EXPRESSION);
+    return new CompilerException(message);
+  }
+
 }
