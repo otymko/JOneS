@@ -61,7 +61,7 @@ subprojects {
         implementation("commons-io", "commons-io", "2.8.0")
         implementation("org.apache.commons", "commons-lang3", "3.12.0")
 
-        compileOnly("org.projectlombok:lombok:1.18.20")
+        compileOnly("org.projectlombok:lombok:1.18.22")
         annotationProcessor("org.projectlombok:lombok:1.18.20")
 
         testCompileOnly("org.projectlombok:lombok:1.18.20")
