@@ -52,6 +52,7 @@ public class MessageResource {
   public static final String INVALID_ARGUMENT_VALUE = "invalidArgumentValue";
   public static final String METHOD_CALL_WRONG_ARG_VALUE = "methodCallWrongArgValue";
   public static final String CHECK_IS_FILLED_NOT_SUPPORTED = "checkIsFilledNotSupported";
+  public static final String ERROR_IN_EXPRESSION = "errorInExpression";
 
   private MessageResource() {
     // none

@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.exception;
 
+import com.github.otymko.jos.compiler.Compiler;
 import com.github.otymko.jos.localization.Resources;
 
 import static com.github.otymko.jos.localization.MessageResource.*;
@@ -55,6 +56,11 @@ public class CompilerException extends EngineException {
 
   public static CompilerException mismatchedRaiseExpressionException() {
     var message = Resources.getResourceString(MISMATCHED_RAISE_EXPRESSION);
+    return new CompilerException(message);
+  }
+
+  public static CompilerException errorInExpression() {
+    var message = Resources.getResourceString(ERROR_IN_EXPRESSION);
     return new CompilerException(message);
   }
 

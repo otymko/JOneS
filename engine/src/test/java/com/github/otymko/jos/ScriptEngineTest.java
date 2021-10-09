@@ -123,4 +123,12 @@ class ScriptEngineTest {
       "ОченьВажное: Текст?");
   }
 
+  @Test
+  void testTernaryOperator() throws Exception {
+    TestHelper.checkCode("Значение = ?(Истина, \"Значение1\", \"Значение2\"); Сообщить(Значение);",
+      "Значение1");
+    TestHelper.checkCode("Значение = ?(Ложь, \"Значение1\", \"Значение2\"); Сообщить(Значение);",
+      "Значение2");
+  }
+
 }
