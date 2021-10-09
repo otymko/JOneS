@@ -131,4 +131,10 @@ class ScriptEngineTest {
       "Значение2");
   }
 
+  @Test
+  void testEnumsFromGlobalContext() throws Exception {
+    var script = Path.of("src/test/resources/global-variable.os");
+    TestHelper.checkScript(script, "");
+  }
+
 }
