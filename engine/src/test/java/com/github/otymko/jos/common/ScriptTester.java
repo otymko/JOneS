@@ -37,9 +37,21 @@ public class ScriptTester implements ContextType, IValue {
     }
   }
 
-  // ПроверитьИстину
+  @ContextMethod(name = "ПроверитьИстину", alias = "CheckTrue")
+  public static void checkTrue(IValue conditional, IValue additionalErrorMessage) {
+    check(conditional, additionalErrorMessage);
+  }
 
-  // ПроверитьЛожь
+  @ContextMethod(name = "ПроверитьЛожь", alias = "CheckFalse")
+  public static void checkFalse(IValue conditional, IValue additionalErrorMessage) {
+    if (conditional.asBoolean()) {
+      // TODO: локализация
+      // TODO: использование additionalErrorMessage
+      final var errorMessage = String.format("Переданный параметр (%s) не является Ложь, а хотели, чтобы не являлся.",
+        conditional.asString());
+      throw new MachineException(errorMessage);
+    }
+  }
 
   // ПроверитьРавенствоДатСТочностью2Секунды
 

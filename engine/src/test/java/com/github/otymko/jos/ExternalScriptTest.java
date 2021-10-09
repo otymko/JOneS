@@ -50,4 +50,9 @@ class ExternalScriptTest extends BaseExternalScriptTest {
     return getTestsFromScript(Path.of("src/test/resources/tests/TypeConversions.os"));
   }
 
+  @TestFactory
+  Collection<DynamicTest> testRegex() throws IOException {
+    return getTestsFromScript(Path.of("src/test/resources/tests/regex.os"));
+  }
+
 }

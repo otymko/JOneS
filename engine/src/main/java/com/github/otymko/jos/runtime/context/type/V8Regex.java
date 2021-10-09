@@ -13,7 +13,6 @@ import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
-import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Getter;
 
@@ -28,7 +27,7 @@ public class V8Regex extends ContextValue implements PropertyNameAccessor {
 
   private V8Regex(String pattern) {
     this.pattern = pattern;
-    this.regex = Pattern.compile(this.pattern, Pattern.UNICODE_CASE);
+    this.regex = Pattern.compile(this.pattern, getPatternFlags());
   }
 
   //region ContextValue
@@ -61,15 +60,15 @@ public class V8Regex extends ContextValue implements PropertyNameAccessor {
 
   @Getter
   @ContextProperty(name = "ИгнорироватьРегистр", alias = "IgnoreCase")
-  public BooleanValue ignoreCase = (BooleanValue) ValueFactory.create(false);
+  public IValue ignoreCase = ValueFactory.create(true);
 
   @Getter
   @ContextProperty(name = "Многострочный", alias = "Multiline")
-  public BooleanValue multiline = (BooleanValue) ValueFactory.create(false);
+  public IValue multiline = ValueFactory.create(true);
 
   public void setIgnoreCase(IValue inputIgnoreCase) {
     if (!ignoreCase.equals(inputIgnoreCase.getRawValue())) {
-      ignoreCase = (BooleanValue) inputIgnoreCase.getRawValue();
+      ignoreCase = inputIgnoreCase.getRawValue();
       int flags = getPatternFlags();
       regex = Pattern.compile(pattern, flags);
     }
@@ -77,7 +76,7 @@ public class V8Regex extends ContextValue implements PropertyNameAccessor {
 
   public void setMultiline(IValue inputMultiline) {
     if (!multiline.equals(inputMultiline.getRawValue())) {
-      multiline = (BooleanValue) inputMultiline.getRawValue();
+      multiline = inputMultiline.getRawValue();
       int flags = getPatternFlags();
       regex = Pattern.compile(pattern, flags);
     }
@@ -90,9 +89,9 @@ public class V8Regex extends ContextValue implements PropertyNameAccessor {
 
   @ContextMethod(name = "Совпадает", alias = "IsMatch")
   public IValue isMatch(IValue inputString, IValue startAt) {
-    var value = inputString.asString();
+    var value = inputString.getRawValue().asString();
 
-    var startAtValue = startAt == null ? 0 : startAt.asNumber().intValue();
+    var startAtValue = startAt == null ? 0 : startAt.getRawValue().asNumber().intValue();
     if (startAtValue > 0) {
       return ValueFactory.create(regex.matcher(value).find(startAtValue));
     }

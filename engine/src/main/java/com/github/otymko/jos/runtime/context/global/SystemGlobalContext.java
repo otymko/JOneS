@@ -8,8 +8,10 @@ package com.github.otymko.jos.runtime.context.global;
 import com.github.otymko.jos.compiler.EnumerationHelper;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextMethod;
+import com.github.otymko.jos.runtime.context.ContextProperty;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.SymbolsContext;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
@@ -19,6 +21,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SystemGlobalContext implements AttachableContext {
   public static final ContextInfo INFO = ContextInfo.createByClass(SystemGlobalContext.class);
+
+  @ContextProperty(name = "Символы", alias = "Chars")
+  public static final IValue SYMBOLS = new SymbolsContext();
 
   @Override
   public ContextInfo getContextInfo() {
