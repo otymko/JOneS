@@ -22,22 +22,22 @@ public class SymbolsContext extends ContextValue {
   public static final ContextInfo INFO = ContextInfo.createByClass(SymbolsContext.class);
 
   @ContextProperty(name = "ПС", alias = "LF")
-  public final IValue LF = ValueFactory.create("\n");
+  public static final IValue LF = ValueFactory.create("\n");
 
   @ContextProperty(name = "ВК", alias = "CR")
-  public final IValue CR = ValueFactory.create("\r");
+  public static final IValue CR = ValueFactory.create("\r");
 
   @ContextProperty(name = "ВТаб", alias = "VTab")
-  public final IValue V_TAB = ValueFactory.create("\\v");
+  public static final IValue V_TAB = ValueFactory.create("\\v");
 
   @ContextProperty(name = "Таб", alias = "Tab")
-  public final IValue TAB = ValueFactory.create("\t");
+  public static final IValue TAB = ValueFactory.create("\t");
 
   @ContextProperty(name = "ПФ", alias = "FF")
-  public final IValue FF = ValueFactory.create("\f");
+  public static final IValue FF = ValueFactory.create("\f");
 
   @ContextProperty(name = "НПП", alias = "Nbsp")
-  public final IValue NBSP = ValueFactory.create("\u00A0");
+  public static final IValue NBSP = ValueFactory.create("\u00A0");
 
   public SymbolsContext() {
     // none
