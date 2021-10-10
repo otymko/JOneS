@@ -94,13 +94,14 @@ public class ContextInfo {
 
   private static ContextInfo createByGlobalContextClass(Class<? extends RuntimeContext> typeClass) {
     var methods = ContextInitializer.getContextMethods(typeClass);
+    var properties = ContextInitializer.getProperties(typeClass);
 
     var builder = ContextInfo.builder();
     builder.name(typeClass.getSimpleName());
     builder.alias(typeClass.getSimpleName());
     builder.typeClass(typeClass);
     builder.methods(methods);
-    builder.properties(new PropertyInfo[0]);
+    builder.properties(properties);
     builder.constructors(new ConstructorInfo[0]);
 
     return builder.build();

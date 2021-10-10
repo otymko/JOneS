@@ -9,10 +9,12 @@ import com.github.otymko.jos.compiler.EnumerationHelper;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextMethod;
+import com.github.otymko.jos.runtime.context.ContextProperty;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
+import com.github.otymko.jos.runtime.context.type.enumeration.SymbolsContext;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
@@ -29,6 +31,9 @@ public class SystemGlobalContext implements AttachableContext {
   public ContextInfo getContextInfo() {
     return INFO;
   }
+
+  @ContextProperty(name = "Символы", alias = "Chars")
+  public static final IValue SYMBOLS = new SymbolsContext();
 
   @ContextMethod(name = "Сообщить", alias = "Message")
   // TODO: для null аргументов можно ввести @ContextMethodArgument(defaultValue = MessageStatus.ORDINARY)

@@ -6,6 +6,7 @@
 package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.runtime.RuntimeContext;
+import com.github.otymko.jos.runtime.SymbolType;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Getter;
@@ -37,6 +38,16 @@ public class CompilerContext {
       scope.getMethodNumbers().put(method.getAlias().toUpperCase(Locale.ENGLISH), index);
       index++;
     }
+
+    index = 0;
+    for (var property : ContextInitializer.getProperties(targetClass)) {
+      var variable = new VariableInfo(property.getName(), property.getAlias(), SymbolType.CONTEXT_PROPERTY);
+      scope.getVariables().add(variable);
+      scope.getVariableNumbers().put(property.getName().toUpperCase(Locale.ENGLISH), index);
+      scope.getVariableNumbers().put(property.getAlias().toUpperCase(Locale.ENGLISH), index);
+      index++;
+    }
+
     scopes.add(scope);
   }
 

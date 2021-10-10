@@ -7,6 +7,7 @@ package com.github.otymko.jos.runtime.context;
 
 import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.RuntimeContext;
+import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 
 public interface AttachableContext extends RuntimeContext, ContextType {
@@ -16,7 +17,13 @@ public interface AttachableContext extends RuntimeContext, ContextType {
   }
 
   default IVariable[] getVariables() {
-    return new IVariable[0];
+    var variables = new IVariable[getContextInfo().getProperties().length];
+    var index = 0;
+    for (var property : getContextInfo().getProperties()) {
+      variables[index] = VariableReference.createContextPropertyReference(this, index, property.getName());
+      index++;
+    }
+    return variables;
   }
 
 }
