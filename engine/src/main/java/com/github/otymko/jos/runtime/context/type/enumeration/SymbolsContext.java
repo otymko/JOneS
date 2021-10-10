@@ -5,7 +5,6 @@
  */
 package com.github.otymko.jos.runtime.context.type.enumeration;
 
-import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
@@ -13,9 +12,6 @@ import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-
-import java.math.BigDecimal;
-import java.util.Date;
 
 @ContextClass(name = "Символы", alias = "Chars")
 public class SymbolsContext extends ContextValue {
@@ -46,26 +42,6 @@ public class SymbolsContext extends ContextValue {
   @Override
   public ContextInfo getContextInfo() {
     return INFO;
-  }
-
-  @Override
-  public BigDecimal asNumber() {
-    throw MachineException.operationNotSupportedException();
-  }
-
-  @Override
-  public Date asDate() {
-    throw MachineException.operationNotSupportedException();
-  }
-
-  @Override
-  public boolean asBoolean() {
-    throw MachineException.operationNotSupportedException();
-  }
-
-  @Override
-  public String asString() {
-    return INFO.getName();
   }
 
   @Override
