@@ -12,9 +12,8 @@ import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -26,6 +25,7 @@ public class ValueFormatter {
   private static final String[] NUM_MAX_SIZE = { "ЧЦ", "ND" };
   private static final String[] NUM_DECIMAL_SIZE = { "ЧДЦ", "NFD" };
   private static final String[] NUM_FRACTION_DELIMITER = { "ЧРД", "NDS" };
+  private static final String[] NUM_DECIMAL_SHIFT = { "ЧС", "NS" };
   private static final String[] NUM_GROUPS_DELIMITER = { "ЧРГ", "NGS" };
   private static final String[] NUM_ZERO_APPEARANCE = { "ЧН", "NZ" };
   private static final String[] NUM_GROUPING = { "ЧГ", "NG" };
@@ -183,82 +183,91 @@ public class ValueFormatter {
     return sdf.format(value);
   }
 
+  private static int parseInt(String param) {
+    final var sb = new StringBuilder();
+    for (var c : param.toCharArray()) {
+      if (Character.isDigit(c) || c == '-')
+        sb.append(c);
+    }
+
+    if (sb.length() == 0) {
+      return 0;
+    }
+
+    return Integer.parseInt(sb.toString());
+  }
+
   private static String numberFormat(BigDecimal value, FormatParametersList params) {
 
-    if (value.equals(BigDecimal.ZERO)) {
-      final var nz = params.get(NUM_ZERO_APPEARANCE);
-      if (nz != null) {
-        return !nz.equals("") ? nz : "0";
-      }
-      return "";
+    final var nf = new NumberFormatter(getLocale(params.get(LOCALE)));
+
+    final var nz = params.get(NUM_ZERO_APPEARANCE);
+    if (nz != null) {
+      nf.setZeroAppearance(nz.equals("") ? "0" : nz);
     }
 
-    final var locale = params.get(LOCALE);
-    final var nf = locale == null
-            ? (DecimalFormat)DecimalFormat.getInstance()
-            : (DecimalFormat)DecimalFormat.getInstance(getLocale(locale));
     final var nfd = params.get(NUM_DECIMAL_SIZE);
-    if (nfd != null) {
-      final var i_nfd = Integer.parseInt(nfd);
-      nf.setMinimumFractionDigits(i_nfd);
-      nf.setMaximumFractionDigits(i_nfd);
+    if (nfd != null && !nfd.isBlank()) {
+      final var i_nfd = parseInt(nfd);
+      if (i_nfd >= 0)
+        nf.setDecimalSize(i_nfd);
     }
 
-    final boolean leadingZeroes = params.get(NUM_LEADING_ZERO) != null;
-
-    boolean hasDigitLimits = false;
-    int totalDigits = 0;
+    nf.setLeadingZeroes(params.get(NUM_LEADING_ZERO) != null);
 
     final var nd = params.get(NUM_MAX_SIZE);
     if (nd != null) {
-      hasDigitLimits = true;
-      totalDigits = Integer.parseInt(nd);
-      nf.setMaximumFractionDigits(totalDigits);
-      if (leadingZeroes) {
-        nf.setMinimumIntegerDigits(totalDigits);
-      }
+      final var i_nd = nd.isBlank() ? 0 : parseInt(nd);
+      if (i_nd >= 0)
+        nf.setMaxSize(i_nd);
     }
 
     final var nds = params.get(NUM_FRACTION_DELIMITER);
-    if (nds != null) {
+    if (nds != null && !nds.isBlank()) {
+      nf.setFractionDelimiter(nds.length() < 2 ? nds : nds.substring(0, 1));
     }
 
     final var ng = params.get(NUM_GROUPING);
     if (ng != null) {
-      // TODO: список размеров групп
-      final var i_ng = ng.equals("") ? 0 : Integer.parseInt(ng);
-      nf.setGroupingSize(i_ng);
+      if (ng.equals("")) nf.setGroupingSize(0);
+      else {
+        final var groups = new ArrayList<Integer>();
+
+        for (var s : ng.split("\\D")) {
+          if (s.isBlank()) continue;
+          final var gv = parseInt(s);
+          if (gv >= 0) groups.add(gv);
+          if (gv == 0) break;
+        }
+
+        if (groups.size() == 0) {
+          nf.setGroupingSize(0);
+        } else if (groups.size() == 1) {
+          final var lgs = groups.get(0);
+          nf.setGroupingSize(lgs);
+        } else {
+          final var lgs = groups.get(0);
+          final var hgs = groups.get(1);
+          nf.setGroupingSize(lgs, hgs);
+        }
+      }
     }
 
     final var nn = params.get(NUM_NEGATIVE_APPEARANCE);
     if (nn != null) {
-      final var i_nn = Integer.parseInt(nn);
-      switch (i_nn) {
-        case 0: {
-          nf.setNegativePrefix("(");
-          nf.setNegativeSuffix(")");
-          break;
-        }
-        case 2: {
-          nf.setNegativePrefix("- ");
-          break;
-        }
-        case 3: {
-          nf.setNegativePrefix("");
-          nf.setNegativeSuffix("-");
-          break;
-        }
-        case 4: {
-          nf.setNegativePrefix("");
-          nf.setNegativeSuffix(" -");
-          break;
-        }
-        default:
-        case 1: {
-          nf.setNegativePrefix("-");
-          break;
-        }
-      }
+      final var i_nn = parseInt(nn);
+      nf.setNegativeAppearance(i_nn);
+    }
+
+    final var ns = params.get(NUM_DECIMAL_SHIFT);
+    if (ns != null) {
+      final var i_ns = parseInt(ns);
+      nf.setDecimalShift(i_ns);
+    }
+
+    final var ngs = params.get(NUM_GROUPS_DELIMITER);
+    if (ngs != null && !ngs.isBlank()) {
+      nf.setGroupDelimiter(ngs.length() < 2 ? ngs : ngs.substring(0, 1));
     }
 
     return nf.format(value);
