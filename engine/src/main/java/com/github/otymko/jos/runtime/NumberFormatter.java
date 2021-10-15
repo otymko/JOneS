@@ -11,6 +11,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
@@ -24,7 +25,7 @@ public class NumberFormatter {
   public static final int NEGATIVE_POSTFIX_SIGN_WHITESPACE = 4; // 1,1 -
 
   public NumberFormatter(Locale locale) {
-    final var systemFormatter = (DecimalFormat)DecimalFormat.getInstance(locale);
+    final var systemFormatter = (DecimalFormat) NumberFormat.getInstance(locale);
     fractionDelimiter = String.valueOf(systemFormatter.getDecimalFormatSymbols().getDecimalSeparator());
     groupDelimiter = String.valueOf(systemFormatter.getDecimalFormatSymbols().getGroupingSeparator());
     lowerGroupingSize = systemFormatter.getGroupingSize();
@@ -153,7 +154,7 @@ public class NumberFormatter {
       return zeroAppearance;
     }
 
-    final var systemFormat = (DecimalFormat)DecimalFormat.getInstance(Locale.ROOT);
+    final var systemFormat = (DecimalFormat)NumberFormat.getInstance(Locale.ROOT);
 
     systemFormat.setNegativeSuffix("");
     systemFormat.setPositivePrefix("");

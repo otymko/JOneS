@@ -10,18 +10,22 @@ import java.util.Map;
 
 public class FormatParametersList {
 
-  private final Map<String, String> _paramList = new HashMap<>();
+  final static Character SINGLE_QUOTE = '\'';
+  final static Character DOUBLE_QUOTE = '\"';
+  final static Character SPACE = ' ';
+
+  private final Map<String, String> paramList = new HashMap<>();
   private  final String format;
 
   public FormatParametersList(String format) {
     this.format = format;
-    ParseParams();
+    parseParams();
   }
 
   public String get(String[] names) {
     for (String n : names) {
-      if (_paramList.containsKey(n.toUpperCase())) {
-        return _paramList.get(n.toUpperCase());
+      if (paramList.containsKey(n.toUpperCase())) {
+        return paramList.get(n.toUpperCase());
       }
     }
     return null;
@@ -31,10 +35,10 @@ public class FormatParametersList {
   private String paramName;
   private String paramValue;
 
-  private void ParseParams() {
+  private void parseParams() {
     index = 0;
     while (readParameterDefinition()) {
-      _paramList.put(paramName.toUpperCase(), paramValue);
+      paramList.put(paramName.toUpperCase(), paramValue);
     }
   }
 
@@ -75,10 +79,13 @@ public class FormatParametersList {
     return false;
   }
 
+  private static Character getTerminalChar(Character c) {
+    if (c == DOUBLE_QUOTE) return DOUBLE_QUOTE;
+    if (c == SINGLE_QUOTE) return SINGLE_QUOTE;
+    return SPACE;
+  }
+
   private void readParameterValue() {
-    final var SINGLE_QUOTE = '\'';
-    final var DOUBLE_QUOTE = '\"';
-    final var SPACE = ' ';
 
     skipWhitespace();
 
@@ -89,10 +96,7 @@ public class FormatParametersList {
 
     final var sb = new StringBuilder();
 
-    final var terminalChar =
-            format.charAt(index) == SINGLE_QUOTE ? SINGLE_QUOTE :
-                    format.charAt(index) == DOUBLE_QUOTE ? DOUBLE_QUOTE :
-                            SPACE;
+    final var terminalChar = getTerminalChar(format.charAt(index));
     if (terminalChar != SPACE) {
       index++;
     }
