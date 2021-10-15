@@ -57,7 +57,7 @@ public class NumberFormatter {
 
   @Getter
   @Setter
-  public Boolean leadingZeroes;
+  public boolean leadingZeroes;
 
   @Getter
   @Setter

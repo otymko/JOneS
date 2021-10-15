@@ -10,12 +10,12 @@ import java.util.Map;
 
 public class FormatParametersList {
 
-  final static Character SINGLE_QUOTE = '\'';
-  final static Character DOUBLE_QUOTE = '\"';
-  final static Character SPACE = ' ';
+  private static final char SINGLE_QUOTE = '\'';
+  private static final char DOUBLE_QUOTE = '\"';
+  private static final char SPACE = ' ';
 
   private final Map<String, String> paramList = new HashMap<>();
-  private  final String format;
+  private final String format;
 
   public FormatParametersList(String format) {
     this.format = format;
@@ -79,9 +79,9 @@ public class FormatParametersList {
     return false;
   }
 
-  private static Character getTerminalChar(Character c) {
-    if (c.equals(DOUBLE_QUOTE)) return DOUBLE_QUOTE;
-    if (c.equals(SINGLE_QUOTE)) return SINGLE_QUOTE;
+  private static char getTerminalChar(char c) {
+    if (c == DOUBLE_QUOTE) return DOUBLE_QUOTE;
+    if (c == SINGLE_QUOTE) return SINGLE_QUOTE;
     return SPACE;
   }
 
@@ -97,7 +97,7 @@ public class FormatParametersList {
     final var sb = new StringBuilder();
 
     final var terminalChar = getTerminalChar(format.charAt(index));
-    if (!terminalChar.equals(SPACE)) {
+    if (terminalChar != SPACE) {
       index++;
     }
     while (index < format.length()) {
@@ -111,7 +111,7 @@ public class FormatParametersList {
           }
 
         break;
-      } else if (c == ';' && terminalChar.equals(SPACE)) {
+      } else if (c == ';' && terminalChar == SPACE) {
         break;
       } else {
         sb.append(c);
@@ -120,7 +120,7 @@ public class FormatParametersList {
     }
 
     if (index < format.length()) {
-      if (!terminalChar.equals(SPACE)) {
+      if (terminalChar != SPACE) {
         index++;
       }
       skipWhitespace();
