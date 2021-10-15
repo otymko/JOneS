@@ -60,6 +60,10 @@ public class DateValue extends PrimitiveValue {
     return super.compareTo(object);
   }
 
+  public static boolean isEmpty(Date date) {
+    return date.equals(EMPTY_DATE);
+  }
+
   public boolean isEmpty() {
     return value.equals(EMPTY_DATE);
   }
