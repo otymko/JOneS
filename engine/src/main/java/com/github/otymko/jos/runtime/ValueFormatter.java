@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class ValueFormatter {
+public final class ValueFormatter {
 
   private static final String[] BOOLEAN_FALSE = {"БЛ", "BF"};
   private static final String[] BOOLEAN_TRUE = {"БИ", "BT"};
@@ -42,8 +42,9 @@ public class ValueFormatter {
       case DATE: return dateFormat(value.asDate(), params);
       case STRING: return value.asString();
       case NUMBER: return numberFormat(value.asNumber(), params);
+      default:
+        throw MachineException.operationNotSupportedException();
     }
-    throw MachineException.operationNotSupportedException();
   }
 
   private static FormatParametersList parseParameters(String format) {
@@ -128,9 +129,9 @@ public class ValueFormatter {
       case LONG_DATE_EN:
         return DateFormat.getDateInstance(DateFormat.LONG, locale).format(value);
 
+      default:
+        throw MachineException.operationNotImplementedException();
     }
-
-    throw MachineException.operationNotImplementedException();
   }
 
   private static String convertToNativeFormat(String param) {
@@ -173,7 +174,7 @@ public class ValueFormatter {
 
   private static Locale getLocale(String localeParamValue) {
     if (localeParamValue == null) {
-      return Locale.forLanguageTag("ru_RU"); // TODO: вынести в константу
+      return Locale.getDefault();
     }
     return Locale.forLanguageTag(localeParamValue.replace('_', '-'));
   }
@@ -240,7 +241,7 @@ public class ValueFormatter {
           if (gv == 0) break;
         }
 
-        if (groups.size() == 0) {
+        if (groups.isEmpty()) {
           nf.setGroupingSize(0);
         } else if (groups.size() == 1) {
           final var lgs = groups.get(0);
@@ -273,4 +274,5 @@ public class ValueFormatter {
     return nf.format(value);
   }
 
+  private ValueFormatter() {}
 }
