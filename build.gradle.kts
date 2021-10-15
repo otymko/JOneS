@@ -5,7 +5,7 @@ plugins {
     `maven-publish`
     jacoco
     id("io.freefair.lombok") version "6.2.0"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.github.johnrengelman.shadow") version "7.1.0"
     id("net.kyori.indra.license-header") version "2.0.6"
     id("org.sonarqube") version "3.3"
 }
@@ -61,13 +61,13 @@ subprojects {
         implementation("commons-io", "commons-io", "2.8.0")
         implementation("org.apache.commons", "commons-lang3", "3.12.0")
 
-        compileOnly("org.projectlombok:lombok:1.18.20")
+        compileOnly("org.projectlombok:lombok:1.18.22")
         annotationProcessor("org.projectlombok:lombok:1.18.20")
 
         testCompileOnly("org.projectlombok:lombok:1.18.20")
         testAnnotationProcessor("org.projectlombok:lombok:1.18.20")
 
-        implementation("org.reflections:reflections:0.9.12")
+        implementation("org.reflections:reflections:0.10.1")
 
         // Use JUnit Jupiter
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")

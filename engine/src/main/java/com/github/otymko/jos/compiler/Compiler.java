@@ -889,6 +889,9 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     } else if (complexIdentifierContext.newExpression() != null) {
       processNewExpression(complexIdentifierContext.newExpression());
       return;
+    } else if (complexIdentifierContext.ternaryOperator() != null) {
+      processTernaryOperator(complexIdentifierContext.ternaryOperator());
+      return;
     }
 
     processIdentifier(complexIdentifierContext.IDENTIFIER().getText());
@@ -969,6 +972,32 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     }
 
     addCommand(OperationCode.NewInstance, argumentCount);
+  }
+
+  /**
+   * Обработка:
+   *
+   * ?(<Логическое выражение>, <Выражение 1>, <Выражение 2>)
+   */
+  private void processTernaryOperator(BSLParser.TernaryOperatorContext ternaryOperator) {
+    var expressions = ternaryOperator.expression();
+    if (expressions.size() != 3) {
+      throw CompilerException.errorInExpression();
+    }
+
+    processExpression(expressions.get(0), new ArrayDeque<>());
+    addCommand(OperationCode.MakeBool);
+
+    var falsePart = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+
+    processExpression(expressions.get(1), new ArrayDeque<>()); // true
+
+    var endPart = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+
+    correctCommandArgument(falsePart, imageCache.getCode().size());
+    processExpression(expressions.get(2), new ArrayDeque<>()); // false
+
+    correctCommandArgument(endPart, imageCache.getCode().size());
   }
 
   private void processParamList(BSLParser.CallParamListContext paramList) {
