@@ -15,6 +15,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public final class ValueFormatter {
@@ -136,27 +137,19 @@ public final class ValueFormatter {
 
   private static String convertToNativeFormat(String param) {
     final var builder = new StringBuilder(param);
-    for (var i = 0; i < param.length(); i++) {
-      if (param.charAt(i) == 'д')
-        builder.setCharAt(i, 'd');
+    final var nativeMap = new HashMap<Character, Character>();
+    nativeMap.put('д', 'd');
+    nativeMap.put('М', 'M');
+    nativeMap.put('г', 'y');
+    nativeMap.put('к', 'q');
+    nativeMap.put('ч', 'h');
+    nativeMap.put('Ч', 'H');
+    nativeMap.put('м', 'm');
+    nativeMap.put('с', 's');
+    nativeMap.put('р', 'S');
 
-      if (param.charAt(i) == 'М')
-        builder.setCharAt(i, 'M');
-
-      if (param.charAt(i) == 'г')
-        builder.setCharAt(i, 'y');
-
-      if (param.charAt(i) == 'к')
-        builder.setCharAt(i, 'q');
-
-      if (param.charAt(i) == 'ч')
-        builder.setCharAt(i, 'h');
-      if (param.charAt(i) == 'Ч')
-        builder.setCharAt(i, 'H');
-      if (param.charAt(i) == 'м')
-        builder.setCharAt(i, 'm');
-      if (param.charAt(i) == 'с')
-        builder.setCharAt(i, 's');
+    int i = 0;
+    while (i < param.length()) {
 
       if (param.charAt(i) == 'в' && i + 1 < param.length() && param.charAt(i + 1) == 'в') {
         builder.setCharAt(i, 't');
@@ -164,9 +157,11 @@ public final class ValueFormatter {
         builder.setCharAt(i, 't');
       }
 
-      if (param.charAt(i) == 'р') {
-        builder.setCharAt(i, 'S');
+      if (nativeMap.containsKey(param.charAt(i))) {
+        builder.setCharAt(i, nativeMap.get(param.charAt(i)));
       }
+
+      i++;
     }
 
     return builder.toString();

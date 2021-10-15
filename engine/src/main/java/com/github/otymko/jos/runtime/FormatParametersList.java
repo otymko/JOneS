@@ -103,13 +103,13 @@ public class FormatParametersList {
     while (index < format.length()) {
       final var c = format.charAt(index);
       if (c == terminalChar) {
-        if (index + 1 < format.length()) {
-          if (format.charAt(index + 1) == terminalChar) {
+        if (index + 1 < format.length()
+          && format.charAt(index + 1) == terminalChar) {
             index += 2;
             sb.append(terminalChar);
             continue;
           }
-        }
+
         break;
       } else if (c == ';' && terminalChar.equals(SPACE)) {
         break;
@@ -124,11 +124,11 @@ public class FormatParametersList {
         index++;
       }
       skipWhitespace();
-      if (index < format.length()) {
-        if (format.charAt(index) == ';') {
+      if (index < format.length()
+        && format.charAt(index) == ';') {
           index++;
         }
-      }
+
     }
 
     paramValue = sb.toString();

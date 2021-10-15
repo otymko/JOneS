@@ -183,20 +183,16 @@ public class NumberFormatter {
       return zeroAppearance;
     }
 
-    if (maxSize > 0) {
+    if (maxSize > 0 && intPart.length() + fracPart.length() > maxSize) {
+      if (intPart.equals("0") && fracPart.length() == maxSize) {
+        intPart = "";
+      } else {
 
-      if (intPart.length() + fracPart.length() > maxSize) {
+        final var intToFill = decimalSize > 0 ? (maxSize - decimalSize) : maxSize;
+        final var fracToFill = decimalSize > 0 ? decimalSize : 0;
 
-        if (intPart.equals("0") && fracPart.length() == maxSize) {
-          intPart = "";
-        } else {
-
-          final var intToFill = decimalSize > 0 ? (maxSize - decimalSize) : maxSize;
-          final var fracToFill = decimalSize > 0 ? decimalSize : 0;
-
-          fracPart = "9".repeat(fracToFill);
-          intPart = "9".repeat(intToFill);
-        }
+        fracPart = "9".repeat(fracToFill);
+        intPart = "9".repeat(intToFill);
       }
     }
 
