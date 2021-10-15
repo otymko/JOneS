@@ -80,8 +80,8 @@ public class FormatParametersList {
   }
 
   private static Character getTerminalChar(Character c) {
-    if (c == DOUBLE_QUOTE) return DOUBLE_QUOTE;
-    if (c == SINGLE_QUOTE) return SINGLE_QUOTE;
+    if (c.equals(DOUBLE_QUOTE)) return DOUBLE_QUOTE;
+    if (c.equals(SINGLE_QUOTE)) return SINGLE_QUOTE;
     return SPACE;
   }
 
@@ -97,7 +97,7 @@ public class FormatParametersList {
     final var sb = new StringBuilder();
 
     final var terminalChar = getTerminalChar(format.charAt(index));
-    if (terminalChar != SPACE) {
+    if (!terminalChar.equals(SPACE)) {
       index++;
     }
     while (index < format.length()) {
@@ -111,7 +111,7 @@ public class FormatParametersList {
           }
         }
         break;
-      } else if (c == ';' && terminalChar == SPACE) {
+      } else if (c == ';' && terminalChar.equals(SPACE)) {
         break;
       } else {
         sb.append(c);
@@ -120,7 +120,7 @@ public class FormatParametersList {
     }
 
     if (index < format.length()) {
-      if (terminalChar != SPACE) {
+      if (!terminalChar.equals(SPACE)) {
         index++;
       }
       skipWhitespace();
