@@ -38,14 +38,17 @@ public final class ValueFormatter {
 
   public static String format(IValue value, String formatString) {
     final var params = parseParameters(formatString);
+    String formattedValue = null;
     switch (value.getDataType()) {
-      case BOOLEAN: return boolFormat(value.asBoolean(), params);
-      case DATE: return dateFormat(value.asDate(), params);
-      case STRING: return value.asString();
-      case NUMBER: return numberFormat(value.asNumber(), params);
+      case BOOLEAN: formattedValue = boolFormat(value.asBoolean(), params); break;
+      case DATE: formattedValue = dateFormat(value.asDate(), params); break;
+      case STRING: formattedValue = value.asString(); break;
+      case NUMBER: formattedValue = numberFormat(value.asNumber(), params); break;
       default:
         throw MachineException.operationNotSupportedException();
     }
+    if (formattedValue == null) return value.asString();
+    return formattedValue;
   }
 
   private static FormatParametersList parseParameters(String format) {
@@ -80,7 +83,7 @@ public final class ValueFormatter {
       return processCommonDateFormat(value, commonDateFormat, locale);
     }
 
-    throw MachineException.operationNotImplementedException();
+    return null;
   }
 
   private static String processLocalDateFormat(Date value, String localDateFormat, String localeParam) {
@@ -232,19 +235,19 @@ public final class ValueFormatter {
         for (var s : ng.split("\\D")) {
           if (s.isBlank()) continue;
           final var gv = parseInt(s);
-          if (gv >= 0) groups.add(gv);
+          groups.add(gv);
           if (gv == 0) break;
         }
 
         if (groups.isEmpty()) {
           nf.setGroupingSize(0);
         } else if (groups.size() == 1) {
-          final var lgs = groups.get(0);
-          nf.setGroupingSize(lgs);
+          final var lowerGroupSize = groups.get(0);
+          nf.setGroupingSize(lowerGroupSize);
         } else {
-          final var lgs = groups.get(0);
-          final var hgs = groups.get(1);
-          nf.setGroupingSize(lgs, hgs);
+          final var lowerGroupSize = groups.get(0);
+          final var highGroupsSize = groups.get(1);
+          nf.setGroupingSize(lowerGroupSize, highGroupsSize);
         }
       }
     }
