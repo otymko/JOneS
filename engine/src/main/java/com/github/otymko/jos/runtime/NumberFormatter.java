@@ -14,15 +14,17 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 public class NumberFormatter {
 
-  public static final int NEGATIVE_BRACES = 0; // (1,1)
-  public static final int NEGATIVE_PREFIX_SIGN = 1; // -1,1
-  public static final int NEGATIVE_PREFIX_SIGN_WHITESPACE = 2; // - 1,1
-  public static final int NEGATIVE_POSTFIX_SIGN = 3; // 1,1-
-  public static final int NEGATIVE_POSTFIX_SIGN_WHITESPACE = 4; // 1,1 -
+  private static final int NEGATIVE_BRACES = 0; // (1,1)
+  private static final int NEGATIVE_PREFIX_SIGN = 1; // -1,1
+  private static final int NEGATIVE_PREFIX_SIGN_WHITESPACE = 2; // - 1,1
+  private static final int NEGATIVE_POSTFIX_SIGN = 3; // 1,1-
+  private static final int NEGATIVE_POSTFIX_SIGN_WHITESPACE = 4; // 1,1 -
+  private static final int DEFAULT_FRACTION_DIGITS = 340;
 
   public NumberFormatter(Locale locale) {
     final var systemFormatter = (DecimalFormat) NumberFormat.getInstance(locale);
@@ -39,33 +41,71 @@ public class NumberFormatter {
   private int maxSize = -1;
 
   public void setMaxSize(int value) {
+    if (value < 0) {
+      return;
+    }
+
     maxSize = value;
-    if (decimalSize == -1) decimalSize = 0;
+    if (decimalSize == -1) {
+      decimalSize = 0;
+    }
+  }
+
+  @Getter
+  private int decimalSize = -1;
+
+  public void setDecimalSize(int value) {
+    if (value >= 0) {
+      decimalSize = value;
+    }
   }
 
   @Getter
   @Setter
-  public int decimalSize = -1;
+  private int negativeAppearance = NEGATIVE_PREFIX_SIGN;
+
+  @Getter
+  private String zeroAppearance = "";
+
+  public void setZeroAppearance(String value) {
+    if (value.isEmpty()) {
+      zeroAppearance = "0";
+    } else {
+      zeroAppearance = value;
+    }
+  }
 
   @Getter
   @Setter
-  public int negativeAppearance = NEGATIVE_PREFIX_SIGN;
-
-  @Setter
-  @Getter
-  public String zeroAppearance = "";
+  private boolean leadingZeroes;
 
   @Getter
-  @Setter
-  public boolean leadingZeroes;
-
-  @Getter
-  @Setter
   private String fractionDelimiter;
 
+  public void setFractionDelimiter(String value) {
+    if (value == null || value.isBlank()) {
+      return;
+    }
+    if (value.length() > 1) {
+      fractionDelimiter = value.substring(0, 1);
+    } else {
+      fractionDelimiter = value;
+    }
+  }
+
   @Getter
-  @Setter
   private String groupDelimiter;
+
+  public void setGroupDelimiter(String value) {
+    if (value == null || value.isBlank()) {
+      return;
+    }
+    if (value.length() > 1) {
+      groupDelimiter = value.substring(0, 1);
+    } else {
+      groupDelimiter = value;
+    }
+  }
 
   @Getter
   @Setter
@@ -86,40 +126,44 @@ public class NumberFormatter {
     higherGroupingSize = hiGroup;
   }
 
+  public void setGroupingSize(List<Integer> groups) {
+    if (groups.isEmpty()) {
+
+      setGroupingSize(0);
+
+    } else if (groups.size() == 1) {
+
+      setGroupingSize(groups.get(0));
+
+    } else {
+
+      setGroupingSize(groups.get(0), groups.get(1));
+
+    }
+  }
+
   private BigDecimal valueToFormat(BigDecimal value) {
-    if (decimalShift < 0) return value.movePointRight(-decimalShift);
-    if (decimalShift > 0) return value.movePointLeft(decimalShift);
+    if (decimalShift < 0) {
+      return value.movePointRight(-decimalShift);
+    }
+    if (decimalShift > 0) {
+      return value.movePointLeft(decimalShift);
+    }
     return value;
   }
 
-  private String getPrefix(int sign) {
-    if (sign < 0) {
-      switch (negativeAppearance){
-        case NEGATIVE_BRACES: return "(";
-        case NEGATIVE_POSTFIX_SIGN:
-        case NEGATIVE_POSTFIX_SIGN_WHITESPACE: return "";
-        case NEGATIVE_PREFIX_SIGN_WHITESPACE: return "- ";
-        default:
-        case NEGATIVE_PREFIX_SIGN: return "-";
-
-      }
+  private String applySign(int sign, String unsignedValuePresentation) {
+    if (sign >= 0) {
+      return unsignedValuePresentation;
     }
-    return "";
-  }
-
-  private String getSuffix(int sign) {
-    if (sign < 0) {
-      switch (negativeAppearance){
-        case NEGATIVE_BRACES: return ")";
-        case NEGATIVE_POSTFIX_SIGN: return "-";
-        case NEGATIVE_POSTFIX_SIGN_WHITESPACE: return " -";
-        default:
-        case NEGATIVE_PREFIX_SIGN_WHITESPACE:
-        case NEGATIVE_PREFIX_SIGN: return "";
-
-      }
+    switch (negativeAppearance){
+      case NEGATIVE_BRACES: return String.format("(%s)", unsignedValuePresentation);
+      case NEGATIVE_POSTFIX_SIGN: return String.format("%s-", unsignedValuePresentation);
+      case NEGATIVE_POSTFIX_SIGN_WHITESPACE: return String.format("%s -", unsignedValuePresentation);
+      case NEGATIVE_PREFIX_SIGN_WHITESPACE: return String.format("- %s", unsignedValuePresentation);
+      default:
+      case NEGATIVE_PREFIX_SIGN: return String.format("-%s", unsignedValuePresentation);
     }
-    return "";
   }
 
   private String applyGroups(String value) {
@@ -128,24 +172,26 @@ public class NumberFormatter {
     }
     final var group1pos = value.length() - lowerGroupingSize;
 
-    final var a = new ArrayList<String>();
-    a.add(value.substring(group1pos));
+    final var groupsBuilder = new ArrayList<String>();
+    groupsBuilder.add(value.substring(group1pos));
 
     var rest = value.substring(0, group1pos);
     if (higherGroupingSize != -1) {
       final var groupSize = higherGroupingSize == 0 ? lowerGroupingSize : higherGroupingSize;
       while (rest.length() > groupSize) {
         final var group2pos = rest.length() - groupSize;
-        a.add(rest.substring(group2pos));
+        groupsBuilder.add(rest.substring(group2pos));
 
         rest = rest.substring(0, group2pos);
       }
     }
 
-    if (!rest.isEmpty()) a.add(rest);
+    if (!rest.isEmpty()) {
+      groupsBuilder.add(rest);
+    }
 
-    Collections.reverse(a);
-    return String.join(groupDelimiter, a);
+    Collections.reverse(groupsBuilder);
+    return String.join(groupDelimiter, groupsBuilder);
   }
 
   public String format(BigDecimal value) {
@@ -154,14 +200,7 @@ public class NumberFormatter {
       return zeroAppearance;
     }
 
-    final var systemFormat = (DecimalFormat)NumberFormat.getInstance(Locale.ROOT);
-
-    systemFormat.setNegativeSuffix("");
-    systemFormat.setPositivePrefix("");
-    systemFormat.setNegativeSuffix("");
-    systemFormat.setPositiveSuffix("");
-    systemFormat.setGroupingUsed(false);
-    systemFormat.setDecimalSeparatorAlwaysShown(true);
+    final var systemFormat = getInvariantFormat();
 
     if (decimalSize != -1) {
       if (maxSize > 0 && decimalSize > maxSize) {
@@ -171,7 +210,7 @@ public class NumberFormatter {
       systemFormat.setMinimumFractionDigits(decimalSize);
       systemFormat.setRoundingMode(RoundingMode.HALF_UP);
     } else {
-      systemFormat.setMaximumFractionDigits(340);
+      systemFormat.setMaximumFractionDigits(DEFAULT_FRACTION_DIGITS);
     }
 
     final var preValue = systemFormat.format(valuePresentation.abs()).split("\\.");
@@ -211,9 +250,19 @@ public class NumberFormatter {
 
     intPart = applyGroups(intPart);
 
-    final var prefix = getPrefix(valuePresentation.signum());
-    final var suffix = getSuffix(valuePresentation.signum());
+    return applySign(valuePresentation.signum(), String.format("%s%s", intPart, fracPart));
+  }
 
-    return String.format("%s%s%s%s", prefix, intPart, fracPart, suffix);
+  private static DecimalFormat getInvariantFormat() {
+    final var systemFormat = (DecimalFormat)NumberFormat.getInstance(Locale.ROOT);
+
+    systemFormat.setNegativeSuffix("");
+    systemFormat.setPositivePrefix("");
+    systemFormat.setNegativeSuffix("");
+    systemFormat.setPositiveSuffix("");
+    systemFormat.setGroupingUsed(false);
+    systemFormat.setDecimalSeparatorAlwaysShown(true);
+
+    return systemFormat;
   }
 }

@@ -13,10 +13,10 @@ import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public final class ValueFormatter {
 
@@ -36,19 +36,32 @@ public final class ValueFormatter {
   private static final String[] DATE_FORMAT = { "ДФ", "DF" };
   private static final String[] DATE_LOCAL_FORMAT = { "ДЛФ", "DLF" };
 
+  private static final String DATETIME_RU = "ДВ";
+  private static final String DATETIME_EN = "DT";
+  private static final String DATE_RU = "Д";
+  private static final String DATE_EN = "D";
+  private static final String LONG_DATE_RU = "ДД";
+  private static final String LONG_DATE_EN = "DD";
+  private static final String LONG_DATETIME_RU = "ДДВ";
+  private static final String LONG_DATETIME_EN = "DDT";
+  private static final String TIME_RU = "В";
+  private static final String TIME_EN = "T";
+
+  private static final Map<Character, Character> dateNativeFormatMap = new HashMap<>();
+
+
+  private ValueFormatter() {}
+
   public static String format(IValue value, String formatString) {
     final var params = parseParameters(formatString);
-    String formattedValue = null;
     switch (value.getDataType()) {
-      case BOOLEAN: formattedValue = boolFormat(value.asBoolean(), params); break;
-      case DATE: formattedValue = dateFormat(value.asDate(), params); break;
-      case STRING: formattedValue = value.asString(); break;
-      case NUMBER: formattedValue = numberFormat(value.asNumber(), params); break;
+      case BOOLEAN: return boolFormat(value.asBoolean(), params);
+      case DATE: return dateFormat(value.asDate(), params);
+      case STRING: return value.asString();
+      case NUMBER: return numberFormat(value.asNumber(), params);
       default:
         throw MachineException.operationNotSupportedException();
     }
-    if (formattedValue == null) return value.asString();
-    return formattedValue;
   }
 
   private static FormatParametersList parseParameters(String format) {
@@ -56,49 +69,31 @@ public final class ValueFormatter {
   }
 
   private static String boolFormat(boolean value, FormatParametersList params) {
-    final var p = params.get( value ? BOOLEAN_TRUE : BOOLEAN_FALSE);
-    if (p == null) {
-      return ValueFactory.create(value).asString();
-    }
-    return p;
+    final var presentation = params.get( value ? BOOLEAN_TRUE : BOOLEAN_FALSE);
+    return presentation.orElse(ValueFactory.create(value).asString());
   }
 
   private static String dateFormat(Date value, FormatParametersList params) {
     if (DateValue.isEmpty(value)) {
       final var emptyDatePresentation = params.get(DATE_EMPTY);
-      if (emptyDatePresentation == null) {
-        return "";
-      }
-      return emptyDatePresentation;
+      return emptyDatePresentation.orElse("");
     }
 
-    final var locale = params.get(LOCALE);
+    final var locale = params.getLocale(LOCALE);
     final var localDateFormat = params.get(DATE_LOCAL_FORMAT);
-    if (localDateFormat != null) {
-      return processLocalDateFormat(value, localDateFormat, locale);
+    if (localDateFormat.isPresent()) {
+      return processLocalDateFormat(value, localDateFormat.get(), locale);
     }
 
     final var commonDateFormat = params.get(DATE_FORMAT);
-    if (commonDateFormat != null) {
-      return processCommonDateFormat(value, commonDateFormat, locale);
+    if (commonDateFormat.isPresent()) {
+      return processCommonDateFormat(value, commonDateFormat.get(), locale);
     }
 
-    return null;
+    return processLocalDateFormat(value, DATETIME_EN, locale);
   }
 
-  private static String processLocalDateFormat(Date value, String localDateFormat, String localeParam) {
-    final var DATETIME_RU = "ДВ";
-    final var DATETIME_EN = "DT";
-    final var DATE_RU = "Д";
-    final var DATE_EN = "D";
-    final var LONG_DATE_RU = "ДД";
-    final var LONG_DATE_EN = "DD";
-    final var LONG_DATETIME_RU = "ДДВ";
-    final var LONG_DATETIME_EN = "DDT";
-    final var TIME_RU = "В";
-    final var TIME_EN = "T";
-
-    final var locale = getLocale(localeParam);
+  private static String processLocalDateFormat(Date value, String localDateFormat, Locale locale) {
 
     switch (localDateFormat) {
 
@@ -140,16 +135,6 @@ public final class ValueFormatter {
 
   private static String convertToNativeFormat(String param) {
     final var builder = new StringBuilder(param);
-    final var nativeMap = new HashMap<Character, Character>();
-    nativeMap.put('д', 'd');
-    nativeMap.put('М', 'M');
-    nativeMap.put('г', 'y');
-    nativeMap.put('к', 'q');
-    nativeMap.put('ч', 'h');
-    nativeMap.put('Ч', 'H');
-    nativeMap.put('м', 'm');
-    nativeMap.put('с', 's');
-    nativeMap.put('р', 'S');
 
     int i = 0;
     while (i < param.length()) {
@@ -160,8 +145,8 @@ public final class ValueFormatter {
         builder.setCharAt(i, 't');
       }
 
-      if (nativeMap.containsKey(param.charAt(i))) {
-        builder.setCharAt(i, nativeMap.get(param.charAt(i)));
+      if (dateNativeFormatMap.containsKey(param.charAt(i))) {
+        builder.setCharAt(i, dateNativeFormatMap.get(param.charAt(i)));
       }
 
       i++;
@@ -170,107 +155,38 @@ public final class ValueFormatter {
     return builder.toString();
   }
 
-  private static Locale getLocale(String localeParamValue) {
-    if (localeParamValue == null) {
-      return Locale.getDefault();
-    }
-    return Locale.forLanguageTag(localeParamValue.replace('_', '-'));
-  }
-
-  private static String processCommonDateFormat(Date value, String localDateFormat, String locale) {
-    final var sdf = new SimpleDateFormat(convertToNativeFormat(localDateFormat), getLocale(locale));
+  private static String processCommonDateFormat(Date value, String localDateFormat, Locale locale) {
+    final var sdf = new SimpleDateFormat(convertToNativeFormat(localDateFormat), locale);
     return sdf.format(value);
-  }
-
-  private static int parseInt(String param) {
-    final var sb = new StringBuilder();
-    for (var c : param.toCharArray()) {
-      if (Character.isDigit(c) || c == '-')
-        sb.append(c);
-    }
-
-    if (sb.length() == 0) {
-      return 0;
-    }
-
-    return Integer.parseInt(sb.toString());
   }
 
   private static String numberFormat(BigDecimal value, FormatParametersList params) {
 
-    final var nf = new NumberFormatter(getLocale(params.get(LOCALE)));
+    final var nf = new NumberFormatter(params.getLocale(LOCALE));
 
-    final var nz = params.get(NUM_ZERO_APPEARANCE);
-    if (nz != null) {
-      nf.setZeroAppearance(nz.equals("") ? "0" : nz);
-    }
-
-    final var nfd = params.get(NUM_DECIMAL_SIZE);
-    if (nfd != null && !nfd.isBlank()) {
-      final var i_nfd = parseInt(nfd);
-      if (i_nfd >= 0)
-        nf.setDecimalSize(i_nfd);
-    }
-
-    nf.setLeadingZeroes(params.get(NUM_LEADING_ZERO) != null);
-
-    final var nd = params.get(NUM_MAX_SIZE);
-    if (nd != null) {
-      final var i_nd = nd.isBlank() ? 0 : parseInt(nd);
-      if (i_nd >= 0)
-        nf.setMaxSize(i_nd);
-    }
-
-    final var nds = params.get(NUM_FRACTION_DELIMITER);
-    if (nds != null && !nds.isBlank()) {
-      nf.setFractionDelimiter(nds.length() < 2 ? nds : nds.substring(0, 1));
-    }
-
-    final var ng = params.get(NUM_GROUPING);
-    if (ng != null) {
-      if (ng.equals("")) nf.setGroupingSize(0);
-      else {
-        final var groups = new ArrayList<Integer>();
-
-        for (var s : ng.split("\\D")) {
-          if (s.isBlank()) continue;
-          final var gv = parseInt(s);
-          groups.add(gv);
-          if (gv == 0) break;
-        }
-
-        if (groups.isEmpty()) {
-          nf.setGroupingSize(0);
-        } else if (groups.size() == 1) {
-          final var lowerGroupSize = groups.get(0);
-          nf.setGroupingSize(lowerGroupSize);
-        } else {
-          final var lowerGroupSize = groups.get(0);
-          final var highGroupsSize = groups.get(1);
-          nf.setGroupingSize(lowerGroupSize, highGroupsSize);
-        }
-      }
-    }
-
-    final var nn = params.get(NUM_NEGATIVE_APPEARANCE);
-    if (nn != null) {
-      final var i_nn = parseInt(nn);
-      nf.setNegativeAppearance(i_nn);
-    }
-
-    final var ns = params.get(NUM_DECIMAL_SHIFT);
-    if (ns != null) {
-      final var i_ns = parseInt(ns);
-      nf.setDecimalShift(i_ns);
-    }
-
-    final var ngs = params.get(NUM_GROUPS_DELIMITER);
-    if (ngs != null && !ngs.isBlank()) {
-      nf.setGroupDelimiter(ngs.length() < 2 ? ngs : ngs.substring(0, 1));
-    }
+    params.get(NUM_ZERO_APPEARANCE).ifPresent(nf::setZeroAppearance);
+    params.getInt(NUM_DECIMAL_SIZE).ifPresent(nf::setDecimalSize);
+    params.get(NUM_LEADING_ZERO).ifPresent(v -> nf.setLeadingZeroes(true));
+    params.getInt(NUM_MAX_SIZE).ifPresent(nf::setMaxSize);
+    params.get(NUM_FRACTION_DELIMITER).ifPresent(nf::setFractionDelimiter);
+    params.getIntList(NUM_GROUPING).ifPresent(nf::setGroupingSize);
+    params.getInt(NUM_NEGATIVE_APPEARANCE).ifPresent(nf::setNegativeAppearance);
+    params.getInt(NUM_DECIMAL_SHIFT).ifPresent(nf::setDecimalShift);
+    params.get(NUM_GROUPS_DELIMITER).ifPresent(nf::setGroupDelimiter);
 
     return nf.format(value);
   }
 
-  private ValueFormatter() {}
+  static {
+    dateNativeFormatMap.put('д', 'd');
+    dateNativeFormatMap.put('М', 'M');
+    dateNativeFormatMap.put('г', 'y');
+    dateNativeFormatMap.put('к', 'q');
+    dateNativeFormatMap.put('ч', 'h');
+    dateNativeFormatMap.put('Ч', 'H');
+    dateNativeFormatMap.put('м', 'm');
+    dateNativeFormatMap.put('с', 's');
+    dateNativeFormatMap.put('р', 'S');
+  }
+
 }

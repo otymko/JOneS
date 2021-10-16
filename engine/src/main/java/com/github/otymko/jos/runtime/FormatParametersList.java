@@ -5,8 +5,12 @@
  */
 package com.github.otymko.jos.runtime;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 public class FormatParametersList {
 
@@ -17,23 +21,76 @@ public class FormatParametersList {
   private final Map<String, String> paramList = new HashMap<>();
   private final String format;
 
+  private int index;
+  private String paramName;
+  private String paramValue;
+
   public FormatParametersList(String format) {
     this.format = format;
     parseParams();
   }
 
-  public String get(String[] names) {
-    for (String n : names) {
-      if (paramList.containsKey(n.toUpperCase())) {
-        return paramList.get(n.toUpperCase());
+  public Optional<String> get(String[] names) {
+    for (String name : names) {
+      if (paramList.containsKey(name.toUpperCase())) {
+        return Optional.of(paramList.get(name.toUpperCase()));
       }
     }
-    return null;
+    return Optional.empty();
   }
 
-  private int index;
-  private String paramName;
-  private String paramValue;
+  public Locale getLocale(String[] names) {
+    final var stringValue = get(names);
+    if (stringValue.isPresent()) {
+      return getLocale(stringValue.get());
+    }
+    return Locale.getDefault();
+  }
+
+  private static Locale getLocale(String localeParamValue) {
+    return Locale.forLanguageTag(localeParamValue.replace('_', '-'));
+  }
+
+
+  public Optional<Integer> getInt(String[] names) {
+    final var stringValue = get(names);
+    if (stringValue.isEmpty()) {
+      return Optional.empty();
+    }
+    return Optional.of(parseInt(stringValue.get()));
+  }
+
+  public Optional<List<Integer>> getIntList(String[] names) {
+    final var asStringValue = get(names);
+    if (asStringValue.isEmpty()) {
+      return Optional.empty();
+    }
+
+    final var result = new ArrayList<Integer>();
+    final var stringValue = asStringValue.get();
+
+    for (final var groupElement : stringValue.split("\\D")) {
+      if (!groupElement.isBlank()) {
+        result.add(parseInt(groupElement));
+      }
+    }
+
+    return Optional.of(result);
+  }
+
+  private static int parseInt(String value) {
+    final var cleanValue = new StringBuilder();
+    for (var c : value.toCharArray()) {
+      if (Character.isDigit(c) || c == '-')
+        cleanValue.append(c);
+    }
+
+    if (cleanValue.length() == 0) {
+      return 0;
+    }
+
+    return Integer.parseInt(cleanValue.toString());
+  }
 
   private void parseParams() {
     index = 0;
@@ -63,14 +120,14 @@ public class FormatParametersList {
     final var start = index;
 
     while (index < format.length()) {
-      final var c = format.charAt(index);
-      if (Character.isLetterOrDigit(c) || c == '.' || c == '_') {
+      final var currentChar = format.charAt(index);
+      if (Character.isLetterOrDigit(currentChar) || currentChar == '.' || currentChar == '_') {
         index++;
-      } else if (c == '=') {
+      } else if (currentChar == '=') {
         paramName = format.substring(start, index).trim();
         index++;
         return true;
-      } else if (Character.isWhitespace(c)) {
+      } else if (Character.isWhitespace(currentChar)) {
         skipWhitespace();
       } else {
         return false;
@@ -80,9 +137,27 @@ public class FormatParametersList {
   }
 
   private static char getTerminalChar(char c) {
-    if (c == DOUBLE_QUOTE) return DOUBLE_QUOTE;
-    if (c == SINGLE_QUOTE) return SINGLE_QUOTE;
+    if (c == DOUBLE_QUOTE) {
+      return DOUBLE_QUOTE;
+    }
+    if (c == SINGLE_QUOTE) {
+      return SINGLE_QUOTE;
+    }
     return SPACE;
+  }
+
+  private char nextChar() {
+    if (index + 1 < format.length()) {
+      return format.charAt(index + 1);
+    }
+    return '\0';
+  }
+
+  private char currentChar() {
+    if (index < format.length()) {
+      return format.charAt(index);
+    }
+    return '\0';
   }
 
   private void readParameterValue() {
@@ -94,27 +169,28 @@ public class FormatParametersList {
       return;
     }
 
-    final var sb = new StringBuilder();
+    final var valueBuilder = new StringBuilder();
 
     final var terminalChar = getTerminalChar(format.charAt(index));
     if (terminalChar != SPACE) {
       index++;
     }
+
     while (index < format.length()) {
-      final var c = format.charAt(index);
-      if (c == terminalChar) {
-        if (index + 1 < format.length()
-          && format.charAt(index + 1) == terminalChar) {
+      if (currentChar() == terminalChar) {
+        if (nextChar() == terminalChar) {
             index += 2;
-            sb.append(terminalChar);
+            valueBuilder.append(terminalChar);
             continue;
           }
 
         break;
-      } else if (c == ';' && terminalChar == SPACE) {
+
+      } else if (currentChar() == ';' && terminalChar == SPACE) {
         break;
+
       } else {
-        sb.append(c);
+        valueBuilder.append(currentChar());
         index++;
       }
     }
@@ -123,15 +199,15 @@ public class FormatParametersList {
       if (terminalChar != SPACE) {
         index++;
       }
-      skipWhitespace();
-      if (index < format.length()
-        && format.charAt(index) == ';') {
-          index++;
-        }
 
+      skipWhitespace();
+
+      if (currentChar() == ';') {
+        index++;
+      }
     }
 
-    paramValue = sb.toString();
+    paramValue = valueBuilder.toString();
   }
 
   private void skipWhitespace() {
