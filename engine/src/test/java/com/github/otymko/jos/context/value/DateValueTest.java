@@ -22,7 +22,7 @@ class DateValueTest {
 
     assertThat(value.asDate()).isEqualTo(date);
     assertThat(value).isEqualTo(ValueFactory.create(date));
-    assertThat(value.asString()).isEqualTo("01.01.2014 00:00:00");
+    assertThat(value.asString()).isEqualTo("01.01.2014 0:00:00");
 
     // TODO: еще тесты
   }

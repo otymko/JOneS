@@ -6,6 +6,7 @@
 package com.github.otymko.jos.runtime.context.type.primitive;
 
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.runtime.ValueFormatter;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
@@ -28,7 +29,6 @@ public class DateValue extends PrimitiveValue {
   private static final Date EMPTY_DATE = new GregorianCalendar(1, Calendar.JANUARY, 1).getTime();
   private static final Predicate<String> IS_EMPTY_DATE = view -> view.equals("00000000") || view.equals("000000000000")
     || view.equals("00000000000000");
-  private static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
   private final Date value;
 
@@ -49,7 +49,7 @@ public class DateValue extends PrimitiveValue {
 
   @Override
   public String asString() {
-    return DEFAULT_FORMAT.format(value);
+    return ValueFormatter.format(this, "");
   }
 
   @Override
