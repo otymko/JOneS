@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +23,12 @@ class DateValueTest {
 
     assertThat(value.asDate()).isEqualTo(date);
     assertThat(value).isEqualTo(ValueFactory.create(date));
-    assertThat(value.asString()).isEqualTo("01.01.2014 0:00:00");
+
+    if (Locale.getDefault().getLanguage().equals("ru")) {
+      assertThat(value.asString()).isEqualTo("01.01.2014 0:00:00");
+    } else if (Locale.getDefault().getLanguage().equals("en")) {
+      assertThat(value.asString()).isEqualTo("1/1/2014 12:00:00 AM");
+    }
 
     // TODO: еще тесты
   }
