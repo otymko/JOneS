@@ -13,6 +13,11 @@ import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.chrono.IsoChronology;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.FormatStyle;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -98,8 +103,19 @@ public final class ValueFormatter {
     switch (localDateFormat) {
 
       case DATE_RU:
-      case DATE_EN:
-        return DateFormat.getDateInstance(DateFormat.SHORT, locale).format(value);
+      case DATE_EN: {
+        final var pattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+                        FormatStyle.SHORT,
+                        null,
+                        IsoChronology.INSTANCE,
+                        locale).
+                replaceAll("y+", "yyyy");
+        final var dateFormatter = DateTimeFormatter.ofPattern(pattern)
+                .withLocale(locale)
+                .withZone(ZoneId.systemDefault());
+
+        return dateFormatter.format(value.toInstant());
+      }
 
       case TIME_RU:
       case TIME_EN:
@@ -110,9 +126,9 @@ public final class ValueFormatter {
         // Штатный подход через
         // DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale)
         // даёт формат с запятой между датой и временем
-        final var df = DateFormat.getDateInstance(DateFormat.SHORT, locale);
-        final var tf = DateFormat.getTimeInstance(DateFormat.MEDIUM, locale);
-        return String.format("%s %s", df.format(value), tf.format(value));
+        return String.format("%s %s",
+                processLocalDateFormat(value, DATE_EN, locale),
+                processLocalDateFormat(value, TIME_EN, locale));
       }
       case LONG_DATETIME_RU:
       case LONG_DATETIME_EN: {
