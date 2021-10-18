@@ -177,22 +177,22 @@ public class FormatParametersList {
     }
 
     while (index < format.length()) {
+
+      if (terminalChar == SPACE && currentChar() == ';') {
+        break;
+      }
+
       if (currentChar() == terminalChar) {
-        if (nextChar() == terminalChar) {
-            index += 2;
-            valueBuilder.append(terminalChar);
-            continue;
-          }
+        if (nextChar() != terminalChar) {
+          break;
+        }
 
-        break;
-
-      } else if (currentChar() == ';' && terminalChar == SPACE) {
-        break;
-
-      } else {
-        valueBuilder.append(currentChar());
         index++;
       }
+
+      valueBuilder.append(currentChar());
+      index++;
+
     }
 
     if (index < format.length()) {
@@ -211,10 +211,7 @@ public class FormatParametersList {
   }
 
   private void skipWhitespace() {
-    while (index < format.length()) {
-      if (!Character.isWhitespace(format.charAt(index))) {
-        break;
-      }
+    while (Character.isWhitespace(currentChar())) {
       index++;
     }
   }

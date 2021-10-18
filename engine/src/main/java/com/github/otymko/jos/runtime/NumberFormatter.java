@@ -12,8 +12,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -166,41 +164,45 @@ public class NumberFormatter {
     }
   }
 
-  private String applyGroups(String value) {
-    if (lowerGroupingSize == 0 || value.length() < lowerGroupingSize) {
-      return value;
-    }
-    final var group1pos = value.length() - lowerGroupingSize;
-
-    final var groupsBuilder = new ArrayList<String>();
-    groupsBuilder.add(value.substring(group1pos));
-
-    var rest = value.substring(0, group1pos);
-    if (higherGroupingSize != -1) {
-      final var groupSize = higherGroupingSize == 0 ? lowerGroupingSize : higherGroupingSize;
-      while (rest.length() > groupSize) {
-        final var group2pos = rest.length() - groupSize;
-        groupsBuilder.add(rest.substring(group2pos));
-
-        rest = rest.substring(0, group2pos);
-      }
-    }
-
-    if (!rest.isEmpty()) {
-      groupsBuilder.add(rest);
-    }
-
-    Collections.reverse(groupsBuilder);
-    return String.join(groupDelimiter, groupsBuilder);
-  }
-
   public String format(BigDecimal value) {
+
     final var valuePresentation = valueToFormat(value);
     if (valuePresentation.equals(BigDecimal.ZERO)) {
       return zeroAppearance;
     }
 
+    final var preValue = getPreliminaryPresentation(valuePresentation);
+
+    if (preValue.isEqualsZero()) {
+      return zeroAppearance;
+    }
+
+    preValue.applySizeRestrictions(maxSize, decimalSize);
+
+    if (leadingZeroes) {
+      preValue.applyLeadingZeroes(maxSize);
+    }
+
+    preValue.applyGroups(groupDelimiter, lowerGroupingSize, higherGroupingSize);
+
+    return applySign(valuePresentation.signum(), preValue.presentation(fractionDelimiter));
+  }
+
+  private NumberFormatterPresentationParts getPreliminaryPresentation(BigDecimal value) {
     final var systemFormat = getInvariantFormat();
+    final var preValue = systemFormat.format(value.abs()).split("\\.");
+    return new NumberFormatterPresentationParts(preValue);
+  }
+
+  private DecimalFormat getInvariantFormat() {
+    final var systemFormat = (DecimalFormat)NumberFormat.getInstance(Locale.ROOT);
+
+    systemFormat.setNegativeSuffix("");
+    systemFormat.setPositivePrefix("");
+    systemFormat.setNegativeSuffix("");
+    systemFormat.setPositiveSuffix("");
+    systemFormat.setGroupingUsed(false);
+    systemFormat.setDecimalSeparatorAlwaysShown(true);
 
     if (decimalSize != -1) {
       if (maxSize > 0 && decimalSize > maxSize) {
@@ -212,56 +214,6 @@ public class NumberFormatter {
     } else {
       systemFormat.setMaximumFractionDigits(DEFAULT_FRACTION_DIGITS);
     }
-
-    final var preValue = systemFormat.format(valuePresentation.abs()).split("\\.");
-
-    var intPart = preValue[0];
-    var fracPart = preValue.length < 2 ? "" : preValue[1];
-
-    if (intPart.equals("0") && fracPart.isBlank()) {
-      return zeroAppearance;
-    }
-
-    if (maxSize > 0 && intPart.length() + fracPart.length() > maxSize) {
-      if (intPart.equals("0") && fracPart.length() == maxSize) {
-        intPart = "";
-      } else {
-
-        final var intToFill = decimalSize > 0 ? (maxSize - decimalSize) : maxSize;
-        final var fracToFill = decimalSize > 0 ? decimalSize : 0;
-
-        fracPart = "9".repeat(fracToFill);
-        intPart = "9".repeat(intToFill);
-      }
-    }
-
-    if (decimalSize == 0 || (decimalSize == -1 && fracPart.isEmpty())) {
-      fracPart = "";
-    }
-
-    if (leadingZeroes && maxSize > intPart.length() + fracPart.length()) {
-      final var zeroesCount = maxSize - (intPart.length() + fracPart.length());
-      intPart = "0".repeat(zeroesCount) + intPart;
-    }
-
-    if (!fracPart.isBlank()) {
-      fracPart = String.format("%s%s", fractionDelimiter, fracPart);
-    }
-
-    intPart = applyGroups(intPart);
-
-    return applySign(valuePresentation.signum(), String.format("%s%s", intPart, fracPart));
-  }
-
-  private static DecimalFormat getInvariantFormat() {
-    final var systemFormat = (DecimalFormat)NumberFormat.getInstance(Locale.ROOT);
-
-    systemFormat.setNegativeSuffix("");
-    systemFormat.setPositivePrefix("");
-    systemFormat.setNegativeSuffix("");
-    systemFormat.setPositiveSuffix("");
-    systemFormat.setGroupingUsed(false);
-    systemFormat.setDecimalSeparatorAlwaysShown(true);
 
     return systemFormat;
   }
