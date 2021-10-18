@@ -171,7 +171,7 @@ public class FormatParametersList {
 
     final var valueBuilder = new StringBuilder();
 
-    final var terminalChar = getTerminalChar(format.charAt(index));
+    final var terminalChar = getTerminalChar(currentChar());
     if (terminalChar != SPACE) {
       index++;
     }
@@ -195,16 +195,14 @@ public class FormatParametersList {
 
     }
 
-    if (index < format.length()) {
-      if (terminalChar != SPACE) {
-        index++;
-      }
+    if (terminalChar != SPACE) {
+      index++;
+    }
 
-      skipWhitespace();
+    skipWhitespace();
 
-      if (currentChar() == ';') {
-        index++;
-      }
+    if (currentChar() == ';') {
+      index++;
     }
 
     paramValue = valueBuilder.toString();
