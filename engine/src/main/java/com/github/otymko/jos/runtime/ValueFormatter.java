@@ -86,16 +86,13 @@ public final class ValueFormatter {
 
     final var locale = params.getLocale(LOCALE);
     final var localDateFormat = params.get(DATE_LOCAL_FORMAT);
-    if (localDateFormat.isPresent()) {
-      return processLocalDateFormat(value, localDateFormat.get(), locale);
-    }
 
     final var commonDateFormat = params.get(DATE_FORMAT);
     if (commonDateFormat.isPresent()) {
       return processCommonDateFormat(value, commonDateFormat.get(), locale);
     }
 
-    return processLocalDateFormat(value, DATETIME_EN, locale);
+    return processLocalDateFormat(value, localDateFormat.orElse(""), locale);
   }
 
   private static String processLocalDateFormat(Date value, String localDateFormat, Locale locale) {
@@ -121,15 +118,6 @@ public final class ValueFormatter {
       case TIME_EN:
         return DateFormat.getTimeInstance(DateFormat.MEDIUM, locale).format(value);
 
-      case DATETIME_RU:
-      case DATETIME_EN: {
-        // Штатный подход через
-        // DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale)
-        // даёт формат с запятой между датой и временем
-        return String.format("%s %s",
-                processLocalDateFormat(value, DATE_EN, locale),
-                processLocalDateFormat(value, TIME_EN, locale));
-      }
       case LONG_DATETIME_RU:
       case LONG_DATETIME_EN: {
         // Штатный подход через
@@ -145,7 +133,15 @@ public final class ValueFormatter {
         return DateFormat.getDateInstance(DateFormat.LONG, locale).format(value);
 
       default:
-        throw MachineException.operationNotImplementedException();
+      case DATETIME_RU:
+      case DATETIME_EN: {
+        // Штатный подход через
+        // DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale)
+        // даёт формат с запятой между датой и временем
+        return String.format("%s %s",
+                processLocalDateFormat(value, DATE_EN, locale),
+                processLocalDateFormat(value, TIME_EN, locale));
+      }
     }
   }
 
@@ -155,10 +151,11 @@ public final class ValueFormatter {
     int i = 0;
     while (i < param.length()) {
 
-      if (param.charAt(i) == 'в' && i + 1 < param.length() && param.charAt(i + 1) == 'в') {
-        builder.setCharAt(i, 't');
+      if (param.charAt(i) == 'в' && i + 1 < param.length() && param.charAt(i + 1) == 'в'
+      || param.charAt(i) == 't' && i + 1 < param.length() && param.charAt(i + 1) == 't') {
+        builder.setCharAt(i, 'a');
         i++;
-        builder.setCharAt(i, 't');
+        builder.delete(i, i + 1);
       }
 
       if (dateNativeFormatMap.containsKey(param.charAt(i))) {
