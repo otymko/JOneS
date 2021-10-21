@@ -31,12 +31,11 @@ public class FormatParametersList {
   }
 
   public Optional<String> get(String[] names) {
-    for (String name : names) {
-      if (paramList.containsKey(name.toUpperCase())) {
-        return Optional.of(paramList.get(name.toUpperCase()));
-      }
-    }
-    return Optional.empty();
+    Arrays.stream(names)
+      .map(name -> name.toUpperCase(Locale.ENGLISH))
+      .map(paramList::get)
+      .filter(Objects::nonNull)
+      .findFirst();
   }
 
   public Locale getLocale(String[] names) {
