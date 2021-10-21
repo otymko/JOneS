@@ -5,12 +5,15 @@
  */
 package com.github.otymko.jos.runtime;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class FormatParametersList {
 
@@ -31,17 +34,17 @@ public class FormatParametersList {
   }
 
   public Optional<String> get(String[] names) {
-    Arrays.stream(names)
-      .map(name -> name.toUpperCase(Locale.ENGLISH))
-      .map(paramList::get)
-      .filter(Objects::nonNull)
-      .findFirst();
+    return Arrays.stream(names)
+            .map(name -> name.toUpperCase(Locale.ENGLISH))
+            .map(paramList::get)
+            .filter(Objects::nonNull)
+            .findFirst();
   }
 
   public Locale getLocale(String[] names) {
-return get(names)
-      .map(this::getLocale)
-      .orElse(Locale.getDefault());
+    return get(names)
+            .map(FormatParametersList::getLocale)
+            .orElse(Locale.getDefault());
   }
 
   private static Locale getLocale(String localeParamValue) {
@@ -51,26 +54,32 @@ return get(names)
 
   public Optional<Integer> getInt(String[] names) {
     return get(names)
-        .map(stringValue -> parseInt(stringValue));
+            .map(FormatParametersList::parseInt);
   }
 
-  public Optional<List<Integer>> getIntList(String[] names) {
-    get(names)
-      .stream()
-      .flatMap(stringValue -> Arrays.stream(stringValue.split("\\D")))
-      .filter(Predicate.not(String::isBlank))
-      .map(this::parseInt)
-      .collect(Collectors.toList());
+  public boolean containsKey(String[] names) {
+    return Arrays.stream(names)
+            .map(name -> name.toUpperCase(Locale.ENGLISH))
+            .anyMatch(paramList::containsKey);
+  }
+
+  public List<Integer> getIntList(String[] names) {
+    return get(names)
+            .stream()
+            .flatMap(stringValue -> Arrays.stream(stringValue.split("\\D")))
+            .filter(Predicate.not(String::isBlank))
+            .map(FormatParametersList::parseInt)
+            .collect(Collectors.toList());
   }
 
   private static int parseInt(String value) {
     String result = value.chars()
-      .filter(ch -> Character.isDigit(ch) || ch == '-')
-      .mapToObj(ch -> (char)ch)
-      .map(String::valueOf)
-      .collect(Collectors.joining());
-      
-      return Integer.parseInt(result)
+            .filter(ch -> Character.isDigit(ch) || ch == '-')
+            .mapToObj(ch -> (char) ch)
+            .map(String::valueOf)
+            .collect(Collectors.joining());
+
+    return result.isBlank() ? 0 : Integer.parseInt(result);
   }
 
   private void parseParams() {

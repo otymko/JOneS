@@ -24,39 +24,11 @@ public class NumberFormatter {
   private static final int NEGATIVE_POSTFIX_SIGN_WHITESPACE = 4; // 1,1 -
   private static final int DEFAULT_FRACTION_DIGITS = 340;
 
-  public NumberFormatter(Locale locale) {
-    final var systemFormatter = (DecimalFormat) NumberFormat.getInstance(locale);
-    fractionDelimiter = String.valueOf(systemFormatter.getDecimalFormatSymbols().getDecimalSeparator());
-    groupDelimiter = String.valueOf(systemFormatter.getDecimalFormatSymbols().getGroupingSeparator());
-    lowerGroupingSize = systemFormatter.getGroupingSize();
-    higherGroupingSize = 0;
-    if (systemFormatter.getNegativePrefix().startsWith("(")) {
-      negativeAppearance = NEGATIVE_BRACES;
-    }
-  }
-
   @Getter
   private int maxSize = -1;
 
-  public void setMaxSize(int value) {
-    if (value < 0) {
-      return;
-    }
-
-    maxSize = value;
-    if (decimalSize == -1) {
-      decimalSize = 0;
-    }
-  }
-
   @Getter
   private int decimalSize = -1;
-
-  public void setDecimalSize(int value) {
-    if (value >= 0) {
-      decimalSize = value;
-    }
-  }
 
   @Getter
   @Setter
@@ -65,14 +37,6 @@ public class NumberFormatter {
   @Getter
   private String zeroAppearance = "";
 
-  public void setZeroAppearance(String value) {
-    if (value.isEmpty()) {
-      zeroAppearance = "0";
-    } else {
-      zeroAppearance = value;
-    }
-  }
-
   @Getter
   @Setter
   private boolean leadingZeroes;
@@ -80,30 +44,8 @@ public class NumberFormatter {
   @Getter
   private String fractionDelimiter;
 
-  public void setFractionDelimiter(String value) {
-    if (value == null || value.isBlank()) {
-      return;
-    }
-    if (value.length() > 1) {
-      fractionDelimiter = value.substring(0, 1);
-    } else {
-      fractionDelimiter = value;
-    }
-  }
-
   @Getter
   private String groupDelimiter;
-
-  public void setGroupDelimiter(String value) {
-    if (value == null || value.isBlank()) {
-      return;
-    }
-    if (value.length() > 1) {
-      groupDelimiter = value.substring(0, 1);
-    } else {
-      groupDelimiter = value;
-    }
-  }
 
   @Getter
   @Setter
@@ -115,28 +57,14 @@ public class NumberFormatter {
   @Getter
   private int higherGroupingSize;
 
-  public void setGroupingSize(int lowGroup) {
-    setGroupingSize(lowGroup, -1);
-  }
-
-  public void setGroupingSize(int lowGroup, int hiGroup) {
-    lowerGroupingSize = lowGroup;
-    higherGroupingSize = hiGroup;
-  }
-
-  public void setGroupingSize(List<Integer> groups) {
-    if (groups.isEmpty()) {
-
-      setGroupingSize(0);
-
-    } else if (groups.size() == 1) {
-
-      setGroupingSize(groups.get(0));
-
-    } else {
-
-      setGroupingSize(groups.get(0), groups.get(1));
-
+  public NumberFormatter(Locale locale) {
+    final var systemFormatter = (DecimalFormat) NumberFormat.getInstance(locale);
+    fractionDelimiter = String.valueOf(systemFormatter.getDecimalFormatSymbols().getDecimalSeparator());
+    groupDelimiter = String.valueOf(systemFormatter.getDecimalFormatSymbols().getGroupingSeparator());
+    lowerGroupingSize = systemFormatter.getGroupingSize();
+    higherGroupingSize = 0;
+    if (systemFormatter.getNegativePrefix().startsWith("(")) {
+      negativeAppearance = NEGATIVE_BRACES;
     }
   }
 
@@ -173,7 +101,7 @@ public class NumberFormatter {
 
     final var preValue = getPreliminaryPresentation(valuePresentation);
 
-    if (preValue.isEqualsZero()) {
+    if (preValue.equalsZero()) {
       return zeroAppearance;
     }
 
@@ -217,4 +145,77 @@ public class NumberFormatter {
 
     return systemFormat;
   }
+
+  public void setMaxSize(int value) {
+    if (value < 0) {
+      return;
+    }
+
+    maxSize = value;
+    if (decimalSize == -1) {
+      decimalSize = 0;
+    }
+  }
+
+  public void setDecimalSize(int value) {
+    if (value >= 0) {
+      decimalSize = value;
+    }
+  }
+
+  public void setZeroAppearance(String value) {
+    if (value.isEmpty()) {
+      zeroAppearance = "0";
+    } else {
+      zeroAppearance = value;
+    }
+  }
+
+  public void setFractionDelimiter(String value) {
+    if (value == null || value.isBlank()) {
+      return;
+    }
+    if (value.length() > 1) {
+      fractionDelimiter = value.substring(0, 1);
+    } else {
+      fractionDelimiter = value;
+    }
+  }
+
+  public void setGroupDelimiter(String value) {
+    if (value == null || value.isBlank()) {
+      return;
+    }
+    if (value.length() > 1) {
+      groupDelimiter = value.substring(0, 1);
+    } else {
+      groupDelimiter = value;
+    }
+  }
+
+  public void setGroupingSize(int lowGroup) {
+    setGroupingSize(lowGroup, -1);
+  }
+
+  public void setGroupingSize(int lowGroup, int hiGroup) {
+    lowerGroupingSize = lowGroup;
+    higherGroupingSize = hiGroup;
+  }
+
+  public void setGroupingSize(List<Integer> groups) {
+    if (groups.isEmpty()) {
+
+      setGroupingSize(0);
+
+    } else if (groups.size() == 1) {
+
+      setGroupingSize(groups.get(0));
+
+    } else {
+
+      setGroupingSize(groups.get(0), groups.get(1));
+
+    }
+  }
+
 }

@@ -9,6 +9,7 @@ import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
+import lombok.experimental.UtilityClass;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+@UtilityClass
 public final class ValueFormatter {
 
   private static final String[] BOOLEAN_FALSE = {"БЛ", "BF"};
@@ -54,8 +56,17 @@ public final class ValueFormatter {
 
   private static final Map<Character, Character> dateNativeFormatMap = new HashMap<>();
 
-
-  private ValueFormatter() {}
+  static {
+    dateNativeFormatMap.put('д', 'd');
+    dateNativeFormatMap.put('М', 'M');
+    dateNativeFormatMap.put('г', 'y');
+    dateNativeFormatMap.put('к', 'q');
+    dateNativeFormatMap.put('ч', 'h');
+    dateNativeFormatMap.put('Ч', 'H');
+    dateNativeFormatMap.put('м', 'm');
+    dateNativeFormatMap.put('с', 's');
+    dateNativeFormatMap.put('р', 'S');
+  }
 
   public static String format(IValue value, String formatString) {
     final var params = parseParameters(formatString);
@@ -182,24 +193,14 @@ public final class ValueFormatter {
     params.get(NUM_LEADING_ZERO).ifPresent(v -> nf.setLeadingZeroes(true));
     params.getInt(NUM_MAX_SIZE).ifPresent(nf::setMaxSize);
     params.get(NUM_FRACTION_DELIMITER).ifPresent(nf::setFractionDelimiter);
-    params.getIntList(NUM_GROUPING).ifPresent(nf::setGroupingSize);
+    if (params.containsKey(NUM_GROUPING)) {
+      nf.setGroupingSize(params.getIntList(NUM_GROUPING));
+    }
     params.getInt(NUM_NEGATIVE_APPEARANCE).ifPresent(nf::setNegativeAppearance);
     params.getInt(NUM_DECIMAL_SHIFT).ifPresent(nf::setDecimalShift);
     params.get(NUM_GROUPS_DELIMITER).ifPresent(nf::setGroupDelimiter);
 
     return nf.format(value);
-  }
-
-  static {
-    dateNativeFormatMap.put('д', 'd');
-    dateNativeFormatMap.put('М', 'M');
-    dateNativeFormatMap.put('г', 'y');
-    dateNativeFormatMap.put('к', 'q');
-    dateNativeFormatMap.put('ч', 'h');
-    dateNativeFormatMap.put('Ч', 'H');
-    dateNativeFormatMap.put('м', 'm');
-    dateNativeFormatMap.put('с', 's');
-    dateNativeFormatMap.put('р', 'S');
   }
 
 }

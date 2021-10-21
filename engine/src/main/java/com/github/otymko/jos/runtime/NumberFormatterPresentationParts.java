@@ -23,7 +23,7 @@ final class NumberFormatterPresentationParts {
   @Getter
   private String fractionPart;
 
-  public boolean isEqualsZero() {
+  public boolean equalsZero() {
     return integerPart.equals("0") && fractionPart.isEmpty();
   }
 
