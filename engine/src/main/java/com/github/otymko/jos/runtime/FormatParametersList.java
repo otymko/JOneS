@@ -51,11 +51,8 @@ return get(names)
 
 
   public Optional<Integer> getInt(String[] names) {
-    final var stringValue = get(names);
-    if (stringValue.isEmpty()) {
-      return Optional.empty();
-    }
-    return Optional.of(parseInt(stringValue.get()));
+    return get(names)
+        .map(stringValue -> parseInt(stringValue));
   }
 
   public Optional<List<Integer>> getIntList(String[] names) {
