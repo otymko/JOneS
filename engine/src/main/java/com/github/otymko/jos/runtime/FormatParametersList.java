@@ -40,11 +40,9 @@ public class FormatParametersList {
   }
 
   public Locale getLocale(String[] names) {
-    final var stringValue = get(names);
-    if (stringValue.isPresent()) {
-      return getLocale(stringValue.get());
-    }
-    return Locale.getDefault();
+return get(names)
+      .map(this::getLocale)
+      .orElse(Locale.getDefault());
   }
 
   private static Locale getLocale(String localeParamValue) {
