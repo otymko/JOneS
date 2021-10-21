@@ -65,17 +65,13 @@ return get(names)
   }
 
   private static int parseInt(String value) {
-    final var cleanValue = new StringBuilder();
-    for (var c : value.toCharArray()) {
-      if (Character.isDigit(c) || c == '-')
-        cleanValue.append(c);
-    }
-
-    if (cleanValue.length() == 0) {
-      return 0;
-    }
-
-    return Integer.parseInt(cleanValue.toString());
+    String result = value.chars()
+      .filter(ch -> Character.isDigit(ch) || ch == '-')
+      .mapToObj(ch -> (char)ch)
+      .map(String::valueOf)
+      .collect(Collectors.joining());
+      
+      return Integer.parseInt(result)
   }
 
   private void parseParams() {
