@@ -56,21 +56,12 @@ return get(names)
   }
 
   public Optional<List<Integer>> getIntList(String[] names) {
-    final var asStringValue = get(names);
-    if (asStringValue.isEmpty()) {
-      return Optional.empty();
-    }
-
-    final var result = new ArrayList<Integer>();
-    final var stringValue = asStringValue.get();
-
-    for (final var groupElement : stringValue.split("\\D")) {
-      if (!groupElement.isBlank()) {
-        result.add(parseInt(groupElement));
-      }
-    }
-
-    return Optional.of(result);
+    get(names)
+      .stream()
+      .flatMap(stringValue -> Arrays.stream(stringValue.split("\\D")))
+      .filter(Predicate.not(String::isBlank))
+      .map(this::parseInt)
+      .collect(Collectors.toList());
   }
 
   private static int parseInt(String value) {
