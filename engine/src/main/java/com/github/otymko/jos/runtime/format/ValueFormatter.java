@@ -6,8 +6,9 @@
 package com.github.otymko.jos.runtime.format;
 
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.localization.MessageResource;
+import com.github.otymko.jos.localization.Resources;
 import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import lombok.experimental.UtilityClass;
 
@@ -86,8 +87,12 @@ public final class ValueFormatter {
   }
 
   private static String boolFormat(boolean value, FormatParametersList params) {
-    final var presentation = params.get( value ? BOOLEAN_TRUE : BOOLEAN_FALSE);
-    return presentation.orElse(ValueFactory.create(value).asString());
+    if (value) {
+      return params.get(BOOLEAN_TRUE).orElse(
+              Resources.getResourceString(MessageResource.DEFAULT_TRUE_PRESENTATION));
+    }
+    return params.get(BOOLEAN_FALSE).orElse(
+            Resources.getResourceString(MessageResource.DEFAULT_FALSE_PRESENTATION));
   }
 
   private static String dateFormat(Date value, FormatParametersList params) {
