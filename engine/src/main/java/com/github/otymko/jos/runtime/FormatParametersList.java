@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class FormatParametersList {
@@ -20,6 +21,7 @@ public class FormatParametersList {
   private static final char SINGLE_QUOTE = '\'';
   private static final char DOUBLE_QUOTE = '\"';
   private static final char SPACE = ' ';
+  private static final Pattern intListSeparatorPattern = Pattern.compile("\\D");
 
   private final Map<String, String> paramList = new HashMap<>();
   private final String format;
@@ -66,7 +68,7 @@ public class FormatParametersList {
   public List<Integer> getIntList(List<String> names) {
     return get(names)
             .stream()
-            .flatMap(stringValue -> Arrays.stream(stringValue.split("\\D")))
+            .flatMap(stringValue -> Arrays.stream(intListSeparatorPattern.split(stringValue)))
             .filter(Predicate.not(String::isBlank))
             .map(FormatParametersList::parseInt)
             .collect(Collectors.toList());
