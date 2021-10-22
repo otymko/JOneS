@@ -6,11 +6,16 @@
 package com.github.otymko.jos.runtime.context.global;
 
 import com.github.otymko.jos.TestHelper;
+import com.github.otymko.jos.localization.MessageResource;
+import com.github.otymko.jos.localization.Resources;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
 class StringOperationGlobalContextTest {
+
+  private static final String YES_STRING = Resources.getResourceString(MessageResource.DEFAULT_TRUE_PRESENTATION);
+  private static final String NO_STRING = Resources.getResourceString(MessageResource.DEFAULT_FALSE_PRESENTATION);
 
   @Test
   void testFind() throws Exception {
@@ -23,7 +28,7 @@ class StringOperationGlobalContextTest {
   @Test
   void testStartsWith() throws Exception {
     var script = Path.of("src/test/resources/global/StringOperation/startsWith.os");
-    var model = "Да\nНет\nНет";
+    var model = String.format("%s\n%s\n%s", YES_STRING, NO_STRING, NO_STRING);
     TestHelper.checkScript(script, model);
     // TODO: проверить СтрНачинаетсяС(ГдеИскать, "")
   }
