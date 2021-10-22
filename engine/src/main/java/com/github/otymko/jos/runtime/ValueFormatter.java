@@ -21,27 +21,28 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 @UtilityClass
 public final class ValueFormatter {
 
-  private static final String[] BOOLEAN_FALSE = {"БЛ", "BF"};
-  private static final String[] BOOLEAN_TRUE = {"БИ", "BT"};
-  private static final String[] LOCALE = { "Л", "L" };
-  private static final String[] NUM_MAX_SIZE = { "ЧЦ", "ND" };
-  private static final String[] NUM_DECIMAL_SIZE = { "ЧДЦ", "NFD" };
-  private static final String[] NUM_FRACTION_DELIMITER = { "ЧРД", "NDS" };
-  private static final String[] NUM_DECIMAL_SHIFT = { "ЧС", "NS" };
-  private static final String[] NUM_GROUPS_DELIMITER = { "ЧРГ", "NGS" };
-  private static final String[] NUM_ZERO_APPEARANCE = { "ЧН", "NZ" };
-  private static final String[] NUM_GROUPING = { "ЧГ", "NG" };
-  private static final String[] NUM_LEADING_ZERO = { "ЧВН", "NLZ" };
-  private static final String[] NUM_NEGATIVE_APPEARANCE = { "ЧО", "NN" };
-  private static final String[] DATE_EMPTY = { "ДП", "DE" };
-  private static final String[] DATE_FORMAT = { "ДФ", "DF" };
-  private static final String[] DATE_LOCAL_FORMAT = { "ДЛФ", "DLF" };
+  private static final List<String> BOOLEAN_FALSE = List.of("БЛ", "BF");
+  private static final List<String> BOOLEAN_TRUE = List.of("БИ", "BT");
+  private static final List<String> LOCALE = List.of( "Л", "L");
+  private static final List<String> NUM_MAX_SIZE = List.of( "ЧЦ", "ND");
+  private static final List<String> NUM_DECIMAL_SIZE = List.of( "ЧДЦ", "NFD");
+  private static final List<String> NUM_FRACTION_DELIMITER = List.of( "ЧРД", "NDS");
+  private static final List<String> NUM_DECIMAL_SHIFT = List.of( "ЧС", "NS");
+  private static final List<String> NUM_GROUPS_DELIMITER = List.of( "ЧРГ", "NGS");
+  private static final List<String> NUM_ZERO_APPEARANCE = List.of( "ЧН", "NZ");
+  private static final List<String> NUM_GROUPING = List.of( "ЧГ", "NG");
+  private static final List<String> NUM_LEADING_ZERO = List.of( "ЧВН", "NLZ");
+  private static final List<String> NUM_NEGATIVE_APPEARANCE = List.of( "ЧО", "NN");
+  private static final List<String> DATE_EMPTY = List.of( "ДП", "DE");
+  private static final List<String> DATE_FORMAT = List.of( "ДФ", "DF");
+  private static final List<String> DATE_LOCAL_FORMAT = List.of( "ДЛФ", "DLF");
 
   private static final String DATETIME_RU = "ДВ";
   private static final String DATETIME_EN = "DT";

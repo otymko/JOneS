@@ -33,15 +33,15 @@ public class FormatParametersList {
     parseParams();
   }
 
-  public Optional<String> get(String[] names) {
-    return Arrays.stream(names)
+  public Optional<String> get(List<String> names) {
+    return names.stream()
             .map(name -> name.toUpperCase(Locale.ENGLISH))
             .map(paramList::get)
             .filter(Objects::nonNull)
             .findFirst();
   }
 
-  public Locale getLocale(String[] names) {
+  public Locale getLocale(List<String> names) {
     return get(names)
             .map(FormatParametersList::getLocale)
             .orElse(Locale.getDefault());
@@ -52,18 +52,18 @@ public class FormatParametersList {
   }
 
 
-  public Optional<Integer> getInt(String[] names) {
+  public Optional<Integer> getInt(List<String> names) {
     return get(names)
             .map(FormatParametersList::parseInt);
   }
 
-  public boolean containsKey(String[] names) {
-    return Arrays.stream(names)
+  public boolean containsKey(List<String> names) {
+    return names.stream()
             .map(name -> name.toUpperCase(Locale.ENGLISH))
             .anyMatch(paramList::containsKey);
   }
 
-  public List<Integer> getIntList(String[] names) {
+  public List<Integer> getIntList(List<String> names) {
     return get(names)
             .stream()
             .flatMap(stringValue -> Arrays.stream(stringValue.split("\\D")))
