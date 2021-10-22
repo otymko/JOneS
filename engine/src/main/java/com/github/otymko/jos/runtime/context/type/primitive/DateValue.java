@@ -6,7 +6,7 @@
 package com.github.otymko.jos.runtime.context.type.primitive;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.ValueFormatter;
+import com.github.otymko.jos.runtime.format.ValueFormatter;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;

@@ -3,92 +3,39 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.github.otymko.jos.runtime;
+package com.github.otymko.jos.runtime.format;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-public class FormatParametersList {
+final class FormatParametersListBuilder {
 
   private static final char SINGLE_QUOTE = '\'';
   private static final char DOUBLE_QUOTE = '\"';
   private static final char SPACE = ' ';
-  private static final Pattern intListSeparatorPattern = Pattern.compile("\\D");
 
-  private final Map<String, String> paramList = new HashMap<>();
   private final String format;
 
   private int index;
   private String paramName;
   private String paramValue;
 
-  public FormatParametersList(String format) {
+  FormatParametersListBuilder(String format) {
     this.format = format;
-    parseParams();
   }
 
-  public Optional<String> get(List<String> names) {
-    return names.stream()
-            .map(name -> name.toUpperCase(Locale.ENGLISH))
-            .map(paramList::get)
-            .filter(Objects::nonNull)
-            .findFirst();
+  public static FormatParametersList build(String params) {
+    final var builder = new FormatParametersListBuilder(params);
+    return new FormatParametersList(builder.parseParams());
   }
 
-  public Locale getLocale(List<String> names) {
-    return get(names)
-            .map(FormatParametersList::getLocale)
-            .orElse(Locale.getDefault());
-  }
-
-  private static Locale getLocale(String localeParamValue) {
-    return Locale.forLanguageTag(localeParamValue.replace('_', '-'));
-  }
-
-
-  public Optional<Integer> getInt(List<String> names) {
-    return get(names)
-            .map(FormatParametersList::parseInt);
-  }
-
-  public boolean containsKey(List<String> names) {
-    return names.stream()
-            .map(name -> name.toUpperCase(Locale.ENGLISH))
-            .anyMatch(paramList::containsKey);
-  }
-
-  public List<Integer> getIntList(List<String> names) {
-    return get(names)
-            .stream()
-            .flatMap(stringValue -> Arrays.stream(intListSeparatorPattern.split(stringValue)))
-            .filter(Predicate.not(String::isBlank))
-            .map(FormatParametersList::parseInt)
-            .collect(Collectors.toList());
-  }
-
-  private static int parseInt(String value) {
-    String result = value.chars()
-            .filter(ch -> Character.isDigit(ch) || ch == '-')
-            .mapToObj(ch -> (char) ch)
-            .map(String::valueOf)
-            .collect(Collectors.joining());
-
-    return result.isBlank() ? 0 : Integer.parseInt(result);
-  }
-
-  private void parseParams() {
+  Map<String, String> parseParams() {
+    final Map<String, String> paramList = new HashMap<>();
     index = 0;
     while (readParameterDefinition()) {
       paramList.put(paramName.toUpperCase(), paramValue);
     }
+    return paramList;
   }
 
   private boolean readParameterDefinition() {
@@ -100,7 +47,6 @@ public class FormatParametersList {
   }
 
   private boolean readParameterName() {
-
     skipWhitespace();
     if (index >= format.length()) {
       return false;

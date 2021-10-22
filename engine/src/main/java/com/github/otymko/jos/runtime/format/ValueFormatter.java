@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.github.otymko.jos.runtime;
+package com.github.otymko.jos.runtime.format;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.IValue;
@@ -82,7 +82,7 @@ public final class ValueFormatter {
   }
 
   private static FormatParametersList parseParameters(String format) {
-    return new FormatParametersList(format);
+    return FormatParametersListBuilder.build(format);
   }
 
   private static String boolFormat(boolean value, FormatParametersList params) {
@@ -157,27 +157,27 @@ public final class ValueFormatter {
     }
   }
 
-  private static String convertToNativeFormat(String param) {
-    final var builder = new StringBuilder(param);
+  private static String convertToNativeFormat(String jonesFormat) {
+    final var nativeFormatBuilder = new StringBuilder(jonesFormat);
 
     int i = 0;
-    while (i < param.length()) {
+    while (i < jonesFormat.length()) {
 
-      if (param.charAt(i) == 'в' && i + 1 < param.length() && param.charAt(i + 1) == 'в'
-      || param.charAt(i) == 't' && i + 1 < param.length() && param.charAt(i + 1) == 't') {
-        builder.setCharAt(i, 'a');
+      if (jonesFormat.charAt(i) == 'в' && i + 1 < jonesFormat.length() && jonesFormat.charAt(i + 1) == 'в'
+      || jonesFormat.charAt(i) == 't' && i + 1 < jonesFormat.length() && jonesFormat.charAt(i + 1) == 't') {
+        nativeFormatBuilder.setCharAt(i, 'a');
         i++;
-        builder.delete(i, i + 1);
+        nativeFormatBuilder.delete(i, i + 1);
       }
 
-      if (dateNativeFormatMap.containsKey(param.charAt(i))) {
-        builder.setCharAt(i, dateNativeFormatMap.get(param.charAt(i)));
+      if (dateNativeFormatMap.containsKey(jonesFormat.charAt(i))) {
+        nativeFormatBuilder.setCharAt(i, dateNativeFormatMap.get(jonesFormat.charAt(i)));
       }
 
       i++;
     }
 
-    return builder.toString();
+    return nativeFormatBuilder.toString();
   }
 
   private static String processCommonDateFormat(Date value, String localDateFormat, Locale locale) {
