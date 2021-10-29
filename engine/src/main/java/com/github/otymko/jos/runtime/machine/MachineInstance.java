@@ -782,8 +782,8 @@ public class MachineInstance {
   private void newInstance(int argument) {
     var argumentValues = new IValue[argument];
 
-    for (var position = 0; position < argument; position++) {
-      argumentValues[position] = breakVariableLink(operationStack.pop());
+    for (var position = argument; position > 0; position--) {
+      argumentValues[position - 1] = breakVariableLink(operationStack.pop());
     }
 
     var typeName = operationStack.pop().asString();
