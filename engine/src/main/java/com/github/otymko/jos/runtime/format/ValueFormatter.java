@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Класс с методами форматирования значений.
+ */
 @UtilityClass
 public final class ValueFormatter {
 
@@ -70,6 +73,15 @@ public final class ValueFormatter {
     dateNativeFormatMap.put('р', 'S');
   }
 
+  /**
+   * Возвращает текстовое представление значения с учетом переданного формата.
+   * В качестве первого параметра может принимать Дату, Булево, Строку и Числа.
+   * Если переданы другие типы, будет вызвано исключение.
+   *
+   * @param value        Значение, для которого необходимо сформировать представление
+   * @param formatString Параметры форматирования значения
+   * @return Текстовое представление значения
+   */
   public static String format(IValue value, String formatString) {
     final var params = parseParameters(formatString);
     switch (value.getDataType()) {
