@@ -91,9 +91,14 @@ public class EnumerationValue implements ContextType, IValue {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof IValue) {
-      return ((IValue) obj).getRawValue().equals(this);
+    if (!(obj instanceof IValue)) {
+      return false;
     }
-    return false;
+    final var rawObject = ((IValue) obj).getRawValue();
+    if (!(rawObject instanceof EnumerationValue)) {
+      return false;
+    }
+    final var enumerationValue = (EnumerationValue)rawObject;
+    return enumerationValue.getValue() == getValue();
   }
 }
