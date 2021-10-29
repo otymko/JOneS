@@ -63,7 +63,8 @@ public class ScriptTester implements ContextType, IValue {
     var oneValueRaw = oneValue.getRawValue();
     var twoValueRaw = twoValue.getRawValue();
 
-    if (oneValueRaw.compareTo(twoValueRaw) != 0) {
+    //if (oneValueRaw.compareTo(twoValueRaw) != 0) {
+    if (!oneValueRaw.equals(twoValueRaw)) {
       // TODO: локализация
       // TODO: использование additionalErrorMessage
       final var errorMessage = String.format("Сравниваемые значения (%s; %s) не равны, а хотели, чтобы были равны.",
@@ -77,7 +78,8 @@ public class ScriptTester implements ContextType, IValue {
     var oneValueRaw = oneValue.getRawValue();
     var twoValueRaw = twoValue.getRawValue();
 
-    if (oneValueRaw.compareTo(twoValueRaw) == 0) {
+    //if (oneValueRaw.compareTo(twoValueRaw) == 0) {
+    if (oneValueRaw.equals(twoValueRaw)) {
       // TODO: локализация
       // TODO: использование additionalErrorMessage
       final var errorMessage = String.format("Сравниваемые значения (%s; %s) равны, а хотели, чтобы были не равны.",
