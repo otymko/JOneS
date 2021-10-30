@@ -6,12 +6,14 @@
 package com.github.otymko.jos.runtime.context.type.typedescription;
 
 import com.github.otymko.jos.compiler.EnumerationHelper;
+import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
+import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.AllowedSignEnum;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
@@ -27,13 +29,13 @@ public class NumberQualifiers extends ContextValue {
   public static final ContextInfo INFO = ContextInfo.createByClass(NumberQualifiers.class);
 
   /**
-   * Общее количество десятичных знаков, доступное для числа
+   * Общее количество десятичных знаков, доступное для числа. 0 - Неограниченно
    */
   @ContextProperty(name = "Разрядность", alias = "Digits", accessMode = PropertyAccessMode.READ_ONLY)
   public int digits;
 
   /**
-   * Количество знаков дробной части числа
+   * Количество знаков дробной части числа. 0 - Без дробной части
    */
   @ContextProperty(name = "РазрядностьДробнойЧасти", alias = "FractionDigits", accessMode = PropertyAccessMode.READ_ONLY)
   public int fractionDigits;
@@ -93,6 +95,29 @@ public class NumberQualifiers extends ContextValue {
             digits.asNumber().intValue(),
             0,
             AllowedSignEnum.ANY);
+  }
+
+  @ContextConstructor
+  public static NumberQualifiers constructor() {
+
+    return new NumberQualifiers(
+            0,
+            0,
+            AllowedSignEnum.ANY);
+  }
+
+  public static NumberQualifiers getOrDefault(IValue numberQualifiers) {
+    if (numberQualifiers == null) {
+      return constructor();
+    }
+    final var rawValue = numberQualifiers.getRawValue();
+    if (rawValue.getDataType() == DataType.UNDEFINED) {
+      return constructor();
+    }
+    if (!(rawValue instanceof NumberQualifiers)) {
+      throw MachineException.invalidArgumentValueException();
+    }
+    return (NumberQualifiers) rawValue;
   }
 
   @Override

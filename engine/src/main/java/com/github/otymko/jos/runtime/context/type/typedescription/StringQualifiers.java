@@ -27,7 +27,7 @@ public class StringQualifiers extends ContextValue {
   public static final ContextInfo INFO = ContextInfo.createByClass(StringQualifiers.class);
 
   /**
-   * Длина строки
+   * Длина строки. 0 - Неограниченно
    */
   @ContextProperty(name = "Длина", alias = "Length", accessMode = PropertyAccessMode.READ_ONLY)
   public int length;
@@ -57,6 +57,11 @@ public class StringQualifiers extends ContextValue {
   @ContextConstructor
   public static StringQualifiers constructor(IValue length) {
     return new StringQualifiers(length.asNumber().intValue(), AllowedLengthEnum.VARIABLE);
+  }
+
+  @ContextConstructor
+  public static StringQualifiers constructor() {
+    return new StringQualifiers(0, AllowedLengthEnum.VARIABLE);
   }
 
   @Override

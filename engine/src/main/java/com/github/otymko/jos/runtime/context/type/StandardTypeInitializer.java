@@ -19,6 +19,7 @@ import com.github.otymko.jos.runtime.context.type.typedescription.BinaryDataQual
 import com.github.otymko.jos.runtime.context.type.typedescription.DateQualifiers;
 import com.github.otymko.jos.runtime.context.type.typedescription.NumberQualifiers;
 import com.github.otymko.jos.runtime.context.type.typedescription.StringQualifiers;
+import com.github.otymko.jos.runtime.context.type.typedescription.TypeDescription;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.experimental.UtilityClass;
 
@@ -69,6 +70,7 @@ public class StandardTypeInitializer {
     implementTypeByInfo(typeManager, DateQualifiers.INFO);
     implementTypeByInfo(typeManager, NumberQualifiers.INFO);
     implementTypeByInfo(typeManager, StringQualifiers.INFO);
+    implementTypeByInfo(typeManager, TypeDescription.INFO);
   }
 
   private void initSystemEnumerations(TypeManager typeManager) {

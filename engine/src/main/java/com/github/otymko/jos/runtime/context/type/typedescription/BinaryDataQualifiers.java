@@ -33,7 +33,7 @@ public class BinaryDataQualifiers extends ContextValue {
   public int length;
 
   /**
-   * Допустимый размер данных
+   * Допустимый размер данных. 0 - Неограниченно
    *
    * @see AllowedLengthEnum
    */
@@ -72,6 +72,17 @@ public class BinaryDataQualifiers extends ContextValue {
   @ContextConstructor
   public static BinaryDataQualifiers constructor(IValue length) {
     return new BinaryDataQualifiers(length.asNumber().intValue(), AllowedLengthEnum.VARIABLE);
+  }
+
+  /**
+   * Возвращает квалификаторы двоичных данных неограниченной длины. Допустимая длина устанавливается Переменная.
+   * @return КвалификаторыДвоичныхДанных
+   * @see BinaryDataQualifiers
+   * @see AllowedLengthEnum
+   */
+  @ContextConstructor
+  public static BinaryDataQualifiers constructor() {
+    return new BinaryDataQualifiers(0, AllowedLengthEnum.VARIABLE);
   }
 
   @Override
