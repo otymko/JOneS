@@ -1003,10 +1003,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     if (callParam.isEmpty()) {
       return 0;
     }
-    if (callParam.size() == 1) {
-      if (callParam.get(0).expression() == null) {
-        return 0;
-      }
+    if (callParam.size() == 1 && callParam.get(0).expression() == null) {
+      return 0;
     }
     int count = 0;
     for (var callParamContext : callParam) {

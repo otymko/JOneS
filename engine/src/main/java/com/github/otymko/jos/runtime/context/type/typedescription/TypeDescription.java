@@ -96,7 +96,7 @@ public class TypeDescription extends ContextValue {
     if (containsTypeInternal(valueType)) {
       targetType = valueType;
     } else {
-      if (types.size() == 0) {
+      if (types.isEmpty()) {
         return rawValue;
       }
       if (types.size() != 1) {
