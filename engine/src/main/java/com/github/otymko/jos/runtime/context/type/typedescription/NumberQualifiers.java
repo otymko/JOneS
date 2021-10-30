@@ -17,18 +17,30 @@ import com.github.otymko.jos.runtime.context.type.enumeration.AllowedSignEnum;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Value;
 
+/**
+ * Квалификаторы числа для Описания типов
+ */
 @ContextClass(name = "КвалификаторыЧисла", alias = "NumberQualifiers")
 @Value
 public class NumberQualifiers extends ContextValue {
 
   public static final ContextInfo INFO = ContextInfo.createByClass(NumberQualifiers.class);
 
+  /**
+   * Общее количество десятичных знаков, доступное для числа
+   */
   @ContextProperty(name = "Разрядность", alias = "Digits", accessMode = PropertyAccessMode.READ_ONLY)
   public int digits;
 
+  /**
+   * Количество знаков дробной части числа
+   */
   @ContextProperty(name = "РазрядностьДробнойЧасти", alias = "FractionDigits", accessMode = PropertyAccessMode.READ_ONLY)
   public int fractionDigits;
 
+  /**
+   * Допустимый знак числа
+   */
   @ContextProperty(name = "ДопустимыйЗнак", alias = "allowedSign", accessMode = PropertyAccessMode.READ_ONLY)
   public AllowedSignEnum allowedSign;
 
