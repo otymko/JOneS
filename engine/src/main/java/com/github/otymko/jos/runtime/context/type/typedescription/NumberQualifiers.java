@@ -70,11 +70,11 @@ public class NumberQualifiers extends ContextValue {
   @ContextConstructor
   public static NumberQualifiers constructor(IValue digits, IValue fractionDigits, IValue allowedSign) {
 
-    var statusValue = EnumerationHelper.getEnumValueOrDefault(allowedSign, AllowedSignEnum.ANY);
+    final var allowedSignValue = EnumerationHelper.getEnumValueOrDefault(allowedSign, AllowedSignEnum.ANY);
     return new NumberQualifiers(
             digits.asNumber().intValue(),
             fractionDigits.asNumber().intValue(),
-            (AllowedSignEnum) statusValue.getValue());
+            (AllowedSignEnum) allowedSignValue.getValue());
   }
 
   @ContextConstructor

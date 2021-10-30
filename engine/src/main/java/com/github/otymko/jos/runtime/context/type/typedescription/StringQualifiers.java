@@ -5,28 +5,59 @@
  */
 package com.github.otymko.jos.runtime.context.type.typedescription;
 
+import com.github.otymko.jos.compiler.EnumerationHelper;
 import com.github.otymko.jos.runtime.context.ContextClass;
+import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
+import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.AllowedLengthEnum;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-import lombok.Getter;
 import lombok.Value;
 
+/**
+ * Квалификаторы строки для Описания типов
+ */
 @ContextClass(name = "КвалификаторыСтроки", alias = "StringQualifiers")
 @Value
 public class StringQualifiers extends ContextValue {
 
   public static final ContextInfo INFO = ContextInfo.createByClass(StringQualifiers.class);
 
-  @Getter
+  /**
+   * Длина строки
+   */
   @ContextProperty(name = "Длина", alias = "Length", accessMode = PropertyAccessMode.READ_ONLY)
-  int length;
+  public int length;
 
-  @Getter
+  /**
+   * Допустимая длина строки
+   *
+   * @see AllowedLengthEnum
+   */
   @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
-  AllowedLengthEnum allowedLength;
+  public AllowedLengthEnum allowedLength;
+
+  public IValue getLength() {
+    return ValueFactory.create(length);
+  }
+
+  public IValue getAllowedLength() {
+    return EnumerationHelper.getEnumByClass(AllowedLengthEnum.class).getEnumValueType(allowedLength);
+  }
+
+  @ContextConstructor
+  public static StringQualifiers constructor(IValue length, IValue allowedLength) {
+    final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLengthEnum.VARIABLE);
+    return new StringQualifiers(length.asNumber().intValue(), (AllowedLengthEnum) allowedLengthValue.getValue());
+  }
+
+  @ContextConstructor
+  public static StringQualifiers constructor(IValue length) {
+    return new StringQualifiers(length.asNumber().intValue(), AllowedLengthEnum.VARIABLE);
+  }
 
   @Override
   public ContextInfo getContextInfo() {

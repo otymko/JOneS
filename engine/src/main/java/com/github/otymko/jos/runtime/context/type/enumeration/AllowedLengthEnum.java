@@ -9,12 +9,21 @@ import com.github.otymko.jos.runtime.context.EnumClass;
 import com.github.otymko.jos.runtime.context.EnumType;
 import com.github.otymko.jos.runtime.context.EnumValue;
 
+/**
+ * Допустимая длина данных
+ */
 @EnumClass(name = "ДопустимаяДлина", alias = "AllowedLength")
 public enum AllowedLengthEnum implements EnumType {
 
+  /**
+   * Переменная длина
+   */
   @EnumValue(name = "Переменная", alias = "Variable")
   VARIABLE,
 
+  /**
+   * Фиксированная длина
+   */
   @EnumValue(name = "Фиксированная", alias = "Fixed")
   FIXED
 

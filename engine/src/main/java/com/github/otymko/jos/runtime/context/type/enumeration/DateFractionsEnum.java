@@ -9,14 +9,27 @@ import com.github.otymko.jos.runtime.context.EnumClass;
 import com.github.otymko.jos.runtime.context.EnumType;
 import com.github.otymko.jos.runtime.context.EnumValue;
 
+/**
+ * Части даты
+ */
 @EnumClass(name = "ЧастиДаты", alias = "DateFractions")
 public enum DateFractionsEnum implements EnumType {
+
+  /**
+   * Дата
+   */
   @EnumValue(name = "Дата", alias = "Date")
   DATE,
 
+  /**
+   * Дата и время
+   */
   @EnumValue(name = "ДатаВремя", alias = "DateTime")
   DATE_TIME,
 
+  /**
+   * Время
+   */
   @EnumValue(name = "Время", alias = "DatTimeTime")
   TIME
 }
