@@ -7,13 +7,17 @@ package com.github.otymko.jos.common;
 
 import com.github.otymko.jos.compiler.ScriptCompiler;
 import com.github.otymko.jos.hosting.ScriptEngine;
+import com.github.otymko.jos.module.ModuleImage;
+import com.github.otymko.jos.module.ModuleImageDumper;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import org.junit.jupiter.api.DynamicTest;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
@@ -69,7 +73,15 @@ public abstract class BaseExternalScriptTest {
     var methodIndex = sdo.getScriptMethod(methodName);
     return DynamicTest.dynamicTest(
       transliterate(methodName),
-      () -> sdo.callScriptMethod(engine, methodIndex, new IValue[0])
+      () -> {
+        try {
+          sdo.callScriptMethod(engine, methodIndex, new IValue[0]);
+        } catch (Exception e) {
+          final var w = new FileWriter(String.format("failed-%s.txt", methodName));
+          ModuleImageDumper.dump(sdo.getModuleImage(), w);
+          throw e;
+        }
+      }
     );
   }
 

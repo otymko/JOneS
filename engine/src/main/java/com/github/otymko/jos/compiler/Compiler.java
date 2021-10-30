@@ -504,8 +504,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var callStatement = (BSLParser.CallStatementContext) globalMethodCall.getParent();
 
     var paramList = callStatement.globalMethodCall().doCall().callParamList();
-    processParamList(paramList);
-    addCommand(OperationCode.ArgNum, calcParams(paramList));
+    final var paramCount = processParamList(paramList);
+    addCommand(OperationCode.ArgNum, paramCount);
     processMethodCall(callStatement.globalMethodCall().methodName(), false);
     return globalMethodCall;
   }
@@ -930,13 +930,12 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   private void processGlobalStatement(BSLParser.GlobalMethodCallContext globalMethodCall) {
     var paramList = globalMethodCall.doCall().callParamList();
-    processParamList(paramList);
+    var factArguments = processParamList(paramList);
 
     var identifier = globalMethodCall.methodName().getText();
     var optionalOperationCode = NativeGlobalMethod.getOperationCode(identifier);
     if (optionalOperationCode.isPresent()) {
       var opCode = optionalOperationCode.get();
-      var factArguments = calcParams(paramList);
       if (opCode == OperationCode.Min || opCode == OperationCode.Max) {
         if (factArguments == 0) {
           throw CompilerException.tooFewMethodArgumentsException();
@@ -949,7 +948,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
     } else {
 
-      addCommand(OperationCode.ArgNum, calcParams(paramList));
+      addCommand(OperationCode.ArgNum, factArguments);
       processMethodCall(globalMethodCall.methodName(), true);
 
     }
@@ -967,8 +966,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var argumentCount = 0;
     if (newExpressionContext.doCall() != null) {
       var paramList = newExpressionContext.doCall().callParamList();
-      argumentCount = calcParams(paramList);
-      processParamList(paramList);
+      argumentCount = processParamList(paramList);
     }
 
     addCommand(OperationCode.NewInstance, argumentCount);
@@ -1000,13 +998,26 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     correctCommandArgument(endPart, imageCache.getCode().size());
   }
 
-  private void processParamList(BSLParser.CallParamListContext paramList) {
-    paramList.callParam().forEach(callParamContext -> {
-      if (callParamContext.expression() == null) {
-        return;
+  private int processParamList(BSLParser.CallParamListContext paramList) {
+    final var callParam = paramList.callParam();
+    if (callParam.isEmpty()) {
+      return 0;
+    }
+    if (callParam.size() == 1) {
+      if (callParam.get(0).expression() == null) {
+        return 0;
       }
-      processExpression(callParamContext.expression(), new ArrayDeque<>());
-    });
+    }
+    int count = 0;
+    for (var callParamContext : callParam) {
+      if (callParamContext.expression() == null) {
+        addCommand(OperationCode.PushDefaultArg);
+      } else {
+        processExpression(callParamContext.expression(), new ArrayDeque<>());
+      }
+      count++;
+    }
+    return count;
   }
 
   private void processIdentifier(String identifier) {
@@ -1032,8 +1043,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   private void processAccessCall(BSLParser.AccessCallContext accessCallContext, boolean ifFunction) {
     var paramList = accessCallContext.methodCall().doCall().callParamList();
-    processParamList(paramList);
-    addCommand(OperationCode.ArgNum, calcParams(paramList));
+    final var paramCount = processParamList(paramList);
+    addCommand(OperationCode.ArgNum, paramCount);
 
     var constant = new ConstantDefinition(ValueFactory.create(accessCallContext.methodCall().methodName().getText()));
     if (!imageCache.getConstants().contains(constant)) {
@@ -1046,16 +1057,6 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     } else {
       addCommand(OperationCode.ResolveMethodProc, index);
     }
-  }
-
-  private int calcParams(BSLParser.CallParamListContext callParamListContext) {
-    var count = 0;
-    for (var callParam : callParamListContext.callParam()) {
-      if (callParam.getChildCount() > 0) {
-        count++;
-      }
-    }
-    return count;
   }
 
   private void processMethodCall(BSLParser.MethodNameContext methodNameContext, boolean isFunction) {
