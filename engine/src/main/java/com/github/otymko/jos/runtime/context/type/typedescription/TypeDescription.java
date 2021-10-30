@@ -6,6 +6,7 @@
 package com.github.otymko.jos.runtime.context.type.typedescription;
 
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextMethod;
@@ -16,6 +17,10 @@ import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
+import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
+import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
+import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
+import com.github.otymko.jos.runtime.context.type.primitive.StringValue;
 import com.github.otymko.jos.runtime.context.type.primitive.TypeValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Value;
@@ -67,7 +72,55 @@ public class TypeDescription extends ContextValue {
     return ValueFactory.create(containsTypeInternal((TypeValue) typeRaw));
   }
 
+  private boolean adjustAsBoolean(IValue value) {
+    try {
+      return value.asBoolean();
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  @ContextMethod(name = "ПривестиЗначение", alias = "AdjustValue")
   public IValue adjustValue(IValue value) {
+
+    if (value == null) {
+      return adjustValue(ValueFactory.create());
+    }
+
+    final var rawValue = value.getRawValue();
+    final var contextType = (RuntimeContext) rawValue;
+    final var valueType = new TypeValue((contextType.getContextInfo()));
+
+    TypeValue targetType;
+
+    if (containsTypeInternal(valueType)) {
+      targetType = valueType;
+    } else {
+      if (types.size() == 0) {
+        return rawValue;
+      }
+      if (types.size() != 1) {
+        return ValueFactory.create();
+      }
+      targetType = types.get(0);
+    }
+
+    if (NumberValue.INFO.equals(targetType.getValue())) {
+      return numberQualifiers.adjustValue(rawValue);
+    }
+
+    if (StringValue.INFO.equals(targetType.getValue())) {
+      return stringQualifiers.adjustValue(rawValue);
+    }
+
+    if (DateValue.INFO.equals(targetType.getValue())) {
+      return dateQualifiers.adjustValue(rawValue);
+    }
+
+    if (BooleanValue.INFO.equals(targetType.getValue())) {
+      return ValueFactory.create(adjustAsBoolean(rawValue));
+    }
+
     throw MachineException.operationNotImplementedException();
   }
 

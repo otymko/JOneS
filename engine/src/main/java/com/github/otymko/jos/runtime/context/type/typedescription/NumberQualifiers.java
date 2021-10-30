@@ -6,18 +6,21 @@
 package com.github.otymko.jos.runtime.context.type.typedescription;
 
 import com.github.otymko.jos.compiler.EnumerationHelper;
-import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
-import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.AllowedSignEnum;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Value;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 /**
  * Квалификаторы числа для Описания типов
@@ -56,6 +59,42 @@ public class NumberQualifiers extends ContextValue {
 
   public IValue getAllowedSign() {
     return EnumerationHelper.getEnumByClass(AllowedSignEnum.class).getEnumValueType(allowedSign);
+  }
+
+  BigDecimal getNines() {
+    // формируем число из девяток
+    var result = BigDecimal.ONE;
+    for (var i = digits; i > 0; i--) {
+      result = result.multiply(BigDecimal.TEN);
+    }
+    result = result.subtract(BigDecimal.ONE).setScale(fractionDigits);
+    for (var i = fractionDigits; i > 0; i--) {
+      result = result.divide(BigDecimal.TEN, RoundingMode.FLOOR);
+    }
+    return result;
+  }
+
+  private BigDecimal adjustNumber(BigDecimal number) {
+    if (digits == 0) {
+      return number;
+    }
+    if (allowedSign == AllowedSignEnum.NON_NEGATIVE && number.compareTo(BigDecimal.ZERO) < 0) {
+      return BigDecimal.ZERO;
+    }
+    var result = number.setScale(fractionDigits, RoundingMode.HALF_UP);
+    if (result.precision() <= digits) {
+      return result;
+    }
+    return getNines();
+  }
+
+  public IValue adjustValue(IValue value) {
+    try {
+      final var castedValue = value.asNumber();
+      return ValueFactory.create(adjustNumber(castedValue));
+    } catch (Exception e) {
+      return ValueFactory.create(0);
+    }
   }
 
   public boolean equals(Object o) {
@@ -104,20 +143,6 @@ public class NumberQualifiers extends ContextValue {
             0,
             0,
             AllowedSignEnum.ANY);
-  }
-
-  public static NumberQualifiers getOrDefault(IValue numberQualifiers) {
-    if (numberQualifiers == null) {
-      return constructor();
-    }
-    final var rawValue = numberQualifiers.getRawValue();
-    if (rawValue.getDataType() == DataType.UNDEFINED) {
-      return constructor();
-    }
-    if (!(rawValue instanceof NumberQualifiers)) {
-      throw MachineException.invalidArgumentValueException();
-    }
-    return (NumberQualifiers) rawValue;
   }
 
   @Override

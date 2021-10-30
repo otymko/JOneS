@@ -48,6 +48,23 @@ public class StringQualifiers extends ContextValue {
     return EnumerationHelper.getEnumByClass(AllowedLengthEnum.class).getEnumValueType(allowedLength);
   }
 
+  private String adjustString(String value) {
+    var result = value;
+    if (length != 0 && result.length() > length) {
+      result = result.substring(0, length);
+    }
+
+    if (allowedLength == AllowedLengthEnum.FIXED && result.length() < length) {
+      result = result.concat(" ".repeat(length - result.length()));
+    }
+
+    return result;
+  }
+
+  public IValue adjustValue(IValue value) {
+    return ValueFactory.create(adjustString(value.asString()));
+  }
+
   @ContextConstructor
   public static StringQualifiers constructor(IValue length, IValue allowedLength) {
     final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLengthEnum.VARIABLE);
