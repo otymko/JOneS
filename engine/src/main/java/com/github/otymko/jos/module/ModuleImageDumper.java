@@ -1,0 +1,29 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+package com.github.otymko.jos.module;
+
+import com.github.otymko.jos.runtime.machine.OperationCode;
+import lombok.experimental.UtilityClass;
+
+import java.io.IOException;
+import java.io.Writer;
+
+@UtilityClass
+public class ModuleImageDumper {
+
+  public static void dump(ModuleImage image, Writer w) throws IOException {
+    int offset = 0;
+    for (final var opCode : image.getCode()) {
+      w.write(String.format("%6d: %s", offset, opCode));
+      if (opCode.getCode() == OperationCode.PushConst) {
+        w.write(String.format(" ; %s", image.getConstants().get(opCode.getArgument())));
+      }
+      w.write('\n');
+      offset++;
+    }
+  }
+
+}
