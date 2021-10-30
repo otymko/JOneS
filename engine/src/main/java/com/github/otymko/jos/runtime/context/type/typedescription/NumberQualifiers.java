@@ -108,6 +108,10 @@ public class NumberQualifiers extends ContextValue {
             && n.allowedSign == allowedSign;
   }
 
+  public int hashCode() {
+    return digits;
+  }
+
   @ContextConstructor
   public static NumberQualifiers constructor(IValue digits, IValue fractionDigits, IValue allowedSign) {
 

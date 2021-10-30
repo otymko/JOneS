@@ -108,6 +108,10 @@ public class DateQualifiers extends ContextValue {
     return asDateQualifiers.dateFractions == dateFractions;
   }
 
+  public int hashCode() {
+    return dateFractions.hashCode();
+  }
+
   @Override
   public ContextInfo getContextInfo() {
     return INFO;
