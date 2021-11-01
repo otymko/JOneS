@@ -13,13 +13,11 @@ import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
-import com.github.otymko.jos.runtime.context.type.enumeration.AllowedSignEnum;
+import com.github.otymko.jos.runtime.context.type.enumeration.AllowedSign;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Value;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.MathContext;
 import java.math.RoundingMode;
 
 /**
@@ -47,7 +45,7 @@ public class NumberQualifiers extends ContextValue {
    * Допустимый знак числа
    */
   @ContextProperty(name = "ДопустимыйЗнак", alias = "allowedSign", accessMode = PropertyAccessMode.READ_ONLY)
-  public AllowedSignEnum allowedSign;
+  public AllowedSign allowedSign;
 
   public IValue getDigits() {
     return ValueFactory.create(digits);
@@ -58,7 +56,7 @@ public class NumberQualifiers extends ContextValue {
   }
 
   public IValue getAllowedSign() {
-    return EnumerationHelper.getEnumByClass(AllowedSignEnum.class).getEnumValueType(allowedSign);
+    return EnumerationHelper.getEnumByClass(AllowedSign.class).getEnumValueType(allowedSign);
   }
 
   BigDecimal getNines() {
@@ -78,7 +76,7 @@ public class NumberQualifiers extends ContextValue {
     if (digits == 0) {
       return number;
     }
-    if (allowedSign == AllowedSignEnum.NON_NEGATIVE && number.compareTo(BigDecimal.ZERO) < 0) {
+    if (allowedSign == AllowedSign.NON_NEGATIVE && number.compareTo(BigDecimal.ZERO) < 0) {
       return BigDecimal.ZERO;
     }
     var result = number.setScale(fractionDigits, RoundingMode.HALF_UP);
@@ -115,11 +113,11 @@ public class NumberQualifiers extends ContextValue {
   @ContextConstructor
   public static NumberQualifiers constructor(IValue digits, IValue fractionDigits, IValue allowedSign) {
 
-    final var allowedSignValue = EnumerationHelper.getEnumValueOrDefault(allowedSign, AllowedSignEnum.ANY);
+    final var allowedSignValue = EnumerationHelper.getEnumValueOrDefault(allowedSign, AllowedSign.ANY);
     return new NumberQualifiers(
             digits.asNumber().intValue(),
             fractionDigits.asNumber().intValue(),
-            (AllowedSignEnum) allowedSignValue.getValue());
+            (AllowedSign) allowedSignValue.getValue());
   }
 
   @ContextConstructor
@@ -128,7 +126,7 @@ public class NumberQualifiers extends ContextValue {
     return new NumberQualifiers(
             digits.asNumber().intValue(),
             fractionDigits.asNumber().intValue(),
-            AllowedSignEnum.ANY);
+            AllowedSign.ANY);
   }
 
   @ContextConstructor
@@ -137,7 +135,7 @@ public class NumberQualifiers extends ContextValue {
     return new NumberQualifiers(
             digits.asNumber().intValue(),
             0,
-            AllowedSignEnum.ANY);
+            AllowedSign.ANY);
   }
 
   @ContextConstructor
@@ -146,7 +144,7 @@ public class NumberQualifiers extends ContextValue {
     return new NumberQualifiers(
             0,
             0,
-            AllowedSignEnum.ANY);
+            AllowedSign.ANY);
   }
 
   @Override

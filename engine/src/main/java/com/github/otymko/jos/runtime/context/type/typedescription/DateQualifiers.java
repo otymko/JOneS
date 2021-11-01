@@ -13,7 +13,7 @@ import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
-import com.github.otymko.jos.runtime.context.type.enumeration.DateFractionsEnum;
+import com.github.otymko.jos.runtime.context.type.enumeration.DateFractions;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Value;
 
@@ -33,13 +33,13 @@ public class DateQualifiers extends ContextValue {
   /**
    * Части даты, хранимые в типе
    *
-   * @see DateFractionsEnum
+   * @see DateFractions
    */
   @ContextProperty(name = "ЧастиДаты", alias = "DateFractions", accessMode = PropertyAccessMode.READ_ONLY)
-  public DateFractionsEnum dateFractions;
+  public DateFractions dateFractions;
 
   public IValue getDateFractions() {
-    return EnumerationHelper.getEnumByClass(DateFractionsEnum.class).getEnumValueType(dateFractions);
+    return EnumerationHelper.getEnumByClass(DateFractions.class).getEnumValueType(dateFractions);
   }
 
   private Date adjustDate(Date date) {
@@ -79,25 +79,25 @@ public class DateQualifiers extends ContextValue {
   /**
    * Возвращает квалификаторы даты с указанными частями дат
    * @param dateParts Части дат
-   * @see DateFractionsEnum
+   * @see DateFractions
    * @return Квалификатор дат
    * @see DateQualifiers
    */
   @ContextConstructor
   public static DateQualifiers constructor(IValue dateParts) {
-    final var datePartsValue = EnumerationHelper.getEnumValueOrDefault(dateParts, DateFractionsEnum.DATE_TIME);
-    return new DateQualifiers((DateFractionsEnum) datePartsValue.getValue());
+    final var datePartsValue = EnumerationHelper.getEnumValueOrDefault(dateParts, DateFractions.DATE_TIME);
+    return new DateQualifiers((DateFractions) datePartsValue.getValue());
   }
 
   /**
    * Возвращает квалификаторы даты с частями дат Дата
-   * @see DateFractionsEnum
+   * @see DateFractions
    * @return Квалификатор дат
    * @see DateQualifiers
    */
   @ContextConstructor
   public static DateQualifiers constructor() {
-    return new DateQualifiers(DateFractionsEnum.DATE);
+    return new DateQualifiers(DateFractions.DATE);
   }
 
   public boolean equals(Object o) {

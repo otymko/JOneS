@@ -10,21 +10,21 @@ import com.github.otymko.jos.runtime.context.EnumType;
 import com.github.otymko.jos.runtime.context.EnumValue;
 
 /**
- * Допустимая длина данных
+ * Допустимые знаки в Описании типов
  */
-@EnumClass(name = "ДопустимаяДлина", alias = "AllowedLength")
-public enum AllowedLengthEnum implements EnumType {
+@EnumClass(name = "ДопустимыйЗнак", alias = "AllowedSign")
+public enum AllowedSign implements EnumType {
 
   /**
-   * Переменная длина
+   * Знак может быть любым
    */
-  @EnumValue(name = "Переменная", alias = "Variable")
-  VARIABLE,
+  @EnumValue(name = "Любой", alias = "Any")
+  ANY,
 
   /**
-   * Фиксированная длина
+   * Не может содерэать отрицательные значения
    */
-  @EnumValue(name = "Фиксированная", alias = "Fixed")
-  FIXED
+  @EnumValue(name = "Неотрицательный", alias = "NonNegative")
+  NON_NEGATIVE
 
 }

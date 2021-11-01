@@ -10,26 +10,21 @@ import com.github.otymko.jos.runtime.context.EnumType;
 import com.github.otymko.jos.runtime.context.EnumValue;
 
 /**
- * Части даты
+ * Допустимая длина данных
  */
-@EnumClass(name = "ЧастиДаты", alias = "DateFractions")
-public enum DateFractionsEnum implements EnumType {
+@EnumClass(name = "ДопустимаяДлина", alias = "AllowedLength")
+public enum AllowedLength implements EnumType {
 
   /**
-   * Дата
+   * Переменная длина
    */
-  @EnumValue(name = "Дата", alias = "Date")
-  DATE,
+  @EnumValue(name = "Переменная", alias = "Variable")
+  VARIABLE,
 
   /**
-   * Дата и время
+   * Фиксированная длина
    */
-  @EnumValue(name = "ДатаВремя", alias = "DateTime")
-  DATE_TIME,
+  @EnumValue(name = "Фиксированная", alias = "Fixed")
+  FIXED
 
-  /**
-   * Время
-   */
-  @EnumValue(name = "Время", alias = "DatTimeTime")
-  TIME
 }

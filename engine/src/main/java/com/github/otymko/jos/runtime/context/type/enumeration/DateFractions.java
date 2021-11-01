@@ -10,21 +10,26 @@ import com.github.otymko.jos.runtime.context.EnumType;
 import com.github.otymko.jos.runtime.context.EnumValue;
 
 /**
- * Допустимые знаки в Описании типов
+ * Части даты
  */
-@EnumClass(name = "ДопустимыйЗнак", alias = "AllowedSign")
-public enum AllowedSignEnum implements EnumType {
+@EnumClass(name = "ЧастиДаты", alias = "DateFractions")
+public enum DateFractions implements EnumType {
 
   /**
-   * Знак может быть любым
+   * Дата
    */
-  @EnumValue(name = "Любой", alias = "Any")
-  ANY,
+  @EnumValue(name = "Дата", alias = "Date")
+  DATE,
 
   /**
-   * Не может содерэать отрицательные значения
+   * Дата и время
    */
-  @EnumValue(name = "Неотрицательный", alias = "NonNegative")
-  NON_NEGATIVE
+  @EnumValue(name = "ДатаВремя", alias = "DateTime")
+  DATE_TIME,
 
+  /**
+   * Время
+   */
+  @EnumValue(name = "Время", alias = "DatTimeTime")
+  TIME
 }

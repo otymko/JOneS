@@ -13,7 +13,7 @@ import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
-import com.github.otymko.jos.runtime.context.type.enumeration.AllowedLengthEnum;
+import com.github.otymko.jos.runtime.context.type.enumeration.AllowedLength;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Value;
 
@@ -35,17 +35,17 @@ public class BinaryDataQualifiers extends ContextValue {
   /**
    * Допустимый размер данных. 0 - Неограниченно
    *
-   * @see AllowedLengthEnum
+   * @see AllowedLength
    */
   @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
-  public AllowedLengthEnum allowedLength;
+  public AllowedLength allowedLength;
 
   public IValue getLength() {
     return ValueFactory.create(length);
   }
 
   public IValue getAllowedLength() {
-    return EnumerationHelper.getEnumByClass(AllowedLengthEnum.class).getEnumValueType(allowedLength);
+    return EnumerationHelper.getEnumByClass(AllowedLength.class).getEnumValueType(allowedLength);
   }
 
   /**
@@ -54,12 +54,12 @@ public class BinaryDataQualifiers extends ContextValue {
    * @param allowedLength Допустимый размер данных
    * @return КвалификаторыДвоичныхДанных
    * @see BinaryDataQualifiers
-   * @see AllowedLengthEnum
+   * @see AllowedLength
    */
   @ContextConstructor
   public static BinaryDataQualifiers constructor(IValue length, IValue allowedLength) {
-    final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLengthEnum.VARIABLE);
-    return new BinaryDataQualifiers(length.asNumber().intValue(), (AllowedLengthEnum) allowedLengthValue.getValue());
+    final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLength.VARIABLE);
+    return new BinaryDataQualifiers(length.asNumber().intValue(), (AllowedLength) allowedLengthValue.getValue());
   }
 
   /**
@@ -67,22 +67,22 @@ public class BinaryDataQualifiers extends ContextValue {
    * @param length        Максимальный размер данных
    * @return КвалификаторыДвоичныхДанных
    * @see BinaryDataQualifiers
-   * @see AllowedLengthEnum
+   * @see AllowedLength
    */
   @ContextConstructor
   public static BinaryDataQualifiers constructor(IValue length) {
-    return new BinaryDataQualifiers(length.asNumber().intValue(), AllowedLengthEnum.VARIABLE);
+    return new BinaryDataQualifiers(length.asNumber().intValue(), AllowedLength.VARIABLE);
   }
 
   /**
    * Возвращает квалификаторы двоичных данных неограниченной длины. Допустимая длина устанавливается Переменная.
    * @return КвалификаторыДвоичныхДанных
    * @see BinaryDataQualifiers
-   * @see AllowedLengthEnum
+   * @see AllowedLength
    */
   @ContextConstructor
   public static BinaryDataQualifiers constructor() {
-    return new BinaryDataQualifiers(0, AllowedLengthEnum.VARIABLE);
+    return new BinaryDataQualifiers(0, AllowedLength.VARIABLE);
   }
 
   @Override

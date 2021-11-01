@@ -13,7 +13,7 @@ import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
-import com.github.otymko.jos.runtime.context.type.enumeration.AllowedLengthEnum;
+import com.github.otymko.jos.runtime.context.type.enumeration.AllowedLength;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Value;
 
@@ -35,17 +35,17 @@ public class StringQualifiers extends ContextValue {
   /**
    * Допустимая длина строки
    *
-   * @see AllowedLengthEnum
+   * @see AllowedLength
    */
   @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
-  public AllowedLengthEnum allowedLength;
+  public AllowedLength allowedLength;
 
   public IValue getLength() {
     return ValueFactory.create(length);
   }
 
   public IValue getAllowedLength() {
-    return EnumerationHelper.getEnumByClass(AllowedLengthEnum.class).getEnumValueType(allowedLength);
+    return EnumerationHelper.getEnumByClass(AllowedLength.class).getEnumValueType(allowedLength);
   }
 
   private String adjustString(String value) {
@@ -54,7 +54,7 @@ public class StringQualifiers extends ContextValue {
       result = result.substring(0, length);
     }
 
-    if (allowedLength == AllowedLengthEnum.FIXED && result.length() < length) {
+    if (allowedLength == AllowedLength.FIXED && result.length() < length) {
       result = result.concat(" ".repeat(length - result.length()));
     }
 
@@ -67,18 +67,18 @@ public class StringQualifiers extends ContextValue {
 
   @ContextConstructor
   public static StringQualifiers constructor(IValue length, IValue allowedLength) {
-    final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLengthEnum.VARIABLE);
-    return new StringQualifiers(length.asNumber().intValue(), (AllowedLengthEnum) allowedLengthValue.getValue());
+    final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLength.VARIABLE);
+    return new StringQualifiers(length.asNumber().intValue(), (AllowedLength) allowedLengthValue.getValue());
   }
 
   @ContextConstructor
   public static StringQualifiers constructor(IValue length) {
-    return new StringQualifiers(length.asNumber().intValue(), AllowedLengthEnum.VARIABLE);
+    return new StringQualifiers(length.asNumber().intValue(), AllowedLength.VARIABLE);
   }
 
   @ContextConstructor
   public static StringQualifiers constructor() {
-    return new StringQualifiers(0, AllowedLengthEnum.VARIABLE);
+    return new StringQualifiers(0, AllowedLength.VARIABLE);
   }
 
   @Override
