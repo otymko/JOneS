@@ -14,14 +14,14 @@ import java.io.Writer;
 @UtilityClass
 public class ModuleImageDumper {
 
-  public static void dump(ModuleImage image, Writer w) throws IOException {
+  public static void dump(ModuleImage image, Writer writer) throws IOException {
     int offset = 0;
     for (final var opCode : image.getCode()) {
-      w.write(String.format("%6d: %s", offset, opCode));
+      writer.write(String.format("%6d: %s", offset, opCode));
       if (opCode.getCode() == OperationCode.PushConst) {
-        w.write(String.format(" ; %s", image.getConstants().get(opCode.getArgument())));
+        writer.write(String.format(" ; %s", image.getConstants().get(opCode.getArgument())));
       }
-      w.write('\n');
+      writer.write('\n');
       offset++;
     }
   }
