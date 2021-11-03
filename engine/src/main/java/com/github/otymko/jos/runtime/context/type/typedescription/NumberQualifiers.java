@@ -59,7 +59,7 @@ public class NumberQualifiers extends ContextValue {
     return EnumerationHelper.getEnumByClass(AllowedSign.class).getEnumValueType(allowedSign);
   }
 
-  BigDecimal getNines() {
+  private BigDecimal getNines() {
     // формируем число из девяток
     var result = BigDecimal.ONE;
     for (var i = digits; i > 0; i--) {
