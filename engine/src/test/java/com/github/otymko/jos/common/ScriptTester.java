@@ -63,7 +63,6 @@ public class ScriptTester implements ContextType, IValue {
     var oneValueRaw = oneValue.getRawValue();
     var twoValueRaw = twoValue.getRawValue();
 
-    //if (oneValueRaw.compareTo(twoValueRaw) != 0) {
     if (!oneValueRaw.equals(twoValueRaw)) {
       // TODO: локализация
       // TODO: использование additionalErrorMessage
@@ -78,7 +77,6 @@ public class ScriptTester implements ContextType, IValue {
     var oneValueRaw = oneValue.getRawValue();
     var twoValueRaw = twoValue.getRawValue();
 
-    //if (oneValueRaw.compareTo(twoValueRaw) == 0) {
     if (oneValueRaw.equals(twoValueRaw)) {
       // TODO: локализация
       // TODO: использование additionalErrorMessage
