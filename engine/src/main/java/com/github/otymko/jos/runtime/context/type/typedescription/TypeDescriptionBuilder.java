@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO: Требует рефакторинга. https://github.com/otymko/JOneS/pull/85#discussion_r741636805
 final class TypeDescriptionBuilder {
 
   final List<TypeValue> types = new ArrayList<>();

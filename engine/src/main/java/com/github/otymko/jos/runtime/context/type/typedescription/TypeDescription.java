@@ -105,18 +105,22 @@ public class TypeDescription extends ContextValue {
       targetType = types.get(0);
     }
 
+    // TODO: Сравнение типов https://github.com/otymko/JOneS/issues/86
     if (NumberValue.INFO.equals(targetType.getValue())) {
       return numberQualifiers.adjustValue(rawValue);
     }
 
+    // TODO: Сравнение типов https://github.com/otymko/JOneS/issues/86
     if (StringValue.INFO.equals(targetType.getValue())) {
       return stringQualifiers.adjustValue(rawValue);
     }
 
+    // TODO: Сравнение типов https://github.com/otymko/JOneS/issues/86
     if (DateValue.INFO.equals(targetType.getValue())) {
       return dateQualifiers.adjustValue(rawValue);
     }
 
+    // TODO: Сравнение типов https://github.com/otymko/JOneS/issues/86
     if (BooleanValue.INFO.equals(targetType.getValue())) {
       return ValueFactory.create(adjustAsBoolean(rawValue));
     }
