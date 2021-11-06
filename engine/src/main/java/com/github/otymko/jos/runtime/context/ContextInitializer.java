@@ -96,7 +96,7 @@ public class ContextInitializer {
       var hasSetter = setter != null;
 
       var getter = getMethodByName(targetClass, "get" + field.getName());
-      var hasGetter = setter != null;
+      var hasGetter = getter != null;
 
       // FIXME: нужен билдер
       var property = new PropertyInfo(contextProperty.name(), contextProperty.alias(),

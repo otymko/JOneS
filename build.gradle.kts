@@ -67,7 +67,7 @@ subprojects {
         testCompileOnly("org.projectlombok:lombok:1.18.20")
         testAnnotationProcessor("org.projectlombok:lombok:1.18.20")
 
-        implementation("org.reflections:reflections:0.10.1")
+        implementation("org.reflections:reflections:0.10.2")
 
         // Use JUnit Jupiter
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
