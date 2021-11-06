@@ -13,28 +13,52 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static com.github.otymko.jos.localization.MessageResource.ERROR_CALL_CONSTRUCTOR;
 
 @UtilityClass
 public class TypeFactory {
 
-  public IValue callConstructor(ContextInfo contextInfo, IValue[] arguments) {
+  private ConstructorInfo findConstructor(ContextInfo contextInfo, int argumentsCount) {
     // TODO: ищем конструктор по количеству аргументов
-    ConstructorInfo constructorInfo = null;
+
     for (var constructor : contextInfo.getConstructors()) {
-      if (constructor.getParameters().length == arguments.length) {
-        constructorInfo = constructor;
+      if (constructor.getParameters().length == argumentsCount) {
+        return constructor;
       }
     }
-    if (constructorInfo == null) {
-      // TODO: exception нужно локализовать
-      throw MachineException.constructorNotFoundException(contextInfo.getName());
+
+    // Ищем первый с бОльшим количеством параметров
+    for (var constructor : contextInfo.getConstructors()) {
+      if (constructor.getParameters().length > argumentsCount) {
+        return constructor;
+      }
     }
+
+    throw MachineException.constructorNotFoundException(contextInfo.getName());
+  }
+
+  private IValue[] prepareArguments(Method method, IValue[] arguments) {
+    if (method.getParameterCount() == arguments.length) {
+      return arguments;
+    }
+    final var list = new ArrayList<>(Arrays.asList(arguments));
+    while (list.size() < method.getParameterCount()) {
+      list.add(ValueFactory.create());
+    }
+    return list.toArray(new IValue[0]);
+  }
+
+  public IValue callConstructor(ContextInfo contextInfo, IValue[] arguments) {
+    final var constructorInfo = findConstructor(contextInfo, arguments.length);
+
     var methodCall = constructorInfo.getMethod();
     Object result;
     try {
-      result = methodCall.invoke(null, arguments);
+      result = methodCall.invoke(null, prepareArguments(methodCall, arguments));
     } catch (IllegalAccessException | InvocationTargetException e) {
       throw new MachineException(Resources.getResourceString(ERROR_CALL_CONSTRUCTOR));
     }

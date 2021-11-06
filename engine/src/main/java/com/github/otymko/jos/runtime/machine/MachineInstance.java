@@ -246,6 +246,7 @@ public class MachineInstance {
     map.put(OperationCode.LineNum, this::lineNum);
     map.put(OperationCode.PushConst, this::pushConst);
     map.put(OperationCode.ArgNum, this::argNum);
+    map.put(OperationCode.PushDefaultArg, this::pushDefaultArg);
     map.put(OperationCode.CallProc, this::callProc);
     map.put(OperationCode.LoadLoc, this::loadLoc);
     map.put(OperationCode.PushLoc, this::pushLoc);
@@ -331,6 +332,11 @@ public class MachineInstance {
     map.put(OperationCode.Str, this::str);
 
     return map;
+  }
+
+  private void pushDefaultArg(int argument) {
+    operationStack.push(ValueFactory.create());
+    nextInstruction();
   }
 
   private void currentDate(int argument) {
@@ -782,8 +788,8 @@ public class MachineInstance {
   private void newInstance(int argument) {
     var argumentValues = new IValue[argument];
 
-    for (var position = 0; position < argument; position++) {
-      argumentValues[position] = breakVariableLink(operationStack.pop());
+    for (var position = argument; position > 0; position--) {
+      argumentValues[position - 1] = breakVariableLink(operationStack.pop());
     }
 
     var typeName = operationStack.pop().asString();
