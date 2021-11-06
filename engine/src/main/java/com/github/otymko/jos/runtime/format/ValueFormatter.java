@@ -204,21 +204,21 @@ public final class ValueFormatter {
 
   private static String numberFormat(BigDecimal value, FormatParametersList params) {
 
-    final var nf = new NumberFormatter(params.getLocale(LOCALE));
+    final var formatter = new NumberFormatter(params.getLocale(LOCALE));
 
-    params.get(NUM_ZERO_APPEARANCE).ifPresent(nf::setZeroAppearance);
-    params.getInt(NUM_DECIMAL_SIZE).ifPresent(nf::setDecimalSize);
-    params.get(NUM_LEADING_ZERO).ifPresent(v -> nf.setLeadingZeroes(true));
-    params.getInt(NUM_MAX_SIZE).ifPresent(nf::setMaxSize);
-    params.get(NUM_FRACTION_DELIMITER).ifPresent(nf::setFractionDelimiter);
+    params.get(NUM_ZERO_APPEARANCE).ifPresent(formatter::setZeroAppearance);
+    params.getInt(NUM_DECIMAL_SIZE).ifPresent(formatter::setDecimalSize);
+    params.get(NUM_LEADING_ZERO).ifPresent(v -> formatter.setLeadingZeroes(true));
+    params.getInt(NUM_MAX_SIZE).ifPresent(formatter::setMaxSize);
+    params.get(NUM_FRACTION_DELIMITER).ifPresent(formatter::setFractionDelimiter);
     if (params.containsKey(NUM_GROUPING)) {
-      nf.setGroupingSize(params.getIntList(NUM_GROUPING));
+      formatter.setGroupingSize(params.getIntList(NUM_GROUPING));
     }
-    params.getInt(NUM_NEGATIVE_APPEARANCE).ifPresent(nf::setNegativeAppearance);
-    params.getInt(NUM_DECIMAL_SHIFT).ifPresent(nf::setDecimalShift);
-    params.get(NUM_GROUPS_DELIMITER).ifPresent(nf::setGroupDelimiter);
+    params.getInt(NUM_NEGATIVE_APPEARANCE).ifPresent(formatter::setNegativeAppearance);
+    params.getInt(NUM_DECIMAL_SHIFT).ifPresent(formatter::setDecimalShift);
+    params.get(NUM_GROUPS_DELIMITER).ifPresent(formatter::setGroupDelimiter);
 
-    return nf.format(value);
+    return formatter.format(value);
   }
 
 }
