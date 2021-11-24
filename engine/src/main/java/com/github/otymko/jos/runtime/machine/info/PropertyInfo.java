@@ -6,6 +6,7 @@
 package com.github.otymko.jos.runtime.machine.info;
 
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
 import lombok.experimental.Accessors;
@@ -14,6 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 @Value
+@Builder
 public class PropertyInfo {
   String name;
   String alias;

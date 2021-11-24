@@ -22,7 +22,9 @@ import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @UtilityClass
 public class ContextInitializer {
@@ -84,27 +86,86 @@ public class ContextInitializer {
     return constructors.toArray(new ConstructorInfo[0]);
   }
 
-  public PropertyInfo[] getProperties(Class<? extends RuntimeContext> targetClass) {
-    List<PropertyInfo> properties = new ArrayList<>();
+  private PropertyInfo.PropertyInfoBuilder getBuilder(
+          Map<String, PropertyInfo.PropertyInfoBuilder> builders,
+          ContextProperty contextProperty) {
+    final var name = contextProperty.name().toLowerCase();
+    PropertyInfo.PropertyInfoBuilder builder;
+    if (builders.containsKey(name)) {
+      builder = builders.get(name);
+    } else {
+      builder = PropertyInfo.builder().name(contextProperty.name());
+      builders.put(name, builder);
+    }
+    builder.alias(contextProperty.alias());
+    return builder;
+  }
+
+  private void fetchPropertiesFromFields(
+          Map<String, PropertyInfo.PropertyInfoBuilder> builders,
+          Class<? extends RuntimeContext> targetClass) {
+
     for (var field : targetClass.getFields()) {
       var contextProperty = field.getAnnotation(ContextProperty.class);
       if (contextProperty == null) {
         continue;
       }
+      final var builder = getBuilder(builders, contextProperty);
+      builder.field(field);
 
-      var setter = getMethodByName(targetClass, "set" + field.getName());
-      var hasSetter = setter != null;
+      if (contextProperty.alias() != null) {
+        builder.alias(contextProperty.alias());
+      }
 
-      var getter = getMethodByName(targetClass, "get" + field.getName());
-      var hasGetter = getter != null;
+      final var setter = getMethodByName(targetClass, "set" + field.getName());
+      if (setter != null) {
+        builder.setter(setter);
+        builder.hasSetter(true);
+      }
 
-      // FIXME: нужен билдер
-      var property = new PropertyInfo(contextProperty.name(), contextProperty.alias(),
-        contextProperty.accessMode(), field, hasSetter, setter, hasGetter, getter);
-
-      properties.add(property);
+      final var getter = getMethodByName(targetClass, "get" + field.getName());
+      if (getter != null) {
+        builder.getter(getter);
+        builder.hasGetter(true);
+      }
     }
-    return properties.toArray(new PropertyInfo[0]);
+  }
+
+  private void fetchPropertiesFromMethods(
+          Map<String, PropertyInfo.PropertyInfoBuilder> builders,
+          Class<? extends RuntimeContext> targetClass) {
+    for (var method : targetClass.getMethods()) {
+      var contextProperty = method.getAnnotation(ContextProperty.class);
+      if (contextProperty == null) {
+        continue;
+      }
+
+      final var builder = getBuilder(builders, contextProperty);
+
+      if (method.getReturnType().equals(void.class)
+        && method.getParameterCount() == 1) {
+        builder.setter(method);
+        builder.hasSetter(true);
+      }
+
+      if (method.getParameterCount() == 0
+        && !method.getReturnType().equals(void.class)) {
+        builder.getter(method);
+        builder.hasGetter(true);
+      }
+
+    }
+  }
+  public PropertyInfo[] getProperties(Class<? extends RuntimeContext> targetClass) {
+
+    final var builders = new HashMap<String, PropertyInfo.PropertyInfoBuilder>();
+
+    fetchPropertiesFromFields(builders, targetClass);
+    fetchPropertiesFromMethods(builders, targetClass);
+
+    return builders.values().stream()
+            .map(PropertyInfo.PropertyInfoBuilder::build)
+            .toArray(PropertyInfo[]::new);
   }
 
   // TODO: удалить?
