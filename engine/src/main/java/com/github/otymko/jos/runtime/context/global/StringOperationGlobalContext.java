@@ -12,9 +12,12 @@ import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.context.type.enumeration.SearchDirection;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
+
+import java.util.regex.Pattern;
 
 @GlobalContextClass
 @NoArgsConstructor
@@ -124,6 +127,28 @@ public class StringOperationGlobalContext implements AttachableContext {
       result = false;
     }
     return ValueFactory.create(result);
+  }
+
+  @ContextMethod(name = "СтрРазделить", alias = "StrSplit")
+  public static IValue strSplit(IValue source, IValue delimiter, IValue includeEmpty) {
+    final var sourceString = getStringArgument(source);
+    final var delimiterString = getStringArgument(delimiter);
+    final var includeEmptyFlag = includeEmpty == null || includeEmpty.asBoolean();
+
+    final var result = V8Array.constructor();
+    if (delimiterString.isEmpty()) {
+      result.add(ValueFactory.create(sourceString));
+    } else {
+      final var substrings = sourceString.split(Pattern.quote(delimiterString));
+      for (final var element : substrings) {
+        if (!includeEmptyFlag && element.isEmpty()) {
+          continue;
+        }
+        result.add(ValueFactory.create(element));
+      }
+    }
+
+    return result;
   }
 
   private static String getStringArgument(IValue argument) {
