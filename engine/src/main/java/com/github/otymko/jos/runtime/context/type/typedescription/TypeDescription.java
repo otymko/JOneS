@@ -125,6 +125,12 @@ public class TypeDescription extends ContextValue {
       return ValueFactory.create(adjustAsBoolean(rawValue));
     }
 
+    if (types.size() == 1
+      && types.get(0).equals(targetType)) {
+      // Единственный тип, совпадающий с типом параметра
+      return rawValue;
+    }
+
     throw MachineException.operationNotImplementedException();
   }
 
