@@ -126,10 +126,6 @@ class CompilerTest {
     var compiler = new ScriptCompiler(engine);
     var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
 
-    try (var w = new FileWriter("complex-id.txt")) {
-      ModuleImageDumper.dump(moduleImage, w);
-    }
-
     var code = moduleImage.getCode();
     var line = findCommand(code, OperationCode.LineNum, 0, 3);
 
