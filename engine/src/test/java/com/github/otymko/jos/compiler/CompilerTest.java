@@ -7,12 +7,14 @@ package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.TestHelper;
 import com.github.otymko.jos.hosting.ScriptEngine;
+import com.github.otymko.jos.module.ModuleImageDumper;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.OperationCode;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -115,6 +117,27 @@ class CompilerTest {
   void testConditionIfElifElse() throws Exception {
     var pathToScript = Path.of("src/test/resources/if-elif-else.os");
     TestHelper.checkScript(pathToScript, "1.1\n2.2\n3.3");
+  }
+
+  @Test
+  void testComplexIdentifier() throws Exception {
+    var pathToScript = Path.of("src/test/resources/complex-id.os");
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
+
+    try (var w = new FileWriter("complex-id.txt")) {
+      ModuleImageDumper.dump(moduleImage, w);
+    }
+
+    var code = moduleImage.getCode();
+    var line = findCommand(code, OperationCode.LineNum, 0, 3);
+
+    var methodCall = findCommand(code, OperationCode.ResolveMethodFunc, line, -1);
+    assertThat(methodCall).isNotEqualTo(-1); // Должен быть вызов метода (ПривестиЗначение)
+
+    var resolveProp = findCommand(code, OperationCode.ResolveProp, line, -1);
+    assertThat(resolveProp).isNotEqualTo(-1); // Должно быть обращение к свойству (К)
   }
 
   private int findCommand(List<Command> commands, OperationCode code, int start) {
