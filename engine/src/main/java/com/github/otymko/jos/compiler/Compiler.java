@@ -540,6 +540,17 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   @Override
   public ParseTree visitAcceptor(BSLParser.AcceptorContext acceptor) {
+    for (var m : acceptor.modifier()) {
+      if (m.accessCall() != null) {
+        processAccessCall(m.accessCall(), true);
+      } else if (m.accessProperty() != null) {
+        visitAccessProperty(m.accessProperty());
+      } else if (m.accessIndex() != null) {
+        visitAccessIndex(m.accessIndex());
+      } else {
+        visitModifier(m);
+      }
+    }
     if (acceptor.accessIndex() != null) {
       visitAccessIndex(acceptor.accessIndex());
     } else {
