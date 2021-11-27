@@ -60,4 +60,14 @@ class ExternalScriptTest extends BaseExternalScriptTest {
     return getTestsFromScript(Path.of("src/test/resources/tests/typedescription.os"));
   }
 
+  @TestFactory
+  Collection<DynamicTest> testMap() throws IOException {
+    return getTestsFromScript(Path.of("src/test/resources/tests/map.os"));
+  }
+
+  @TestFactory
+  Collection<DynamicTest> testFixedMap() throws IOException {
+    return getTestsFromScript(Path.of("src/test/resources/tests/fixed-map.os"));
+  }
+
 }
