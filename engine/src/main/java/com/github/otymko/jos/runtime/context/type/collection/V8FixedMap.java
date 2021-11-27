@@ -83,7 +83,7 @@ public class V8FixedMap extends ContextValue implements IndexAccessor,
 
   @Override
   public IValue getIndexedValue(IValue index) {
-    return getInternal(index).orElseThrow();
+    return getInternal(index).orElseThrow(MachineException::keyNotFound);
   }
 
   @Override
