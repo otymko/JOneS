@@ -485,11 +485,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       processIdentifier(ctx.IDENTIFIER().getText());
     }
 
-    if (ctx.modifier() != null) {
-      for (var modifier : ctx.modifier()) {
-        visitModifier(modifier);
-      }
-    }
+    processModifier(ctx.modifier());
 
     if (ctx.globalMethodCall() != null) {
       visitGlobalMethodCall(ctx.globalMethodCall());
@@ -540,23 +536,30 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   @Override
   public ParseTree visitAcceptor(BSLParser.AcceptorContext acceptor) {
-    for (var m : acceptor.modifier()) {
-      if (m.accessCall() != null) {
-        processAccessCall(m.accessCall(), true);
-      } else if (m.accessProperty() != null) {
-        visitAccessProperty(m.accessProperty());
-      } else if (m.accessIndex() != null) {
-        visitAccessIndex(m.accessIndex());
-      } else {
-        visitModifier(m);
-      }
-    }
+    processModifier(acceptor.modifier());
     if (acceptor.accessIndex() != null) {
       visitAccessIndex(acceptor.accessIndex());
     } else {
       visitAccessProperty(acceptor.accessProperty());
     }
     return acceptor;
+  }
+
+  private void processModifier(List<? extends BSLParser.ModifierContext> modifierList) {
+    if (modifierList == null) {
+      return;
+    }
+    for (final var modifier : modifierList) {
+      if (modifier.accessCall() != null) {
+        processAccessCall(modifier.accessCall(), true);
+      } else if (modifier.accessProperty() != null) {
+        visitAccessProperty(modifier.accessProperty());
+      } else if (modifier.accessIndex() != null) {
+        visitAccessIndex(modifier.accessIndex());
+      } else {
+        visitModifier(modifier);
+      }
+    }
   }
 
   @Override
@@ -908,23 +911,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     processIdentifier(complexIdentifierContext.IDENTIFIER().getText());
 
     // проверим, что идет дальше
-    if (complexIdentifierContext.modifier() != null) {
-      for (var modifier : complexIdentifierContext.modifier()) {
-
-        if (modifier.accessCall() != null) {
-          processAccessCall(modifier.accessCall(), true);
-        } else if (modifier.accessProperty() != null) {
-          visitAccessProperty(modifier.accessProperty());
-        } else if (modifier.accessIndex() != null) {
-          processExpression(modifier.accessIndex().expression(), new ArrayDeque<>());
-          addCommand(OperationCode.PushIndexed, 0);
-        } else {
-          throw CompilerException.notSupportedException();
-        }
-
-      }
-    }
-
+    processModifier(complexIdentifierContext.modifier());
   }
 
   private void processUnaryModifier(BSLParser.UnaryModifierContext child, Deque<ExpressionOperator> operators) {
