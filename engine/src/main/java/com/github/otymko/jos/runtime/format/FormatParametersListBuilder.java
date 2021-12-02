@@ -33,16 +33,22 @@ final class FormatParametersListBuilder {
     final Map<String, String> paramList = new HashMap<>();
     index = 0;
     while (readParameterDefinition()) {
-      paramList.put(paramName.toUpperCase(), paramValue);
+      if (!paramName.isEmpty()) {
+        paramList.put(paramName.toUpperCase(), paramValue);
+      }
     }
     return paramList;
   }
 
   private boolean readParameterDefinition() {
-    if (!readParameterName()) {
+    skipWhitespace();
+    if (index >= format.length()) {
       return false;
     }
-    readParameterValue();
+
+    if (readParameterName()) {
+      readParameterValue();
+    }
     return true;
   }
 
@@ -65,6 +71,10 @@ final class FormatParametersListBuilder {
         paramName = format.substring(start, index).trim();
         index++;
         return true;
+      } else if (currentChar == ';') {
+        index++;
+        paramName = "";
+        return false;
       } else if (Character.isWhitespace(currentChar)) {
         skipWhitespace();
       } else {
