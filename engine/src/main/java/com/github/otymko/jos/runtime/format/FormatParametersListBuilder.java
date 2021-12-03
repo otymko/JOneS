@@ -8,6 +8,10 @@ package com.github.otymko.jos.runtime.format;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Вспомогательный класс, отвечающий за разбор строки параметров в соответствие @{code FormatParametersList}.
+ * @see FormatParametersList
+ */
 final class FormatParametersListBuilder {
 
   private static final char SINGLE_QUOTE = '\'';

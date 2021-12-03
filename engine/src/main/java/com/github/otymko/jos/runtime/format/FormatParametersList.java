@@ -15,16 +15,30 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Вспомогательный класс, представляющий параметры форматирования для функции Формат.
+ * @see ValueFormatter
+ */
 final class FormatParametersList {
 
   private static final Pattern intListSeparatorPattern = Pattern.compile("\\D");
 
   private final Map<String, String> paramList;
 
+  /**
+   * Создает экземпляр класса по соответствию
+   * @param paramList - Соответствие параметров форматирования
+   */
   public FormatParametersList(Map<String, String> paramList) {
     this.paramList = paramList;
   }
 
+  /**
+   * Получает значение параметра по одному из его имен.
+   * @param names Список возможных имен параметра
+   * @return Возвращает {@code Optional}, который пуст, если ни по одному имени не нашлось значения,
+   *         и заполненное строковое значение по одному из найденных имен
+   */
   public Optional<String> get(List<String> names) {
     return names.stream()
             .map(name -> name.toUpperCase(Locale.ENGLISH))
@@ -33,6 +47,11 @@ final class FormatParametersList {
             .findFirst();
   }
 
+  /**
+   * Возвращает локаль форматирования в соответствии с именами параметров
+   * @param names Список возможных имен параметра
+   * @return Возвращает {@code Locale}, определенное по значению параметра по одному из имен, или {@code Locale.getDefault()}
+   */
   public Locale getLocale(List<String> names) {
     return get(names)
             .map(FormatParametersList::getLocale)
@@ -43,18 +62,32 @@ final class FormatParametersList {
     return Locale.forLanguageTag(localeParamValue.replace('_', '-'));
   }
 
-
+  /**
+   * Возвращает значение параметра, приведенное к целому. Если значение не может быть приведено к целому, возвращает 0.
+   * @param names Список возможных имен параметра
+   * @return Значение параметра, приведенное к {@code Integer} или 0, если приведение невозможно
+   */
   public Optional<Integer> getInt(List<String> names) {
     return get(names)
             .map(FormatParametersList::parseInt);
   }
 
+  /**
+   * Проверяет наличие параметра в списке
+   * @param names Список возможных имен параметра
+   * @return @{code true}, если параметр был установлен, и @{code false} в противном случае
+   */
   public boolean containsKey(List<String> names) {
     return names.stream()
             .map(name -> name.toUpperCase(Locale.ENGLISH))
             .anyMatch(paramList::containsKey);
   }
 
+  /**
+   * Получает значение параметра, преобразованное в список целых значений.
+   * @param names Список возможных имен параметра
+   * @return Значение параметра, преобразованное в список целых значений.
+   */
   public List<Integer> getIntList(List<String> names) {
     return get(names)
             .stream()
