@@ -7,6 +7,7 @@ package com.github.otymko.jos.runtime.format;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Вспомогательный класс, отвечающий за разбор строки параметров в соответствие @{code FormatParametersList}.
@@ -16,13 +17,11 @@ final class FormatParametersListBuilder {
 
   private static final char SINGLE_QUOTE = '\'';
   private static final char DOUBLE_QUOTE = '\"';
-  private static final char SPACE = ' ';
+  private static final char PARAM_DELIMITER = ';';
+  private static final char NAME_VALUE_DELIMITER = '=';
 
   private final String format;
-
   private int index;
-  private String paramName;
-  private String paramValue;
 
   FormatParametersListBuilder(String format) {
     this.format = format;
@@ -33,136 +32,142 @@ final class FormatParametersListBuilder {
     return new FormatParametersList(builder.parseParams());
   }
 
-  Map<String, String> parseParams() {
+  private Map<String, String> parseParams() {
     final Map<String, String> paramList = new HashMap<>();
     index = 0;
-    while (readParameterDefinition()) {
-      if (!paramName.isEmpty()) {
-        paramList.put(paramName.toUpperCase(), paramValue);
+    while (canReadParam()) {
+
+      final var paramName = readParameterName();
+      if (paramName.isEmpty()) {
+        continue;
       }
+
+      final var value = readParameterValue();
+      if (value.isEmpty()) {
+        continue;
+      }
+
+      paramList.put(paramName.get().toUpperCase(), value.get());
     }
     return paramList;
   }
 
-  private boolean readParameterDefinition() {
-    skipWhitespace();
-    if (index >= format.length()) {
-      return false;
-    }
-
-    if (readParameterName()) {
-      readParameterValue();
-    }
-    return true;
-  }
-
-  private boolean readParameterName() {
-    skipWhitespace();
-    if (index >= format.length()) {
-      return false;
-    }
-    if (!Character.isLetter(format.charAt(index))) {
-      return false;
-    }
-
-    final var start = index;
-
-    while (index < format.length()) {
-      final var currentChar = format.charAt(index);
-      if (Character.isLetterOrDigit(currentChar) || currentChar == '.' || currentChar == '_') {
-        index++;
-      } else if (currentChar == '=') {
-        paramName = format.substring(start, index).trim();
-        index++;
-        return true;
-      } else if (currentChar == ';') {
-        index++;
-        paramName = "";
-        return false;
-      } else if (Character.isWhitespace(currentChar)) {
-        skipWhitespace();
+  private boolean canReadParam() {
+    // пропускаем пробелы и разделители
+    while (!outOfText()) {
+      if (currentChar() == PARAM_DELIMITER) {
+        moveNext();
       } else {
-        return false;
+        return true;
       }
     }
     return false;
   }
 
-  private static char getTerminalChar(char c) {
-    if (c == DOUBLE_QUOTE) {
-      return DOUBLE_QUOTE;
-    }
-    if (c == SINGLE_QUOTE) {
-      return SINGLE_QUOTE;
-    }
-    return SPACE;
-  }
-
-  private char nextChar() {
-    if (index + 1 < format.length()) {
-      return format.charAt(index + 1);
-    }
-    return '\0';
-  }
-
-  private char currentChar() {
-    if (index < format.length()) {
-      return format.charAt(index);
-    }
-    return '\0';
-  }
-
-  private void readParameterValue() {
-
+  private boolean outOfText() {
     skipWhitespace();
+    return !canRead();
+  }
 
-    paramValue = "";
-    if (index >= format.length()) {
-      return;
+  private Optional<String> readParameterName() {
+    if (!isNameFirstCharacter(currentChar())) {
+      return Optional.empty();
+    }
+
+    final var nameBuilder = new StringBuilder();
+
+    while (canRead()) {
+      final var currentChar = currentChar();
+      if (currentChar == PARAM_DELIMITER) {
+        break;
+      }
+      if (currentChar == NAME_VALUE_DELIMITER) {
+        moveNext();
+        return Optional.of(nameBuilder.toString().trim());
+      }
+      nameBuilder.append(currentChar);
+      moveNext();
+    }
+    return Optional.empty();
+  }
+
+  private static boolean isNameFirstCharacter(char ch) {
+    return !Character.isWhitespace(ch) && ch != PARAM_DELIMITER && ch != NAME_VALUE_DELIMITER;
+  }
+
+  private static boolean isQuote(char c) {
+    return c == DOUBLE_QUOTE
+            || c == SINGLE_QUOTE;
+  }
+
+  private Optional<String> readParameterValue() {
+
+    if (outOfText()) {
+      return Optional.of("");
     }
 
     final var valueBuilder = new StringBuilder();
 
-    final var terminalChar = getTerminalChar(currentChar());
-    if (terminalChar != SPACE) {
-      index++;
+    if (isQuote(currentChar())) {
+      return readQuotedValue();
     }
 
-    while (index < format.length()) {
+    while (canRead()) {
 
-      if (terminalChar == SPACE && currentChar() == ';') {
+      if (Character.isWhitespace(currentChar()) || currentChar() == PARAM_DELIMITER) {
         break;
       }
 
-      if (currentChar() == terminalChar) {
-        if (nextChar() != terminalChar) {
-          break;
-        }
-
-        index++;
-      }
-
       valueBuilder.append(currentChar());
-      index++;
-
+      moveNext();
     }
 
-    if (terminalChar != SPACE) {
-      index++;
+    return Optional.of(valueBuilder.toString());
+  }
+
+  private Optional<String> readQuotedValue() {
+    final var valueBuilder = new StringBuilder();
+
+    final var quote = currentChar();
+    moveNext();
+
+    while (canRead()) {
+     if (currentChar() == quote) {
+        moveNext();
+        if (!canRead() || currentChar() != quote) {
+          return Optional.of(valueBuilder.toString());
+        }
+      }
+      valueBuilder.append(currentChar());
+      moveNext();
     }
 
-    skipWhitespace();
-
-    if (currentChar() == ';') {
-      index++;
-    }
-
-    paramValue = valueBuilder.toString();
+    return Optional.empty();
   }
 
   private void skipWhitespace() {
-    while (Character.isWhitespace(currentChar())) {
-      index++;
+    while (canRead()) {
+      if (!Character.isWhitespace(currentChar())) {
+        break;
+      }
+      moveNext();
     }
   }
+
+  private void moveNext() {
+    index++;
+  }
+
+  private boolean canRead() {
+    return index < format.length();
+  }
+
+  private char currentChar() {
+    return format.charAt(index);
+  }
+
+  private int pos() {
+    return index;
+  }
+
 }
