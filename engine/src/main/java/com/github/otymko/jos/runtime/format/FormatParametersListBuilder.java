@@ -166,8 +166,4 @@ final class FormatParametersListBuilder {
     return format.charAt(index);
   }
 
-  private int pos() {
-    return index;
-  }
-
 }
