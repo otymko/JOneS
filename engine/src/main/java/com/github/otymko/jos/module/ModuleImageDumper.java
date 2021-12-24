@@ -18,7 +18,10 @@ public class ModuleImageDumper {
     int offset = 0;
     for (final var opCode : image.getCode()) {
       writer.write(String.format("%6d: %s", offset, opCode));
-      if (opCode.getCode() == OperationCode.PushConst) {
+      if (opCode.getCode() == OperationCode.PushConst
+        || opCode.getCode() == OperationCode.ResolveMethodProc
+        || opCode.getCode() == OperationCode.ResolveMethodFunc
+        || opCode.getCode() == OperationCode.ResolveProp) {
         writer.write(String.format(" ; %s", image.getConstants().get(opCode.getArgument())));
       }
       writer.write('\n');
