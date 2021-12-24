@@ -86,11 +86,13 @@ public class ContextInitializer {
 
   public PropertyInfo[] getProperties(Class<? extends RuntimeContext> targetClass) {
     List<PropertyInfo> properties = new ArrayList<>();
-    for (var field : targetClass.getFields()) {
+    for (var field : targetClass.getDeclaredFields()) {
       var contextProperty = field.getAnnotation(ContextProperty.class);
       if (contextProperty == null) {
         continue;
       }
+
+      field.setAccessible(true);
 
       var setter = getMethodByName(targetClass, "set" + field.getName());
       var hasSetter = setter != null;
