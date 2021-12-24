@@ -36,7 +36,7 @@ public class DateQualifiers extends ContextValue {
    * @see DateFractions
    */
   @ContextProperty(name = "ЧастиДаты", alias = "DateFractions", accessMode = PropertyAccessMode.READ_ONLY)
-  public DateFractions dateFractions;
+  DateFractions dateFractions;
 
   public IValue getDateFractions() {
     return EnumerationHelper.getEnumByClass(DateFractions.class).getEnumValueType(dateFractions);

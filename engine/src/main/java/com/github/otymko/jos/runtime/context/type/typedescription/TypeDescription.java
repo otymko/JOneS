@@ -36,16 +36,16 @@ public class TypeDescription extends ContextValue {
   List<TypeValue> types;
 
   @ContextProperty(name = "КвалификаторыЧисла", alias = "NumberQualifiers", accessMode = PropertyAccessMode.READ_ONLY)
-  public NumberQualifiers numberQualifiers;
+  NumberQualifiers numberQualifiers;
 
   @ContextProperty(name = "КвалификаторыСтроки", alias = "StringQualifiers", accessMode = PropertyAccessMode.READ_ONLY)
-  public StringQualifiers stringQualifiers;
+  StringQualifiers stringQualifiers;
 
   @ContextProperty(name = "КвалификаторыДаты", alias = "DateQualifiers", accessMode = PropertyAccessMode.READ_ONLY)
-  public DateQualifiers dateQualifiers;
+  DateQualifiers dateQualifiers;
 
   @ContextProperty(name = "КвалификаторыДвоичныхДанных", alias = "BinaryDataQualifiers", accessMode = PropertyAccessMode.READ_ONLY)
-  public BinaryDataQualifiers binaryDataQualifiers;
+  BinaryDataQualifiers binaryDataQualifiers;
 
   @ContextMethod(name = "Типы", alias = "Types")
   public V8Array types() {

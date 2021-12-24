@@ -92,7 +92,8 @@ public class ContextInitializer {
         continue;
       }
 
-      field.setAccessible(true);
+      // проектное решение для доступа через стековую машину к приватным полям
+      field.setAccessible(true); // NOSONAR
 
       var setter = getMethodByName(targetClass, "set" + field.getName());
       var hasSetter = setter != null;
