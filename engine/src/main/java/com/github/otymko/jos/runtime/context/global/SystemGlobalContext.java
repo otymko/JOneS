@@ -33,7 +33,7 @@ public class SystemGlobalContext implements AttachableContext {
   }
 
   @ContextProperty(name = "Символы", alias = "Chars")
-  public static final IValue SYMBOLS = new SymbolsContext();
+  private static final IValue SYMBOLS = new SymbolsContext();
 
   @ContextMethod(name = "Сообщить", alias = "Message")
   // TODO: для null аргументов можно ввести @ContextMethodArgument(defaultValue = MessageStatus.ORDINARY)

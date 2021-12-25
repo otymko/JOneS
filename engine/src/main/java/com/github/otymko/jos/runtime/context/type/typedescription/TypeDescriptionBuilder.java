@@ -32,10 +32,10 @@ final class TypeDescriptionBuilder {
   void applyBaseDescription(TypeDescription baseDescription) {
     types.clear();
     addTypes(baseDescription.getTypes());
-    numberQualifiers = baseDescription.numberQualifiers;
-    stringQualifiers = baseDescription.stringQualifiers;
-    dateQualifiers = baseDescription.dateQualifiers;
-    binaryDataQualifiers = baseDescription.binaryDataQualifiers;
+    numberQualifiers = baseDescription.getNumberQualifiers();
+    stringQualifiers = baseDescription.getStringQualifiers();
+    dateQualifiers = baseDescription.getDateQualifiers();
+    binaryDataQualifiers = baseDescription.getBinaryDataQualifiers();
   }
 
   List<TypeValue> typesFromArray(V8Array array) {
