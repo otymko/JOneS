@@ -15,6 +15,11 @@ import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
 import com.github.otymko.jos.runtime.context.type.primitive.StringValue;
 import com.github.otymko.jos.runtime.context.type.primitive.TypeValue;
 import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
+import com.github.otymko.jos.runtime.context.type.typedescription.BinaryDataQualifiers;
+import com.github.otymko.jos.runtime.context.type.typedescription.DateQualifiers;
+import com.github.otymko.jos.runtime.context.type.typedescription.NumberQualifiers;
+import com.github.otymko.jos.runtime.context.type.typedescription.StringQualifiers;
+import com.github.otymko.jos.runtime.context.type.typedescription.TypeDescription;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.experimental.UtilityClass;
 
@@ -60,6 +65,12 @@ public class StandardTypeInitializer {
     implementTypeByInfo(typeManager, V8Array.INFO);
     implementTypeByInfo(typeManager, V8KeyAndValue.INFO);
     implementTypeByInfo(typeManager, V8Structure.INFO);
+
+    implementTypeByInfo(typeManager, BinaryDataQualifiers.INFO);
+    implementTypeByInfo(typeManager, DateQualifiers.INFO);
+    implementTypeByInfo(typeManager, NumberQualifiers.INFO);
+    implementTypeByInfo(typeManager, StringQualifiers.INFO);
+    implementTypeByInfo(typeManager, TypeDescription.INFO);
     implementTypeByInfo(typeManager, V8Regex.INFO);
   }
 

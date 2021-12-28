@@ -27,7 +27,12 @@ public interface RuntimeContext {
       callMethod.invoke(this, arguments);
     } catch (MachineException exception) {
       throw exception;
-    } catch (IllegalAccessException | InvocationTargetException exception) {
+    } catch (IllegalAccessException exception) {
+      throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
+    } catch (InvocationTargetException exception) {
+      if (exception.getTargetException() instanceof MachineException) {
+        throw (MachineException)exception.getTargetException();
+      }
       throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
     }
   }
@@ -40,7 +45,12 @@ public interface RuntimeContext {
       result = callMethod.invoke(this, arguments);
     } catch (MachineException exception) {
       throw exception;
-    } catch (IllegalAccessException | InvocationTargetException exception) {
+    } catch (IllegalAccessException exception) {
+      throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
+    } catch (InvocationTargetException exception) {
+      if (exception.getTargetException() instanceof MachineException) {
+        throw (MachineException)exception.getTargetException();
+      }
       throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
     }
     return (IValue) result;

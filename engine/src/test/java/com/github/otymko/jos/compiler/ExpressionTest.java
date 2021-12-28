@@ -6,6 +6,8 @@
 package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.hosting.ScriptEngine;
+import com.github.otymko.jos.localization.MessageResource;
+import com.github.otymko.jos.localization.Resources;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExpressionTest {
   private static final String TEMPLATE = "Значение = %s;\nСообщить(Значение);";
+  private static final String YES_STRING = Resources.getResourceString(MessageResource.DEFAULT_TRUE_PRESENTATION);
+  private static final String NO_STRING = Resources.getResourceString(MessageResource.DEFAULT_FALSE_PRESENTATION);
 
   @Test
   void testSimple() throws Exception {
@@ -25,38 +29,38 @@ public class ExpressionTest {
 
   @Test
   void testSimpleLogic() throws Exception {
-    checkEvalExpression("Истина", "Да");
-    checkEvalExpression("Не Истина", "Нет");
-    checkEvalExpression("Ложь", "Нет");
-    checkEvalExpression("Не Ложь", "Да");
-    checkEvalExpression("Ложь И Ложь", "Нет");
-    checkEvalExpression("Истина И Ложь", "Нет");
-    checkEvalExpression("Ложь И Истина", "Нет");
-    checkEvalExpression("Истина И Истина", "Да");
-    checkEvalExpression("Ложь Или Ложь", "Нет");
-    checkEvalExpression("Истина Или Ложь", "Да");
-    checkEvalExpression("Ложь Или Истина", "Да");
-    checkEvalExpression("Истина И Истина", "Да");
-    checkEvalExpression("Истина Или Истина И Истина", "Да");
-    checkEvalExpression("Ложь Или Истина И Истина", "Да");
-    checkEvalExpression("Ложь Или Ложь И Истина", "Нет");
-    checkEvalExpression("Ложь Или Истина И Ложь", "Нет");
-    checkEvalExpression("Истина И (Истина Или Ложь)", "Да");
-    checkEvalExpression("(Истина Или Ложь) И Истина", "Да");
+    checkEvalExpression("Истина", YES_STRING);
+    checkEvalExpression("Не Истина", NO_STRING);
+    checkEvalExpression("Ложь", NO_STRING);
+    checkEvalExpression("Не Ложь", YES_STRING);
+    checkEvalExpression("Ложь И Ложь", NO_STRING);
+    checkEvalExpression("Истина И Ложь", NO_STRING);
+    checkEvalExpression("Ложь И Истина", NO_STRING);
+    checkEvalExpression("Истина И Истина", YES_STRING);
+    checkEvalExpression("Ложь Или Ложь", NO_STRING);
+    checkEvalExpression("Истина Или Ложь", YES_STRING);
+    checkEvalExpression("Ложь Или Истина", YES_STRING);
+    checkEvalExpression("Истина И Истина", YES_STRING);
+    checkEvalExpression("Истина Или Истина И Истина", YES_STRING);
+    checkEvalExpression("Ложь Или Истина И Истина", YES_STRING);
+    checkEvalExpression("Ложь Или Ложь И Истина", NO_STRING);
+    checkEvalExpression("Ложь Или Истина И Ложь", NO_STRING);
+    checkEvalExpression("Истина И (Истина Или Ложь)", YES_STRING);
+    checkEvalExpression("(Истина Или Ложь) И Истина", YES_STRING);
   }
 
   @Test
   void testCompare() throws Exception {
-    checkEvalExpression("1 > 0", "Да");
-    checkEvalExpression("1 < 0", "Нет");
-    checkEvalExpression("10 >= 10", "Да");
-    checkEvalExpression("10 >= 11", "Нет");
-    checkEvalExpression("10 <= 10", "Да");
-    checkEvalExpression("10 <= 9", "Нет");
-    checkEvalExpression("10 = 10", "Да");
-    checkEvalExpression("10 = 9", "Нет");
-    checkEvalExpression("10 <> 10", "Нет");
-    checkEvalExpression("10 <> 9", "Да");
+    checkEvalExpression("1 > 0", YES_STRING);
+    checkEvalExpression("1 < 0", NO_STRING);
+    checkEvalExpression("10 >= 10", YES_STRING);
+    checkEvalExpression("10 >= 11", NO_STRING);
+    checkEvalExpression("10 <= 10", YES_STRING);
+    checkEvalExpression("10 <= 9", NO_STRING);
+    checkEvalExpression("10 = 10", YES_STRING);
+    checkEvalExpression("10 = 9", NO_STRING);
+    checkEvalExpression("10 <> 10", NO_STRING);
+    checkEvalExpression("10 <> 9", YES_STRING);
   }
 
   @Test

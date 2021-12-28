@@ -176,4 +176,9 @@ public class MachineException extends EngineException {
     return new MachineException(message);
   }
 
+  public static MachineException checkIsFilledNotSupportedForType(String typeName) {
+    var message = String.format(Resources.getResourceString(CHECK_IS_FILLED_NOT_SUPPORTED, typeName));
+    return new MachineException(message);
+  }
+
 }

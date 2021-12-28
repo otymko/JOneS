@@ -6,6 +6,7 @@
 package com.github.otymko.jos.runtime.context.type.primitive;
 
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.runtime.format.ValueFormatter;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.IValue;
@@ -13,19 +14,20 @@ import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.function.Predicate;
 
 @ContextClass(name = "Дата", alias = "Date")
 public class DateValue extends PrimitiveValue {
   public static final ContextInfo INFO = ContextInfo.createByClass(DateValue.class);
 
+  private static final Date EMPTY_DATE = new GregorianCalendar(1, Calendar.JANUARY, 1).getTime();
   private static final Predicate<String> IS_EMPTY_DATE = view -> view.equals("00000000") || view.equals("000000000000")
     || view.equals("00000000000000");
-  private static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
   private final Date value;
 
@@ -46,7 +48,7 @@ public class DateValue extends PrimitiveValue {
 
   @Override
   public String asString() {
-    return DEFAULT_FORMAT.format(value);
+    return ValueFormatter.format(this, "");
   }
 
   @Override
@@ -55,6 +57,14 @@ public class DateValue extends PrimitiveValue {
       return value.compareTo(object.asDate());
     }
     return super.compareTo(object);
+  }
+
+  public static boolean isEmpty(Date date) {
+    return date.equals(EMPTY_DATE);
+  }
+
+  public boolean isEmpty() {
+    return value.equals(EMPTY_DATE);
   }
 
   public static IValue parse(String view) {
@@ -70,7 +80,7 @@ public class DateValue extends PrimitiveValue {
       throw MachineException.convertToDateException();
     }
     if (IS_EMPTY_DATE.test(view)) {
-      result = ValueFactory.create(new Date());
+      result = ValueFactory.create(EMPTY_DATE);
     } else {
       Date date;
       try {

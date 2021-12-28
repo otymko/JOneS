@@ -86,17 +86,20 @@ public class ContextInitializer {
 
   public PropertyInfo[] getProperties(Class<? extends RuntimeContext> targetClass) {
     List<PropertyInfo> properties = new ArrayList<>();
-    for (var field : targetClass.getFields()) {
+    for (var field : targetClass.getDeclaredFields()) {
       var contextProperty = field.getAnnotation(ContextProperty.class);
       if (contextProperty == null) {
         continue;
       }
 
+      // проектное решение для доступа через стековую машину к приватным полям
+      field.setAccessible(true); // NOSONAR
+
       var setter = getMethodByName(targetClass, "set" + field.getName());
       var hasSetter = setter != null;
 
       var getter = getMethodByName(targetClass, "get" + field.getName());
-      var hasGetter = setter != null;
+      var hasGetter = getter != null;
 
       // FIXME: нужен билдер
       var property = new PropertyInfo(contextProperty.name(), contextProperty.alias(),

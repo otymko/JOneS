@@ -485,11 +485,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       processIdentifier(ctx.IDENTIFIER().getText());
     }
 
-    if (ctx.modifier() != null) {
-      for (var modifier : ctx.modifier()) {
-        visitModifier(modifier);
-      }
-    }
+    processModifier(ctx.modifier());
 
     if (ctx.globalMethodCall() != null) {
       visitGlobalMethodCall(ctx.globalMethodCall());
@@ -504,8 +500,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var callStatement = (BSLParser.CallStatementContext) globalMethodCall.getParent();
 
     var paramList = callStatement.globalMethodCall().doCall().callParamList();
-    processParamList(paramList);
-    addCommand(OperationCode.ArgNum, calcParams(paramList));
+    final var paramCount = processParamList(paramList);
+    addCommand(OperationCode.ArgNum, paramCount);
     processMethodCall(callStatement.globalMethodCall().methodName(), false);
     return globalMethodCall;
   }
@@ -540,12 +536,30 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   @Override
   public ParseTree visitAcceptor(BSLParser.AcceptorContext acceptor) {
+    processModifier(acceptor.modifier());
     if (acceptor.accessIndex() != null) {
       visitAccessIndex(acceptor.accessIndex());
     } else {
       visitAccessProperty(acceptor.accessProperty());
     }
     return acceptor;
+  }
+
+  private void processModifier(List<? extends BSLParser.ModifierContext> modifierList) {
+    if (modifierList == null) {
+      return;
+    }
+    for (final var modifier : modifierList) {
+      if (modifier.accessCall() != null) {
+        processAccessCall(modifier.accessCall(), true);
+      } else if (modifier.accessProperty() != null) {
+        visitAccessProperty(modifier.accessProperty());
+      } else if (modifier.accessIndex() != null) {
+        visitAccessIndex(modifier.accessIndex());
+      } else {
+        visitModifier(modifier);
+      }
+    }
   }
 
   @Override
@@ -889,28 +903,15 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     } else if (complexIdentifierContext.newExpression() != null) {
       processNewExpression(complexIdentifierContext.newExpression());
       return;
+    } else if (complexIdentifierContext.ternaryOperator() != null) {
+      processTernaryOperator(complexIdentifierContext.ternaryOperator());
+      return;
     }
 
     processIdentifier(complexIdentifierContext.IDENTIFIER().getText());
 
     // проверим, что идет дальше
-    if (complexIdentifierContext.modifier() != null) {
-      for (var modifier : complexIdentifierContext.modifier()) {
-
-        if (modifier.accessCall() != null) {
-          processAccessCall(modifier.accessCall(), true);
-        } else if (modifier.accessProperty() != null) {
-          visitAccessProperty(modifier.accessProperty());
-        } else if (modifier.accessIndex() != null) {
-          processExpression(modifier.accessIndex().expression(), new ArrayDeque<>());
-          addCommand(OperationCode.PushIndexed, 0);
-        } else {
-          throw CompilerException.notSupportedException();
-        }
-
-      }
-    }
-
+    processModifier(complexIdentifierContext.modifier());
   }
 
   private void processUnaryModifier(BSLParser.UnaryModifierContext child, Deque<ExpressionOperator> operators) {
@@ -927,13 +928,12 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   private void processGlobalStatement(BSLParser.GlobalMethodCallContext globalMethodCall) {
     var paramList = globalMethodCall.doCall().callParamList();
-    processParamList(paramList);
+    var factArguments = processParamList(paramList);
 
     var identifier = globalMethodCall.methodName().getText();
     var optionalOperationCode = NativeGlobalMethod.getOperationCode(identifier);
     if (optionalOperationCode.isPresent()) {
       var opCode = optionalOperationCode.get();
-      var factArguments = calcParams(paramList);
       if (opCode == OperationCode.Min || opCode == OperationCode.Max) {
         if (factArguments == 0) {
           throw CompilerException.tooFewMethodArgumentsException();
@@ -946,7 +946,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
     } else {
 
-      addCommand(OperationCode.ArgNum, calcParams(paramList));
+      addCommand(OperationCode.ArgNum, factArguments);
       processMethodCall(globalMethodCall.methodName(), true);
 
     }
@@ -964,20 +964,56 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var argumentCount = 0;
     if (newExpressionContext.doCall() != null) {
       var paramList = newExpressionContext.doCall().callParamList();
-      argumentCount = calcParams(paramList);
-      processParamList(paramList);
+      argumentCount = processParamList(paramList);
     }
 
     addCommand(OperationCode.NewInstance, argumentCount);
   }
 
-  private void processParamList(BSLParser.CallParamListContext paramList) {
-    paramList.callParam().forEach(callParamContext -> {
+  /**
+   * Обработка:
+   *
+   * ?(<Логическое выражение>, <Выражение 1>, <Выражение 2>)
+   */
+  private void processTernaryOperator(BSLParser.TernaryOperatorContext ternaryOperator) {
+    var expressions = ternaryOperator.expression();
+    if (expressions.size() != 3) {
+      throw CompilerException.errorInExpression();
+    }
+
+    processExpression(expressions.get(0), new ArrayDeque<>());
+    addCommand(OperationCode.MakeBool);
+
+    var falsePart = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+
+    processExpression(expressions.get(1), new ArrayDeque<>()); // true
+
+    var endPart = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+
+    correctCommandArgument(falsePart, imageCache.getCode().size());
+    processExpression(expressions.get(2), new ArrayDeque<>()); // false
+
+    correctCommandArgument(endPart, imageCache.getCode().size());
+  }
+
+  private int processParamList(BSLParser.CallParamListContext paramList) {
+    final var callParam = paramList.callParam();
+    if (callParam.isEmpty()) {
+      return 0;
+    }
+    if (callParam.size() == 1 && callParam.get(0).expression() == null) {
+      return 0;
+    }
+    int count = 0;
+    for (var callParamContext : callParam) {
       if (callParamContext.expression() == null) {
-        return;
+        addCommand(OperationCode.PushDefaultArg);
+      } else {
+        processExpression(callParamContext.expression(), new ArrayDeque<>());
       }
-      processExpression(callParamContext.expression(), new ArrayDeque<>());
-    });
+      count++;
+    }
+    return count;
   }
 
   private void processIdentifier(String identifier) {
@@ -1003,8 +1039,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   private void processAccessCall(BSLParser.AccessCallContext accessCallContext, boolean ifFunction) {
     var paramList = accessCallContext.methodCall().doCall().callParamList();
-    processParamList(paramList);
-    addCommand(OperationCode.ArgNum, calcParams(paramList));
+    final var paramCount = processParamList(paramList);
+    addCommand(OperationCode.ArgNum, paramCount);
 
     var constant = new ConstantDefinition(ValueFactory.create(accessCallContext.methodCall().methodName().getText()));
     if (!imageCache.getConstants().contains(constant)) {
@@ -1017,16 +1053,6 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     } else {
       addCommand(OperationCode.ResolveMethodProc, index);
     }
-  }
-
-  private int calcParams(BSLParser.CallParamListContext callParamListContext) {
-    var count = 0;
-    for (var callParam : callParamListContext.callParam()) {
-      if (callParam.getChildCount() > 0) {
-        count++;
-      }
-    }
-    return count;
   }
 
   private void processMethodCall(BSLParser.MethodNameContext methodNameContext, boolean isFunction) {

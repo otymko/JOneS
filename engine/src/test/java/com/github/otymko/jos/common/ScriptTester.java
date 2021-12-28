@@ -28,18 +28,18 @@ public class ScriptTester implements ContextType, IValue {
 
   @ContextMethod(name = "Проверить", alias = "Check")
   public static void check(IValue conditional, IValue additionalErrorMessage) {
-    if (!conditional.asBoolean()) {
-      // TODO: локализация
-      // TODO: использование additionalErrorMessage
-      final var errorMessage = String.format("Переданный параметр (%s) не является Истиной, а хотели, чтобы являлся.",
-        conditional.asString());
-      throw new MachineException(errorMessage);
-    }
+    checkTrue(conditional, additionalErrorMessage);
   }
 
   @ContextMethod(name = "ПроверитьИстину", alias = "CheckTrue")
   public static void checkTrue(IValue conditional, IValue additionalErrorMessage) {
-    check(conditional, additionalErrorMessage);
+    if (!conditional.asBoolean()) {
+      // TODO: локализация
+      // TODO: использование additionalErrorMessage
+      final var errorMessage = String.format("Переданный параметр (%s) не является Истиной, а хотели, чтобы являлся.",
+              conditional.asString());
+      throw new MachineException(errorMessage);
+    }
   }
 
   @ContextMethod(name = "ПроверитьЛожь", alias = "CheckFalse")
@@ -47,11 +47,12 @@ public class ScriptTester implements ContextType, IValue {
     if (conditional.asBoolean()) {
       // TODO: локализация
       // TODO: использование additionalErrorMessage
-      final var errorMessage = String.format("Переданный параметр (%s) не является Ложь, а хотели, чтобы не являлся.",
-        conditional.asString());
+      final var errorMessage = String.format("Переданный параметр (%s) не является Ложью, а хотели, чтобы являлся.",
+              conditional.asString());
       throw new MachineException(errorMessage);
     }
   }
+
 
   // ПроверитьРавенствоДатСТочностью2Секунды
 
@@ -62,7 +63,7 @@ public class ScriptTester implements ContextType, IValue {
     var oneValueRaw = oneValue.getRawValue();
     var twoValueRaw = twoValue.getRawValue();
 
-    if (oneValueRaw.compareTo(twoValueRaw) != 0) {
+    if (!oneValueRaw.equals(twoValueRaw)) {
       // TODO: локализация
       // TODO: использование additionalErrorMessage
       final var errorMessage = String.format("Сравниваемые значения (%s; %s) не равны, а хотели, чтобы были равны.",
@@ -76,7 +77,7 @@ public class ScriptTester implements ContextType, IValue {
     var oneValueRaw = oneValue.getRawValue();
     var twoValueRaw = twoValue.getRawValue();
 
-    if (oneValueRaw.compareTo(twoValueRaw) == 0) {
+    if (oneValueRaw.equals(twoValueRaw)) {
       // TODO: локализация
       // TODO: использование additionalErrorMessage
       final var errorMessage = String.format("Сравниваемые значения (%s; %s) равны, а хотели, чтобы были не равны.",

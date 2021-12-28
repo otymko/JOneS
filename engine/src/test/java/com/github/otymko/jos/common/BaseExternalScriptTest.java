@@ -7,13 +7,18 @@ package com.github.otymko.jos.common;
 
 import com.github.otymko.jos.compiler.ScriptCompiler;
 import com.github.otymko.jos.hosting.ScriptEngine;
+import com.github.otymko.jos.module.ModuleImage;
+import com.github.otymko.jos.module.ModuleImageDumper;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
+import lombok.Setter;
 import org.junit.jupiter.api.DynamicTest;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
@@ -28,6 +33,21 @@ public abstract class BaseExternalScriptTest {
   private static final char[] ABS_CYRILLIC = {' ', 'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я', 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
   private static final String[] ABS_LATIN = {" ", "a", "b", "v", "g", "d", "e", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "h", "ts", "ch", "sh", "sch", "", "i", "", "e", "ju", "ja", "A", "B", "V", "G", "D", "E", "E", "Zh", "Z", "I", "Y", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "F", "H", "Ts", "Ch", "Sh", "Sch", "", "I", "", "E", "Ju", "Ja", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
   private static final String METHOD_GET_LIST_ALL_TESTS = "ПолучитьСписокТестов";
+
+  private static final String DUMP_IMAGE_PARAM_NAME = "JONES_DUMP_IMAGE_ON_FAILED_TEST";
+
+  @Setter
+  private static boolean dumpImageOnFailedTest = getDefaultDumpImageOnFailedTest();
+
+  private static boolean getDefaultDumpImageOnFailedTest() {
+    final var defaultValue = false;
+
+    final var env = System.getenv();
+    if (!env.containsKey(DUMP_IMAGE_PARAM_NAME)) {
+      return defaultValue;
+    }
+    return Boolean.parseBoolean(env.get(DUMP_IMAGE_PARAM_NAME));
+  }
 
   /**
    * @param pathToScript путь к скрипту с тестами
@@ -69,7 +89,17 @@ public abstract class BaseExternalScriptTest {
     var methodIndex = sdo.getScriptMethod(methodName);
     return DynamicTest.dynamicTest(
       transliterate(methodName),
-      () -> sdo.callScriptMethod(engine, methodIndex, new IValue[0])
+      () -> {
+        try {
+          sdo.callScriptMethod(engine, methodIndex, new IValue[0]);
+        } catch (Exception e) {
+          if (dumpImageOnFailedTest) {
+            final var dumpWriter = new FileWriter(String.format("failed-%s.txt", methodName));
+            ModuleImageDumper.dump(sdo.getModuleImage(), dumpWriter);
+          }
+          throw e;
+        }
+      }
     );
   }
 

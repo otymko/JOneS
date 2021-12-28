@@ -26,4 +26,16 @@ class MachineExceptionTest {
       .hasMessageContaining("Тип не зарегистрирован (Массив1)");
   }
 
+  @Test
+  void testInternalMachineException() {
+    var code = "А = Новый Массив; А.Установить(0, 0);";
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    var moduleImage = compiler.compile(code, UserScriptContext.class);
+
+    assertThatCode(() -> engine.newObject(moduleImage))
+            .isInstanceOf(MachineException.class)
+            .hasMessageContaining("Значение индекса выходит за пределы диапазона");
+  }
+
 }

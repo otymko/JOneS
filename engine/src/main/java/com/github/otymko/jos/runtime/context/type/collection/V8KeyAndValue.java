@@ -19,10 +19,10 @@ public class V8KeyAndValue extends ContextValue implements IndexAccessor {
   public static final ContextInfo INFO = ContextInfo.createByClass(V8KeyAndValue.class);
 
   @ContextProperty(name = "Ключ", alias = "Key", accessMode = PropertyAccessMode.READ_ONLY)
-  public final IValue key;
+  private final IValue key;
 
   @ContextProperty(name = "Значение", alias = "Value", accessMode = PropertyAccessMode.READ_ONLY)
-  public final IValue value;
+  private final IValue value;
 
   public V8KeyAndValue(IValue key, IValue value) {
     this.key = key;

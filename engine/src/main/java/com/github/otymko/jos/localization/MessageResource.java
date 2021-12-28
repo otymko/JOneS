@@ -51,6 +51,10 @@ public class MessageResource {
   public static final String ENUM_TYPE_NOT_FOUND = "enumTypeNotFound";
   public static final String INVALID_ARGUMENT_VALUE = "invalidArgumentValue";
   public static final String METHOD_CALL_WRONG_ARG_VALUE = "methodCallWrongArgValue";
+  public static final String CHECK_IS_FILLED_NOT_SUPPORTED = "checkIsFilledNotSupported";
+  public static final String ERROR_IN_EXPRESSION = "errorInExpression";
+  public static final String DEFAULT_TRUE_PRESENTATION = "defaultTruePresentation";
+  public static final String DEFAULT_FALSE_PRESENTATION = "defaultFalsePresentation";
 
   private MessageResource() {
     // none

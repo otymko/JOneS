@@ -4,8 +4,8 @@ plugins {
     `java-library`
     `maven-publish`
     jacoco
-    id("io.freefair.lombok") version "6.2.0"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("io.freefair.lombok") version "6.3.0"
+    id("com.github.johnrengelman.shadow") version "7.1.1"
     id("net.kyori.indra.license-header") version "2.0.6"
     id("org.sonarqube") version "3.3"
 }
@@ -61,21 +61,21 @@ subprojects {
         implementation("commons-io", "commons-io", "2.8.0")
         implementation("org.apache.commons", "commons-lang3", "3.12.0")
 
-        compileOnly("org.projectlombok:lombok:1.18.20")
+        compileOnly("org.projectlombok:lombok:1.18.22")
         annotationProcessor("org.projectlombok:lombok:1.18.20")
 
         testCompileOnly("org.projectlombok:lombok:1.18.20")
         testAnnotationProcessor("org.projectlombok:lombok:1.18.20")
 
-        implementation("org.reflections:reflections:0.9.12")
+        implementation("org.reflections:reflections:0.10.2")
 
         // Use JUnit Jupiter
-        testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.0")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.0")
+        testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
 
-        testImplementation("com.ginsberg:junit5-system-exit:1.1.1")
+        testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
 
-        testImplementation("org.assertj:assertj-core:3.20.2")
+        testImplementation("org.assertj:assertj-core:3.21.0")
     }
 
     val test by tasks.getting(Test::class) {
