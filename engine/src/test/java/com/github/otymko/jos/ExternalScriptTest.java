@@ -56,6 +56,11 @@ class ExternalScriptTest extends BaseExternalScriptTest {
   }
 
   @TestFactory
+  Collection<DynamicTest> testFormat() throws IOException {
+    return getTestsFromScript(Path.of("src/test/resources/tests/formatting.os"));
+  }
+
+  @TestFactory
   Collection<DynamicTest> testTypeDescription() throws IOException {
     return getTestsFromScript(Path.of("src/test/resources/tests/typedescription.os"));
   }
