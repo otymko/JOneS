@@ -5,7 +5,7 @@ plugins {
     `maven-publish`
     jacoco
     id("io.freefair.lombok") version "6.3.0"
-    id("com.github.johnrengelman.shadow") version "7.1.0"
+    id("com.github.johnrengelman.shadow") version "7.1.1"
     id("net.kyori.indra.license-header") version "2.0.6"
     id("org.sonarqube") version "3.3"
 }
@@ -70,10 +70,10 @@ subprojects {
         implementation("org.reflections:reflections:0.10.2")
 
         // Use JUnit Jupiter
-        testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+        testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
 
-        testImplementation("com.ginsberg:junit5-system-exit:1.1.1")
+        testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
 
         testImplementation("org.assertj:assertj-core:3.21.0")
     }

@@ -30,7 +30,7 @@ public class BinaryDataQualifiers extends ContextValue {
    * Размер двоичных данных
    */
   @ContextProperty(name = "Длина", alias = "Length", accessMode = PropertyAccessMode.READ_ONLY)
-  public int length;
+  int length;
 
   /**
    * Допустимый размер данных. 0 - Неограниченно
@@ -38,7 +38,7 @@ public class BinaryDataQualifiers extends ContextValue {
    * @see AllowedLength
    */
   @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
-  public AllowedLength allowedLength;
+  AllowedLength allowedLength;
 
   public IValue getLength() {
     return ValueFactory.create(length);

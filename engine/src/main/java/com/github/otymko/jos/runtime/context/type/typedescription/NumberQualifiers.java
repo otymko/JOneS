@@ -33,19 +33,19 @@ public class NumberQualifiers extends ContextValue {
    * Общее количество десятичных знаков, доступное для числа. 0 - Неограниченно
    */
   @ContextProperty(name = "Разрядность", alias = "Digits", accessMode = PropertyAccessMode.READ_ONLY)
-  public int digits;
+  int digits;
 
   /**
    * Количество знаков дробной части числа. 0 - Без дробной части
    */
   @ContextProperty(name = "РазрядностьДробнойЧасти", alias = "FractionDigits", accessMode = PropertyAccessMode.READ_ONLY)
-  public int fractionDigits;
+  int fractionDigits;
 
   /**
    * Допустимый знак числа
    */
   @ContextProperty(name = "ДопустимыйЗнак", alias = "allowedSign", accessMode = PropertyAccessMode.READ_ONLY)
-  public AllowedSign allowedSign;
+  AllowedSign allowedSign;
 
   public IValue getDigits() {
     return ValueFactory.create(digits);
