@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.github.otymko.jos.runtime.context.type;
+package com.github.otymko.jos.runtime.context.type.regex;
 
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
@@ -12,6 +12,7 @@ import com.github.otymko.jos.runtime.context.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Getter;
@@ -19,13 +20,13 @@ import lombok.Getter;
 import java.util.regex.Pattern;
 
 @ContextClass(name = "РегулярноеВыражение", alias = "Regex")
-public class V8Regex extends ContextValue implements PropertyNameAccessor {
-  public static final ContextInfo INFO = ContextInfo.createByClass(V8Regex.class);
+public class Regex extends ContextValue implements PropertyNameAccessor {
+  public static final ContextInfo INFO = ContextInfo.createByClass(Regex.class);
 
   private final String pattern;
   private Pattern regex;
 
-  private V8Regex(String pattern) {
+  private Regex(String pattern) {
     this.pattern = pattern;
     this.regex = Pattern.compile(this.pattern, getPatternFlags());
   }
@@ -83,8 +84,8 @@ public class V8Regex extends ContextValue implements PropertyNameAccessor {
   }
 
   @ContextConstructor
-  public static V8Regex constructor(IValue pattern) {
-    return new V8Regex(pattern.asString());
+  public static Regex constructor(IValue pattern) {
+    return new Regex(pattern.asString());
   }
 
   @ContextMethod(name = "Совпадает", alias = "IsMatch")
@@ -99,9 +100,13 @@ public class V8Regex extends ContextValue implements PropertyNameAccessor {
   }
 
   @ContextMethod(name = "НайтиСовпадения", alias = "Matches")
-  public IValue matches() {
-    // TODO: реализовать
-    return ValueFactory.create();
+  public IValue matches(IValue inputString, IValue startAt) {
+    var value = inputString.getRawValue().asString();
+
+    // TODO: учесть поиск с определенной позиции
+    //var startAtValue = startAt == null ? 0 : startAt.getRawValue().asNumber().intValue();
+
+    return new RegexMatchCollection(regex.matcher(value), regex);
   }
 
   @ContextMethod(name = "Разделить", alias = "Split")
