@@ -61,7 +61,7 @@ public class NativeGlobalMethod {
     addNativeMethod("Число", "Number", OperationCode.Number, REQUIRED_PARAMETER);
     addNativeMethod("Строка", "String", OperationCode.Str, REQUIRED_PARAMETER);
     addNativeMethod("Булево", "Boolean", OperationCode.Bool, REQUIRED_PARAMETER);
-    addNativeMethod("Дата", "Date", OperationCode.Bool, REQUIRED_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER);
+    addNativeMethod("Дата", "Date", OperationCode.Date, REQUIRED_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER);
     addNativeMethod("Формат", "Format", OperationCode.Format, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
   }
 
