@@ -109,7 +109,7 @@ public class ScriptTester implements ContextType, IValue {
   // ПроверитьТип
 
   @ContextMethod(name = "ПроверитьТип", alias = "CheckType")
-  public static void CheckType(IValue inputValue, IValue inputType, IValue additionalErrorMessage) {
+  public static void checkType(IValue inputValue, IValue inputType, IValue additionalErrorMessage) {
     var rawValue = inputValue.getRawValue();
     var rawEqualsType = inputType.getRawValue();
 

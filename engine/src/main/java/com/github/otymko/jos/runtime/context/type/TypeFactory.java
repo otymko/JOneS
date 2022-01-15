@@ -59,7 +59,9 @@ public class TypeFactory {
     Object result;
     try {
       result = methodCall.invoke(null, prepareArguments(methodCall, arguments));
-    } catch (IllegalAccessException | InvocationTargetException e) {
+    } catch (InvocationTargetException exception) {
+      throw new MachineException(exception.getTargetException().getMessage());
+    } catch (IllegalAccessException exception) {
       throw new MachineException(Resources.getResourceString(ERROR_CALL_CONSTRUCTOR));
     }
     return (IValue) result;
