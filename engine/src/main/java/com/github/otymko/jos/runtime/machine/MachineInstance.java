@@ -15,6 +15,7 @@ import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Arithmetic;
 import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.RuntimeContext;
+import com.github.otymko.jos.runtime.format.ValueFormatter;
 import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.AttachableContext;
@@ -331,7 +332,16 @@ public class MachineInstance {
     map.put(OperationCode.Number, this::number);
     map.put(OperationCode.Str, this::str);
 
+    map.put(OperationCode.Format, this::format);
+
     return map;
+  }
+
+  private void format(int argument) {
+    final var formatString = operationStack.pop().asString();
+    final var value = operationStack.pop().getRawValue();
+    operationStack.push(ValueFactory.create(ValueFormatter.format(value, formatString)));
+    nextInstruction();
   }
 
   private void pushDefaultArg(int argument) {

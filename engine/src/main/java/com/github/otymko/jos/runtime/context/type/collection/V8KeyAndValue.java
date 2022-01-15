@@ -14,6 +14,8 @@ import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.AccessLevel;
+import lombok.Getter;
 
 import java.util.Map;
 import java.util.Set;
@@ -23,11 +25,13 @@ import java.util.stream.Collectors;
 public class V8KeyAndValue extends ContextValue implements IndexAccessor {
   public static final ContextInfo INFO = ContextInfo.createByClass(V8KeyAndValue.class);
 
+  @Getter(AccessLevel.PROTECTED)
   @ContextProperty(name = "Ключ", alias = "Key", accessMode = PropertyAccessMode.READ_ONLY)
-  public final IValue key;
+  private final IValue key;
 
+  @Getter(AccessLevel.PROTECTED)
   @ContextProperty(name = "Значение", alias = "Value", accessMode = PropertyAccessMode.READ_ONLY)
-  public final IValue value;
+  private final IValue value;
 
   public V8KeyAndValue(IValue key, IValue value) {
     this.key = key;

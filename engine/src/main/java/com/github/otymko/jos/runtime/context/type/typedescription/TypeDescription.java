@@ -36,16 +36,16 @@ public class TypeDescription extends ContextValue {
   List<TypeValue> types;
 
   @ContextProperty(name = "КвалификаторыЧисла", alias = "NumberQualifiers", accessMode = PropertyAccessMode.READ_ONLY)
-  public NumberQualifiers numberQualifiers;
+  NumberQualifiers numberQualifiers;
 
   @ContextProperty(name = "КвалификаторыСтроки", alias = "StringQualifiers", accessMode = PropertyAccessMode.READ_ONLY)
-  public StringQualifiers stringQualifiers;
+  StringQualifiers stringQualifiers;
 
   @ContextProperty(name = "КвалификаторыДаты", alias = "DateQualifiers", accessMode = PropertyAccessMode.READ_ONLY)
-  public DateQualifiers dateQualifiers;
+  DateQualifiers dateQualifiers;
 
   @ContextProperty(name = "КвалификаторыДвоичныхДанных", alias = "BinaryDataQualifiers", accessMode = PropertyAccessMode.READ_ONLY)
-  public BinaryDataQualifiers binaryDataQualifiers;
+  BinaryDataQualifiers binaryDataQualifiers;
 
   @ContextMethod(name = "Типы", alias = "Types")
   public V8Array types() {
@@ -123,6 +123,12 @@ public class TypeDescription extends ContextValue {
     // TODO: Сравнение типов https://github.com/otymko/JOneS/issues/86
     if (BooleanValue.INFO.equals(targetType.getValue())) {
       return ValueFactory.create(adjustAsBoolean(rawValue));
+    }
+
+    if (types.size() == 1
+      && types.get(0).equals(targetType)) {
+      // Единственный тип, совпадающий с типом параметра
+      return rawValue;
     }
 
     throw MachineException.operationNotImplementedException();

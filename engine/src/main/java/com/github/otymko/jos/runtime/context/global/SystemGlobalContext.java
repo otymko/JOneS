@@ -27,13 +27,13 @@ import java.math.BigDecimal;
 public class SystemGlobalContext implements AttachableContext {
   public static final ContextInfo INFO = ContextInfo.createByClass(SystemGlobalContext.class);
 
+  @ContextProperty(name = "Символы", alias = "Chars")
+  public static final IValue SYMBOLS = new SymbolsContext();
+
   @Override
   public ContextInfo getContextInfo() {
     return INFO;
   }
-
-  @ContextProperty(name = "Символы", alias = "Chars")
-  public static final IValue SYMBOLS = new SymbolsContext();
 
   @ContextMethod(name = "Сообщить", alias = "Message")
   // TODO: для null аргументов можно ввести @ContextMethodArgument(defaultValue = MessageStatus.ORDINARY)

@@ -22,7 +22,7 @@ public class V8FixedMap extends V8BaseMap {
   public V8FixedMap(V8Map source) {
     source.iterator().forEach(value -> {
       final var element = (V8KeyAndValue) value;
-      data.put(element.key, element.value);
+      data.put(element.getKey(), element.getValue());
     });
   }
 

@@ -40,7 +40,7 @@ public class V8Map extends V8BaseMap {
     final var result = new V8Map();
     for (final var value : rawFixedMap.iterator()) {
       final var element = (V8KeyAndValue) value;
-      result.insert(element.key, element.value);
+      result.insert(element.getKey(), element.getValue());
     }
     return result;
   }
