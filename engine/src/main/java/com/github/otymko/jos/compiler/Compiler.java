@@ -433,6 +433,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
           isValidRaise = true;
           break;
         }
+        parent = parent.getParent();
       }
 
       if (!isValidRaise) {

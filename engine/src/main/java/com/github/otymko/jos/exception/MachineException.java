@@ -181,4 +181,9 @@ public class MachineException extends EngineException {
     return new MachineException(message);
   }
 
+  public static MachineException keyNotFound() {
+    var message = Resources.getResourceString(KEY_NOT_FOUND);
+    return new MachineException(message);
+  }
+
 }

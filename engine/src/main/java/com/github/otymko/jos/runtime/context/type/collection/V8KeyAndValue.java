@@ -11,16 +11,25 @@ import com.github.otymko.jos.runtime.context.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
+import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.AccessLevel;
+import lombok.Getter;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @ContextClass(name = "КлючИЗначение", alias = "KeyAndValue")
 public class V8KeyAndValue extends ContextValue implements IndexAccessor {
   public static final ContextInfo INFO = ContextInfo.createByClass(V8KeyAndValue.class);
 
+  @Getter(AccessLevel.PROTECTED)
   @ContextProperty(name = "Ключ", alias = "Key", accessMode = PropertyAccessMode.READ_ONLY)
   private final IValue key;
 
+  @Getter(AccessLevel.PROTECTED)
   @ContextProperty(name = "Значение", alias = "Value", accessMode = PropertyAccessMode.READ_ONLY)
   private final IValue value;
 
@@ -46,4 +55,11 @@ public class V8KeyAndValue extends ContextValue implements IndexAccessor {
     throw MachineException.getPropertyIsNotWritableException(index.asString());
   }
 
+  public static IteratorValue iteratorOf(Set<Map.Entry<IValue, IValue>> values) {
+    var iterator = values.stream()
+            .sorted((valueOne, valueTwo) -> valueOne.getValue().compareTo(valueTwo.getValue()))
+            .map(entity -> (IValue)(new V8KeyAndValue(entity.getKey(), entity.getValue())))
+            .collect(Collectors.toList()).iterator();
+    return new IteratorValue(iterator);
+  }
 }
