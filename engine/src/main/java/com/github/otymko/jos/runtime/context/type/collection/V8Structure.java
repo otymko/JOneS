@@ -23,7 +23,6 @@ import com.github.otymko.jos.util.Common;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 @ContextClass(name = "Структура", alias = "Structure")
 public class V8Structure extends ContextValue implements IndexAccessor, PropertyNameAccessor,
@@ -165,11 +164,6 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
 
   @Override
   public IteratorValue iterator() {
-    var iterator = values.entrySet().stream()
-      .sorted((valueOne, valueTwo) -> valueOne.getValue().compareTo(valueTwo.getValue()))
-      .map(entity -> new V8KeyAndValue(entity.getKey(), entity.getValue()))
-      .map(IValue.class::cast) // FIXME: ??
-      .collect(Collectors.toList()).iterator();
-    return new IteratorValue(iterator);
+    return V8KeyAndValue.iteratorOf(values.entrySet());
   }
 }

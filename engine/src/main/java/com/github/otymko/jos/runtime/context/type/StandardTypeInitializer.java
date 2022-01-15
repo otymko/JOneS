@@ -6,7 +6,9 @@
 package com.github.otymko.jos.runtime.context.type;
 
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
+import com.github.otymko.jos.runtime.context.type.collection.V8FixedMap;
 import com.github.otymko.jos.runtime.context.type.collection.V8KeyAndValue;
+import com.github.otymko.jos.runtime.context.type.collection.V8Map;
 import com.github.otymko.jos.runtime.context.type.collection.V8Structure;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
@@ -15,6 +17,7 @@ import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
 import com.github.otymko.jos.runtime.context.type.primitive.StringValue;
 import com.github.otymko.jos.runtime.context.type.primitive.TypeValue;
 import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
+import com.github.otymko.jos.runtime.context.type.regex.Regex;
 import com.github.otymko.jos.runtime.context.type.typedescription.BinaryDataQualifiers;
 import com.github.otymko.jos.runtime.context.type.typedescription.DateQualifiers;
 import com.github.otymko.jos.runtime.context.type.typedescription.NumberQualifiers;
@@ -65,12 +68,15 @@ public class StandardTypeInitializer {
     implementTypeByInfo(typeManager, V8Array.INFO);
     implementTypeByInfo(typeManager, V8KeyAndValue.INFO);
     implementTypeByInfo(typeManager, V8Structure.INFO);
+    implementTypeByInfo(typeManager, V8Map.INFO);
+    implementTypeByInfo(typeManager, V8FixedMap.INFO);
 
     implementTypeByInfo(typeManager, BinaryDataQualifiers.INFO);
     implementTypeByInfo(typeManager, DateQualifiers.INFO);
     implementTypeByInfo(typeManager, NumberQualifiers.INFO);
     implementTypeByInfo(typeManager, StringQualifiers.INFO);
     implementTypeByInfo(typeManager, TypeDescription.INFO);
+    implementTypeByInfo(typeManager, Regex.INFO);
   }
 
   private void initSystemEnumerations(TypeManager typeManager) {

@@ -55,6 +55,7 @@ public class MessageResource {
   public static final String ERROR_IN_EXPRESSION = "errorInExpression";
   public static final String DEFAULT_TRUE_PRESENTATION = "defaultTruePresentation";
   public static final String DEFAULT_FALSE_PRESENTATION = "defaultFalsePresentation";
+  public static final String KEY_NOT_FOUND = "keyNotFound";
 
   private MessageResource() {
     // none

@@ -26,6 +26,10 @@ import java.util.Date;
 public class ScriptTester implements ContextType, IValue {
   public static ContextInfo INFO = ContextInfo.createByClass(ScriptTester.class);
 
+  // Модуль "Ожидаем"
+  private IValue valueToCheck;
+  private IValue messageToThrow;
+
   @ContextMethod(name = "Проверить", alias = "Check")
   public static void check(IValue conditional, IValue additionalErrorMessage) {
     checkTrue(conditional, additionalErrorMessage);
@@ -105,7 +109,7 @@ public class ScriptTester implements ContextType, IValue {
   // ПроверитьТип
 
   @ContextMethod(name = "ПроверитьТип", alias = "CheckType")
-  public static void CheckType(IValue inputValue, IValue inputType, IValue additionalErrorMessage) {
+  public static void checkType(IValue inputValue, IValue inputType, IValue additionalErrorMessage) {
     var rawValue = inputValue.getRawValue();
     var rawEqualsType = inputType.getRawValue();
 
@@ -120,6 +124,21 @@ public class ScriptTester implements ContextType, IValue {
         rawValue.asString(), type.asString(), typeEquals.asString());
       throw new MachineException(errorMessage);
     }
+  }
+
+  // модуль Ожидаем
+
+  @ContextMethod(name = "Что", alias = "That")
+  public IValue that(IValue value, IValue message) {
+    valueToCheck = value;
+    messageToThrow = message;
+    return this;
+  }
+
+  @ContextMethod(name = "Равно", alias = "Equals")
+  public IValue equals(IValue expectedValue) {
+    checkEquals(valueToCheck, expectedValue, messageToThrow);
+    return this;
   }
 
   @Override

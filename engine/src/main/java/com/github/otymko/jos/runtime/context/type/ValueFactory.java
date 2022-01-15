@@ -51,6 +51,21 @@ public class ValueFactory {
     return value ? BooleanValue.TRUE : BooleanValue.FALSE;
   }
 
+  public static IValue rawValueOrDefault(IValue inValue, IValue defaultValue) {
+    if (inValue == null) {
+      return defaultValue;
+    }
+    final var raw = inValue.getRawValue();
+    if (raw.getDataType() == DataType.UNDEFINED) {
+      return defaultValue;
+    }
+    return raw;
+  }
+
+  public static IValue rawValueOrUndefined(IValue inValue) {
+    return rawValueOrDefault(inValue, create());
+  }
+
   // invalidValue?
 
   public static IValue createNullValue() {
