@@ -26,6 +26,7 @@ import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
+import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.TypeFactory;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.primitive.TypeValue;
@@ -36,11 +37,13 @@ import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import com.github.otymko.jos.util.Common;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Deque;
 import java.util.EnumMap;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -331,6 +334,8 @@ public class MachineInstance {
     map.put(OperationCode.CurrentDate, this::currentDate);
     map.put(OperationCode.Number, this::number);
     map.put(OperationCode.Str, this::str);
+    map.put(OperationCode.Bool, this::makeBool);
+    map.put(OperationCode.Date, this::date);
 
     map.put(OperationCode.Format, this::format);
 
@@ -357,6 +362,41 @@ public class MachineInstance {
   private void number(int argument) {
     final var source = operationStack.pop();
     operationStack.push(ValueFactory.create(source.asNumber()));
+    nextInstruction();
+  }
+
+  private void date(int arg) {
+    if (arg == 1)
+    {
+      var strDate = operationStack.pop().asString();
+      operationStack.push(ValueFactory.parse(strDate, DataType.DATE));
+    }
+    else if (arg >= 3 && arg <= 6)
+    {
+      int[] factArgs = new int[6];
+
+      for (int i = arg - 1; i >= 0; i--)
+      {
+        factArgs[i] = operationStack.pop().asNumber().intValue();
+      }
+
+      @SuppressWarnings("MagicConstant")
+      var date = new GregorianCalendar(
+        factArgs[0],
+        factArgs[1]-1,
+        factArgs[2],
+        factArgs[3],
+        factArgs[4],
+        factArgs[5]);
+
+      operationStack.push(ValueFactory.create(date.getTime()));
+
+    }
+    else
+    {
+      throw new MachineException("Неверное количество параметров");
+    }
+
     nextInstruction();
   }
 
