@@ -5,9 +5,13 @@
  */
 package com.github.otymko.jos.context.value;
 
+import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,6 +23,12 @@ class NullValueTest {
 
     assertThat(value).isEqualTo(NullValue.VALUE);
     assertThat(value.asString()).isEmpty();
+
+    Set<IValue> set = new HashSet<>();
+    set.add(NullValue.VALUE);
+    set.add(NullValue.VALUE);
+
+    assertThat(set).hasSize(1);
 
     // TODO: еще тесты
   }

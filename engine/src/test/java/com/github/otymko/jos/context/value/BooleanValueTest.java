@@ -5,9 +5,13 @@
  */
 package com.github.otymko.jos.context.value;
 
+import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,13 +22,23 @@ class BooleanValueTest {
     assertThat(BooleanValue.TRUE.asBoolean()).isTrue();
     assertThat(BooleanValue.FALSE.asBoolean()).isFalse();
 
-    assertThat(BooleanValue.TRUE).isSameAs(ValueFactory.create(true));
-    assertThat(BooleanValue.FALSE).isSameAs(ValueFactory.create(false));
+    assertThat(ValueFactory.create(true)).isSameAs(BooleanValue.TRUE);
+    assertThat(ValueFactory.create(false)).isSameAs(BooleanValue.FALSE);
 
-    assertThat(0f).isEqualTo(BooleanValue.FALSE.asNumber().floatValue());
-    assertThat(1f).isEqualTo(BooleanValue.TRUE.asNumber().floatValue());
+    assertThat(BooleanValue.FALSE.asNumber().floatValue()).isEqualTo(0f);
+    assertThat(BooleanValue.TRUE.asNumber().floatValue()).isEqualTo(1f);
 
     assertThat(BooleanValue.TRUE.compareTo(BooleanValue.FALSE) > 0).isTrue();
+
+    Set<IValue> set = new HashSet<>();
+    set.add(BooleanValue.TRUE);
+    set.add(BooleanValue.TRUE);
+
+    assertThat(set).hasSize(1)
+      .allMatch(iValue -> iValue.equals(BooleanValue.TRUE));
+
+    set.add(BooleanValue.FALSE);
+    assertThat(set).hasSize(2);
 
     // TODO: boolean -> date, boolean -> object
   }

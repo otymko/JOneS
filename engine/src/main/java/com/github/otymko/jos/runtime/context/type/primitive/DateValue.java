@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 @ContextClass(name = "Дата", alias = "Date")
@@ -106,4 +107,8 @@ public class DateValue extends PrimitiveValue {
     return baseValue.getDataType() == DataType.DATE && value.equals(baseValue.asDate());
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(value);
+  }
 }

@@ -5,8 +5,13 @@
  */
 package com.github.otymko.jos.context.value;
 
+import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,6 +23,16 @@ class UndefinedValueTest {
 
     assertThat(value).isEqualTo(ValueFactory.create());
     assertThat(value.asString()).isEmpty();
+
+    Set<IValue> set = new HashSet<>();
+    set.add(ValueFactory.create());
+    set.add(ValueFactory.create());
+
+    assertThat(set).hasSize(1);
+
+    set.add(BooleanValue.TRUE);
+
+    assertThat(set).hasSize(2);
 
     // TODO: еще тесты
   }

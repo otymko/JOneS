@@ -12,6 +12,9 @@ import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Getter;
 
+import java.util.Locale;
+import java.util.Objects;
+
 @ContextClass(name = "Тип", alias = "Type")
 public class TypeValue extends PrimitiveValue {
   public static final ContextInfo INFO = ContextInfo.createByClass(TypeValue.class);
@@ -44,6 +47,12 @@ public class TypeValue extends PrimitiveValue {
     }
     var baseValue = (TypeValue) obj;
     return baseValue.getDataType() == DataType.TYPE && value.getName().equalsIgnoreCase(baseValue.getValue().getName());
+  }
+
+  @Override
+  public int hashCode() {
+    var key = value.getName().toLowerCase(Locale.ENGLISH);
+    return Objects.hashCode(key);
   }
 
   @Override

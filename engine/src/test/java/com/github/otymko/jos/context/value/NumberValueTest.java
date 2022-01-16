@@ -5,10 +5,13 @@
  */
 package com.github.otymko.jos.context.value;
 
+import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,8 +31,18 @@ class NumberValueTest {
       .isNotEqualTo(null);
 
     assertThat(number5.asNumber().intValue()).isEqualTo(5);
-    assertThat(number0.asNumber().intValue()).isEqualTo(0);
+    assertThat(number0.asNumber().intValue()).isZero();
     assertThat(number5).isNotEqualTo(number0);
+
+    Set<IValue> set = new HashSet<>();
+    set.add(numberOne);
+    set.add(numberTwo);
+
+    assertThat(set).hasSize(1)
+      .allMatch(iValue -> iValue.equals(numberOne));
+
+    set.add(number5);
+    assertThat(set).hasSize(2);
 
     // TODO: еще тесты
   }
