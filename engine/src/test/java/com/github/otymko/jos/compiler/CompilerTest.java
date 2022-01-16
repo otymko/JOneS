@@ -7,14 +7,12 @@ package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.TestHelper;
 import com.github.otymko.jos.hosting.ScriptEngine;
-import com.github.otymko.jos.module.ModuleImageDumper;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.OperationCode;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -64,18 +62,18 @@ class CompilerTest {
     var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
 
     var code = moduleImage.getCode();
-    var line = findCommand(code, OperationCode.LineNum, 0, 2);
-    var falseCondition = findCommand(code, OperationCode.JmpFalse, line);
+    var line = findCommand(code, OperationCode.LINE_NUM, 0, 2);
+    var falseCondition = findCommand(code, OperationCode.JMP_FALSE, line);
     var jmpFalse = code.get(falseCondition);
-    assertThat(code.get(jmpFalse.getArgument()).getCode()).isEqualTo(OperationCode.Nop);
+    assertThat(code.get(jmpFalse.getArgument()).getCode()).isEqualTo(OperationCode.NOP);
     var jump = code.get(jmpFalse.getArgument() - 1);
-    assertThat(jump.getCode()).isEqualTo(OperationCode.Jmp);
+    assertThat(jump.getCode()).isEqualTo(OperationCode.JMP);
     assertThat(jump.getArgument()).isEqualTo(line);
 
-    var breakCommandIndex = findCommand(code, OperationCode.Jmp, falseCondition, jmpFalse.getArgument());
+    var breakCommandIndex = findCommand(code, OperationCode.JMP, falseCondition, jmpFalse.getArgument());
     assertThat(breakCommandIndex).isNotEqualTo(-1);
 
-    var continueCommandIndex = findCommand(code, OperationCode.Jmp, falseCondition, line);
+    var continueCommandIndex = findCommand(code, OperationCode.JMP, falseCondition, line);
     assertThat(continueCommandIndex).isNotEqualTo(-1);
   }
 
@@ -127,12 +125,12 @@ class CompilerTest {
     var moduleImage = compiler.compile(pathToScript, UserScriptContext.class);
 
     var code = moduleImage.getCode();
-    var line = findCommand(code, OperationCode.LineNum, 0, 3);
+    var line = findCommand(code, OperationCode.LINE_NUM, 0, 3);
 
-    var methodCall = findCommand(code, OperationCode.ResolveMethodFunc, line, -1);
+    var methodCall = findCommand(code, OperationCode.RESOLVE_METHOD_FUNC, line, -1);
     assertThat(methodCall).isNotEqualTo(-1); // Должен быть вызов метода (ПривестиЗначение)
 
-    var resolveProp = findCommand(code, OperationCode.ResolveProp, line, -1);
+    var resolveProp = findCommand(code, OperationCode.RESOLVE_PROP, line, -1);
     assertThat(resolveProp).isNotEqualTo(-1); // Должно быть обращение к свойству (К)
   }
 

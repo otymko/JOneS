@@ -37,7 +37,6 @@ import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import com.github.otymko.jos.util.Common;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Date;
@@ -247,97 +246,97 @@ public class MachineInstance {
 
   private Map<OperationCode, Consumer<Integer>> createMachineCommands() {
     Map<OperationCode, Consumer<Integer>> map = new EnumMap<>(OperationCode.class);
-    map.put(OperationCode.LineNum, this::lineNum);
-    map.put(OperationCode.PushConst, this::pushConst);
-    map.put(OperationCode.ArgNum, this::argNum);
-    map.put(OperationCode.PushDefaultArg, this::pushDefaultArg);
-    map.put(OperationCode.CallProc, this::callProc);
-    map.put(OperationCode.LoadLoc, this::loadLoc);
-    map.put(OperationCode.PushLoc, this::pushLoc);
-    map.put(OperationCode.PushRef, this::pushRef);
-    map.put(OperationCode.PushVar, this::pushVar);
-    map.put(OperationCode.LoadVar, this::loadVar);
-    map.put(OperationCode.Return, this::toReturn);
-    map.put(OperationCode.Add, this::add);
-    map.put(OperationCode.Sub, this::sub);
-    map.put(OperationCode.Mul, this::mul);
-    map.put(OperationCode.Div, this::div);
-    map.put(OperationCode.Mod, this::mod);
-    map.put(OperationCode.Not, this::not);
-    map.put(OperationCode.Neg, this::neg);
+    map.put(OperationCode.LINE_NUM, this::lineNum);
+    map.put(OperationCode.PUSH_CONST, this::pushConst);
+    map.put(OperationCode.ARG_NUN, this::argNum);
+    map.put(OperationCode.PUSH_DEFAULT_ARG, this::pushDefaultArg);
+    map.put(OperationCode.CALL_PROC, this::callProc);
+    map.put(OperationCode.LOAD_LOC, this::loadLoc);
+    map.put(OperationCode.PUSH_LOC, this::pushLoc);
+    map.put(OperationCode.PUSH_REF, this::pushRef);
+    map.put(OperationCode.PUSH_VAR, this::pushVar);
+    map.put(OperationCode.LOAD_VAR, this::loadVar);
+    map.put(OperationCode.RETURN, this::toReturn);
+    map.put(OperationCode.ADD, this::add);
+    map.put(OperationCode.SUB, this::sub);
+    map.put(OperationCode.MUL, this::mul);
+    map.put(OperationCode.DIV, this::div);
+    map.put(OperationCode.MOD, this::mod);
+    map.put(OperationCode.NOT, this::not);
+    map.put(OperationCode.NEG, this::neg);
 
-    map.put(OperationCode.And, this::and);
-    map.put(OperationCode.Or, this::or);
-    map.put(OperationCode.MakeBool, this::makeBool);
-    map.put(OperationCode.Jmp, this::jmp);
-    map.put(OperationCode.JmpFalse, this::jmpFalse);
+    map.put(OperationCode.AND, this::and);
+    map.put(OperationCode.OR, this::or);
+    map.put(OperationCode.MAKE_BOOL, this::makeBool);
+    map.put(OperationCode.JMP, this::jmp);
+    map.put(OperationCode.JMP_FALSE, this::jmpFalse);
 
-    map.put(OperationCode.Greater, this::greater);
-    map.put(OperationCode.GreaterOrEqual, this::greaterOrEqual);
-    map.put(OperationCode.Less, this::less);
-    map.put(OperationCode.LessOrEqual, this::lessOrEqual);
-    map.put(OperationCode.Equals, this::toEquals);
-    map.put(OperationCode.NotEqual, this::notEqual);
+    map.put(OperationCode.GREATER, this::greater);
+    map.put(OperationCode.GREATER_OR_EQUAL, this::greaterOrEqual);
+    map.put(OperationCode.LESS, this::less);
+    map.put(OperationCode.LESS_OR_EQUAL, this::lessOrEqual);
+    map.put(OperationCode.EQUALS, this::toEquals);
+    map.put(OperationCode.NOT_EQUAL, this::notEqual);
 
 
-    map.put(OperationCode.MakeRawValue, this::makeRawValue);
-    map.put(OperationCode.CallFunc, this::callFunc);
+    map.put(OperationCode.MAKE_RAW_VALUE, this::makeRawValue);
+    map.put(OperationCode.CALL_FUNC, this::callFunc);
 
-    map.put(OperationCode.NewInstance, this::newInstance);
+    map.put(OperationCode.NEW_INSTANCE, this::newInstance);
 
-    map.put(OperationCode.ResolveMethodProc, this::resolveMethodProc);
-    map.put(OperationCode.ResolveMethodFunc, this::resolveMethodFunc);
+    map.put(OperationCode.RESOLVE_METHOD_PROC, this::resolveMethodProc);
+    map.put(OperationCode.RESOLVE_METHOD_FUNC, this::resolveMethodFunc);
 
-    map.put(OperationCode.PushIndexed, this::pushIndexed);
-    map.put(OperationCode.BeginTry, this::beginTry);
-    map.put(OperationCode.EndTry, this::endTry);
-    map.put(OperationCode.RaiseException, this::raiseException);
+    map.put(OperationCode.PUSH_INDEXED, this::pushIndexed);
+    map.put(OperationCode.BEGIN_TRY, this::beginTry);
+    map.put(OperationCode.END_TRY, this::endTry);
+    map.put(OperationCode.RAISE_EXCEPTION, this::raiseException);
 
-    map.put(OperationCode.AssignRef, this::assignReference);
+    map.put(OperationCode.ASSIGN_REF, this::assignReference);
 
-    map.put(OperationCode.ResolveProp, this::resolveProp);
+    map.put(OperationCode.RESOLVE_PROP, this::resolveProp);
 
     // Функции работы с типами
-    map.put(OperationCode.Type, this::callType);
-    map.put(OperationCode.ValType, this::callTypeOf);
+    map.put(OperationCode.TYPE, this::callType);
+    map.put(OperationCode.VAL_TYPE, this::callTypeOf);
 
-    map.put(OperationCode.ExceptionDescr, this::exceptionDescr);
-    map.put(OperationCode.ExceptionInfo, this::exceptionInfo);
+    map.put(OperationCode.EXCEPTION_DESCR, this::exceptionDescr);
+    map.put(OperationCode.EXCEPTION_INFO, this::exceptionInfo);
 
-    map.put(OperationCode.PushIterator, this::pushIterator);
-    map.put(OperationCode.IteratorNext, this::iteratorNext);
-    map.put(OperationCode.StopIterator, this::stopIterator);
+    map.put(OperationCode.PUSH_ITERATOR, this::pushIterator);
+    map.put(OperationCode.ITERATOR_NEXT, this::iteratorNext);
+    map.put(OperationCode.STOP_ITERATOR, this::stopIterator);
 
-    map.put(OperationCode.PushTmp, this::pushTmp);
-    map.put(OperationCode.Inc, this::increment);
-    map.put(OperationCode.JmpCounter, this::jmpCounter);
-    map.put(OperationCode.PopTmp, this::popTmp);
+    map.put(OperationCode.PUSH_TMP, this::pushTmp);
+    map.put(OperationCode.INC, this::increment);
+    map.put(OperationCode.JMP_COUNTER, this::jmpCounter);
+    map.put(OperationCode.POP_TMP, this::popTmp);
 
-    map.put(OperationCode.Nop, this::nop);
+    map.put(OperationCode.NOP, this::nop);
 
-    map.put(OperationCode.StrLen, this::stringLength);
-    map.put(OperationCode.UCase, this::upperCase);
-    map.put(OperationCode.LCase, this::lowerCase);
-    map.put(OperationCode.TrimL, this::trimL);
-    map.put(OperationCode.TrimR, this::trimR);
-    map.put(OperationCode.TrimLR, this::trimLR);
+    map.put(OperationCode.STR_LEN, this::stringLength);
+    map.put(OperationCode.U_CASE, this::upperCase);
+    map.put(OperationCode.L_CASE, this::lowerCase);
+    map.put(OperationCode.TRIM_L, this::trimL);
+    map.put(OperationCode.TRIM_R, this::trimR);
+    map.put(OperationCode.TRIM_LR, this::trimLR);
 
-    map.put(OperationCode.Left, this::left);
-    map.put(OperationCode.Right, this::right);
-    map.put(OperationCode.Mid, this::middle);
+    map.put(OperationCode.LEFT, this::left);
+    map.put(OperationCode.RIGHT, this::right);
+    map.put(OperationCode.MID, this::middle);
 
-    map.put(OperationCode.EmptyStr, this::emptyStr);
-    map.put(OperationCode.Chr, this::chr);
-    map.put(OperationCode.ChrCode, this::chrCode);
-    map.put(OperationCode.StrReplace, this::strReplace);
+    map.put(OperationCode.EMPTY_STR, this::emptyStr);
+    map.put(OperationCode.CHR, this::chr);
+    map.put(OperationCode.CHR_CODE, this::chrCode);
+    map.put(OperationCode.STR_REPLACE, this::strReplace);
 
-    map.put(OperationCode.CurrentDate, this::currentDate);
-    map.put(OperationCode.Number, this::number);
-    map.put(OperationCode.Str, this::str);
-    map.put(OperationCode.Bool, this::makeBool);
-    map.put(OperationCode.Date, this::date);
+    map.put(OperationCode.CURRENT_DATE, this::currentDate);
+    map.put(OperationCode.NUMBER, this::number);
+    map.put(OperationCode.STR, this::str);
+    map.put(OperationCode.BOOL, this::makeBool);
+    map.put(OperationCode.DATE, this::date);
 
-    map.put(OperationCode.Format, this::format);
+    map.put(OperationCode.FORMAT, this::format);
 
     return map;
   }

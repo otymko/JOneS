@@ -40,29 +40,29 @@ public class NativeGlobalMethod {
   }
 
   private static void initNativeMethods() {
-    addNativeMethod("Тип", "Type", OperationCode.Type, REQUIRED_PARAMETER);
-    addNativeMethod("ТипЗнч", "TypeOf", OperationCode.ValType, REQUIRED_PARAMETER);
-    addNativeMethod("ОписаниеОшибки", "ErrorDescription", OperationCode.ExceptionDescr);
-    addNativeMethod("ИнформацияОбОшибке", "ErrorDescription", OperationCode.ExceptionDescr);
-    addNativeMethod("ВРег", "Upper", OperationCode.UCase, REQUIRED_PARAMETER);
-    addNativeMethod("НРег", "Lower", OperationCode.LCase, REQUIRED_PARAMETER);
-    addNativeMethod("СтрДлина", "StrLen", OperationCode.StrLen, REQUIRED_PARAMETER);
-    addNativeMethod("СокрП", "TrimR", OperationCode.TrimR, REQUIRED_PARAMETER);
-    addNativeMethod("СокрЛ", "TrimL", OperationCode.TrimL, REQUIRED_PARAMETER);
-    addNativeMethod("СокрЛП", "TrimLR", OperationCode.TrimLR, REQUIRED_PARAMETER);
-    addNativeMethod("Лев", "Left", OperationCode.Left, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
-    addNativeMethod("Прав", "Right", OperationCode.Right, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
-    addNativeMethod("Сред", "Mid", OperationCode.Mid, REQUIRED_PARAMETER, REQUIRED_PARAMETER, OPTIONAL_PARAMETER);
-    addNativeMethod("ПустаяСтрока", "EmptyStr", OperationCode.EmptyStr, REQUIRED_PARAMETER);
-    addNativeMethod("Символ", "Chr", OperationCode.Chr, REQUIRED_PARAMETER);
-    addNativeMethod("КодСимвола", "ChrCode", OperationCode.ChrCode, REQUIRED_PARAMETER, OPTIONAL_PARAMETER);
-    addNativeMethod("СтрЗаменить", "StrReplace", OperationCode.StrReplace, REQUIRED_PARAMETER, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
-    addNativeMethod("ТекущаяДата", "CurrentDate", OperationCode.CurrentDate);
-    addNativeMethod("Число", "Number", OperationCode.Number, REQUIRED_PARAMETER);
-    addNativeMethod("Строка", "String", OperationCode.Str, REQUIRED_PARAMETER);
-    addNativeMethod("Булево", "Boolean", OperationCode.Bool, REQUIRED_PARAMETER);
-    addNativeMethod("Дата", "Date", OperationCode.Date, REQUIRED_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER);
-    addNativeMethod("Формат", "Format", OperationCode.Format, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
+    addNativeMethod("Тип", "Type", OperationCode.TYPE, REQUIRED_PARAMETER);
+    addNativeMethod("ТипЗнч", "TypeOf", OperationCode.VAL_TYPE, REQUIRED_PARAMETER);
+    addNativeMethod("ОписаниеОшибки", "ErrorDescription", OperationCode.EXCEPTION_DESCR);
+    addNativeMethod("ИнформацияОбОшибке", "ErrorDescription", OperationCode.EXCEPTION_DESCR);
+    addNativeMethod("ВРег", "Upper", OperationCode.U_CASE, REQUIRED_PARAMETER);
+    addNativeMethod("НРег", "Lower", OperationCode.L_CASE, REQUIRED_PARAMETER);
+    addNativeMethod("СтрДлина", "StrLen", OperationCode.STR_LEN, REQUIRED_PARAMETER);
+    addNativeMethod("СокрП", "TrimR", OperationCode.TRIM_R, REQUIRED_PARAMETER);
+    addNativeMethod("СокрЛ", "TrimL", OperationCode.TRIM_L, REQUIRED_PARAMETER);
+    addNativeMethod("СокрЛП", "TrimLR", OperationCode.TRIM_LR, REQUIRED_PARAMETER);
+    addNativeMethod("Лев", "Left", OperationCode.LEFT, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
+    addNativeMethod("Прав", "Right", OperationCode.RIGHT, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
+    addNativeMethod("Сред", "Mid", OperationCode.MID, REQUIRED_PARAMETER, REQUIRED_PARAMETER, OPTIONAL_PARAMETER);
+    addNativeMethod("ПустаяСтрока", "EmptyStr", OperationCode.EMPTY_STR, REQUIRED_PARAMETER);
+    addNativeMethod("Символ", "Chr", OperationCode.CHR, REQUIRED_PARAMETER);
+    addNativeMethod("КодСимвола", "ChrCode", OperationCode.CHR_CODE, REQUIRED_PARAMETER, OPTIONAL_PARAMETER);
+    addNativeMethod("СтрЗаменить", "StrReplace", OperationCode.STR_REPLACE, REQUIRED_PARAMETER, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
+    addNativeMethod("ТекущаяДата", "CurrentDate", OperationCode.CURRENT_DATE);
+    addNativeMethod("Число", "Number", OperationCode.NUMBER, REQUIRED_PARAMETER);
+    addNativeMethod("Строка", "String", OperationCode.STR, REQUIRED_PARAMETER);
+    addNativeMethod("Булево", "Boolean", OperationCode.BOOL, REQUIRED_PARAMETER);
+    addNativeMethod("Дата", "Date", OperationCode.DATE, REQUIRED_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER);
+    addNativeMethod("Формат", "Format", OperationCode.FORMAT, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
   }
 
   private static void addNativeMethod(String name, String alias, OperationCode code, ParameterInfo... params) {

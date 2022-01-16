@@ -195,7 +195,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   @Override
   public ParseTree visitStatement(BSLParser.StatementContext statement) {
     int numberLint = statement.getStart().getLine();
-    addCommand(OperationCode.LineNum, numberLint);
+    addCommand(OperationCode.LINE_NUM, numberLint);
     if (currentMethodDescriptor != null && currentMethodDescriptor.getEntry() == DUMMY_ADDRESS) {
       currentMethodDescriptor.setEntry(imageCache.getCode().size() - 1);
     }
@@ -219,7 +219,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     visitExpression(expression);
 
     if (acceptor) {
-      addCommand(OperationCode.AssignRef, 0);
+      addCommand(OperationCode.ASSIGN_REF, 0);
     } else {
       buildLocalVariable(variableName);
     }
@@ -232,32 +232,32 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     List<Integer> exits = new ArrayList<>();
 
     visitExpression(ifStatement.ifBranch().expression());
-    var jumpFalse = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+    var jumpFalse = addCommand(OperationCode.JMP_FALSE, DUMMY_ADDRESS);
     visitCodeBlock(ifStatement.ifBranch().codeBlock());
-    exits.add(addCommand(OperationCode.Jmp, DUMMY_ADDRESS));
+    exits.add(addCommand(OperationCode.JMP, DUMMY_ADDRESS));
 
     var alternativeBranches = false;
     for (var elseIfBranches : ifStatement.elsifBranch()) {
       correctCommandArgument(jumpFalse, imageCache.getCode().size());
-      addCommand(OperationCode.LineNum, elseIfBranches.getStart().getLine());
+      addCommand(OperationCode.LINE_NUM, elseIfBranches.getStart().getLine());
 
       visitExpression(elseIfBranches.expression());
 
-      jumpFalse = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+      jumpFalse = addCommand(OperationCode.JMP_FALSE, DUMMY_ADDRESS);
 
       visitCodeBlock(elseIfBranches.codeBlock());
-      exits.add(addCommand(OperationCode.Jmp, DUMMY_ADDRESS));
+      exits.add(addCommand(OperationCode.JMP, DUMMY_ADDRESS));
     }
 
     if (ifStatement.elseBranch() != null) {
       alternativeBranches = true;
       correctCommandArgument(jumpFalse, imageCache.getCode().size());
-      addCommand(OperationCode.LineNum, ifStatement.elseBranch().getStart().getLine());
+      addCommand(OperationCode.LINE_NUM, ifStatement.elseBranch().getStart().getLine());
 
       visitCodeBlock(ifStatement.elseBranch().codeBlock());
     }
 
-    var endIndex = addCommand(OperationCode.LineNum, ifStatement.getStop().getLine());
+    var endIndex = addCommand(OperationCode.LINE_NUM, ifStatement.getStop().getLine());
     if (!alternativeBranches) {
       correctCommandArgument(jumpFalse, endIndex);
     }
@@ -279,12 +279,12 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     nestedLoops.push(loopRecord);
     processExpression(whileStatement.expression(), new ArrayDeque<>());
 
-    var jumpFalseIndex = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+    var jumpFalseIndex = addCommand(OperationCode.JMP_FALSE, DUMMY_ADDRESS);
 
     visitCodeBlock(whileStatement.codeBlock());
 
-    addCommand(OperationCode.Jmp, conditionIndex);
-    var endLoop = addCommand(OperationCode.Nop, 0);
+    addCommand(OperationCode.JMP, conditionIndex);
+    var endLoop = addCommand(OperationCode.NOP, 0);
     correctCommandArgument(jumpFalseIndex, endLoop);
     correctBreakStatements(nestedLoops.pop(), endLoop);
 
@@ -300,22 +300,22 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
     visitExpression(forStatement.expression().get(1));
 
-    addCommand(OperationCode.MakeRawValue);
-    addCommand(OperationCode.PushTmp);
+    addCommand(OperationCode.MAKE_RAW_VALUE);
+    addCommand(OperationCode.PUSH_TMP);
 
-    var jumpIndex = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
-    var loopStart = addCommand(OperationCode.LineNum, forStatement.getStart().getLine());
+    var jumpIndex = addCommand(OperationCode.JMP, DUMMY_ADDRESS);
+    var loopStart = addCommand(OperationCode.LINE_NUM, forStatement.getStart().getLine());
 
     // инкремент
     processIdentifier(identifier);
-    addCommand(OperationCode.Inc);
+    addCommand(OperationCode.INC);
     buildLocalVariable(identifier);
 
     var counterIndex = imageCache.getCode().size();
     processIdentifier(identifier);
     correctCommandArgument(jumpIndex, counterIndex);
 
-    var conditionIndex = addCommand(OperationCode.JmpCounter, DUMMY_ADDRESS);
+    var conditionIndex = addCommand(OperationCode.JMP_COUNTER, DUMMY_ADDRESS);
 
     var loop = new NestedLoopInfo();
     loop.setStartPoint(loopStart);
@@ -323,9 +323,9 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
     visitCodeBlock(forStatement.codeBlock());
 
-    addCommand(OperationCode.Jmp, loopStart);
+    addCommand(OperationCode.JMP, loopStart);
 
-    var loopEnd = addCommand(OperationCode.PopTmp, 1);
+    var loopEnd = addCommand(OperationCode.POP_TMP, 1);
     correctCommandArgument(conditionIndex, loopEnd);
     correctBreakStatements(nestedLoops.pop(), loopEnd);
 
@@ -336,13 +336,13 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   public ParseTree visitForEachStatement(BSLParser.ForEachStatementContext forEachStatement) {
     visitExpression(forEachStatement.expression());
 
-    addCommand(OperationCode.PushIterator);
+    addCommand(OperationCode.PUSH_ITERATOR);
 
-    var loopStart = addCommand(OperationCode.LineNum, forEachStatement.getStart().getLine());
+    var loopStart = addCommand(OperationCode.LINE_NUM, forEachStatement.getStart().getLine());
 
-    addCommand(OperationCode.IteratorNext);
+    addCommand(OperationCode.ITERATOR_NEXT);
 
-    var condition = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+    var condition = addCommand(OperationCode.JMP_FALSE, DUMMY_ADDRESS);
 
     buildLocalVariable(forEachStatement.IDENTIFIER().getText());
 
@@ -350,9 +350,9 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     loop.setStartPoint(loopStart);
     nestedLoops.push(loop);
     visitCodeBlock(forEachStatement.codeBlock());
-    addCommand(OperationCode.Jmp, loopStart);
+    addCommand(OperationCode.JMP, loopStart);
 
-    var loopEnd = addCommand(OperationCode.StopIterator);
+    var loopEnd = addCommand(OperationCode.STOP_ITERATOR);
     correctCommandArgument(condition, loopEnd);
     correctBreakStatements(nestedLoops.pop(), loopEnd);
     return forEachStatement;
@@ -360,19 +360,19 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
   @Override
   public ParseTree visitTryStatement(BSLParser.TryStatementContext tryStatement) {
-    var beginTryIndex = addCommand(OperationCode.BeginTry, DUMMY_ADDRESS);
+    var beginTryIndex = addCommand(OperationCode.BEGIN_TRY, DUMMY_ADDRESS);
     visitTryCodeBlock(tryStatement.tryCodeBlock());
-    var jmpIndex = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+    var jmpIndex = addCommand(OperationCode.JMP, DUMMY_ADDRESS);
 
-    var beginHandler = addCommand(OperationCode.LineNum, tryStatement.exceptCodeBlock().getStart().getLine());
+    var beginHandler = addCommand(OperationCode.LINE_NUM, tryStatement.exceptCodeBlock().getStart().getLine());
 
     correctCommandArgument(beginTryIndex, beginHandler);
 
     visitExceptCodeBlock(tryStatement.exceptCodeBlock());
 
-    var endIndex = addCommand(OperationCode.LineNum, tryStatement.getStop().getLine());
+    var endIndex = addCommand(OperationCode.LINE_NUM, tryStatement.getStop().getLine());
 
-    addCommand(OperationCode.EndTry, 0);
+    addCommand(OperationCode.END_TRY, 0);
     correctCommandArgument(jmpIndex, endIndex);
 
     return tryStatement;
@@ -390,8 +390,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   public ParseTree visitReturnStatement(BSLParser.ReturnStatementContext returnStatement) {
     super.visitReturnStatement(returnStatement);
 
-    addCommand(OperationCode.MakeRawValue, 0);
-    var indexJump = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+    addCommand(OperationCode.MAKE_RAW_VALUE, 0);
+    var indexJump = addCommand(OperationCode.JMP, DUMMY_ADDRESS);
     currentCommandReturnInMethod.add(indexJump);
 
     return returnStatement;
@@ -403,7 +403,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var loopInfo = nestedLoops.peek();
     // FIXME
     assert loopInfo != null;
-    addCommand(OperationCode.Jmp, loopInfo.getStartPoint());
+    addCommand(OperationCode.JMP, loopInfo.getStartPoint());
     return continueStatement;
   }
 
@@ -413,7 +413,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var loopInfo = nestedLoops.peek();
     // FIXME
     assert loopInfo != null;
-    var idx = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+    var idx = addCommand(OperationCode.JMP, DUMMY_ADDRESS);
     loopInfo.getBreakStatements().add(idx);
     return breakStatement;
   }
@@ -440,11 +440,11 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         throw CompilerException.mismatchedRaiseExpressionException();
       }
 
-      addCommand(OperationCode.RaiseException, -1);
+      addCommand(OperationCode.RAISE_EXCEPTION, -1);
 
     } else {
       visitExpression(expression);
-      addCommand(OperationCode.RaiseException, 0);
+      addCommand(OperationCode.RAISE_EXCEPTION, 0);
     }
 
     return raiseStatement;
@@ -502,7 +502,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
     var paramList = callStatement.globalMethodCall().doCall().callParamList();
     final var paramCount = processParamList(paramList);
-    addCommand(OperationCode.ArgNum, paramCount);
+    addCommand(OperationCode.ARG_NUN, paramCount);
     processMethodCall(callStatement.globalMethodCall().methodName(), false);
     return globalMethodCall;
   }
@@ -525,7 +525,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     if (!imageCache.getConstants().contains(constant)) {
       imageCache.getConstants().add(constant);
     }
-    addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
+    addCommand(OperationCode.PUSH_CONST, imageCache.getConstants().indexOf(constant));
     return constValue;
   }
 
@@ -566,7 +566,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   @Override
   public ParseTree visitAccessIndex(BSLParser.AccessIndexContext ctx) {
     visitExpression(ctx.expression());
-    addCommand(OperationCode.PushIndexed, 0);
+    addCommand(OperationCode.PUSH_INDEXED, 0);
     return ctx;
   }
 
@@ -578,7 +578,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       imageCache.getConstants().add(constant);
     }
     var indexConstant = imageCache.getConstants().indexOf(constant);
-    addCommand(OperationCode.ResolveProp, indexConstant);
+    addCommand(OperationCode.RESOLVE_PROP, indexConstant);
     return accessProperty;
   }
 
@@ -650,7 +650,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
           var constant = getConstantDefinitionByConstValue(param.defaultValue().constValue(), true);
           imageCache.getConstants().add(constant);
           var indexConstant = imageCache.getConstants().indexOf(constant);
-          addCommand(OperationCode.PushConst, indexConstant);
+          addCommand(OperationCode.PUSH_CONST, indexConstant);
 
           builder.hasDefaultValue(true);
           builder.defaultValueIndex(indexConstant);
@@ -686,7 +686,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   }
 
   private int addReturn() {
-    return addCommand(OperationCode.Return, 0);
+    return addCommand(OperationCode.RETURN, 0);
   }
 
   private void processExpression(BSLParser.ExpressionContext expression, Deque<ExpressionOperator> operators) {
@@ -716,7 +716,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     }
 
     if (booleanExpression) {
-      var lastIndexCommand = addCommand(OperationCode.MakeBool, 0);
+      var lastIndexCommand = addCommand(OperationCode.MAKE_BOOL, 0);
       booleanCommands.forEach(commandId -> correctCommandArgument(commandId, lastIndexCommand));
     }
 
@@ -788,52 +788,52 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     OperationCode operationCode;
     switch (operator) {
       case ADD:
-        operationCode = OperationCode.Add;
+        operationCode = OperationCode.ADD;
         break;
       case SUB:
-        operationCode = OperationCode.Sub;
+        operationCode = OperationCode.SUB;
         break;
       case MUL:
-        operationCode = OperationCode.Mul;
+        operationCode = OperationCode.MUL;
         break;
       case DIV:
-        operationCode = OperationCode.Div;
+        operationCode = OperationCode.DIV;
         break;
       case MOD:
-        operationCode = OperationCode.Mod;
+        operationCode = OperationCode.MOD;
         break;
       case UNARY_PLUS:
-        operationCode = OperationCode.Number;
+        operationCode = OperationCode.NUMBER;
         break;
       case UNARY_MINUS:
-        operationCode = OperationCode.Neg;
+        operationCode = OperationCode.NEG;
         break;
       case NOT:
-        operationCode = OperationCode.Not;
+        operationCode = OperationCode.NOT;
         break;
       case OR:
-        operationCode = OperationCode.Or;
+        operationCode = OperationCode.OR;
         break;
       case AND:
-        operationCode = OperationCode.And;
+        operationCode = OperationCode.AND;
         break;
       case EQUAL:
-        operationCode = OperationCode.Equals;
+        operationCode = OperationCode.EQUALS;
         break;
       case LESS:
-        operationCode = OperationCode.Less;
+        operationCode = OperationCode.LESS;
         break;
       case LESS_OR_EQUAL:
-        operationCode = OperationCode.LessOrEqual;
+        operationCode = OperationCode.LESS_OR_EQUAL;
         break;
       case GREATER:
-        operationCode = OperationCode.Greater;
+        operationCode = OperationCode.GREATER;
         break;
       case GREATER_OR_EQUAL:
-        operationCode = OperationCode.GreaterOrEqual;
+        operationCode = OperationCode.GREATER_OR_EQUAL;
         break;
       case NOT_EQUAL:
-        operationCode = OperationCode.NotEqual;
+        operationCode = OperationCode.NOT_EQUAL;
         break;
       default:
         throw CompilerException.notSupportedExpressionOperatorException(operator.getText());
@@ -935,7 +935,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var optionalOperationCode = NativeGlobalMethod.getOperationCode(identifier);
     if (optionalOperationCode.isPresent()) {
       var opCode = optionalOperationCode.get();
-      if (opCode == OperationCode.Min || opCode == OperationCode.Max) {
+      if (opCode == OperationCode.MIN || opCode == OperationCode.MAX) {
         if (factArguments == 0) {
           throw CompilerException.tooFewMethodArgumentsException();
         }
@@ -947,7 +947,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
     } else {
 
-      addCommand(OperationCode.ArgNum, factArguments);
+      addCommand(OperationCode.ARG_NUN, factArguments);
       processMethodCall(globalMethodCall.methodName(), true);
 
     }
@@ -960,7 +960,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     if (!imageCache.getConstants().contains(constant)) {
       imageCache.getConstants().add(constant);
     }
-    addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
+    addCommand(OperationCode.PUSH_CONST, imageCache.getConstants().indexOf(constant));
 
     var argumentCount = 0;
     if (newExpressionContext.doCall() != null) {
@@ -968,7 +968,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       argumentCount = processParamList(paramList);
     }
 
-    addCommand(OperationCode.NewInstance, argumentCount);
+    addCommand(OperationCode.NEW_INSTANCE, argumentCount);
   }
 
   /**
@@ -983,13 +983,13 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     }
 
     processExpression(expressions.get(0), new ArrayDeque<>());
-    addCommand(OperationCode.MakeBool);
+    addCommand(OperationCode.MAKE_BOOL);
 
-    var falsePart = addCommand(OperationCode.JmpFalse, DUMMY_ADDRESS);
+    var falsePart = addCommand(OperationCode.JMP_FALSE, DUMMY_ADDRESS);
 
     processExpression(expressions.get(1), new ArrayDeque<>()); // true
 
-    var endPart = addCommand(OperationCode.Jmp, DUMMY_ADDRESS);
+    var endPart = addCommand(OperationCode.JMP, DUMMY_ADDRESS);
 
     correctCommandArgument(falsePart, imageCache.getCode().size());
     processExpression(expressions.get(2), new ArrayDeque<>()); // false
@@ -1008,7 +1008,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     int count = 0;
     for (var callParamContext : callParam) {
       if (callParamContext.expression() == null) {
-        addCommand(OperationCode.PushDefaultArg);
+        addCommand(OperationCode.PUSH_DEFAULT_ARG);
       } else {
         processExpression(callParamContext.expression(), new ArrayDeque<>());
       }
@@ -1025,14 +1025,14 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var address = binding.getAddress();
     if (binding.getType() == SymbolType.VARIABLE) {
       if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
-        addCommand(OperationCode.PushLoc, address.getSymbolId());
+        addCommand(OperationCode.PUSH_LOC, address.getSymbolId());
       } else {
         imageCache.getVariableRefs().add(address);
-        addCommand(OperationCode.PushVar, imageCache.getVariableRefs().indexOf(address));
+        addCommand(OperationCode.PUSH_VAR, imageCache.getVariableRefs().indexOf(address));
       }
     } else if (binding.getType() == SymbolType.CONTEXT_PROPERTY) {
       imageCache.getVariableRefs().add(address);
-      addCommand(OperationCode.PushRef, imageCache.getVariableRefs().indexOf(address));
+      addCommand(OperationCode.PUSH_REF, imageCache.getVariableRefs().indexOf(address));
     } else {
       throw CompilerException.notSupportedException();
     }
@@ -1041,7 +1041,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   private void processAccessCall(BSLParser.AccessCallContext accessCallContext, boolean ifFunction) {
     var paramList = accessCallContext.methodCall().doCall().callParamList();
     final var paramCount = processParamList(paramList);
-    addCommand(OperationCode.ArgNum, paramCount);
+    addCommand(OperationCode.ARG_NUN, paramCount);
 
     var constant = new ConstantDefinition(ValueFactory.create(accessCallContext.methodCall().methodName().getText()));
     if (!imageCache.getConstants().contains(constant)) {
@@ -1050,9 +1050,9 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     var index = imageCache.getConstants().indexOf(constant);
 
     if (ifFunction) {
-      addCommand(OperationCode.ResolveMethodFunc, index);
+      addCommand(OperationCode.RESOLVE_METHOD_FUNC, index);
     } else {
-      addCommand(OperationCode.ResolveMethodProc, index);
+      addCommand(OperationCode.RESOLVE_METHOD_PROC, index);
     }
   }
 
@@ -1067,9 +1067,9 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     }
     var refs = imageCache.getMethodRefs().indexOf(address);
     if (isFunction) {
-      addCommand(OperationCode.CallFunc, refs);
+      addCommand(OperationCode.CALL_FUNC, refs);
     } else {
-      addCommand(OperationCode.CallProc, refs);
+      addCommand(OperationCode.CALL_PROC, refs);
     }
   }
 
@@ -1083,7 +1083,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     assert nestedLoops.peek() != null;
     var tryBlocks = nestedLoops.peek().getTryNesting();
     if (tryBlocks > 0) {
-      addCommand(OperationCode.ExitTry, tryBlocks);
+      addCommand(OperationCode.EXIT_TRY, tryBlocks);
     }
   }
 
@@ -1146,7 +1146,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     // скрытый возврат Неопределено
     var constant = new ConstantDefinition(ValueFactory.create());
     imageCache.getConstants().add(constant);
-    addCommand(OperationCode.PushConst, imageCache.getConstants().indexOf(constant));
+    addCommand(OperationCode.PUSH_CONST, imageCache.getConstants().indexOf(constant));
   }
 
   private void buildLocalVariable(String variableName) {
@@ -1157,14 +1157,14 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
       localScope.getVariables().add(variableInfo);
       localScope.getVariableNumbers().put(variableName.toUpperCase(Locale.ENGLISH), localScope.getVariables().indexOf(variableInfo));
       var index = localScope.getVariables().size() - 1;
-      addCommand(OperationCode.LoadLoc, index);
+      addCommand(OperationCode.LOAD_LOC, index);
 
     } else {
       if (address.getContextId() == compiler.getModuleContext().getMaxScopeIndex()) {
-        addCommand(OperationCode.LoadLoc, address.getSymbolId());
+        addCommand(OperationCode.LOAD_LOC, address.getSymbolId());
       } else {
         imageCache.getVariableRefs().add(address);
-        addCommand(OperationCode.LoadVar, imageCache.getVariableRefs().indexOf(address));
+        addCommand(OperationCode.LOAD_VAR, imageCache.getVariableRefs().indexOf(address));
       }
     }
   }
