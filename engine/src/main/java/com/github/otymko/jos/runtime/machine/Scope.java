@@ -6,7 +6,6 @@
 package com.github.otymko.jos.runtime.machine;
 
 import com.github.otymko.jos.runtime.IVariable;
-import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import lombok.RequiredArgsConstructor;

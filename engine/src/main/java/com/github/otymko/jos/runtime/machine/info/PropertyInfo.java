@@ -6,7 +6,6 @@
 package com.github.otymko.jos.runtime.machine.info;
 
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
-import lombok.Getter;
 import lombok.Value;
 import lombok.experimental.Accessors;
 
