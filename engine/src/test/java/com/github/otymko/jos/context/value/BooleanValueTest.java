@@ -18,11 +18,11 @@ class BooleanValueTest {
     assertThat(BooleanValue.TRUE.asBoolean()).isTrue();
     assertThat(BooleanValue.FALSE.asBoolean()).isFalse();
 
-    assertThat(BooleanValue.TRUE).isSameAs(ValueFactory.create(true));
-    assertThat(BooleanValue.FALSE).isSameAs(ValueFactory.create(false));
+    assertThat(ValueFactory.create(true)).isSameAs(BooleanValue.TRUE);
+    assertThat(ValueFactory.create(false)).isSameAs(BooleanValue.FALSE);
 
-    assertThat(0f).isEqualTo(BooleanValue.FALSE.asNumber().floatValue());
-    assertThat(1f).isEqualTo(BooleanValue.TRUE.asNumber().floatValue());
+    assertThat(BooleanValue.FALSE.asNumber().floatValue()).isEqualTo(0f);
+    assertThat(BooleanValue.TRUE.asNumber().floatValue()).isEqualTo(1f);
 
     assertThat(BooleanValue.TRUE.compareTo(BooleanValue.FALSE) > 0).isTrue();
 
