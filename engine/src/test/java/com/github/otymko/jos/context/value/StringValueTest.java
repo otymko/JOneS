@@ -5,12 +5,15 @@
  */
 package com.github.otymko.jos.context.value;
 
+import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,6 +36,18 @@ class StringValueTest {
 
     var numberString = ValueFactory.create("012.12");
     assertThat(numberString.asNumber().floatValue()).isEqualTo(12.12f);
+
+    var oneValue = ValueFactory.create("Истина");
+    Set<IValue> set = new HashSet<>();
+    set.add(oneValue);
+    set.add(ValueFactory.create("Истина"));
+
+    assertThat(set).hasSize(1)
+      .allMatch(iValue -> iValue.equals(oneValue));
+
+    set.add(ValueFactory.create("Ложь"));
+
+    assertThat(set).hasSize(2);
 
     // TODO: date -> object && true -> number
   }

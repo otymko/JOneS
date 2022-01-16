@@ -17,6 +17,7 @@ import com.github.otymko.jos.localization.Resources;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 import static com.github.otymko.jos.localization.MessageResource.NULL_VALUE_NOT_SUPPORTED;
 
@@ -79,7 +80,6 @@ public final class StringValue extends PrimitiveValue {
     throw MachineException.operationNotSupportedException();
   }
 
-  // FIXME
   @Override
   public boolean equals(Object object) {
     if (!(object instanceof IValue)) {
@@ -92,10 +92,9 @@ public final class StringValue extends PrimitiveValue {
     return false;
   }
 
-  // FIXME
   @Override
   public int hashCode() {
-    return super.hashCode();
+    return Objects.hashCode(value);
   }
 
   @Override
