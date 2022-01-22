@@ -101,6 +101,13 @@ class ScriptEngineTest {
   }
 
   @Test
+  void testSimpleDereference() throws Exception {
+    // https://github.com/otymko/JOneS/issues/142
+    Path script = Path.of("src/test/resources/test-var-dereference.os");
+    TestHelper.checkScript(script, "1");
+  }
+
+  @Test
   void testEratosfen() throws Exception {
     Path script = Path.of("src/test/resources/Eratosfen.os");
     TestHelper.checkScriptWithoutException(script);
