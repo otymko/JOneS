@@ -16,19 +16,23 @@ import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
+import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.util.Common;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 @ContextClass(name = "Структура", alias = "Structure")
 public class V8Structure extends ContextValue implements IndexAccessor, PropertyNameAccessor,
   CollectionIterable<V8KeyAndValue> {
 
   public static final ContextInfo INFO = ContextInfo.createByClass(V8Structure.class);
+  private static final Pattern fieldsSplitter = Pattern.compile(",");
 
   private final Map<IValue, IValue> values;
   private final Map<String, IValue> views;
@@ -41,6 +45,42 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
   @ContextConstructor
   public static V8Structure constructor() {
     return new V8Structure();
+  }
+
+  @ContextConstructor
+  public static V8Structure constructorExtended(IValue keysOrFixedStructure,
+                                                IValue value0,
+                                                IValue value1,
+                                                IValue value2,
+                                                IValue value3,
+                                                IValue value4,
+                                                IValue value5,
+                                                IValue value6,
+                                                IValue value7) {
+    final var result = new V8Structure();
+    if (keysOrFixedStructure.getDataType() == DataType.STRING) {
+      final var valuesList = new ArrayList<IValue>();
+      valuesList.add(value0);
+      valuesList.add(value1);
+      valuesList.add(value2);
+      valuesList.add(value3);
+      valuesList.add(value4);
+      valuesList.add(value5);
+      valuesList.add(value6);
+      valuesList.add(value7);
+
+      final var fieldNames = fieldsSplitter.split(keysOrFixedStructure.asString());
+      int valueIndex = 0;
+      for (final var fieldName : fieldNames) {
+        if (fieldName.isBlank()) {
+          continue;
+        }
+        result.insert(ValueFactory.create(fieldName.trim()), valuesList.get(valueIndex));
+        ++valueIndex;
+      }
+      return result;
+    }
+    throw MachineException.invalidArgumentValueException();
   }
 
   @ContextMethod(name = "Вставить", alias = "Insert")
@@ -68,6 +108,7 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
   @ContextMethod(name = "Очистить", alias = "Clear")
   public void clear() {
     values.clear();
+    views.clear();
   }
 
   @ContextMethod(name = "Удалить", alias = "Delete")
