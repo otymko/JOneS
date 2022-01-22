@@ -24,7 +24,7 @@ public class Variable extends ContextValue implements IVariable {
   private DataType dataType;
 
   public void setValue(IValue value) {
-    this.value = value;
+    this.value = value.getRawValue();
     setDataType(value.getDataType());
   }
 
