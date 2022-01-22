@@ -63,4 +63,9 @@ public class CompilerException extends EngineException {
     return new CompilerException(message);
   }
 
+  public static CompilerException returnStatementOutsideMethod() {
+    var message = Resources.getResourceString(RETURN_STATEMENT_OUTSIDE_METHOD);
+    return new CompilerException(message);
+  }
+
 }

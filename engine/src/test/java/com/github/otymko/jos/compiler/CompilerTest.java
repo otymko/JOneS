@@ -6,6 +6,7 @@
 package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.TestHelper;
+import com.github.otymko.jos.exception.CompilerException;
 import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.machine.Command;
@@ -132,6 +133,52 @@ class CompilerTest {
 
     var resolveProp = findCommand(code, OperationCode.RESOLVE_PROP, line, -1);
     assertThat(resolveProp).isNotEqualTo(-1); // Должно быть обращение к свойству (К)
+  }
+
+  @Test
+  void testReturnOutsideMethod() throws Exception {
+    var scriptSourceString = "Возврат";
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+    var exceptionThrown = false;
+    try {
+      var moduleImage = compiler.compile(scriptSourceString, UserScriptContext.class);
+    } catch (CompilerException exception) {
+      exceptionThrown = true;
+    }
+    assertThat(exceptionThrown).isTrue();
+  }
+
+  @Test
+  void testReturnInFunction() throws Exception {
+    var scriptSourceString = "Функция Ф1() Возврат 1; КонецФункции";
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+
+    var moduleImage = compiler.compile(scriptSourceString, UserScriptContext.class);
+    var code = moduleImage.getCode();
+    var line = findCommand(code, OperationCode.LINE_NUM, 0, 1);
+    assertThat(line).isNotNegative();
+    var makeRawValue = findCommand(code, OperationCode.MAKE_RAW_VALUE, line);
+    assertThat(makeRawValue).isNotNegative();
+    var jmp = findCommand(code, OperationCode.JMP, makeRawValue);
+    assertThat(jmp).isNotNegative();
+  }
+
+  @Test
+  void testReturnInProcedure() throws Exception {
+    var scriptSourceString = "Процедура П1() Возврат; КонецПроцедуры";
+    var engine = new ScriptEngine();
+    var compiler = new ScriptCompiler(engine);
+
+    var moduleImage = compiler.compile(scriptSourceString, UserScriptContext.class);
+    var code = moduleImage.getCode();
+    var line = findCommand(code, OperationCode.LINE_NUM, 0, 1);
+    assertThat(line).isNotNegative();
+    var makeRawValue = findCommand(code, OperationCode.MAKE_RAW_VALUE, line);
+    assertThat(makeRawValue).isNegative();
+    var jmp = findCommand(code, OperationCode.JMP, line);
+    assertThat(jmp).isNotNegative();
   }
 
   private int findCommand(List<Command> commands, OperationCode code, int start) {
