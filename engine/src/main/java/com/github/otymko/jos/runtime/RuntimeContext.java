@@ -60,7 +60,7 @@ public interface RuntimeContext {
     var contextInfo = getContextInfo();
     for (var index = 0; index < contextInfo.getMethods().length; index++) {
       var method = contextInfo.getMethods()[index];
-      if (method.getName().equalsIgnoreCase(name)) {
+      if (method.equalsByName(name)) {
         return index;
       }
     }

@@ -36,4 +36,16 @@ public class MethodInfo {
 
   }
 
+  /**
+   * Проверяет, соответствует ли метод переданному имени
+   * @param requestedName Имя метода для сравнения
+   * @return true - Переданная строка является именем или алиасом метода
+   *         false - Переданная строка не является именем или алиасом метода
+   */
+  public boolean equalsByName(String requestedName) {
+    return requestedName != null
+            && (requestedName.equalsIgnoreCase(name)
+              || requestedName.equalsIgnoreCase(alias));
+  }
+
 }
