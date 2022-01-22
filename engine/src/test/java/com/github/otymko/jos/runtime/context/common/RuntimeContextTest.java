@@ -13,12 +13,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RuntimeContextTest {
+class RuntimeContextTest {
 
-  void checkMethods(RuntimeContext object) {
+  @Test
+  void testNameAndAlias() throws Exception {
+    checkRuntimeContextObject(V8Array.constructor());
+    checkRuntimeContextObject(V8Structure.constructor());
+    checkRuntimeContextObject((RuntimeContext) V8Map.constructor());
+  }
+
+  private void checkMethods(RuntimeContext object) {
     for (final var method : object.getContextInfo().getMethods()) {
       final var idByName = object.findMethodId(method.getName());
-      assertThat(idByName).isGreaterThan(-1);
+      assertThat(idByName).isNotNegative();
 
       if (method.getAlias() != null) {
         final var idByAlias = object.findMethodId(method.getAlias());
@@ -27,10 +34,10 @@ public class RuntimeContextTest {
     }
   }
 
-  void checkProperties(RuntimeContext object) {
+  private void checkProperties(RuntimeContext object) {
     for (final var property : object.getContextInfo().getProperties()) {
       final var idByName = object.findProperty(property.getName());
-      assertThat(idByName).isGreaterThan(-1);
+      assertThat(idByName).isNotNegative();
 
       if (property.getAlias() != null) {
         final var idByAlias = object.findProperty(property.getAlias());
@@ -39,16 +46,9 @@ public class RuntimeContextTest {
     }
   }
 
-  void checkRuntimeContextObject(RuntimeContext object) {
+  private void checkRuntimeContextObject(RuntimeContext object) {
     checkMethods(object);
     checkProperties(object);
-  }
-
-  @Test
-  void testNameAndAlias() throws Exception {
-    checkRuntimeContextObject(V8Array.constructor());
-    checkRuntimeContextObject(V8Structure.constructor());
-    checkRuntimeContextObject((RuntimeContext) V8Map.constructor());
   }
 
 }
