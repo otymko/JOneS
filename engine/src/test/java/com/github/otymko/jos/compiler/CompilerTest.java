@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class CompilerTest {
 
@@ -140,13 +141,8 @@ class CompilerTest {
     var scriptSourceString = "Возврат";
     var engine = new ScriptEngine();
     var compiler = new ScriptCompiler(engine);
-    var exceptionThrown = false;
-    try {
-      var moduleImage = compiler.compile(scriptSourceString, UserScriptContext.class);
-    } catch (CompilerException exception) {
-      exceptionThrown = true;
-    }
-    assertThat(exceptionThrown).isTrue();
+    assertThatExceptionOfType(CompilerException.class)
+            .isThrownBy(() -> compiler.compile(scriptSourceString, UserScriptContext.class));
   }
 
   @Test
