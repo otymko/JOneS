@@ -8,6 +8,7 @@ package com.github.otymko.jos.runtime.context.type;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.localization.Resources;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
 import com.github.otymko.jos.runtime.machine.info.ConstructorInfo;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.experimental.UtilityClass;
@@ -38,10 +39,38 @@ public class TypeFactory {
       }
     }
 
+    // Ищем конструктор с varargs
+    for (var constructor : contextInfo.getConstructors()) {
+      if (constructor.getMethod().isVarArgs()) {
+        return constructor;
+      }
+    }
+
     throw MachineException.constructorNotFoundException(contextInfo.getName());
   }
 
-  private IValue[] prepareArguments(Method method, IValue[] arguments) {
+  private Object[] prepareArgumentsWithVarArgs(Method method, IValue[] arguments) {
+    final var list = new ArrayList<Object>();
+    final var staticArgumentsCount = method.getParameterCount() - 1;
+    for (int i = 0; i < staticArgumentsCount; i++) {
+      if (i < arguments.length) {
+        list.add(arguments[i]);
+      } else {
+        list.add(UndefinedValue.VALUE);
+      }
+    }
+    final var varArgs = new ArrayList<IValue>();
+    for (int i = staticArgumentsCount; i < arguments.length; i++) {
+      varArgs.add(arguments[i]);
+    }
+    list.add(varArgs.toArray(new IValue[0]));
+    return list.toArray(new Object[0]);
+  }
+
+  private Object[] prepareArguments(Method method, IValue[] arguments) {
+    if (method.isVarArgs()) {
+      return prepareArgumentsWithVarArgs(method, arguments);
+    }
     if (method.getParameterCount() == arguments.length) {
       return arguments;
     }
@@ -49,7 +78,7 @@ public class TypeFactory {
     while (list.size() < method.getParameterCount()) {
       list.add(ValueFactory.create());
     }
-    return list.toArray(new IValue[0]);
+    return list.toArray(new Object[0]);
   }
 
   public IValue callConstructor(ContextInfo contextInfo, IValue[] arguments) {
