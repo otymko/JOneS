@@ -22,7 +22,6 @@ import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.util.Common;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,7 +32,7 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
   CollectionIterable<V8KeyAndValue> {
 
   public static final ContextInfo INFO = ContextInfo.createByClass(V8Structure.class);
-  private static final Pattern fieldsSplitter = Pattern.compile(",");
+  private static final Pattern FIELDS_SPLITTER = Pattern.compile(",");
 
   private final Map<IValue, IValue> values;
   private final Map<String, IValue> views;
@@ -54,7 +53,7 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
     final var result = new V8Structure();
     if (keysOrFixedStructure.getDataType() == DataType.STRING) {
 
-      final var fieldNames = fieldsSplitter.split(keysOrFixedStructure.asString());
+      final var fieldNames = FIELDS_SPLITTER.split(keysOrFixedStructure.asString());
       int valueIndex = 0;
       for (final var fieldName : fieldNames) {
         if (fieldName.isBlank()) {
