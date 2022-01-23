@@ -15,6 +15,7 @@ import java.util.List;
 @Data
 public class MethodDescriptor {
   private int entry = -1;
+  private boolean bodyMethod;
   private MethodInfo signature;
   private List<VariableInfo> variables = new ArrayList<>();
 }

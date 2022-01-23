@@ -390,7 +390,14 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
   public ParseTree visitReturnStatement(BSLParser.ReturnStatementContext returnStatement) {
     super.visitReturnStatement(returnStatement);
 
-    addCommand(OperationCode.MAKE_RAW_VALUE, 0);
+    assert currentMethodDescriptor != null;
+
+    if (currentMethodDescriptor.isBodyMethod()) {
+      throw CompilerException.returnStatementOutsideMethod();
+    }
+    if (currentMethodDescriptor.getSignature().isFunction()) {
+      addCommand(OperationCode.MAKE_RAW_VALUE, 0);
+    }
     var indexJump = addCommand(OperationCode.JMP, DUMMY_ADDRESS);
     currentCommandReturnInMethod.add(indexJump);
 
@@ -615,6 +622,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
     var methodDescriptor = new MethodDescriptor();
     methodDescriptor.setSignature(methodInfo);
+    methodDescriptor.setBodyMethod(true);
     return methodDescriptor;
   }
 
