@@ -18,6 +18,7 @@ import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.util.Common;
 
@@ -49,25 +50,9 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
 
   @ContextConstructor
   public static V8Structure constructorExtended(IValue keysOrFixedStructure,
-                                                IValue value0,
-                                                IValue value1,
-                                                IValue value2,
-                                                IValue value3,
-                                                IValue value4,
-                                                IValue value5,
-                                                IValue value6,
-                                                IValue value7) {
+                                                IValue... values) {
     final var result = new V8Structure();
     if (keysOrFixedStructure.getDataType() == DataType.STRING) {
-      final var valuesList = new ArrayList<IValue>();
-      valuesList.add(value0);
-      valuesList.add(value1);
-      valuesList.add(value2);
-      valuesList.add(value3);
-      valuesList.add(value4);
-      valuesList.add(value5);
-      valuesList.add(value6);
-      valuesList.add(value7);
 
       final var fieldNames = fieldsSplitter.split(keysOrFixedStructure.asString());
       int valueIndex = 0;
@@ -75,7 +60,8 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
         if (fieldName.isBlank()) {
           continue;
         }
-        result.insert(ValueFactory.create(fieldName.trim()), valuesList.get(valueIndex));
+        final var valueToPut = valueIndex < values.length ? values[valueIndex] : UndefinedValue.VALUE;
+        result.insert(ValueFactory.create(fieldName.trim()), valueToPut);
         ++valueIndex;
       }
       return result;
