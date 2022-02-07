@@ -6,7 +6,7 @@ plugins {
     jacoco
     id("io.freefair.lombok") version "6.3.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("net.kyori.indra.license-header") version "2.1.0"
+    id("net.kyori.indra.license-header") version "2.1.1"
     id("org.sonarqube") version "3.3"
 }
 
