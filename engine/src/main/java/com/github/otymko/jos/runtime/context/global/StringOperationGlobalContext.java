@@ -151,6 +151,20 @@ public class StringOperationGlobalContext implements AttachableContext {
     return result;
   }
 
+  @ContextMethod(name = "СтрСравнить", alias = "StrCompare")
+  public static IValue strCompare(IValue leftValue, IValue rightValue) {
+    var left = leftValue.getRawValue().asString();
+    var right = rightValue.getRawValue().asString();
+    var result = left.compareToIgnoreCase(right);
+    if (result < 0) {
+      return ValueFactory.create(-1);
+    } else if (result > 0) {
+      return ValueFactory.create(1);
+    } else {
+      return ValueFactory.create(0);
+    }
+  }
+
   private static String getStringArgument(IValue argument) {
     return argument == null ? "" : argument.asString();
   }
