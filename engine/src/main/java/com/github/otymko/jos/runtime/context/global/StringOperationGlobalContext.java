@@ -17,6 +17,7 @@ import com.github.otymko.jos.runtime.context.type.enumeration.SearchDirection;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
 
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 @GlobalContextClass
@@ -163,6 +164,23 @@ public class StringOperationGlobalContext implements AttachableContext {
     } else {
       return ValueFactory.create(0);
     }
+  }
+
+  @ContextMethod(name = "СтрСоединить", alias = "StrConcat")
+  public static IValue strConcat(IValue inputCollection, IValue inputSeparator) {
+    var collection = inputCollection.getRawValue();
+    if (!(collection instanceof V8Array)) {
+      throw MachineException.invalidArgumentValueException();
+    }
+
+    var separator = inputSeparator == null ? "" : inputSeparator.getRawValue().asString();
+
+    var joiner = new StringJoiner(separator);
+    for (var value : ((V8Array) collection).iterator()) {
+      joiner.add(value.getRawValue().asString());
+    }
+
+    return ValueFactory.create(joiner.toString());
   }
 
   private static String getStringArgument(IValue argument) {
