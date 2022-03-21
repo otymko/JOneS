@@ -16,19 +16,23 @@ import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
+import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.util.Common;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 @ContextClass(name = "Структура", alias = "Structure")
 public class V8Structure extends ContextValue implements IndexAccessor, PropertyNameAccessor,
   CollectionIterable<V8KeyAndValue> {
 
   public static final ContextInfo INFO = ContextInfo.createByClass(V8Structure.class);
+  private static final Pattern FIELDS_SPLITTER = Pattern.compile(",");
 
   private final Map<IValue, IValue> values;
   private final Map<String, IValue> views;
@@ -41,6 +45,27 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
   @ContextConstructor
   public static V8Structure constructor() {
     return new V8Structure();
+  }
+
+  @ContextConstructor
+  public static V8Structure constructorExtended(IValue keysOrFixedStructure,
+                                                IValue... values) {
+    final var result = new V8Structure();
+    if (keysOrFixedStructure.getDataType() == DataType.STRING) {
+
+      final var fieldNames = FIELDS_SPLITTER.split(keysOrFixedStructure.asString());
+      int valueIndex = 0;
+      for (final var fieldName : fieldNames) {
+        if (fieldName.isBlank()) {
+          continue;
+        }
+        final var valueToPut = valueIndex < values.length ? values[valueIndex] : UndefinedValue.VALUE;
+        result.insert(ValueFactory.create(fieldName.trim()), valueToPut);
+        ++valueIndex;
+      }
+      return result;
+    }
+    throw MachineException.invalidArgumentValueException();
   }
 
   @ContextMethod(name = "Вставить", alias = "Insert")
@@ -68,6 +93,7 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
   @ContextMethod(name = "Очистить", alias = "Clear")
   public void clear() {
     values.clear();
+    views.clear();
   }
 
   @ContextMethod(name = "Удалить", alias = "Delete")
