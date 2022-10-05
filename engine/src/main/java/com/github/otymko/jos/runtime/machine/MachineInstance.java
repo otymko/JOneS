@@ -49,6 +49,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.github.otymko.jos.util.StringUtils.toTitleCase;
+
 /**
  * Экземпляр стековой машины
  */
@@ -317,6 +319,7 @@ public class MachineInstance {
     map.put(OperationCode.STR_LEN, this::stringLength);
     map.put(OperationCode.U_CASE, this::upperCase);
     map.put(OperationCode.L_CASE, this::lowerCase);
+    map.put(OperationCode.T_CASE, this::titleCase);
     map.put(OperationCode.TRIM_L, this::trimL);
     map.put(OperationCode.TRIM_R, this::trimR);
     map.put(OperationCode.TRIM_LR, this::trimLR);
@@ -413,6 +416,14 @@ public class MachineInstance {
 
   private void lowerCase(int argument) {
     var value = operationStack.pop().asString().toLowerCase(Locale.ENGLISH);
+    operationStack.push(ValueFactory.create(value));
+    nextInstruction();
+  }
+
+  private void titleCase(int argument)
+  {
+    var value = operationStack.pop().asString();
+    value = toTitleCase(value);
     operationStack.push(ValueFactory.create(value));
     nextInstruction();
   }

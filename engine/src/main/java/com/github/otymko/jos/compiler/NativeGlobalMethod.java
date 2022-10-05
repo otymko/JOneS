@@ -46,6 +46,7 @@ public class NativeGlobalMethod {
     addNativeMethod("ИнформацияОбОшибке", "ErrorDescription", OperationCode.EXCEPTION_DESCR);
     addNativeMethod("ВРег", "Upper", OperationCode.U_CASE, REQUIRED_PARAMETER);
     addNativeMethod("НРег", "Lower", OperationCode.L_CASE, REQUIRED_PARAMETER);
+    addNativeMethod("ТРег", "Title", OperationCode.T_CASE, REQUIRED_PARAMETER);
     addNativeMethod("СтрДлина", "StrLen", OperationCode.STR_LEN, REQUIRED_PARAMETER);
     addNativeMethod("СокрП", "TrimR", OperationCode.TRIM_R, REQUIRED_PARAMETER);
     addNativeMethod("СокрЛ", "TrimL", OperationCode.TRIM_L, REQUIRED_PARAMETER);
