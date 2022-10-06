@@ -7,7 +7,7 @@ plugins {
     id("io.freefair.lombok") version "6.5.1"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("net.kyori.indra.license-header") version "2.1.1"
-    id("org.sonarqube") version "3.3"
+    id("org.sonarqube") version "3.4.0.2513"
 }
 
 java {
