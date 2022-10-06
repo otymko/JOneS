@@ -10,6 +10,7 @@ import com.github.otymko.jos.runtime.context.type.collection.V8FixedMap;
 import com.github.otymko.jos.runtime.context.type.collection.V8KeyAndValue;
 import com.github.otymko.jos.runtime.context.type.collection.V8Map;
 import com.github.otymko.jos.runtime.context.type.collection.V8Structure;
+import com.github.otymko.jos.runtime.context.type.file.V8File;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
@@ -76,7 +77,9 @@ public class StandardTypeInitializer {
     implementTypeByInfo(typeManager, NumberQualifiers.INFO);
     implementTypeByInfo(typeManager, StringQualifiers.INFO);
     implementTypeByInfo(typeManager, TypeDescription.INFO);
+
     implementTypeByInfo(typeManager, Regex.INFO);
+    implementTypeByInfo(typeManager, V8File.INFO);
   }
 
   private void initSystemEnumerations(TypeManager typeManager) {

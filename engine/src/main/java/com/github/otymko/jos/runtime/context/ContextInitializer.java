@@ -9,6 +9,7 @@ import com.github.otymko.jos.compiler.AnnotationDefinition;
 import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.VariableReference;
+import com.github.otymko.jos.runtime.context.global.FileOperationsGlobalContext;
 import com.github.otymko.jos.runtime.context.global.GlobalContext;
 import com.github.otymko.jos.runtime.context.global.StringOperationGlobalContext;
 import com.github.otymko.jos.runtime.context.global.SystemGlobalContext;
@@ -31,6 +32,7 @@ public class ContextInitializer {
     machineInstance.implementContext(new GlobalContext());
     machineInstance.implementContext(new SystemGlobalContext());
     machineInstance.implementContext(new StringOperationGlobalContext());
+    machineInstance.implementContext(new FileOperationsGlobalContext());
   }
 
   public MethodInfo[] getContextMethods(Class<? extends RuntimeContext> targetClass) {
