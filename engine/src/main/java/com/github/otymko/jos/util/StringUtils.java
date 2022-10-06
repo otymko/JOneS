@@ -20,17 +20,8 @@ public final class StringUtils {
     public static String toTitleCase(String value) {
         char[] chars = value.toCharArray();
         boolean isWord = false;
-        if (chars.length >= 1) {
-            if (Character.isLetter(chars[0])) {
-                isWord = true;
-            }
 
-            if (Character.isLowerCase(chars[0])) {
-                chars[0] = Character.toUpperCase(chars[0]);
-            }
-        }
-
-        for (int i = 1; i < chars.length; i++) {
+        for (int i = 0; i < chars.length; i++) {
             if (isWord && Character.isLetter(chars[i])) {
                 chars[i] = Character.toLowerCase(chars[i]);
             } else if (charIsSeparator(chars[i]) || charIsPunctuation(chars[i])) {
