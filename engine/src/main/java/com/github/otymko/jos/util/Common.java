@@ -11,6 +11,7 @@ import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -58,6 +59,13 @@ public class Common {
     }
 
     return true;
+  }
+
+  /**
+   * Возвращает признак, что текущая операционная система на базе Windows.
+   */
+  public static boolean isWindows() {
+    return SystemUtils.IS_OS_WINDOWS;
   }
 
 }
