@@ -55,7 +55,7 @@ public class FileOperationsGlobalContext implements AttachableContext {
     private static String getRandomFileName(String extension) {
         var name = TMP_PREFIX + System.currentTimeMillis() + random.nextLong();
         if (!extension.isEmpty()) {
-            name = name + "." + extension;
+            name = name + extension;
         }
 
         return name;

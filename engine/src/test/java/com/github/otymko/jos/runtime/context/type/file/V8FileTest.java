@@ -15,7 +15,7 @@ import java.util.Collection;
 
 class V8FileTest extends BaseExternalScriptTest {
     @TestFactory
-    Collection<DynamicTest> testSample() throws IOException {
+    Collection<DynamicTest> tests() throws IOException {
         return getTestsFromScript(Path.of("src/test/resources/tests/File.os"));
     }
 }
