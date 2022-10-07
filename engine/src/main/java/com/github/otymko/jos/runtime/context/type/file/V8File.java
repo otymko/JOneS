@@ -12,6 +12,7 @@ import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.file.exception.FileAttributeException;
@@ -39,15 +40,15 @@ public class V8File extends ContextValue {
     private final File file;
 
     // FIXME: фиктивные поля, нужен рефакторинг определений класса
-    @ContextProperty(name = "Имя", alias = "Name")
+    @ContextProperty(name = "Имя", alias = "Name", accessMode = PropertyAccessMode.READ_ONLY)
     private IValue name;
-    @ContextProperty(name = "ИмяБезРасширения", alias = "BaseName")
+    @ContextProperty(name = "ИмяБезРасширения", alias = "BaseName", accessMode = PropertyAccessMode.READ_ONLY)
     private IValue nameWithoutExtension;
-    @ContextProperty(name = "Расширение", alias = "Extension")
+    @ContextProperty(name = "Расширение", alias = "Extension", accessMode = PropertyAccessMode.READ_ONLY)
     private IValue extension;
-    @ContextProperty(name = "ПолноеИмя", alias = "FullName")
+    @ContextProperty(name = "ПолноеИмя", alias = "FullName", accessMode = PropertyAccessMode.READ_ONLY)
     private IValue fullName;
-    @ContextProperty(name = "Путь", alias = "Path")
+    @ContextProperty(name = "Путь", alias = "Path", accessMode = PropertyAccessMode.READ_ONLY)
     private IValue path;
 
     @Override
@@ -83,26 +84,30 @@ public class V8File extends ContextValue {
     }
 
     public IValue getExtension() {
-        var name = file.getName();
-        if (!name.contains(".")) {
+        var fileName = file.getName();
+        if (!fileName.contains(".")) {
             return ValueFactory.create("");
         }
 
-        var extension = name.substring(name.lastIndexOf(".") + 1);
+        var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
 
         return ValueFactory.create(extension);
     }
 
     public IValue getFullName() {
-        var fullName = file.getAbsolutePath();
+        return doWithWrapException(() -> {
+            var fullName = file.getAbsolutePath();
 
-        return ValueFactory.create(fullName);
+            return ValueFactory.create(fullName);
+        });
     }
 
     public IValue getPath() {
-        var parentPath = file.getParentFile().getAbsolutePath();
+        return doWithWrapException(() -> {
+            var parentPath = file.getParentFile().getAbsolutePath();
 
-        return ValueFactory.create(parentPath + "/");
+            return ValueFactory.create(parentPath + "/");
+        });
     }
 
     @ContextMethod(name = "ПолучитьВремяИзменения", alias = "GetModificationTime")
@@ -127,7 +132,7 @@ public class V8File extends ContextValue {
 
     @ContextMethod(name = "Существует", alias = "Exists")
     public IValue isExists() {
-        return ValueFactory.create(file.exists());
+        return doWithWrapException(() -> ValueFactory.create(file.exists()));
     }
 
     @ContextMethod(name = "Размер", alias = "Size")
