@@ -24,6 +24,8 @@ import com.github.otymko.jos.util.Common;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -106,7 +108,7 @@ public class V8File extends ContextValue {
         return doWithWrapException(() -> {
             var parentPath = file.getParentFile().getAbsolutePath();
 
-            return ValueFactory.create(parentPath + "/");
+            return ValueFactory.create(parentPath + FileSystems.getDefault().getSeparator());
         });
     }
 
