@@ -16,14 +16,14 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
 
 import java.nio.file.Path;
-import java.util.Random;
+import java.security.SecureRandom;
 
 @GlobalContextClass
 @NoArgsConstructor
 public class FileOperationsGlobalContext implements AttachableContext {
     public static final ContextInfo INFO = ContextInfo.createByClass(FileOperationsGlobalContext.class);
 
-    private static final Random random = new Random();
+    private static final SecureRandom random = new SecureRandom();
 
     private static final String PROPERTY_TMPDIR = "java.io.tmpdir";
     private static final String TMP_PREFIX = "tmp";
