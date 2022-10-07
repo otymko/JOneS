@@ -186,4 +186,9 @@ public class MachineException extends EngineException {
     return new MachineException(message);
   }
 
+  public static MachineException fileAccessDenied(String path) {
+    var message = String.format(Resources.getResourceString(FILE_ACCESS_DENIED), path);
+    return new MachineException(message);
+  }
+
 }

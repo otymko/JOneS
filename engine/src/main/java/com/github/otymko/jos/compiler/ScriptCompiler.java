@@ -13,6 +13,7 @@ import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.module.ModuleImageCache;
 import com.github.otymko.jos.module.ModuleSource;
 import com.github.otymko.jos.runtime.SymbolType;
+import com.github.otymko.jos.runtime.context.global.FileOperationsGlobalContext;
 import com.github.otymko.jos.runtime.context.global.StringOperationGlobalContext;
 import com.github.otymko.jos.runtime.context.global.SystemGlobalContext;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
@@ -125,6 +126,7 @@ public class ScriptCompiler {
     addGlobalContext();
     outerContext.implementContext(SystemGlobalContext.class);
     outerContext.implementContext(StringOperationGlobalContext.class);
+    outerContext.implementContext(FileOperationsGlobalContext.class);
   }
 
   private void addGlobalContext() {

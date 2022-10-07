@@ -57,6 +57,7 @@ public class MessageResource {
   public static final String DEFAULT_FALSE_PRESENTATION = "defaultFalsePresentation";
   public static final String KEY_NOT_FOUND = "keyNotFound";
   public static final String RETURN_STATEMENT_OUTSIDE_METHOD = "returnStatementOutsideMethod";
+  public static final String FILE_ACCESS_DENIED = "fileAccessDenied";
 
   private MessageResource() {
     // none
