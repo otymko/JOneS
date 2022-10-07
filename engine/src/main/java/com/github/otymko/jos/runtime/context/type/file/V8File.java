@@ -75,12 +75,12 @@ public class V8File extends ContextValue {
     }
 
     public IValue getNameWithoutExtension() {
-        var name = file.getName();
-        if (name.contains(".")) {
-            name = name.substring(0, name.lastIndexOf(".") - 1);
+        var fileName = file.getName();
+        if (fileName.contains(".")) {
+            fileName = fileName.substring(0, fileName.lastIndexOf(".") - 1);
         }
 
-        return ValueFactory.create(name);
+        return ValueFactory.create(fileName);
     }
 
     public IValue getExtension() {
