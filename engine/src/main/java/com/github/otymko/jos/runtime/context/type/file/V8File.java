@@ -24,12 +24,10 @@ import com.github.otymko.jos.util.Common;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.sql.Date;
 import java.util.function.Supplier;
 
 /**
@@ -91,16 +89,16 @@ public class V8File extends ContextValue {
             return ValueFactory.create("");
         }
 
-        var extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+        var currentExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
 
-        return ValueFactory.create(extension);
+        return ValueFactory.create(currentExtension);
     }
 
     public IValue getFullName() {
         return doWithWrapException(() -> {
-            var fullName = file.getAbsolutePath();
+            var value = file.getAbsolutePath();
 
-            return ValueFactory.create(fullName);
+            return ValueFactory.create(value);
         });
     }
 
@@ -118,7 +116,7 @@ public class V8File extends ContextValue {
             BasicFileAttributes attributes = getFileAttributes();
             var instant = attributes.lastModifiedTime().toInstant();
 
-            return ValueFactory.create(Date.from(instant));
+            return ValueFactory.create(java.util.Date.from(instant));
         });
     }
 
