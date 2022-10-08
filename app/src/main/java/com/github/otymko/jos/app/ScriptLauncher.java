@@ -5,25 +5,25 @@
  */
 package com.github.otymko.jos.app;
 
-import com.github.otymko.jos.exception.ApplicationException;
+import com.github.otymko.jos.ScriptEngine;
+import com.github.otymko.jos.app.exception.ApplicationException;
+import com.github.otymko.jos.localization.MessageResource;
 import com.github.otymko.jos.localization.Resources;
 
 import java.io.File;
 import java.nio.file.Path;
-
-import static com.github.otymko.jos.localization.MessageResource.*;
 
 public class ScriptLauncher {
 
   public static void main(String[] args) throws Exception {
 
     if (args.length == 0) {
-      throw new ApplicationException(Resources.getResourceString(EXPECTED_AT_LEAST_ONE_ARGUMENT));
+      throw new ApplicationException(Resources.getResourceString(MessageResource.EXPECTED_AT_LEAST_ONE_ARGUMENT));
     }
 
     final var pathToScriptFromArgument = args[0];
     if (pathToScriptFromArgument.isEmpty()) {
-      throw new ApplicationException(Resources.getResourceString(PATH_TO_SCRIPT_IS_NOT_SPECIFIED));
+      throw new ApplicationException(Resources.getResourceString(MessageResource.PATH_TO_SCRIPT_IS_NOT_SPECIFIED));
     }
 
     Path pathToScript;
@@ -34,7 +34,7 @@ public class ScriptLauncher {
     } else {
       var otherPathToScript = Path.of(pwd.toString(), pathToScriptFromArgument);
       if (otherPathToScript.toFile().exists()) {
-        throw new ApplicationException(Resources.getResourceString(SCRIPT_FILE_NOT_FOUND));
+        throw new ApplicationException(Resources.getResourceString(MessageResource.SCRIPT_FILE_NOT_FOUND));
       }
       pathToScript = otherPathToScript.toAbsolutePath();
     }

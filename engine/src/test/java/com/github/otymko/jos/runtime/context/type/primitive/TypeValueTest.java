@@ -5,7 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.type.primitive;
 
-import com.github.otymko.jos.app.ScriptEngine;
+import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.runtime.context.IValue;
 import org.junit.jupiter.api.Test;
 

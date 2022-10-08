@@ -1,23 +1,17 @@
 description = "JOneScript Engine"
 
-tasks.jar {
-    manifest {
-        attributes["Main-Class"] = "com.github.otymko.jos.app.ScriptLauncher"
-        attributes["Implementation-Version"] = archiveVersion.get()
+dependencies {
+    // https://github.com/1c-syntax/bsl-parser
+    api("com.github.1c-syntax", "bsl-parser", "0.19.3") {
+        exclude("com.tunnelvisionlabs", "antlr4-annotations")
+        exclude("com.ibm.icu", "*")
+        exclude("org.antlr", "ST4")
+        exclude("org.abego.treelayout", "org.abego.treelayout.core")
+        exclude("org.antlr", "antlr-runtime")
     }
-    enabled = true
-    archiveClassifier.set("")
-    dependsOn(tasks.shadowJar)
-}
 
-tasks.shadowJar {
-    project.configurations.implementation.get().isCanBeResolved = true
-    configurations = listOf(project.configurations["implementation"])
-    archiveClassifier.set("exec")
-}
+    implementation("commons-io", "commons-io", "2.8.0")
+    implementation("org.apache.commons", "commons-lang3", "3.12.0")
 
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
-    options.compilerArgs.add("-Xlint:unchecked")
-    options.compilerArgs.add("-Xlint:deprecation")
+    implementation("org.reflections:reflections:0.10.2")
 }

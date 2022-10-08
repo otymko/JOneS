@@ -6,7 +6,7 @@
 package com.github.otymko.jos.common;
 
 import com.github.otymko.jos.compiler.ScriptCompiler;
-import com.github.otymko.jos.app.ScriptEngine;
+import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImageDumper;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;

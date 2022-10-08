@@ -5,7 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.sdo;
 
-import com.github.otymko.jos.app.ScriptEngine;
+import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.Variable;

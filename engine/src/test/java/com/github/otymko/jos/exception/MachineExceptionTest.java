@@ -5,8 +5,8 @@
  */
 package com.github.otymko.jos.exception;
 
+import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.compiler.ScriptCompiler;
-import com.github.otymko.jos.app.ScriptEngine;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import org.junit.jupiter.api.Test;
 

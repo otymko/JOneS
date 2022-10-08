@@ -6,7 +6,7 @@
 package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.CustomEnum;
-import com.github.otymko.jos.app.ScriptEngine;
+import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.context.type.TypeManager;
 import org.junit.jupiter.api.Test;

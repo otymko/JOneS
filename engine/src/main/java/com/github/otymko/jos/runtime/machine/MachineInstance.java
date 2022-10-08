@@ -5,12 +5,12 @@
  */
 package com.github.otymko.jos.runtime.machine;
 
+import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.compiler.MethodDescriptor;
 import com.github.otymko.jos.compiler.SymbolAddress;
 import com.github.otymko.jos.exception.EngineException;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.exception.WrappedJavaException;
-import com.github.otymko.jos.app.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Arithmetic;
 import com.github.otymko.jos.runtime.IVariable;

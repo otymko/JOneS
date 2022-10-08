@@ -7,8 +7,8 @@ package com.github.otymko.jos.compiler;
 
 import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github._1c_syntax.bsl.parser.BSLTokenizer;
+import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.exception.CompilerException;
-import com.github.otymko.jos.app.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.module.ModuleImageCache;
 import com.github.otymko.jos.module.ModuleSource;

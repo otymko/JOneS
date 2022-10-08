@@ -3,11 +3,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.github.otymko.jos.app;
+package com.github.otymko.jos;
 
 import com.github.otymko.jos.compiler.ScriptCompiler;
 import com.github.otymko.jos.exception.EngineException;
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.localization.MessageResource;
 import com.github.otymko.jos.localization.Resources;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.context.AttachableContext;
@@ -21,8 +22,6 @@ import lombok.Getter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-
-import static com.github.otymko.jos.localization.MessageResource.ERROR_READING_FILE_SCRIPT;
 
 public class ScriptEngine {
   @Getter
@@ -47,7 +46,7 @@ public class ScriptEngine {
     try {
       exitCode = executeInternal(pathToScript);
     } catch (IOException exception) {
-      var errorMessage = String.format(Resources.getResourceString(ERROR_READING_FILE_SCRIPT),
+      var errorMessage = String.format(Resources.getResourceString(MessageResource.ERROR_READING_FILE_SCRIPT),
         pathToScript, exception.getMessage());
       System.out.println(errorMessage);
 
