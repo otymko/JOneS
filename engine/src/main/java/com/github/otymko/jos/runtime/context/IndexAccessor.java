@@ -6,6 +6,7 @@
 package com.github.otymko.jos.runtime.context;
 
 public interface IndexAccessor {
-  IValue getIndexedValue(IValue index);
-  void setIndexedValue(IValue index, IValue value);
+    IValue getIndexedValue(IValue index);
+
+    void setIndexedValue(IValue index, IValue value);
 }

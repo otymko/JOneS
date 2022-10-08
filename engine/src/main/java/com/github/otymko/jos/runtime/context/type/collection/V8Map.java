@@ -15,67 +15,67 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 @ContextClass(name = "Соответствие", alias = "Map")
 public class V8Map extends V8BaseMap {
-  public static final ContextInfo INFO = ContextInfo.createByClass(V8Map.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(V8Map.class);
 
-  private V8Map() {
-    // nope
-  }
-
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
-
-  @ContextConstructor
-  public static IValue constructor() {
-    return new V8Map();
-  }
-
-  @ContextConstructor
-  public static IValue constructor(IValue fixedMap) {
-    final var rawValue = fixedMap.getRawValue();
-    if (!(rawValue instanceof V8FixedMap)) {
-      throw MachineException.invalidArgumentValueException();
+    private V8Map() {
+        // nope
     }
-    final var rawFixedMap = (V8FixedMap) rawValue;
-    final var result = new V8Map();
-    for (final var value : rawFixedMap.iterator()) {
-      final var element = (V8KeyAndValue) value;
-      result.insert(element.getKey(), element.getValue());
+
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
     }
-    return result;
-  }
 
-  // region ContextMethod
+    @ContextConstructor
+    public static IValue constructor() {
+        return new V8Map();
+    }
 
-  @ContextMethod(name = "Вставить", alias = "Insert")
-  public void insert(IValue key, IValue value) {
-    final var rawKey = ValueFactory.rawValueOrUndefined(key);
-    final var rawValue = ValueFactory.rawValueOrUndefined(value);
-    data.put(rawKey, rawValue);
-  }
+    @ContextConstructor
+    public static IValue constructor(IValue fixedMap) {
+        final var rawValue = fixedMap.getRawValue();
+        if (!(rawValue instanceof V8FixedMap)) {
+            throw MachineException.invalidArgumentValueException();
+        }
+        final var rawFixedMap = (V8FixedMap) rawValue;
+        final var result = new V8Map();
+        for (final var value : rawFixedMap.iterator()) {
+            final var element = (V8KeyAndValue) value;
+            result.insert(element.getKey(), element.getValue());
+        }
+        return result;
+    }
 
-  @ContextMethod(name = "Очистить", alias = "Clear")
-  public void clear() {
-    data.clear();
-  }
+    // region ContextMethod
 
-  @ContextMethod(name = "Удалить", alias = "Delete")
-  public void remove(IValue key) {
-    final var rawKey = ValueFactory.rawValueOrUndefined(key);
-    data.remove(rawKey);
-  }
+    @ContextMethod(name = "Вставить", alias = "Insert")
+    public void insert(IValue key, IValue value) {
+        final var rawKey = ValueFactory.rawValueOrUndefined(key);
+        final var rawValue = ValueFactory.rawValueOrUndefined(value);
+        data.put(rawKey, rawValue);
+    }
 
-  // endregion
+    @ContextMethod(name = "Очистить", alias = "Clear")
+    public void clear() {
+        data.clear();
+    }
 
-  @Override
-  public void setIndexedValue(IValue index, IValue value) {
-    insert(index, value);
-  }
+    @ContextMethod(name = "Удалить", alias = "Delete")
+    public void remove(IValue key) {
+        final var rawKey = ValueFactory.rawValueOrUndefined(key);
+        data.remove(rawKey);
+    }
 
-  @Override
-  public IValue getIndexedValue(IValue index) {
-    return getInternal(index).orElse(ValueFactory.create());
-  }
+    // endregion
+
+    @Override
+    public void setIndexedValue(IValue index, IValue value) {
+        insert(index, value);
+    }
+
+    @Override
+    public IValue getIndexedValue(IValue index) {
+        return getInternal(index).orElse(ValueFactory.create());
+    }
 
 }

@@ -14,16 +14,16 @@ import java.lang.reflect.Method;
 
 @Value
 public class PropertyInfo {
-  String name;
-  String alias;
-  PropertyAccessMode accessMode;
-  Field field;
+    String name;
+    String alias;
+    PropertyAccessMode accessMode;
+    Field field;
 
-  @Accessors(fluent = true)
-  boolean hasSetter;
-  Method setter;
+    @Accessors(fluent = true)
+    boolean hasSetter;
+    Method setter;
 
-  @Accessors(fluent = true)
-  boolean hasGetter;
-  Method getter;
+    @Accessors(fluent = true)
+    boolean hasGetter;
+    Method getter;
 }

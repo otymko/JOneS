@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 public class TypeStorage {
-  @Getter
-  private final Map<String, ContextInfo> types = new HashMap<>();
-  @Getter
-  private final List<EnumerationContext> enumerationContext = new ArrayList<>();
+    @Getter
+    private final Map<String, ContextInfo> types = new HashMap<>();
+    @Getter
+    private final List<EnumerationContext> enumerationContext = new ArrayList<>();
 }

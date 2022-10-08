@@ -21,41 +21,41 @@ import java.util.List;
 @Data
 @Builder
 public class ModuleImage {
-  /**
-   * Источник модуля
-   */
-  private ModuleSource source;
+    /**
+     * Источник модуля
+     */
+    private ModuleSource source;
 
-  /**
-   * Байткоды
-   */
-  private List<Command> code;
-  /**
-   * Методы
-   */
-  private List<MethodDescriptor> methods;
-  /**
-   * Переменные
-   */
-  private List<VariableInfo> variables;
-  /**
-   * Константы
-   */
-  private List<ConstantDefinition> constants;
+    /**
+     * Байткоды
+     */
+    private List<Command> code;
+    /**
+     * Методы
+     */
+    private List<MethodDescriptor> methods;
+    /**
+     * Переменные
+     */
+    private List<VariableInfo> variables;
+    /**
+     * Константы
+     */
+    private List<ConstantDefinition> constants;
 
-  /**
-   * Карта ссылок методы
-   */
-  private List<SymbolAddress> methodRefs;
+    /**
+     * Карта ссылок методы
+     */
+    private List<SymbolAddress> methodRefs;
 
-  /**
-   * Карта ссылок на переменные
-   */
-  private List<SymbolAddress> variableRefs;
+    /**
+     * Карта ссылок на переменные
+     */
+    private List<SymbolAddress> variableRefs;
 
-  /**
-   * Точка входа
-   */
-  private int entry;
+    /**
+     * Точка входа
+     */
+    private int entry;
 
 }

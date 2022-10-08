@@ -14,41 +14,41 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 class CompilerExceptionTest {
 
-  @Test
-  void testSymbolNotFoundException() {
-    var code = "Переменная = А + 1;";
-    var engine = new ScriptEngine();
-    var compiler = new ScriptCompiler(engine);
-    assertThatCode(() -> compiler.compile(code, UserScriptContext.class))
-      .isInstanceOf(CompilerException.class)
-      .hasMessageContaining("Неизвестный символ: А");
-  }
+    @Test
+    void testSymbolNotFoundException() {
+        var code = "Переменная = А + 1;";
+        var engine = new ScriptEngine();
+        var compiler = new ScriptCompiler(engine);
+        assertThatCode(() -> compiler.compile(code, UserScriptContext.class))
+                .isInstanceOf(CompilerException.class)
+                .hasMessageContaining("Неизвестный символ: А");
+    }
 
-  @Test
-  void testNativeMethodArguments() {
-    var codeOne = "Значение = Тип(\"Строка\", Неопределено)";
-    var engine = new ScriptEngine();
-    var compiler = new ScriptCompiler(engine);
+    @Test
+    void testNativeMethodArguments() {
+        var codeOne = "Значение = Тип(\"Строка\", Неопределено)";
+        var engine = new ScriptEngine();
+        var compiler = new ScriptCompiler(engine);
 
-    assertThatCode(() -> compiler.compile(codeOne, UserScriptContext.class))
-      .isInstanceOf(CompilerException.class)
-      .hasMessageContaining("Слишком много фактических параметров");
+        assertThatCode(() -> compiler.compile(codeOne, UserScriptContext.class))
+                .isInstanceOf(CompilerException.class)
+                .hasMessageContaining("Слишком много фактических параметров");
 
-    var codeTwo = "Значение = Тип()";
-    assertThatCode(() -> compiler.compile(codeTwo, UserScriptContext.class))
-      .isInstanceOf(CompilerException.class)
-      .hasMessageContaining("Недостаточно фактических параметров");
-  }
+        var codeTwo = "Значение = Тип()";
+        assertThatCode(() -> compiler.compile(codeTwo, UserScriptContext.class))
+                .isInstanceOf(CompilerException.class)
+                .hasMessageContaining("Недостаточно фактических параметров");
+    }
 
-  @Test
-  void test() {
-    var code = "Значение = 1 f\n" +
-      "Значе2 = 1";
-    var engine = new ScriptEngine();
-    var compiler = new ScriptCompiler(engine);
-    assertThatCode(() -> compiler.compile(code, UserScriptContext.class))
-      .isInstanceOf(CompilerException.class)
-      .hasMessageContaining("Ошибка разбора исходного кода в");
-  }
+    @Test
+    void test() {
+        var code = "Значение = 1 f\n" +
+                "Значе2 = 1";
+        var engine = new ScriptEngine();
+        var compiler = new ScriptCompiler(engine);
+        assertThatCode(() -> compiler.compile(code, UserScriptContext.class))
+                .isInstanceOf(CompilerException.class)
+                .hasMessageContaining("Ошибка разбора исходного кода в");
+    }
 
 }

@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 public class SymbolScope {
-  @Getter
-  private final Map<String, Integer> variableNumbers = new HashMap<>();
-  @Getter
-  private final List<VariableInfo> variables = new ArrayList<>();
-  @Getter
-  private final Map<String, Integer> methodNumbers = new HashMap<>();
-  @Getter
-  private final List<MethodInfo> methods = new ArrayList<>();
+    @Getter
+    private final Map<String, Integer> variableNumbers = new HashMap<>();
+    @Getter
+    private final List<VariableInfo> variables = new ArrayList<>();
+    @Getter
+    private final Map<String, Integer> methodNumbers = new HashMap<>();
+    @Getter
+    private final List<MethodInfo> methods = new ArrayList<>();
 }

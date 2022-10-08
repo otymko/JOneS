@@ -15,20 +15,20 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 @ContextClass(name = "СкриптСКлючом", alias = "ScriptWithKey")
 public class TestTwoScriptContext extends ScriptDrivenObject {
-  public static final ContextInfo INFO = ContextInfo.createByClass(TestTwoScriptContext.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(TestTwoScriptContext.class);
 
-  public TestTwoScriptContext(ModuleImage moduleImage) {
-    super(moduleImage);
-  }
+    public TestTwoScriptContext(ModuleImage moduleImage) {
+        super(moduleImage);
+    }
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
 
-  @ContextMethod(name = "ПолучитьКлюч", alias = "GetKey")
-  public IValue getKey() {
-    return ValueFactory.create("Ключ из " + INFO.getName());
-  }
+    @ContextMethod(name = "ПолучитьКлюч", alias = "GetKey")
+    public IValue getKey() {
+        return ValueFactory.create("Ключ из " + INFO.getName());
+    }
 
 }

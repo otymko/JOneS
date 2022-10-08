@@ -25,48 +25,48 @@ import java.util.stream.Collectors;
 
 @ContextClass(name = "КоллекцияСовпаденийРегулярногоВыражения", alias = "RegExMatchCollection")
 public class RegexMatchCollection extends ContextValue implements CollectionIterable<RegexMatch>, IndexAccessor {
-  public static final ContextInfo INFO = ContextInfo.createByClass(RegexMatchCollection.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(RegexMatchCollection.class);
 
-  private final Matcher matcher;
-  private final Pattern pattern;
-  private final List<MatchResult> results;
+    private final Matcher matcher;
+    private final Pattern pattern;
+    private final List<MatchResult> results;
 
-  public RegexMatchCollection(Matcher matcher, Pattern pattern) {
-    this.matcher = matcher;
-    this.pattern = pattern;
+    public RegexMatchCollection(Matcher matcher, Pattern pattern) {
+        this.matcher = matcher;
+        this.pattern = pattern;
 
-    this.results = matcher.results().collect(Collectors.toList());
-  }
+        this.results = matcher.results().collect(Collectors.toList());
+    }
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
 
-  @Override
-  public IteratorValue iterator() {
-    var iterator = results.stream()
-      .map(result -> new RegexMatch(result, pattern))
-      .map(IValue.class::cast)
-      .iterator();
-    return new IteratorValue(iterator);
-  }
+    @Override
+    public IteratorValue iterator() {
+        var iterator = results.stream()
+                .map(result -> new RegexMatch(result, pattern))
+                .map(IValue.class::cast)
+                .iterator();
+        return new IteratorValue(iterator);
+    }
 
-  @ContextMethod(name = "Количество", alias = "Count")
-  public IValue getCount() {
-    return ValueFactory.create(BigDecimal.valueOf(results.size()));
-  }
+    @ContextMethod(name = "Количество", alias = "Count")
+    public IValue getCount() {
+        return ValueFactory.create(BigDecimal.valueOf(results.size()));
+    }
 
-  @Override
-  public IValue getIndexedValue(IValue inputIndex) {
-    var index = inputIndex.getRawValue().asNumber().intValue();
-    var result = (MatchResult) results.toArray()[index];
-    return new RegexMatch(result, pattern);
-  }
+    @Override
+    public IValue getIndexedValue(IValue inputIndex) {
+        var index = inputIndex.getRawValue().asNumber().intValue();
+        var result = (MatchResult) results.toArray()[index];
+        return new RegexMatch(result, pattern);
+    }
 
-  @Override
-  public void setIndexedValue(IValue index, IValue value) {
-    throw MachineException.getPropertyIsNotWritableException(index.asString());
-  }
+    @Override
+    public void setIndexedValue(IValue index, IValue value) {
+        throw MachineException.getPropertyIsNotWritableException(index.asString());
+    }
 
 }

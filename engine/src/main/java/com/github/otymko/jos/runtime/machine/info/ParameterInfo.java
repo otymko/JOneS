@@ -15,18 +15,18 @@ import lombok.experimental.Accessors;
 @Value
 @Builder
 public class ParameterInfo {
-  String name;
+    String name;
 
-  @Builder.Default
-  boolean byValue = false;
+    @Builder.Default
+    boolean byValue = false;
 
-  @Builder.Default
-  @Accessors(fluent = true)
-  boolean hasDefaultValue = false;
+    @Builder.Default
+    @Accessors(fluent = true)
+    boolean hasDefaultValue = false;
 
-  @Builder.Default
-  int defaultValueIndex = -1;
+    @Builder.Default
+    int defaultValueIndex = -1;
 
-  // todo: Аннотации ?
+    // todo: Аннотации ?
 
 }

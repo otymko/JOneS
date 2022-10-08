@@ -30,60 +30,60 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class StandardTypeInitializer {
 
-  public void initialize(TypeManager typeManager) {
-    initPrimitives(typeManager);
-    initSystemEnumerations(typeManager);
-    initCollections(typeManager);
-  }
-
-  private void initPrimitives(TypeManager typeManager) {
-    for (var type : DataType.values()) {
-
-      if (type == DataType.UNDEFINED) {
-        implementTypeByInfo(typeManager, UndefinedValue.INFO);
-      } else if (type == DataType.GENERIC_VALUE) {
-        implementTypeByInfo(typeManager, NullValue.INFO);
-      } else if (type == DataType.BOOLEAN) {
-        implementTypeByInfo(typeManager, BooleanValue.INFO);
-      } else if (type == DataType.STRING) {
-        implementTypeByInfo(typeManager, StringValue.INFO);
-      } else if (type == DataType.NUMBER) {
-        implementTypeByInfo(typeManager, NumberValue.INFO);
-      } else if (type == DataType.DATE) {
-        implementTypeByInfo(typeManager, DateValue.INFO);
-      } else if (type == DataType.TYPE) {
-        implementTypeByInfo(typeManager, TypeValue.INFO);
-      }
-      // object
-      // + алиас?
+    public void initialize(TypeManager typeManager) {
+        initPrimitives(typeManager);
+        initSystemEnumerations(typeManager);
+        initCollections(typeManager);
     }
-  }
 
-  private void implementTypeByInfo(TypeManager typeManager, ContextInfo info) {
-    typeManager.registerType(info.getName(), info);
-    typeManager.registerType(info.getAlias(), info);
-  }
+    private void initPrimitives(TypeManager typeManager) {
+        for (var type : DataType.values()) {
 
-  private void initCollections(TypeManager typeManager) {
-    // TODO: name и alias из contextType
-    implementTypeByInfo(typeManager, V8Array.INFO);
-    implementTypeByInfo(typeManager, V8KeyAndValue.INFO);
-    implementTypeByInfo(typeManager, V8Structure.INFO);
-    implementTypeByInfo(typeManager, V8Map.INFO);
-    implementTypeByInfo(typeManager, V8FixedMap.INFO);
+            if (type == DataType.UNDEFINED) {
+                implementTypeByInfo(typeManager, UndefinedValue.INFO);
+            } else if (type == DataType.GENERIC_VALUE) {
+                implementTypeByInfo(typeManager, NullValue.INFO);
+            } else if (type == DataType.BOOLEAN) {
+                implementTypeByInfo(typeManager, BooleanValue.INFO);
+            } else if (type == DataType.STRING) {
+                implementTypeByInfo(typeManager, StringValue.INFO);
+            } else if (type == DataType.NUMBER) {
+                implementTypeByInfo(typeManager, NumberValue.INFO);
+            } else if (type == DataType.DATE) {
+                implementTypeByInfo(typeManager, DateValue.INFO);
+            } else if (type == DataType.TYPE) {
+                implementTypeByInfo(typeManager, TypeValue.INFO);
+            }
+            // object
+            // + алиас?
+        }
+    }
 
-    implementTypeByInfo(typeManager, BinaryDataQualifiers.INFO);
-    implementTypeByInfo(typeManager, DateQualifiers.INFO);
-    implementTypeByInfo(typeManager, NumberQualifiers.INFO);
-    implementTypeByInfo(typeManager, StringQualifiers.INFO);
-    implementTypeByInfo(typeManager, TypeDescription.INFO);
+    private void implementTypeByInfo(TypeManager typeManager, ContextInfo info) {
+        typeManager.registerType(info.getName(), info);
+        typeManager.registerType(info.getAlias(), info);
+    }
 
-    implementTypeByInfo(typeManager, Regex.INFO);
-    implementTypeByInfo(typeManager, V8File.INFO);
-  }
+    private void initCollections(TypeManager typeManager) {
+        // TODO: name и alias из contextType
+        implementTypeByInfo(typeManager, V8Array.INFO);
+        implementTypeByInfo(typeManager, V8KeyAndValue.INFO);
+        implementTypeByInfo(typeManager, V8Structure.INFO);
+        implementTypeByInfo(typeManager, V8Map.INFO);
+        implementTypeByInfo(typeManager, V8FixedMap.INFO);
 
-  private void initSystemEnumerations(TypeManager typeManager) {
-    typeManager.getEnumerationContext().forEach(context -> implementTypeByInfo(typeManager, context.getContextInfo()));
-  }
+        implementTypeByInfo(typeManager, BinaryDataQualifiers.INFO);
+        implementTypeByInfo(typeManager, DateQualifiers.INFO);
+        implementTypeByInfo(typeManager, NumberQualifiers.INFO);
+        implementTypeByInfo(typeManager, StringQualifiers.INFO);
+        implementTypeByInfo(typeManager, TypeDescription.INFO);
+
+        implementTypeByInfo(typeManager, Regex.INFO);
+        implementTypeByInfo(typeManager, V8File.INFO);
+    }
+
+    private void initSystemEnumerations(TypeManager typeManager) {
+        typeManager.getEnumerationContext().forEach(context -> implementTypeByInfo(typeManager, context.getContextInfo()));
+    }
 
 }

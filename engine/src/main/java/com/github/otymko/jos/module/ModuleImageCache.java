@@ -20,12 +20,12 @@ import java.util.List;
  */
 @Data
 public class ModuleImageCache {
-  private ModuleSource source;
-  private int entryPoint = -1;
-  private List<Command> code = new ArrayList<>();
-  private List<ConstantDefinition> constants = new ArrayList<>();
-  private List<VariableInfo> variables = new ArrayList<>();
-  private List<MethodDescriptor> methods = new ArrayList<>();
-  private List<SymbolAddress> methodRefs = new ArrayList<>();
-  private List<SymbolAddress> variableRefs = new ArrayList<>();
+    private ModuleSource source;
+    private int entryPoint = -1;
+    private List<Command> code = new ArrayList<>();
+    private List<ConstantDefinition> constants = new ArrayList<>();
+    private List<VariableInfo> variables = new ArrayList<>();
+    private List<MethodDescriptor> methods = new ArrayList<>();
+    private List<SymbolAddress> methodRefs = new ArrayList<>();
+    private List<SymbolAddress> variableRefs = new ArrayList<>();
 }

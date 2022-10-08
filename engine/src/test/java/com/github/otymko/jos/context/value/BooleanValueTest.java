@@ -17,30 +17,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class BooleanValueTest {
 
-  @Test
-  void test() {
-    assertThat(BooleanValue.TRUE.asBoolean()).isTrue();
-    assertThat(BooleanValue.FALSE.asBoolean()).isFalse();
+    @Test
+    void test() {
+        assertThat(BooleanValue.TRUE.asBoolean()).isTrue();
+        assertThat(BooleanValue.FALSE.asBoolean()).isFalse();
 
-    assertThat(ValueFactory.create(true)).isSameAs(BooleanValue.TRUE);
-    assertThat(ValueFactory.create(false)).isSameAs(BooleanValue.FALSE);
+        assertThat(ValueFactory.create(true)).isSameAs(BooleanValue.TRUE);
+        assertThat(ValueFactory.create(false)).isSameAs(BooleanValue.FALSE);
 
-    assertThat(BooleanValue.FALSE.asNumber().floatValue()).isEqualTo(0f);
-    assertThat(BooleanValue.TRUE.asNumber().floatValue()).isEqualTo(1f);
+        assertThat(BooleanValue.FALSE.asNumber().floatValue()).isEqualTo(0f);
+        assertThat(BooleanValue.TRUE.asNumber().floatValue()).isEqualTo(1f);
 
-    assertThat(BooleanValue.TRUE.compareTo(BooleanValue.FALSE) > 0).isTrue();
+        assertThat(BooleanValue.TRUE.compareTo(BooleanValue.FALSE) > 0).isTrue();
 
-    Set<IValue> set = new HashSet<>();
-    set.add(BooleanValue.TRUE);
-    set.add(BooleanValue.TRUE);
+        Set<IValue> set = new HashSet<>();
+        set.add(BooleanValue.TRUE);
+        set.add(BooleanValue.TRUE);
 
-    assertThat(set).hasSize(1)
-      .allMatch(iValue -> iValue.equals(BooleanValue.TRUE));
+        assertThat(set).hasSize(1)
+                .allMatch(iValue -> iValue.equals(BooleanValue.TRUE));
 
-    set.add(BooleanValue.FALSE);
-    assertThat(set).hasSize(2);
+        set.add(BooleanValue.FALSE);
+        assertThat(set).hasSize(2);
 
-    // TODO: boolean -> date, boolean -> object
-  }
+        // TODO: boolean -> date, boolean -> object
+    }
 
 }

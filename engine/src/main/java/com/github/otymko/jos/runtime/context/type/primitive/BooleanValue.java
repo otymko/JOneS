@@ -19,65 +19,65 @@ import java.util.function.Predicate;
 
 @ContextClass(name = "Булево", alias = "Boolean")
 public class BooleanValue extends PrimitiveValue {
-  public static final ContextInfo INFO = ContextInfo.createByClass(BooleanValue.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(BooleanValue.class);
 
-  public static final BooleanValue TRUE = new BooleanValue(true);
-  public static final BooleanValue FALSE = new BooleanValue(false);
+    public static final BooleanValue TRUE = new BooleanValue(true);
+    public static final BooleanValue FALSE = new BooleanValue(false);
 
-  private static final Predicate<String> IS_TRUE = view -> view.equalsIgnoreCase("истина")
-    || view.equalsIgnoreCase("true") || view.equalsIgnoreCase("да");
-  private static final Predicate<String> IS_FALSE = view -> view.equalsIgnoreCase("ложь")
-    || view.equalsIgnoreCase("false") || view.equalsIgnoreCase("нет");
+    private static final Predicate<String> IS_TRUE = view -> view.equalsIgnoreCase("истина")
+            || view.equalsIgnoreCase("true") || view.equalsIgnoreCase("да");
+    private static final Predicate<String> IS_FALSE = view -> view.equalsIgnoreCase("ложь")
+            || view.equalsIgnoreCase("false") || view.equalsIgnoreCase("нет");
 
-  private final boolean value;
+    private final boolean value;
 
-  private BooleanValue(boolean value) {
-    this.value = value;
-    setDataType(DataType.BOOLEAN);
-  }
-
-  public static IValue parse(String view) {
-    IValue result;
-    if (IS_TRUE.test(view)) {
-      result = ValueFactory.create(true);
-    } else if (IS_FALSE.test(view)) {
-      result = ValueFactory.create(false);
-    } else {
-      throw MachineException.convertToBooleanException();
+    private BooleanValue(boolean value) {
+        this.value = value;
+        setDataType(DataType.BOOLEAN);
     }
-    return result;
-  }
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
-
-  @Override
-  public boolean asBoolean() {
-    return value;
-  }
-
-  @Override
-  public BigDecimal asNumber() {
-    if (value) {
-      return BigDecimal.ONE;
+    public static IValue parse(String view) {
+        IValue result;
+        if (IS_TRUE.test(view)) {
+            result = ValueFactory.create(true);
+        } else if (IS_FALSE.test(view)) {
+            result = ValueFactory.create(false);
+        } else {
+            throw MachineException.convertToBooleanException();
+        }
+        return result;
     }
-    return BigDecimal.ZERO;
-  }
 
-  @Override
-  public String asString() {
-    return ValueFormatter.format(this, "");
-  }
-
-  // FIXME
-  @Override
-  public int compareTo(IValue other) {
-    if (other.getDataType() == DataType.BOOLEAN || other.getDataType() == DataType.NUMBER) {
-      return asNumber().compareTo(other.asNumber());
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
     }
-    return super.compareTo(other);
-  }
+
+    @Override
+    public boolean asBoolean() {
+        return value;
+    }
+
+    @Override
+    public BigDecimal asNumber() {
+        if (value) {
+            return BigDecimal.ONE;
+        }
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public String asString() {
+        return ValueFormatter.format(this, "");
+    }
+
+    // FIXME
+    @Override
+    public int compareTo(IValue other) {
+        if (other.getDataType() == DataType.BOOLEAN || other.getDataType() == DataType.NUMBER) {
+            return asNumber().compareTo(other.asNumber());
+        }
+        return super.compareTo(other);
+    }
 
 }

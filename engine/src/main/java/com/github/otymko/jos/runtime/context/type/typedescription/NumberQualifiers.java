@@ -27,128 +27,128 @@ import java.math.RoundingMode;
 @Value
 public class NumberQualifiers extends ContextValue {
 
-  public static final ContextInfo INFO = ContextInfo.createByClass(NumberQualifiers.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(NumberQualifiers.class);
 
-  /**
-   * Общее количество десятичных знаков, доступное для числа. 0 - Неограниченно
-   */
-  @ContextProperty(name = "Разрядность", alias = "Digits", accessMode = PropertyAccessMode.READ_ONLY)
-  int digits;
+    /**
+     * Общее количество десятичных знаков, доступное для числа. 0 - Неограниченно
+     */
+    @ContextProperty(name = "Разрядность", alias = "Digits", accessMode = PropertyAccessMode.READ_ONLY)
+    int digits;
 
-  /**
-   * Количество знаков дробной части числа. 0 - Без дробной части
-   */
-  @ContextProperty(name = "РазрядностьДробнойЧасти", alias = "FractionDigits", accessMode = PropertyAccessMode.READ_ONLY)
-  int fractionDigits;
+    /**
+     * Количество знаков дробной части числа. 0 - Без дробной части
+     */
+    @ContextProperty(name = "РазрядностьДробнойЧасти", alias = "FractionDigits", accessMode = PropertyAccessMode.READ_ONLY)
+    int fractionDigits;
 
-  /**
-   * Допустимый знак числа
-   */
-  @ContextProperty(name = "ДопустимыйЗнак", alias = "allowedSign", accessMode = PropertyAccessMode.READ_ONLY)
-  AllowedSign allowedSign;
+    /**
+     * Допустимый знак числа
+     */
+    @ContextProperty(name = "ДопустимыйЗнак", alias = "allowedSign", accessMode = PropertyAccessMode.READ_ONLY)
+    AllowedSign allowedSign;
 
-  public IValue getDigits() {
-    return ValueFactory.create(digits);
-  }
-
-  public IValue getFractionDigits() {
-    return ValueFactory.create(fractionDigits);
-  }
-
-  public IValue getAllowedSign() {
-    return EnumerationHelper.getEnumByClass(AllowedSign.class).getEnumValueType(allowedSign);
-  }
-
-  private BigDecimal getNines() {
-    // формируем число из девяток
-    var result = BigDecimal.ONE;
-    for (var i = digits; i > 0; i--) {
-      result = result.multiply(BigDecimal.TEN);
-    }
-    result = result.subtract(BigDecimal.ONE).setScale(fractionDigits);
-    for (var i = fractionDigits; i > 0; i--) {
-      result = result.divide(BigDecimal.TEN, RoundingMode.FLOOR);
-    }
-    return result;
-  }
-
-  private BigDecimal adjustNumber(BigDecimal number) {
-    if (digits == 0) {
-      return number;
-    }
-    if (allowedSign == AllowedSign.NON_NEGATIVE && number.compareTo(BigDecimal.ZERO) < 0) {
-      return BigDecimal.ZERO;
-    }
-    var result = number.setScale(fractionDigits, RoundingMode.HALF_UP);
-    if (result.precision() <= digits) {
-      return result;
-    }
-    return getNines();
-  }
-
-  public IValue adjustValue(IValue value) {
-    try {
-      final var castedValue = value.asNumber();
-      return ValueFactory.create(adjustNumber(castedValue));
-    } catch (Exception e) {
-      return ValueFactory.create(0);
-    }
-  }
-
-  public boolean equals(Object o) {
-    if (!(o instanceof NumberQualifiers)) {
-      return false;
+    public IValue getDigits() {
+        return ValueFactory.create(digits);
     }
 
-    final var n = (NumberQualifiers)o;
-    return n.digits == digits
-            && n.fractionDigits == fractionDigits
-            && n.allowedSign == allowedSign;
-  }
+    public IValue getFractionDigits() {
+        return ValueFactory.create(fractionDigits);
+    }
 
-  public int hashCode() {
-    return digits;
-  }
+    public IValue getAllowedSign() {
+        return EnumerationHelper.getEnumByClass(AllowedSign.class).getEnumValueType(allowedSign);
+    }
 
-  @ContextConstructor
-  public static NumberQualifiers constructor(IValue digits, IValue fractionDigits, IValue allowedSign) {
+    private BigDecimal getNines() {
+        // формируем число из девяток
+        var result = BigDecimal.ONE;
+        for (var i = digits; i > 0; i--) {
+            result = result.multiply(BigDecimal.TEN);
+        }
+        result = result.subtract(BigDecimal.ONE).setScale(fractionDigits);
+        for (var i = fractionDigits; i > 0; i--) {
+            result = result.divide(BigDecimal.TEN, RoundingMode.FLOOR);
+        }
+        return result;
+    }
 
-    final var allowedSignValue = EnumerationHelper.getEnumValueOrDefault(allowedSign, AllowedSign.ANY);
-    return new NumberQualifiers(
-            digits.asNumber().intValue(),
-            fractionDigits.asNumber().intValue(),
-            (AllowedSign) allowedSignValue.getValue());
-  }
+    private BigDecimal adjustNumber(BigDecimal number) {
+        if (digits == 0) {
+            return number;
+        }
+        if (allowedSign == AllowedSign.NON_NEGATIVE && number.compareTo(BigDecimal.ZERO) < 0) {
+            return BigDecimal.ZERO;
+        }
+        var result = number.setScale(fractionDigits, RoundingMode.HALF_UP);
+        if (result.precision() <= digits) {
+            return result;
+        }
+        return getNines();
+    }
 
-  @ContextConstructor
-  public static NumberQualifiers constructor(IValue digits, IValue fractionDigits) {
+    public IValue adjustValue(IValue value) {
+        try {
+            final var castedValue = value.asNumber();
+            return ValueFactory.create(adjustNumber(castedValue));
+        } catch (Exception e) {
+            return ValueFactory.create(0);
+        }
+    }
 
-    return new NumberQualifiers(
-            digits.asNumber().intValue(),
-            fractionDigits.asNumber().intValue(),
-            AllowedSign.ANY);
-  }
+    public boolean equals(Object o) {
+        if (!(o instanceof NumberQualifiers)) {
+            return false;
+        }
 
-  @ContextConstructor
-  public static NumberQualifiers constructor(IValue digits) {
+        final var n = (NumberQualifiers) o;
+        return n.digits == digits
+                && n.fractionDigits == fractionDigits
+                && n.allowedSign == allowedSign;
+    }
 
-    return new NumberQualifiers(
-            digits.asNumber().intValue(),
-            0,
-            AllowedSign.ANY);
-  }
+    public int hashCode() {
+        return digits;
+    }
 
-  @ContextConstructor
-  public static NumberQualifiers constructor() {
+    @ContextConstructor
+    public static NumberQualifiers constructor(IValue digits, IValue fractionDigits, IValue allowedSign) {
 
-    return new NumberQualifiers(
-            0,
-            0,
-            AllowedSign.ANY);
-  }
+        final var allowedSignValue = EnumerationHelper.getEnumValueOrDefault(allowedSign, AllowedSign.ANY);
+        return new NumberQualifiers(
+                digits.asNumber().intValue(),
+                fractionDigits.asNumber().intValue(),
+                (AllowedSign) allowedSignValue.getValue());
+    }
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
+    @ContextConstructor
+    public static NumberQualifiers constructor(IValue digits, IValue fractionDigits) {
+
+        return new NumberQualifiers(
+                digits.asNumber().intValue(),
+                fractionDigits.asNumber().intValue(),
+                AllowedSign.ANY);
+    }
+
+    @ContextConstructor
+    public static NumberQualifiers constructor(IValue digits) {
+
+        return new NumberQualifiers(
+                digits.asNumber().intValue(),
+                0,
+                AllowedSign.ANY);
+    }
+
+    @ContextConstructor
+    public static NumberQualifiers constructor() {
+
+        return new NumberQualifiers(
+                0,
+                0,
+                AllowedSign.ANY);
+    }
+
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
 }

@@ -14,13 +14,13 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = true)
 @ContextClass(name = "ИнформацияОбОшибке", alias = "ErrorInfo")
 public class ExceptionInfoContext extends ContextValue {
-  public static final ContextInfo INFO = ContextInfo.createByClass(ExceptionInfoContext.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(ExceptionInfoContext.class);
 
-  EngineException exception;
+    EngineException exception;
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
 
 }

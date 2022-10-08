@@ -22,49 +22,49 @@ import static com.github.otymko.jos.localization.MessageResource.ERROR_CALL_CONS
 @UtilityClass
 public class TypeFactory {
 
-  private ConstructorInfo findConstructor(ContextInfo contextInfo, int argumentsCount) {
-    // TODO: ищем конструктор по количеству аргументов
+    private ConstructorInfo findConstructor(ContextInfo contextInfo, int argumentsCount) {
+        // TODO: ищем конструктор по количеству аргументов
 
-    for (var constructor : contextInfo.getConstructors()) {
-      if (constructor.getParameters().length == argumentsCount) {
-        return constructor;
-      }
+        for (var constructor : contextInfo.getConstructors()) {
+            if (constructor.getParameters().length == argumentsCount) {
+                return constructor;
+            }
+        }
+
+        // Ищем первый с бОльшим количеством параметров
+        for (var constructor : contextInfo.getConstructors()) {
+            if (constructor.getParameters().length > argumentsCount) {
+                return constructor;
+            }
+        }
+
+        throw MachineException.constructorNotFoundException(contextInfo.getName());
     }
 
-    // Ищем первый с бОльшим количеством параметров
-    for (var constructor : contextInfo.getConstructors()) {
-      if (constructor.getParameters().length > argumentsCount) {
-        return constructor;
-      }
+    private IValue[] prepareArguments(Method method, IValue[] arguments) {
+        if (method.getParameterCount() == arguments.length) {
+            return arguments;
+        }
+        final var list = new ArrayList<>(Arrays.asList(arguments));
+        while (list.size() < method.getParameterCount()) {
+            list.add(ValueFactory.create());
+        }
+        return list.toArray(new IValue[0]);
     }
 
-    throw MachineException.constructorNotFoundException(contextInfo.getName());
-  }
+    public IValue callConstructor(ContextInfo contextInfo, IValue[] arguments) {
+        final var constructorInfo = findConstructor(contextInfo, arguments.length);
 
-  private IValue[] prepareArguments(Method method, IValue[] arguments) {
-    if (method.getParameterCount() == arguments.length) {
-      return arguments;
+        var methodCall = constructorInfo.getMethod();
+        Object result;
+        try {
+            result = methodCall.invoke(null, prepareArguments(methodCall, arguments));
+        } catch (InvocationTargetException exception) {
+            throw new MachineException(exception.getTargetException().getMessage());
+        } catch (IllegalAccessException exception) {
+            throw new MachineException(Resources.getResourceString(ERROR_CALL_CONSTRUCTOR));
+        }
+        return (IValue) result;
     }
-    final var list = new ArrayList<>(Arrays.asList(arguments));
-    while (list.size() < method.getParameterCount()) {
-      list.add(ValueFactory.create());
-    }
-    return list.toArray(new IValue[0]);
-  }
-
-  public IValue callConstructor(ContextInfo contextInfo, IValue[] arguments) {
-    final var constructorInfo = findConstructor(contextInfo, arguments.length);
-
-    var methodCall = constructorInfo.getMethod();
-    Object result;
-    try {
-      result = methodCall.invoke(null, prepareArguments(methodCall, arguments));
-    } catch (InvocationTargetException exception) {
-      throw new MachineException(exception.getTargetException().getMessage());
-    } catch (IllegalAccessException exception) {
-      throw new MachineException(Resources.getResourceString(ERROR_CALL_CONSTRUCTOR));
-    }
-    return (IValue) result;
-  }
 
 }

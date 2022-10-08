@@ -15,33 +15,33 @@ import java.nio.file.Path;
 
 public class ScriptLauncher {
 
-  public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
-    if (args.length == 0) {
-      throw new ApplicationException(Resources.getResourceString(MessageResource.EXPECTED_AT_LEAST_ONE_ARGUMENT));
+        if (args.length == 0) {
+            throw new ApplicationException(Resources.getResourceString(MessageResource.EXPECTED_AT_LEAST_ONE_ARGUMENT));
+        }
+
+        final var pathToScriptFromArgument = args[0];
+        if (pathToScriptFromArgument.isEmpty()) {
+            throw new ApplicationException(Resources.getResourceString(MessageResource.PATH_TO_SCRIPT_IS_NOT_SPECIFIED));
+        }
+
+        Path pathToScript;
+        var pwd = Path.of("");
+        var file = new File(pathToScriptFromArgument);
+        if (file.exists()) {
+            pathToScript = file.toPath().toAbsolutePath();
+        } else {
+            var otherPathToScript = Path.of(pwd.toString(), pathToScriptFromArgument);
+            if (otherPathToScript.toFile().exists()) {
+                throw new ApplicationException(Resources.getResourceString(MessageResource.SCRIPT_FILE_NOT_FOUND));
+            }
+            pathToScript = otherPathToScript.toAbsolutePath();
+        }
+
+        var engine = new ScriptEngine();
+        int exitCode = engine.execute(pathToScript);
+        System.exit(exitCode);
     }
-
-    final var pathToScriptFromArgument = args[0];
-    if (pathToScriptFromArgument.isEmpty()) {
-      throw new ApplicationException(Resources.getResourceString(MessageResource.PATH_TO_SCRIPT_IS_NOT_SPECIFIED));
-    }
-
-    Path pathToScript;
-    var pwd = Path.of("");
-    var file = new File(pathToScriptFromArgument);
-    if (file.exists()) {
-      pathToScript = file.toPath().toAbsolutePath();
-    } else {
-      var otherPathToScript = Path.of(pwd.toString(), pathToScriptFromArgument);
-      if (otherPathToScript.toFile().exists()) {
-        throw new ApplicationException(Resources.getResourceString(MessageResource.SCRIPT_FILE_NOT_FOUND));
-      }
-      pathToScript = otherPathToScript.toAbsolutePath();
-    }
-
-    var engine = new ScriptEngine();
-    int exitCode = engine.execute(pathToScript);
-    System.exit(exitCode);
-  }
 
 }

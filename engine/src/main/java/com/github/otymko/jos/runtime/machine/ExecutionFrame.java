@@ -16,19 +16,19 @@ import java.util.Deque;
 
 @Data
 public class ExecutionFrame {
-  private int instructionPointer;
-  private int lineNumber;
-  private IVariable[] localVariables;
+    private int instructionPointer;
+    private int lineNumber;
+    private IVariable[] localVariables;
 
-  private Deque<IValue> localFrameStack = new ArrayDeque<>();
+    private Deque<IValue> localFrameStack = new ArrayDeque<>();
 
-  private Scope moduleScope;
-  private int moduleLoadIndex;
-  private ModuleImage image;
-  private String methodName;
-  private EngineException lastException;
+    private Scope moduleScope;
+    private int moduleLoadIndex;
+    private ModuleImage image;
+    private String methodName;
+    private EngineException lastException;
 
-  private boolean discardReturnValue;
+    private boolean discardReturnValue;
 
-  private boolean oneTimeCall;
+    private boolean oneTimeCall;
 }

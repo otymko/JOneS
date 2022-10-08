@@ -15,43 +15,43 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ConstantDefinitionTest {
 
-  @Test
-  void testEquals() {
-    List<ConstantDefinition> list = new ArrayList<>();
+    @Test
+    void testEquals() {
+        List<ConstantDefinition> list = new ArrayList<>();
 
-    var value1 = new ConstantDefinition(ValueFactory.create(100));
-    var value2 = new ConstantDefinition(ValueFactory.create(100));
+        var value1 = new ConstantDefinition(ValueFactory.create(100));
+        var value2 = new ConstantDefinition(ValueFactory.create(100));
 
-    list.add(value1);
+        list.add(value1);
 
-    assertThat(value1).isEqualTo(value2);
-    assertThat(list.contains(value2)).isTrue();
-  }
+        assertThat(value1).isEqualTo(value2);
+        assertThat(list.contains(value2)).isTrue();
+    }
 
-  @Test
-  void testDiffers_false_zero() {
-    List<ConstantDefinition> list = new ArrayList<>();
+    @Test
+    void testDiffers_false_zero() {
+        List<ConstantDefinition> list = new ArrayList<>();
 
-    var value1 = new ConstantDefinition(ValueFactory.create(false));
-    var value2 = new ConstantDefinition(ValueFactory.create(0));
+        var value1 = new ConstantDefinition(ValueFactory.create(false));
+        var value2 = new ConstantDefinition(ValueFactory.create(0));
 
-    list.add(value1);
+        list.add(value1);
 
-    assertThat(value1).isNotEqualTo(value2);
-    assertThat(list.contains(value2)).isFalse();
-  }
+        assertThat(value1).isNotEqualTo(value2);
+        assertThat(list.contains(value2)).isFalse();
+    }
 
-  @Test
-  void testDiffers_zero_false() {
-    List<ConstantDefinition> list = new ArrayList<>();
+    @Test
+    void testDiffers_zero_false() {
+        List<ConstantDefinition> list = new ArrayList<>();
 
-    var value1 = new ConstantDefinition(ValueFactory.create(0));
-    var value2 = new ConstantDefinition(ValueFactory.create(false));
+        var value1 = new ConstantDefinition(ValueFactory.create(0));
+        var value2 = new ConstantDefinition(ValueFactory.create(false));
 
-    list.add(value1);
+        list.add(value1);
 
-    assertThat(value1).isNotEqualTo(value2);
-    assertThat(list.contains(value2)).isFalse();
-  }
+        assertThat(value1).isNotEqualTo(value2);
+        assertThat(list.contains(value2)).isFalse();
+    }
 
 }

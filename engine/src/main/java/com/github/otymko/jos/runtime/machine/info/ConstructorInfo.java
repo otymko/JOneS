@@ -11,6 +11,6 @@ import java.lang.reflect.Method;
 
 @Value
 public class ConstructorInfo {
-  ParameterInfo[] parameters;
-  Method method;
+    ParameterInfo[] parameters;
+    Method method;
 }

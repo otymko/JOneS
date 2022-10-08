@@ -11,8 +11,8 @@ import com.github.otymko.jos.runtime.context.EnumValue;
 
 @EnumClass(name = "МоеПеречисление", alias = "MyEnum")
 public enum CustomEnum implements EnumType {
-  @EnumValue(name = "Значение1", alias = "Value1")
-  VALUE1,
-  @EnumValue(name = "Значение2", alias = "Value2")
-  VALUE2
+    @EnumValue(name = "Значение1", alias = "Value1")
+    VALUE1,
+    @EnumValue(name = "Значение2", alias = "Value2")
+    VALUE2
 }

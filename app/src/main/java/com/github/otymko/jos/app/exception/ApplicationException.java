@@ -7,8 +7,8 @@ package com.github.otymko.jos.app.exception;
 
 public class ApplicationException extends RuntimeException {
 
-  public ApplicationException(String message) {
-    super(message);
-  }
+    public ApplicationException(String message) {
+        super(message);
+    }
 
 }

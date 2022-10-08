@@ -8,7 +8,7 @@ package com.github.otymko.jos.runtime.context.type.file.exception;
 /**
  * Исключение, выбрасываемое, если не удалось прочитать или записать атрибут файла.
  */
-public final class FileAttributeException extends RuntimeException{
+public final class FileAttributeException extends RuntimeException {
     public FileAttributeException() {
         super();
     }

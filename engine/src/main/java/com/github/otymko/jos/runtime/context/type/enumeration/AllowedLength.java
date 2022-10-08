@@ -15,16 +15,16 @@ import com.github.otymko.jos.runtime.context.EnumValue;
 @EnumClass(name = "ДопустимаяДлина", alias = "AllowedLength")
 public enum AllowedLength implements EnumType {
 
-  /**
-   * Переменная длина
-   */
-  @EnumValue(name = "Переменная", alias = "Variable")
-  VARIABLE,
+    /**
+     * Переменная длина
+     */
+    @EnumValue(name = "Переменная", alias = "Variable")
+    VARIABLE,
 
-  /**
-   * Фиксированная длина
-   */
-  @EnumValue(name = "Фиксированная", alias = "Fixed")
-  FIXED
+    /**
+     * Фиксированная длина
+     */
+    @EnumValue(name = "Фиксированная", alias = "Fixed")
+    FIXED
 
 }

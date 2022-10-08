@@ -12,14 +12,14 @@ import static com.github.otymko.jos.localization.MessageResource.SOURCE_CODE_NOT
 
 @Data
 public class ErrorInfo {
-  private int line;
-  private String source = "";
-  private String code = "";
+    private int line;
+    private String source = "";
+    private String code = "";
 
-  public String getSource() {
-    if (source == null || source.isEmpty()) {
-      return Resources.getResourceString(SOURCE_CODE_NOT_AVAILABLE);
+    public String getSource() {
+        if (source == null || source.isEmpty()) {
+            return Resources.getResourceString(SOURCE_CODE_NOT_AVAILABLE);
+        }
+        return source;
     }
-    return source;
-  }
 }

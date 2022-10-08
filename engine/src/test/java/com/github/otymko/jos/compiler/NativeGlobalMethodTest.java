@@ -14,9 +14,9 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 class NativeGlobalMethodTest extends BaseExternalScriptTest {
-  @TestFactory
-  Collection<DynamicTest> nativeTests() throws IOException {
-    return getTestsFromScript(Path.of("src/test/resources/tests/nativeGlobalMethods.os"));
-  }
+    @TestFactory
+    Collection<DynamicTest> nativeTests() throws IOException {
+        return getTestsFromScript(Path.of("src/test/resources/tests/nativeGlobalMethods.os"));
+    }
 
 }

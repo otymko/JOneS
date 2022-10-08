@@ -12,14 +12,14 @@ import java.nio.file.Path;
 
 class V8KeyAndValueTest {
 
-  @Test
-  void test() throws Exception {
-    var pathToScript = Path.of("src/test/resources/keyAndValue/accessMode.os");
-    var model = "Ключ1\n" +
-      "Значение1\n" +
-      "ОК\n" +
-      "ОК";
-    TestHelper.checkScript(pathToScript, model);
-  }
+    @Test
+    void test() throws Exception {
+        var pathToScript = Path.of("src/test/resources/keyAndValue/accessMode.os");
+        var model = "Ключ1\n" +
+                "Значение1\n" +
+                "ОК\n" +
+                "ОК";
+        TestHelper.checkScript(pathToScript, model);
+    }
 
 }

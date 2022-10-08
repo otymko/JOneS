@@ -12,6 +12,6 @@ import lombok.Value;
 @Value
 @RequiredArgsConstructor
 public class VariableBinding {
-  SymbolType type;
-  SymbolAddress address;
+    SymbolType type;
+    SymbolAddress address;
 }

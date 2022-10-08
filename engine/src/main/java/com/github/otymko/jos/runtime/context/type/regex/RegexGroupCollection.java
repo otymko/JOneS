@@ -22,49 +22,49 @@ import java.util.regex.Pattern;
 
 @ContextClass(name = "КоллекцияГруппРегулярногоВыражения", alias = "RegExGroupCollection")
 public class RegexGroupCollection extends ContextValue implements CollectionIterable<IValue>, IndexAccessor {
-  public static final ContextInfo INFO = ContextInfo.createByClass(RegexGroupCollection.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(RegexGroupCollection.class);
 
-  private final MatchResult result;
-  private final Pattern pattern;
+    private final MatchResult result;
+    private final Pattern pattern;
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
-
-  public RegexGroupCollection(MatchResult result, Pattern pattern) {
-    this.result = result;
-    this.pattern = pattern;
-  }
-
-  @ContextMethod(name = "Количество", alias = "Count")
-  public IValue getCount() {
-    return ValueFactory.create(result.groupCount() + 1);
-  }
-
-  public IValue getByName(IValue inputName) {
-    // TODO: не реализовано
-    return ValueFactory.create();
-  }
-
-
-  @Override
-  public IteratorValue iterator() {
-    var groups = new ArrayList<IValue>();
-    for (var position = 0; position < result.groupCount() + 1; position++) {
-      groups.add(new RegexGroup(result.group(position)));
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
     }
-    return new IteratorValue(groups.iterator());
-  }
 
-  @Override
-  public IValue getIndexedValue(IValue inputIndex) {
-    var index = inputIndex.getRawValue().asNumber().intValue();
-    return new RegexGroup(result.group(index));
-  }
+    public RegexGroupCollection(MatchResult result, Pattern pattern) {
+        this.result = result;
+        this.pattern = pattern;
+    }
 
-  @Override
-  public void setIndexedValue(IValue index, IValue value) {
-    throw MachineException.getPropertyIsNotWritableException(index.asString());
-  }
+    @ContextMethod(name = "Количество", alias = "Count")
+    public IValue getCount() {
+        return ValueFactory.create(result.groupCount() + 1);
+    }
+
+    public IValue getByName(IValue inputName) {
+        // TODO: не реализовано
+        return ValueFactory.create();
+    }
+
+
+    @Override
+    public IteratorValue iterator() {
+        var groups = new ArrayList<IValue>();
+        for (var position = 0; position < result.groupCount() + 1; position++) {
+            groups.add(new RegexGroup(result.group(position)));
+        }
+        return new IteratorValue(groups.iterator());
+    }
+
+    @Override
+    public IValue getIndexedValue(IValue inputIndex) {
+        var index = inputIndex.getRawValue().asNumber().intValue();
+        return new RegexGroup(result.group(index));
+    }
+
+    @Override
+    public void setIndexedValue(IValue index, IValue value) {
+        throw MachineException.getPropertyIsNotWritableException(index.asString());
+    }
 }

@@ -17,15 +17,15 @@ import java.util.Optional;
 @UtilityClass
 public class EnumerationHelper {
 
-  public EnumerationContext getEnumByClass(Class<? extends EnumType> enumClass) {
-    return TypeManager.getInstance().getEnumByClass(enumClass);
-  }
+    public EnumerationContext getEnumByClass(Class<? extends EnumType> enumClass) {
+        return TypeManager.getInstance().getEnumByClass(enumClass);
+    }
 
-  public EnumerationValue getEnumValueOrDefault(IValue value, EnumType defaultValue) {
-    var context = getEnumByClass(defaultValue.getClass());
-    return Optional.ofNullable(value)
-      .map(em -> (EnumerationValue) value.getRawValue())
-      .orElse(context.getEnumValueType(defaultValue));
-  }
+    public EnumerationValue getEnumValueOrDefault(IValue value, EnumType defaultValue) {
+        var context = getEnumByClass(defaultValue.getClass());
+        return Optional.ofNullable(value)
+                .map(em -> (EnumerationValue) value.getRawValue())
+                .orElse(context.getEnumValueType(defaultValue));
+    }
 
 }

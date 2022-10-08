@@ -9,16 +9,16 @@ package com.github.otymko.jos.runtime.context;
  * Режим доступа к свойству
  */
 public enum PropertyAccessMode {
-  /**
-   * Чтение и запись
-   */
-  READ_AND_WRITE,
-  /**
-   * Только запись
-   */
-  WRITE_ONLY,
-  /**
-   * Только чтение
-   */
-  READ_ONLY
+    /**
+     * Чтение и запись
+     */
+    READ_AND_WRITE,
+    /**
+     * Только запись
+     */
+    WRITE_ONLY,
+    /**
+     * Только чтение
+     */
+    READ_ONLY
 }

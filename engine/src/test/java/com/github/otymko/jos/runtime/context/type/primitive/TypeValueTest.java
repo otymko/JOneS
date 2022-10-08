@@ -16,30 +16,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TypeValueTest {
 
-  @Test
-  void test() {
-    var engine = new ScriptEngine();
+    @Test
+    void test() {
+        var engine = new ScriptEngine();
 
-    var stringInfo = engine.getTypeManager().getContextInfoByName("Строка").get();
-    var numberInfo = engine.getTypeManager().getContextInfoByName("Число").get();
+        var stringInfo = engine.getTypeManager().getContextInfoByName("Строка").get();
+        var numberInfo = engine.getTypeManager().getContextInfoByName("Число").get();
 
-    var typeOne = new TypeValue(stringInfo);
-    var typeTwo = new TypeValue(stringInfo);
-    var typeNumber = new TypeValue(numberInfo);
+        var typeOne = new TypeValue(stringInfo);
+        var typeTwo = new TypeValue(stringInfo);
+        var typeNumber = new TypeValue(numberInfo);
 
-    assertThat(typeOne).isEqualTo(typeTwo);
-    assertThat(typeOne).isNotEqualTo(typeNumber);
+        assertThat(typeOne).isEqualTo(typeTwo);
+        assertThat(typeOne).isNotEqualTo(typeNumber);
 
-    Set<IValue> set = new HashSet<>();
-    set.add(typeOne);
-    set.add(typeTwo);
+        Set<IValue> set = new HashSet<>();
+        set.add(typeOne);
+        set.add(typeTwo);
 
-    assertThat(set).hasSize(1)
-      .allMatch(iValue -> iValue.equals(typeOne));
+        assertThat(set).hasSize(1)
+                .allMatch(iValue -> iValue.equals(typeOne));
 
-    set.add(typeNumber);
-    assertThat(set).hasSize(2);
+        set.add(typeNumber);
+        assertThat(set).hasSize(2);
 
-  }
+    }
 
 }

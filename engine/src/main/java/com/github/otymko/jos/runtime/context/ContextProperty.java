@@ -13,7 +13,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface ContextProperty {
-  String name();
-  String alias();
-  PropertyAccessMode accessMode() default PropertyAccessMode.READ_AND_WRITE;
+    String name();
+
+    String alias();
+
+    PropertyAccessMode accessMode() default PropertyAccessMode.READ_AND_WRITE;
 }

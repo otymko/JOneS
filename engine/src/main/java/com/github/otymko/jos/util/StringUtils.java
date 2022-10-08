@@ -14,7 +14,6 @@ public final class StringUtils {
      * Все остальные символы преобразуются к нижнему регистру.
      *
      * @param value Входящее значение
-     *
      * @return Преобразованное значение
      */
     public static String toTitleCase(String value) {

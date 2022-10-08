@@ -14,39 +14,39 @@ import java.util.Date;
 
 public abstract class ContextValue implements IValue, ContextType, RuntimeContext {
 
-  @Override
-  public BigDecimal asNumber() {
-    throw MachineException.operationNotSupportedException();
-  }
+    @Override
+    public BigDecimal asNumber() {
+        throw MachineException.operationNotSupportedException();
+    }
 
-  @Override
-  public Date asDate() {
-    throw MachineException.operationNotSupportedException();
-  }
+    @Override
+    public Date asDate() {
+        throw MachineException.operationNotSupportedException();
+    }
 
-  @Override
-  public boolean asBoolean() {
-    throw MachineException.operationNotSupportedException();
-  }
+    @Override
+    public boolean asBoolean() {
+        throw MachineException.operationNotSupportedException();
+    }
 
-  @Override
-  public String asString() {
-    return getContextInfo().getName();
-  }
+    @Override
+    public String asString() {
+        return getContextInfo().getName();
+    }
 
-  @Override
-  public IValue getRawValue() {
-    return this;
-  }
+    @Override
+    public IValue getRawValue() {
+        return this;
+    }
 
-  @Override
-  public DataType getDataType() {
-    return DataType.TYPE;
-  }
+    @Override
+    public DataType getDataType() {
+        return DataType.TYPE;
+    }
 
-  @Override
-  public int compareTo(IValue o) {
-    throw MachineException.operationNotSupportedException();
-  }
+    @Override
+    public int compareTo(IValue o) {
+        throw MachineException.operationNotSupportedException();
+    }
 
 }

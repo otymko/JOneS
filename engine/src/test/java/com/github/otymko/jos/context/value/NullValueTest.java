@@ -17,28 +17,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class NullValueTest {
 
-  @Test
-  void test() {
-    var value = ValueFactory.createNullValue();
+    @Test
+    void test() {
+        var value = ValueFactory.createNullValue();
 
-    assertThat(value).isEqualTo(NullValue.VALUE);
-    assertThat(value.asString()).isEmpty();
+        assertThat(value).isEqualTo(NullValue.VALUE);
+        assertThat(value.asString()).isEmpty();
 
-    Set<IValue> set = new HashSet<>();
-    set.add(NullValue.VALUE);
-    set.add(NullValue.VALUE);
+        Set<IValue> set = new HashSet<>();
+        set.add(NullValue.VALUE);
+        set.add(NullValue.VALUE);
 
-    assertThat(set).hasSize(1);
+        assertThat(set).hasSize(1);
 
-    // TODO: еще тесты
-  }
+        // TODO: еще тесты
+    }
 
-  @Test
-  void testParse() {
-    var stringValue = "nUll";
-    var value = NullValue.parse(stringValue);
+    @Test
+    void testParse() {
+        var stringValue = "nUll";
+        var value = NullValue.parse(stringValue);
 
-    assertThat(value).isEqualTo(NullValue.VALUE);
-  }
+        assertThat(value).isEqualTo(NullValue.VALUE);
+    }
 
 }

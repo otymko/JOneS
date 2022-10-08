@@ -12,32 +12,32 @@ import java.util.ResourceBundle;
 
 @UtilityClass
 public class Resources {
-  private static final String LANGUAGE_RU = "ru";
-  private static final String LANGUAGE_EN = "en";
+    private static final String LANGUAGE_RU = "ru";
+    private static final String LANGUAGE_EN = "en";
 
-  private static final Locale DEFAULT_LOCALE;
+    private static final Locale DEFAULT_LOCALE;
 
-  static {
-    if (System.getProperty("user.language").contains(LANGUAGE_RU)) {
-      DEFAULT_LOCALE = new Locale(LANGUAGE_RU);
-    } else {
-      DEFAULT_LOCALE = new Locale(LANGUAGE_EN);
+    static {
+        if (System.getProperty("user.language").contains(LANGUAGE_RU)) {
+            DEFAULT_LOCALE = new Locale(LANGUAGE_RU);
+        } else {
+            DEFAULT_LOCALE = new Locale(LANGUAGE_EN);
+        }
     }
-  }
 
-  private final String PROPERTIES_NAME = "Message";
+    private final String PROPERTIES_NAME = "Message";
 
-  public String getResourceString(Locale locale, String key) {
-    return ResourceBundle.getBundle(PROPERTIES_NAME, locale).getString(key).intern();
-  }
+    public String getResourceString(Locale locale, String key) {
+        return ResourceBundle.getBundle(PROPERTIES_NAME, locale).getString(key).intern();
+    }
 
-  public String getResourceString(String key) {
-    return ResourceBundle.getBundle(PROPERTIES_NAME, DEFAULT_LOCALE).getString(key).intern();
-  }
+    public String getResourceString(String key) {
+        return ResourceBundle.getBundle(PROPERTIES_NAME, DEFAULT_LOCALE).getString(key).intern();
+    }
 
-  public String getResourceString(String key, Object... args) {
-    var template = ResourceBundle.getBundle(PROPERTIES_NAME, DEFAULT_LOCALE).getString(key).intern();
-    return String.format(template, args);
-  }
+    public String getResourceString(String key, Object... args) {
+        var template = ResourceBundle.getBundle(PROPERTIES_NAME, DEFAULT_LOCALE).getString(key).intern();
+        return String.format(template, args);
+    }
 
 }
