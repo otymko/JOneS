@@ -3,10 +3,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.github.otymko.jos;
+package com.github.otymko.jos.app;
 
 import com.github.otymko.jos.exception.ApplicationException;
-import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.localization.Resources;
 
 import java.io.File;
@@ -14,7 +13,7 @@ import java.nio.file.Path;
 
 import static com.github.otymko.jos.localization.MessageResource.*;
 
-public class ScriptApplication {
+public class ScriptLauncher {
 
   public static void main(String[] args) throws Exception {
 

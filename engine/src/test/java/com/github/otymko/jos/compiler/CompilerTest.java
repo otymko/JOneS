@@ -7,7 +7,7 @@ package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.TestHelper;
 import com.github.otymko.jos.exception.CompilerException;
-import com.github.otymko.jos.hosting.ScriptEngine;
+import com.github.otymko.jos.app.ScriptEngine;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.OperationCode;

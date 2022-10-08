@@ -6,8 +6,7 @@
 package com.github.otymko.jos.common;
 
 import com.github.otymko.jos.compiler.ScriptCompiler;
-import com.github.otymko.jos.hosting.ScriptEngine;
-import com.github.otymko.jos.module.ModuleImage;
+import com.github.otymko.jos.app.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImageDumper;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.DynamicTest;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;

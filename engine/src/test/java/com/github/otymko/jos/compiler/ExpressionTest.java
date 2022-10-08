@@ -5,7 +5,7 @@
  */
 package com.github.otymko.jos.compiler;
 
-import com.github.otymko.jos.hosting.ScriptEngine;
+import com.github.otymko.jos.app.ScriptEngine;
 import com.github.otymko.jos.localization.MessageResource;
 import com.github.otymko.jos.localization.Resources;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;

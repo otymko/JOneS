@@ -2,7 +2,7 @@ description = "JOneScript Engine"
 
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = "com.github.otymko.jos.ScriptApplication"
+        attributes["Main-Class"] = "com.github.otymko.jos.app.ScriptLauncher"
         attributes["Implementation-Version"] = archiveVersion.get()
     }
     enabled = true

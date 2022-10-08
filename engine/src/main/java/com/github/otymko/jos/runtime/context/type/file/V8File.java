@@ -39,29 +39,8 @@ public class V8File extends ContextValue {
 
     private final File file;
 
-    // FIXME: фиктивные поля, нужен рефакторинг определений класса
-    @ContextProperty(name = "Имя", alias = "Name", accessMode = PropertyAccessMode.READ_ONLY)
-    private IValue name;
-    @ContextProperty(name = "ИмяБезРасширения", alias = "BaseName", accessMode = PropertyAccessMode.READ_ONLY)
-    private IValue nameWithoutExtension;
-    @ContextProperty(name = "Расширение", alias = "Extension", accessMode = PropertyAccessMode.READ_ONLY)
-    private IValue extension;
-    @ContextProperty(name = "ПолноеИмя", alias = "FullName", accessMode = PropertyAccessMode.READ_ONLY)
-    private IValue fullName;
-    @ContextProperty(name = "Путь", alias = "Path", accessMode = PropertyAccessMode.READ_ONLY)
-    private IValue path;
-
-    @Override
-    public ContextInfo getContextInfo() {
-        return INFO;
-    }
-
-    public V8File(String path) {
-        this.file = new File(path);
-    }
-
     @ContextConstructor
-    public static IValue constructorByPath(IValue path) {
+    public static IValue createByPath(IValue path) {
         final var rawValue = path.getRawValue();
         if (!(rawValue instanceof StringValue)) {
             throw MachineException.invalidArgumentValueException();
@@ -70,11 +49,22 @@ public class V8File extends ContextValue {
         return new V8File(rawValue.asString());
     }
 
+    public V8File(String path) {
+        this.file = new File(path);
+    }
+
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
+
+    @ContextProperty(name = "Имя", alias = "Name", accessMode = PropertyAccessMode.READ_ONLY)
     public IValue getName() {
         return ValueFactory.create(file.getName());
     }
 
-    public IValue getNameWithoutExtension() {
+    @ContextProperty(name = "ИмяБезРасширения", alias = "BaseName", accessMode = PropertyAccessMode.READ_ONLY)
+    public IValue getBaseName() {
         var fileName = file.getName();
         if (fileName.contains(".")) {
             fileName = fileName.substring(0, fileName.lastIndexOf(".") - 1);
@@ -83,6 +73,7 @@ public class V8File extends ContextValue {
         return ValueFactory.create(fileName);
     }
 
+    @ContextProperty(name = "Расширение", alias = "Extension", accessMode = PropertyAccessMode.READ_ONLY)
     public IValue getExtension() {
         var fileName = file.getName();
         if (!fileName.contains(".")) {
@@ -94,6 +85,7 @@ public class V8File extends ContextValue {
         return ValueFactory.create(currentExtension);
     }
 
+    @ContextProperty(name = "ПолноеИмя", alias = "FullName", accessMode = PropertyAccessMode.READ_ONLY)
     public IValue getFullName() {
         return doWithWrapException(() -> {
             var value = file.getAbsolutePath();
@@ -102,6 +94,7 @@ public class V8File extends ContextValue {
         });
     }
 
+    @ContextProperty(name = "Путь", alias = "Path", accessMode = PropertyAccessMode.READ_ONLY)
     public IValue getPath() {
         return doWithWrapException(() -> {
             var parentPath = file.getParentFile().getAbsolutePath();
@@ -248,3 +241,4 @@ public class V8File extends ContextValue {
         return result;
     }
 }
+

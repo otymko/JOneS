@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.github.otymko.jos.compiler.helper;
+package com.github.otymko.jos.compiler;
 
 import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github.otymko.jos.compiler.AnnotationDefinition;

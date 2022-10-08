@@ -6,7 +6,7 @@
 package com.github.otymko.jos.sdo;
 
 import com.github.otymko.jos.compiler.ScriptCompiler;
-import com.github.otymko.jos.hosting.ScriptEngine;
+import com.github.otymko.jos.app.ScriptEngine;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import org.junit.jupiter.api.Test;

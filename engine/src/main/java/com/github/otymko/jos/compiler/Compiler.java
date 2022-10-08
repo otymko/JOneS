@@ -8,7 +8,6 @@ package com.github.otymko.jos.compiler;
 import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github._1c_syntax.bsl.parser.BSLParserBaseVisitor;
 import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
-import com.github.otymko.jos.compiler.helper.AnnotationProcessing;
 import com.github.otymko.jos.exception.CompilerException;
 import com.github.otymko.jos.module.ModuleImageCache;
 import com.github.otymko.jos.runtime.SymbolType;
