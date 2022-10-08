@@ -5,7 +5,6 @@ plugins {
     `maven-publish`
     jacoco
     id("io.freefair.lombok") version "6.5.1"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
     id("net.kyori.indra.license-header") version "3.0.0"
     id("org.sonarqube") version "3.4.0.2513"
 }
@@ -43,38 +42,22 @@ allprojects {
 
 subprojects {
     apply(plugin = "java-library")
-    apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "net.kyori.indra.license-header")
     apply(plugin = "jacoco")
     apply(plugin = "maven-publish")
 
     dependencies {
-        // https://github.com/1c-syntax/bsl-parser
-        api("com.github.1c-syntax", "bsl-parser", "0.19.3") {
-            exclude("com.tunnelvisionlabs", "antlr4-annotations")
-            exclude("com.ibm.icu", "*")
-            exclude("org.antlr", "ST4")
-            exclude("org.abego.treelayout", "org.abego.treelayout.core")
-            exclude("org.antlr", "antlr-runtime")
-        }
-
-        implementation("commons-io", "commons-io", "2.8.0")
-        implementation("org.apache.commons", "commons-lang3", "3.12.0")
-
+        // Lombok
         compileOnly("org.projectlombok:lombok:1.18.24")
         annotationProcessor("org.projectlombok:lombok:1.18.24")
-
         testCompileOnly("org.projectlombok:lombok:1.18.20")
         testAnnotationProcessor("org.projectlombok:lombok:1.18.20")
-
-        implementation("org.reflections:reflections:0.10.2")
 
         // Use JUnit Jupiter
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.1")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
 
         testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
-
         testImplementation("org.assertj:assertj-core:3.23.1")
     }
 
@@ -141,5 +124,4 @@ subprojects {
             }
         }
     }
-
 }

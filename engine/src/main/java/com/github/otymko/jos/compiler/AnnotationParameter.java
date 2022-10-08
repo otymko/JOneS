@@ -11,9 +11,9 @@ import lombok.Value;
 @Value
 @Builder
 public class AnnotationParameter {
-  public static final String UNKNOWN_NAME = "UNKNOWN";
-  @Builder.Default
-  String name = UNKNOWN_NAME;
-  int valueIndex;
-  // TODO: нужен ли runtimeValue ?
+    public static final String UNKNOWN_NAME = "UNKNOWN";
+    @Builder.Default
+    String name = UNKNOWN_NAME;
+    int valueIndex;
+    // TODO: нужен ли runtimeValue ?
 }

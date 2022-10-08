@@ -24,65 +24,65 @@ import lombok.Value;
 @Value
 public class StringQualifiers extends ContextValue {
 
-  public static final ContextInfo INFO = ContextInfo.createByClass(StringQualifiers.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(StringQualifiers.class);
 
-  /**
-   * Длина строки. 0 - Неограниченно
-   */
-  @ContextProperty(name = "Длина", alias = "Length", accessMode = PropertyAccessMode.READ_ONLY)
-  int length;
+    /**
+     * Длина строки. 0 - Неограниченно
+     */
+    @ContextProperty(name = "Длина", alias = "Length", accessMode = PropertyAccessMode.READ_ONLY)
+    int length;
 
-  /**
-   * Допустимая длина строки
-   *
-   * @see AllowedLength
-   */
-  @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
-  AllowedLength allowedLength;
+    /**
+     * Допустимая длина строки
+     *
+     * @see AllowedLength
+     */
+    @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
+    AllowedLength allowedLength;
 
-  public IValue getLength() {
-    return ValueFactory.create(length);
-  }
-
-  public IValue getAllowedLength() {
-    return EnumerationHelper.getEnumByClass(AllowedLength.class).getEnumValueType(allowedLength);
-  }
-
-  private String adjustString(String value) {
-    var result = value;
-    if (length != 0 && result.length() > length) {
-      result = result.substring(0, length);
+    public IValue getLength() {
+        return ValueFactory.create(length);
     }
 
-    if (allowedLength == AllowedLength.FIXED && result.length() < length) {
-      result = result.concat(" ".repeat(length - result.length()));
+    public IValue getAllowedLength() {
+        return EnumerationHelper.getEnumByClass(AllowedLength.class).getEnumValueType(allowedLength);
     }
 
-    return result;
-  }
+    private String adjustString(String value) {
+        var result = value;
+        if (length != 0 && result.length() > length) {
+            result = result.substring(0, length);
+        }
 
-  public IValue adjustValue(IValue value) {
-    return ValueFactory.create(adjustString(value.asString()));
-  }
+        if (allowedLength == AllowedLength.FIXED && result.length() < length) {
+            result = result.concat(" ".repeat(length - result.length()));
+        }
 
-  @ContextConstructor
-  public static StringQualifiers constructor(IValue length, IValue allowedLength) {
-    final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLength.VARIABLE);
-    return new StringQualifiers(length.asNumber().intValue(), (AllowedLength) allowedLengthValue.getValue());
-  }
+        return result;
+    }
 
-  @ContextConstructor
-  public static StringQualifiers constructor(IValue length) {
-    return new StringQualifiers(length.asNumber().intValue(), AllowedLength.VARIABLE);
-  }
+    public IValue adjustValue(IValue value) {
+        return ValueFactory.create(adjustString(value.asString()));
+    }
 
-  @ContextConstructor
-  public static StringQualifiers constructor() {
-    return new StringQualifiers(0, AllowedLength.VARIABLE);
-  }
+    @ContextConstructor
+    public static StringQualifiers constructor(IValue length, IValue allowedLength) {
+        final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLength.VARIABLE);
+        return new StringQualifiers(length.asNumber().intValue(), (AllowedLength) allowedLengthValue.getValue());
+    }
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
+    @ContextConstructor
+    public static StringQualifiers constructor(IValue length) {
+        return new StringQualifiers(length.asNumber().intValue(), AllowedLength.VARIABLE);
+    }
+
+    @ContextConstructor
+    public static StringQualifiers constructor() {
+        return new StringQualifiers(0, AllowedLength.VARIABLE);
+    }
+
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
 }

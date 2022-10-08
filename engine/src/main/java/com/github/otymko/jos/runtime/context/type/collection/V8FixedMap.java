@@ -13,41 +13,41 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 @ContextClass(name = "ФиксированноеСоответствие", alias = "FixedMap")
 public class V8FixedMap extends V8BaseMap {
-  public static final ContextInfo INFO = ContextInfo.createByClass(V8FixedMap.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(V8FixedMap.class);
 
-  private V8FixedMap() {
-    // nope
-  }
-
-  public V8FixedMap(V8Map source) {
-    source.iterator().forEach(value -> {
-      final var element = (V8KeyAndValue) value;
-      data.put(element.getKey(), element.getValue());
-    });
-  }
-
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
-
-  @ContextConstructor
-  public static IValue constructor(IValue source) {
-    final var rawValue = source.getRawValue();
-    if (!(rawValue instanceof V8Map)) {
-      throw MachineException.invalidArgumentValueException();
+    private V8FixedMap() {
+        // nope
     }
-    return new V8FixedMap((V8Map) rawValue);
-  }
 
-  @Override
-  public IValue getIndexedValue(IValue index) {
-    return getInternal(index).orElseThrow(MachineException::keyNotFound);
-  }
+    public V8FixedMap(V8Map source) {
+        source.iterator().forEach(value -> {
+            final var element = (V8KeyAndValue) value;
+            data.put(element.getKey(), element.getValue());
+        });
+    }
 
-  @Override
-  public void setIndexedValue(IValue index, IValue value) {
-    throw MachineException.getPropertyIsNotWritableException(index.asString());
-  }
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
+
+    @ContextConstructor
+    public static IValue constructor(IValue source) {
+        final var rawValue = source.getRawValue();
+        if (!(rawValue instanceof V8Map)) {
+            throw MachineException.invalidArgumentValueException();
+        }
+        return new V8FixedMap((V8Map) rawValue);
+    }
+
+    @Override
+    public IValue getIndexedValue(IValue index) {
+        return getInternal(index).orElseThrow(MachineException::keyNotFound);
+    }
+
+    @Override
+    public void setIndexedValue(IValue index, IValue value) {
+        throw MachineException.getPropertyIsNotWritableException(index.asString());
+    }
 
 }

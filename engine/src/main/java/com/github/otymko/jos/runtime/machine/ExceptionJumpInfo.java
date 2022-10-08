@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 class ExceptionJumpInfo {
-  private int handlerAddress;
-  private ExecutionFrame handlerFrame;
-  private int stackSize;
+    private int handlerAddress;
+    private ExecutionFrame handlerFrame;
+    private int stackSize;
 }

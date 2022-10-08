@@ -129,5 +129,5 @@ public enum OperationCode {
     FORMAT,
     EXCEPTION_INFO,
     EXCEPTION_DESCR,
-    MODULE_INFO;
+    MODULE_INFO
 }

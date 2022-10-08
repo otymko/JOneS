@@ -15,14 +15,14 @@ import lombok.Value;
 @Value
 @RequiredArgsConstructor
 public class VariableInfo {
-  String name;
-  String alias;
-  SymbolType type;
+    String name;
+    String alias;
+    SymbolType type;
 
-  public VariableInfo(String name) {
-    this.name = name;
-    this.alias = name;
-    this.type = SymbolType.VARIABLE;
-  }
+    public VariableInfo(String name) {
+        this.name = name;
+        this.alias = name;
+        this.type = SymbolType.VARIABLE;
+    }
 
 }

@@ -25,64 +25,69 @@ import java.math.BigDecimal;
 @GlobalContextClass
 @NoArgsConstructor
 public class SystemGlobalContext implements AttachableContext {
-  public static final ContextInfo INFO = ContextInfo.createByClass(SystemGlobalContext.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(SystemGlobalContext.class);
 
-  @ContextProperty(name = "Символы", alias = "Chars")
-  public static final IValue SYMBOLS = new SymbolsContext();
+    @ContextProperty(name = "Символы", alias = "Chars")
+    public static final IValue SYMBOLS = new SymbolsContext();
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
-
-  @ContextMethod(name = "Сообщить", alias = "Message")
-  // TODO: для null аргументов можно ввести @ContextMethodArgument(defaultValue = MessageStatus.ORDINARY)
-  public static void message(IValue message, IValue status) {
-    var statusValue = EnumerationHelper.getEnumValueOrDefault(status, MessageStatus.ORDINARY);
-
-    String rawMessage;
-    switch ((MessageStatus) statusValue.getValue()) {
-      case WITHOUT_STATUS:
-      case ORDINARY:
-        rawMessage = message.asString();
-        break;
-      default:
-        rawMessage = String.format("%s: %s", statusValue.getName(), message.asString());
-        break;
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
     }
 
-    System.out.println(rawMessage);
-  }
+    @ContextMethod(name = "Сообщить", alias = "Message")
+    // TODO: для null аргументов можно ввести @ContextMethodArgument(defaultValue = MessageStatus.ORDINARY)
+    public static void message(IValue message, IValue status) {
+        var statusValue = EnumerationHelper.getEnumValueOrDefault(status, MessageStatus.ORDINARY);
 
-  @ContextMethod(name = "ТекущаяУниверсальнаяДатаВМиллисекундах", alias = "CurrentUniversalDateInMilliseconds")
-  public static IValue currentUniversalDateInMilliseconds() {
-    return ValueFactory.create(System.nanoTime() / 1000000);
-  }
+        String rawMessage;
+        switch ((MessageStatus) statusValue.getValue()) {
+            case WITHOUT_STATUS:
+            case ORDINARY:
+                rawMessage = message.asString();
+                break;
+            default:
+                rawMessage = String.format("%s: %s", statusValue.getName(), message.asString());
+                break;
+        }
 
-  private static boolean valueIsFilledInternal(IValue pValue) {
-    if (pValue == null) {
-      return false;
+        System.out.println(rawMessage);
     }
 
-    final var value = pValue.getRawValue();
-
-    if (value instanceof NullValue) {
-      return false;
+    @ContextMethod(name = "ТекущаяУниверсальнаяДатаВМиллисекундах", alias = "CurrentUniversalDateInMilliseconds")
+    public static IValue currentUniversalDateInMilliseconds() {
+        return ValueFactory.create(System.nanoTime() / 1000000);
     }
 
-    switch (value.getDataType()) {
-      case UNDEFINED: return false;
-      case STRING: return !value.asString().isBlank();
-      case NUMBER: return !value.asNumber().equals(BigDecimal.ZERO);
-      case DATE: return !((DateValue)value).isEmpty();
-      case BOOLEAN: return true;
-      default:
-        throw MachineException.checkIsFilledNotSupportedForType(value.getDataType().toString());
-    }
-  }
+    private static boolean valueIsFilledInternal(IValue pValue) {
+        if (pValue == null) {
+            return false;
+        }
 
-  @ContextMethod(name = "ЗначениеЗаполнено", alias = "ValueIsFilled")
-  public static IValue valueIsFilled(IValue pValue) {
-      return ValueFactory.create(valueIsFilledInternal(pValue));
-  }
+        final var value = pValue.getRawValue();
+
+        if (value instanceof NullValue) {
+            return false;
+        }
+
+        switch (value.getDataType()) {
+            case UNDEFINED:
+                return false;
+            case STRING:
+                return !value.asString().isBlank();
+            case NUMBER:
+                return !value.asNumber().equals(BigDecimal.ZERO);
+            case DATE:
+                return !((DateValue) value).isEmpty();
+            case BOOLEAN:
+                return true;
+            default:
+                throw MachineException.checkIsFilledNotSupportedForType(value.getDataType().toString());
+        }
+    }
+
+    @ContextMethod(name = "ЗначениеЗаполнено", alias = "ValueIsFilled")
+    public static IValue valueIsFilled(IValue pValue) {
+        return ValueFactory.create(valueIsFilledInternal(pValue));
+    }
 }

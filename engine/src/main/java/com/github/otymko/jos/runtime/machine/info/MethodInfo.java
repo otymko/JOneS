@@ -17,35 +17,36 @@ import java.lang.reflect.Method;
 @Value
 @RequiredArgsConstructor
 public class MethodInfo {
-  String name;
-  String alias;
-  boolean function;
-  ParameterInfo[] parameters;
-  AnnotationDefinition[] annotations;
-  Method method;
+    String name;
+    String alias;
+    boolean function;
+    ParameterInfo[] parameters;
+    AnnotationDefinition[] annotations;
+    Method method;
 
-  public MethodInfo(String name, String alias, boolean function, ParameterInfo[] parameters,
-                    AnnotationDefinition[] annotations) {
+    public MethodInfo(String name, String alias, boolean function, ParameterInfo[] parameters,
+                      AnnotationDefinition[] annotations) {
 
-    this.name = name;
-    this.alias = alias;
-    this.function = function;
-    this.parameters = parameters;
-    this.annotations = annotations;
-    this.method = null;
+        this.name = name;
+        this.alias = alias;
+        this.function = function;
+        this.parameters = parameters;
+        this.annotations = annotations;
+        this.method = null;
 
-  }
+    }
 
-  /**
-   * Проверяет, соответствует ли метод переданному имени
-   * @param requestedName Имя метода для сравнения
-   * @return true - Переданная строка является именем или алиасом метода
-   *         false - Переданная строка не является именем или алиасом метода
-   */
-  public boolean equalsByName(String requestedName) {
-    return requestedName != null
-            && (requestedName.equalsIgnoreCase(name)
-              || requestedName.equalsIgnoreCase(alias));
-  }
+    /**
+     * Проверяет, соответствует ли метод переданному имени
+     *
+     * @param requestedName Имя метода для сравнения
+     * @return true - Переданная строка является именем или алиасом метода
+     * false - Переданная строка не является именем или алиасом метода
+     */
+    public boolean equalsByName(String requestedName) {
+        return requestedName != null
+                && (requestedName.equalsIgnoreCase(name)
+                || requestedName.equalsIgnoreCase(alias));
+    }
 
 }

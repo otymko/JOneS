@@ -14,8 +14,8 @@ import lombok.experimental.NonFinal;
  */
 @Value
 public class Command {
-  OperationCode code;
-  @Setter
-  @NonFinal
-  int argument;
+    OperationCode code;
+    @Setter
+    @NonFinal
+    int argument;
 }

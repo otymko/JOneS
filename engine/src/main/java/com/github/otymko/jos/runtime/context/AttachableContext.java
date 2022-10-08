@@ -12,18 +12,18 @@ import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 
 public interface AttachableContext extends RuntimeContext, ContextType {
 
-  default MethodInfo[] getMethods() {
-    return getContextInfo().getMethods();
-  }
-
-  default IVariable[] getVariables() {
-    var variables = new IVariable[getContextInfo().getProperties().length];
-    var index = 0;
-    for (var property : getContextInfo().getProperties()) {
-      variables[index] = VariableReference.createContextPropertyReference(this, index, property.getName());
-      index++;
+    default MethodInfo[] getMethods() {
+        return getContextInfo().getMethods();
     }
-    return variables;
-  }
+
+    default IVariable[] getVariables() {
+        var variables = new IVariable[getContextInfo().getProperties().length];
+        var index = 0;
+        for (var property : getContextInfo().getProperties()) {
+            variables[index] = VariableReference.createContextPropertyReference(this, index, property.getName());
+            index++;
+        }
+        return variables;
+    }
 
 }

@@ -20,58 +20,58 @@ import java.util.List;
 
 @GlobalContextClass
 public class GlobalContext implements AttachableContext {
-  private final ContextInfo info;
-  private final IVariable[] variables;
-  private final List<EnumerationContext> enumerationContexts;
+    private final ContextInfo info;
+    private final IVariable[] variables;
+    private final List<EnumerationContext> enumerationContexts;
 
-  public GlobalContext() {
-    this.info = ContextInfo.EMPTY;
+    public GlobalContext() {
+        this.info = ContextInfo.EMPTY;
 
-    var contexts = TypeManager.getInstance().getEnumerationContext();
-    this.enumerationContexts = contexts;
-    var index = 0;
-    List<IVariable> localVariables = new ArrayList<>();
-    for (var enumContext : contexts) {
-      var variable = VariableReference.createContextPropertyReference(this, index,
-        enumContext.getContextInfo().getName());
-      localVariables.add(variable);
-      index++;
+        var contexts = TypeManager.getInstance().getEnumerationContext();
+        this.enumerationContexts = contexts;
+        var index = 0;
+        List<IVariable> localVariables = new ArrayList<>();
+        for (var enumContext : contexts) {
+            var variable = VariableReference.createContextPropertyReference(this, index,
+                    enumContext.getContextInfo().getName());
+            localVariables.add(variable);
+            index++;
+        }
+        this.variables = localVariables.toArray(new IVariable[0]);
     }
-    this.variables = localVariables.toArray(new IVariable[0]);
-  }
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return info;
-  }
+    @Override
+    public ContextInfo getContextInfo() {
+        return info;
+    }
 
-  @Override
-  public int findProperty(String propertyName) {
-    return AttachableContext.super.findProperty(propertyName);
-  }
+    @Override
+    public int findProperty(String propertyName) {
+        return AttachableContext.super.findProperty(propertyName);
+    }
 
-  @Override
-  public IValue getPropertyValue(int index) {
-    return enumerationContexts.get(index);
-  }
+    @Override
+    public IValue getPropertyValue(int index) {
+        return enumerationContexts.get(index);
+    }
 
-  @Override
-  public void setPropertyValue(int index, IValue value) {
-    throw MachineException.getPropertyIsNotWritableException("");
-  }
+    @Override
+    public void setPropertyValue(int index, IValue value) {
+        throw MachineException.getPropertyIsNotWritableException("");
+    }
 
-  @Override
-  public boolean isPropertyReadOnly(int index) {
-    return true;
-  }
+    @Override
+    public boolean isPropertyReadOnly(int index) {
+        return true;
+    }
 
-  @Override
-  public boolean isPropertyWriteOnly(int index) {
-    return false;
-  }
+    @Override
+    public boolean isPropertyWriteOnly(int index) {
+        return false;
+    }
 
-  @Override
-  public IVariable[] getVariables() {
-    return variables;
-  }
+    @Override
+    public IVariable[] getVariables() {
+        return variables;
+    }
 }

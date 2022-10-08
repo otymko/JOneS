@@ -19,66 +19,66 @@ import java.util.Date;
 
 public class ValueFactory {
 
-  private ValueFactory() {
-    // none
-  }
-
-  public static IValue create() {
-    return UndefinedValue.VALUE;
-  }
-
-  public static IValue create(String value) {
-    return StringValue.create(value);
-  }
-
-  public static IValue create(float value) {
-    return NumberValue.create(BigDecimal.valueOf(value));
-  }
-
-  public static IValue create(BigDecimal value) {
-    return NumberValue.create(value);
-  }
-
-  public static IValue create(int value) {
-    return NumberValue.create(BigDecimal.valueOf(value));
-  }
-
-  public static IValue create(Date value) {
-    return new DateValue(value);
-  }
-
-  public static IValue create(boolean value) {
-    return value ? BooleanValue.TRUE : BooleanValue.FALSE;
-  }
-
-  public static IValue rawValueOrDefault(IValue inValue, IValue defaultValue) {
-    if (inValue == null) {
-      return defaultValue;
+    private ValueFactory() {
+        // none
     }
-    final var raw = inValue.getRawValue();
-    if (raw.getDataType() == DataType.UNDEFINED) {
-      return defaultValue;
+
+    public static IValue create() {
+        return UndefinedValue.VALUE;
     }
-    return raw;
-  }
 
-  public static IValue rawValueOrUndefined(IValue inValue) {
-    return rawValueOrDefault(inValue, create());
-  }
-
-  // invalidValue?
-
-  public static IValue createNullValue() {
-    return NullValue.VALUE;
-  }
-
-  // object
-
-  public static IValue parse(String view, DataType type) {
-    if (type == DataType.DATE) {
-      return DateValue.parse(view);
+    public static IValue create(String value) {
+        return StringValue.create(value);
     }
-    throw MachineException.operationNotImplementedException();
-  }
+
+    public static IValue create(float value) {
+        return NumberValue.create(BigDecimal.valueOf(value));
+    }
+
+    public static IValue create(BigDecimal value) {
+        return NumberValue.create(value);
+    }
+
+    public static IValue create(int value) {
+        return NumberValue.create(BigDecimal.valueOf(value));
+    }
+
+    public static IValue create(Date value) {
+        return new DateValue(value);
+    }
+
+    public static IValue create(boolean value) {
+        return value ? BooleanValue.TRUE : BooleanValue.FALSE;
+    }
+
+    public static IValue rawValueOrDefault(IValue inValue, IValue defaultValue) {
+        if (inValue == null) {
+            return defaultValue;
+        }
+        final var raw = inValue.getRawValue();
+        if (raw.getDataType() == DataType.UNDEFINED) {
+            return defaultValue;
+        }
+        return raw;
+    }
+
+    public static IValue rawValueOrUndefined(IValue inValue) {
+        return rawValueOrDefault(inValue, create());
+    }
+
+    // invalidValue?
+
+    public static IValue createNullValue() {
+        return NullValue.VALUE;
+    }
+
+    // object
+
+    public static IValue parse(String view, DataType type) {
+        if (type == DataType.DATE) {
+            return DateValue.parse(view);
+        }
+        throw MachineException.operationNotImplementedException();
+    }
 
 }

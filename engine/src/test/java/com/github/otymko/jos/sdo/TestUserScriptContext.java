@@ -11,13 +11,13 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 public class TestUserScriptContext extends ScriptDrivenObject {
 
-  protected TestUserScriptContext(ModuleImage moduleImage) {
-    super(moduleImage);
-  }
+    protected TestUserScriptContext(ModuleImage moduleImage) {
+        super(moduleImage);
+    }
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return null;
-  }
+    @Override
+    public ContextInfo getContextInfo() {
+        return null;
+    }
 
 }

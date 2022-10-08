@@ -5,8 +5,8 @@
  */
 package com.github.otymko.jos.exception;
 
+import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.compiler.ScriptCompiler;
-import com.github.otymko.jos.hosting.ScriptEngine;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import org.junit.jupiter.api.Test;
 
@@ -14,28 +14,28 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 class MachineExceptionTest {
 
-  @Test
-  void testTypeNotRegisteredException() {
-    var code = "Тип = Тип(\"Массив1\");";
-    var engine = new ScriptEngine();
-    var compiler = new ScriptCompiler(engine);
-    var moduleImage = compiler.compile(code, UserScriptContext.class);
+    @Test
+    void testTypeNotRegisteredException() {
+        var code = "Тип = Тип(\"Массив1\");";
+        var engine = new ScriptEngine();
+        var compiler = new ScriptCompiler(engine);
+        var moduleImage = compiler.compile(code, UserScriptContext.class);
 
-    assertThatCode(() -> engine.newObject(moduleImage))
-      .isInstanceOf(MachineException.class)
-      .hasMessageContaining("Тип не зарегистрирован (Массив1)");
-  }
+        assertThatCode(() -> engine.newObject(moduleImage))
+                .isInstanceOf(MachineException.class)
+                .hasMessageContaining("Тип не зарегистрирован (Массив1)");
+    }
 
-  @Test
-  void testInternalMachineException() {
-    var code = "А = Новый Массив; А.Установить(0, 0);";
-    var engine = new ScriptEngine();
-    var compiler = new ScriptCompiler(engine);
-    var moduleImage = compiler.compile(code, UserScriptContext.class);
+    @Test
+    void testInternalMachineException() {
+        var code = "А = Новый Массив; А.Установить(0, 0);";
+        var engine = new ScriptEngine();
+        var compiler = new ScriptCompiler(engine);
+        var moduleImage = compiler.compile(code, UserScriptContext.class);
 
-    assertThatCode(() -> engine.newObject(moduleImage))
-            .isInstanceOf(MachineException.class)
-            .hasMessageContaining("Значение индекса выходит за пределы диапазона");
-  }
+        assertThatCode(() -> engine.newObject(moduleImage))
+                .isInstanceOf(MachineException.class)
+                .hasMessageContaining("Значение индекса выходит за пределы диапазона");
+    }
 
 }

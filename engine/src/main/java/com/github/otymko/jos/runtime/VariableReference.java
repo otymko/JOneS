@@ -22,135 +22,135 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class VariableReference extends ContextValue implements IVariable {
-  private String name;
-  private ReferenceType referenceType;
-  private IVariable referencedValue;
-  private RuntimeContext context;
-  private int contextPropertyNumber;
-  private IValue index;
+    private String name;
+    private ReferenceType referenceType;
+    private IVariable referencedValue;
+    private RuntimeContext context;
+    private int contextPropertyNumber;
+    private IValue index;
 
-  public static VariableReference create(IVariable variable, String referenceName) {
-    var reference = new VariableReference();
-    reference.setReferenceType(ReferenceType.SIMPLE);
-    reference.setReferencedValue(variable);
-    reference.setName(referenceName);
-    return reference;
-  }
-
-  public static VariableReference createIndexedPropertyReference(RuntimeContext context, IValue index, String referenceName) {
-    var reference = new VariableReference();
-    reference.setReferenceType(ReferenceType.INDEXED_PROPERTY);
-    reference.setContext(context);
-    reference.setIndex(index);
-    reference.setName(referenceName);
-    return reference;
-  }
-
-  public static VariableReference createDynamicPropertyNameReference(RuntimeContext context, IValue index, String referenceName) {
-    var reference = new VariableReference();
-    reference.setReferenceType(ReferenceType.DYNAMIC_PROPERTY);
-    reference.setContext(context);
-    reference.setIndex(index);
-    reference.setName(referenceName);
-    return reference;
-  }
-
-  public static VariableReference createContextPropertyReference(RuntimeContext context, int propertyNumber, String referenceName) {
-    var reference = new VariableReference();
-    reference.setReferenceType(ReferenceType.CONTEXT_PROPERTY);
-    reference.setContext(context);
-    reference.setContextPropertyNumber(propertyNumber);
-    reference.setName(referenceName);
-    return reference;
-  }
-
-  @Override
-  public DataType getDataType() {
-    return getValue().getDataType();
-  }
-
-  @Override
-  public IValue getValue() {
-    if (referenceType == ReferenceType.SIMPLE) {
-      return referencedValue.getValue();
-    } else if (referenceType == ReferenceType.INDEXED_PROPERTY) {
-      var accessor = (IndexAccessor) context;
-      return accessor.getIndexedValue(index);
-    } else if (referenceType == ReferenceType.DYNAMIC_PROPERTY) {
-      var accessor = (PropertyNameAccessor) context;
-      return accessor.getPropertyValue(index);
-    } else if (referenceType == ReferenceType.CONTEXT_PROPERTY) {
-      if (context.isPropertyWriteOnly(contextPropertyNumber)) {
-        throw MachineException.getPropertyIsNotReadableException("");
-      }
-      return context.getPropertyValue(contextPropertyNumber);
-    } else {
-      throw MachineException.operationNotImplementedException();
+    public static VariableReference create(IVariable variable, String referenceName) {
+        var reference = new VariableReference();
+        reference.setReferenceType(ReferenceType.SIMPLE);
+        reference.setReferencedValue(variable);
+        reference.setName(referenceName);
+        return reference;
     }
-  }
 
-  @Override
-  public void setValue(IValue value) {
-    if (referenceType == ReferenceType.SIMPLE) {
-      referencedValue.setValue(value);
-    } else if (referenceType == ReferenceType.INDEXED_PROPERTY) {
-      var accessor = (IndexAccessor) context;
-      accessor.setIndexedValue(index, value);
-    } else if (referenceType == ReferenceType.DYNAMIC_PROPERTY) {
-      var accessor = (PropertyNameAccessor) context;
-      accessor.setPropertyValue(index, value);
-    } else if (referenceType == ReferenceType.CONTEXT_PROPERTY) {
-      if (context.isPropertyReadOnly(contextPropertyNumber)) {
-        throw MachineException.getPropertyIsNotWritableException("");
-      }
-      context.setPropertyValue(contextPropertyNumber, value);
-    } else {
-      throw MachineException.operationNotImplementedException();
+    public static VariableReference createIndexedPropertyReference(RuntimeContext context, IValue index, String referenceName) {
+        var reference = new VariableReference();
+        reference.setReferenceType(ReferenceType.INDEXED_PROPERTY);
+        reference.setContext(context);
+        reference.setIndex(index);
+        reference.setName(referenceName);
+        return reference;
     }
-  }
 
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public ContextInfo getContextInfo() {
-    var value = getValue();
-    if (value instanceof ContextType) {
-      return ((ContextType) value).getContextInfo();
+    public static VariableReference createDynamicPropertyNameReference(RuntimeContext context, IValue index, String referenceName) {
+        var reference = new VariableReference();
+        reference.setReferenceType(ReferenceType.DYNAMIC_PROPERTY);
+        reference.setContext(context);
+        reference.setIndex(index);
+        reference.setName(referenceName);
+        return reference;
     }
-    throw MachineException.operationNotImplementedException();
-  }
 
-  @Override
-  public BigDecimal asNumber() {
-    return getValue().asNumber();
-  }
+    public static VariableReference createContextPropertyReference(RuntimeContext context, int propertyNumber, String referenceName) {
+        var reference = new VariableReference();
+        reference.setReferenceType(ReferenceType.CONTEXT_PROPERTY);
+        reference.setContext(context);
+        reference.setContextPropertyNumber(propertyNumber);
+        reference.setName(referenceName);
+        return reference;
+    }
 
-  @Override
-  public Date asDate() {
-    return getValue().asDate();
-  }
+    @Override
+    public DataType getDataType() {
+        return getValue().getDataType();
+    }
 
-  @Override
-  public boolean asBoolean() {
-    return getValue().asBoolean();
-  }
+    @Override
+    public IValue getValue() {
+        if (referenceType == ReferenceType.SIMPLE) {
+            return referencedValue.getValue();
+        } else if (referenceType == ReferenceType.INDEXED_PROPERTY) {
+            var accessor = (IndexAccessor) context;
+            return accessor.getIndexedValue(index);
+        } else if (referenceType == ReferenceType.DYNAMIC_PROPERTY) {
+            var accessor = (PropertyNameAccessor) context;
+            return accessor.getPropertyValue(index);
+        } else if (referenceType == ReferenceType.CONTEXT_PROPERTY) {
+            if (context.isPropertyWriteOnly(contextPropertyNumber)) {
+                throw MachineException.getPropertyIsNotReadableException("");
+            }
+            return context.getPropertyValue(contextPropertyNumber);
+        } else {
+            throw MachineException.operationNotImplementedException();
+        }
+    }
 
-  @Override
-  public String asString() {
-    return getValue().asString();
-  }
+    @Override
+    public void setValue(IValue value) {
+        if (referenceType == ReferenceType.SIMPLE) {
+            referencedValue.setValue(value);
+        } else if (referenceType == ReferenceType.INDEXED_PROPERTY) {
+            var accessor = (IndexAccessor) context;
+            accessor.setIndexedValue(index, value);
+        } else if (referenceType == ReferenceType.DYNAMIC_PROPERTY) {
+            var accessor = (PropertyNameAccessor) context;
+            accessor.setPropertyValue(index, value);
+        } else if (referenceType == ReferenceType.CONTEXT_PROPERTY) {
+            if (context.isPropertyReadOnly(contextPropertyNumber)) {
+                throw MachineException.getPropertyIsNotWritableException("");
+            }
+            context.setPropertyValue(contextPropertyNumber, value);
+        } else {
+            throw MachineException.operationNotImplementedException();
+        }
+    }
 
-  @Override
-  public IValue getRawValue() {
-    return getValue().getRawValue();
-  }
+    @Override
+    public String getName() {
+        return name;
+    }
 
-  @Override
-  public int compareTo(IValue o) {
-    return getValue().compareTo(o);
-  }
+    @Override
+    public ContextInfo getContextInfo() {
+        var value = getValue();
+        if (value instanceof ContextType) {
+            return ((ContextType) value).getContextInfo();
+        }
+        throw MachineException.operationNotImplementedException();
+    }
+
+    @Override
+    public BigDecimal asNumber() {
+        return getValue().asNumber();
+    }
+
+    @Override
+    public Date asDate() {
+        return getValue().asDate();
+    }
+
+    @Override
+    public boolean asBoolean() {
+        return getValue().asBoolean();
+    }
+
+    @Override
+    public String asString() {
+        return getValue().asString();
+    }
+
+    @Override
+    public IValue getRawValue() {
+        return getValue().getRawValue();
+    }
+
+    @Override
+    public int compareTo(IValue o) {
+        return getValue().compareTo(o);
+    }
 
 }

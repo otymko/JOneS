@@ -8,8 +8,9 @@ package com.github.otymko.jos.runtime;
 import com.github.otymko.jos.runtime.context.IValue;
 
 public interface IVariable extends IValue {
-  IValue getValue();
-  void setValue(IValue value);
+    IValue getValue();
 
-  String getName();
+    void setValue(IValue value);
+
+    String getName();
 }

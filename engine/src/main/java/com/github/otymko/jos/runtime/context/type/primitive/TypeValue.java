@@ -17,50 +17,50 @@ import java.util.Objects;
 
 @ContextClass(name = "Тип", alias = "Type")
 public class TypeValue extends PrimitiveValue {
-  public static final ContextInfo INFO = ContextInfo.createByClass(TypeValue.class);
-  @Getter
-  private final ContextInfo value;
+    public static final ContextInfo INFO = ContextInfo.createByClass(TypeValue.class);
+    @Getter
+    private final ContextInfo value;
 
-  public TypeValue(ContextInfo value) {
-    this.value = value;
-    setDataType(DataType.TYPE);
-  }
-
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
-
-  @Override
-  public String asString() {
-    // FIXME: для перечисления выводится без `Перечисление`
-    return value.getName();
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
+    public TypeValue(ContextInfo value) {
+        this.value = value;
+        setDataType(DataType.TYPE);
     }
-    if (!(obj instanceof IValue)) {
-      return false;
-    }
-    var baseValue = (TypeValue) obj;
-    return baseValue.getDataType() == DataType.TYPE && value.getName().equalsIgnoreCase(baseValue.getValue().getName());
-  }
 
-  @Override
-  public int hashCode() {
-    var key = value.getName().toLowerCase(Locale.ENGLISH);
-    return Objects.hashCode(key);
-  }
-
-  @Override
-  public int compareTo(IValue object) {
-    if (object.getDataType() != DataType.TYPE) {
-      return 1;
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
     }
-    var inputValue = (TypeValue) object;
-    return getValue().equals(inputValue.getValue()) ? 0 : 1;
-  }
+
+    @Override
+    public String asString() {
+        // FIXME: для перечисления выводится без `Перечисление`
+        return value.getName();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof IValue)) {
+            return false;
+        }
+        var baseValue = (TypeValue) obj;
+        return baseValue.getDataType() == DataType.TYPE && value.getName().equalsIgnoreCase(baseValue.getValue().getName());
+    }
+
+    @Override
+    public int hashCode() {
+        var key = value.getName().toLowerCase(Locale.ENGLISH);
+        return Objects.hashCode(key);
+    }
+
+    @Override
+    public int compareTo(IValue object) {
+        if (object.getDataType() != DataType.TYPE) {
+            return 1;
+        }
+        var inputValue = (TypeValue) object;
+        return getValue().equals(inputValue.getValue()) ? 0 : 1;
+    }
 }

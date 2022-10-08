@@ -15,16 +15,16 @@ import com.github.otymko.jos.runtime.context.EnumValue;
 @EnumClass(name = "ДопустимыйЗнак", alias = "AllowedSign")
 public enum AllowedSign implements EnumType {
 
-  /**
-   * Знак может быть любым
-   */
-  @EnumValue(name = "Любой", alias = "Any")
-  ANY,
+    /**
+     * Знак может быть любым
+     */
+    @EnumValue(name = "Любой", alias = "Any")
+    ANY,
 
-  /**
-   * Не может содерэать отрицательные значения
-   */
-  @EnumValue(name = "Неотрицательный", alias = "NonNegative")
-  NON_NEGATIVE
+    /**
+     * Не может содерэать отрицательные значения
+     */
+    @EnumValue(name = "Неотрицательный", alias = "NonNegative")
+    NON_NEGATIVE
 
 }

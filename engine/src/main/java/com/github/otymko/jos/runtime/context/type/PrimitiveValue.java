@@ -16,44 +16,44 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public abstract class PrimitiveValue implements IValue, ContextType, Comparable<IValue> {
-  @Getter
-  @Setter(AccessLevel.PROTECTED)
-  private DataType dataType;
+    @Getter
+    @Setter(AccessLevel.PROTECTED)
+    private DataType dataType;
 
-  public BigDecimal asNumber() {
-    throw MachineException.operationNotSupportedException();
-  }
+    public BigDecimal asNumber() {
+        throw MachineException.operationNotSupportedException();
+    }
 
-  public Date asDate() {
-    throw MachineException.operationNotSupportedException();
-  }
+    public Date asDate() {
+        throw MachineException.operationNotSupportedException();
+    }
 
-  public boolean asBoolean() {
-    throw MachineException.operationNotSupportedException();
-  }
+    public boolean asBoolean() {
+        throw MachineException.operationNotSupportedException();
+    }
 
-  public String asString() {
-    return dataType.toString();
-  }
+    public String asString() {
+        return dataType.toString();
+    }
 
-  // TODO: asObject
+    // TODO: asObject
 
-  public IValue getRawValue() {
-    return this;
-  }
+    public IValue getRawValue() {
+        return this;
+    }
 
-  @Override
-  public String toString() {
-    return asString();
-  }
+    @Override
+    public String toString() {
+        return asString();
+    }
 
-  @Override
-  public int compareTo(IValue o) {
-    throw MachineException.operationNotSupportedException();
-  }
+    @Override
+    public int compareTo(IValue o) {
+        throw MachineException.operationNotSupportedException();
+    }
 
-  public static IValue parse(String view) {
-    throw MachineException.operationNotSupportedException();
-  }
+    public static IValue parse(String view) {
+        throw MachineException.operationNotSupportedException();
+    }
 
 }

@@ -37,8 +37,7 @@ public class FileOperationsGlobalContext implements AttachableContext {
     public static IValue getTempFileName(IValue extension) {
         String suffix = "";
         if (extension != null) {
-            if (!(extension.getRawValue() instanceof StringValue))
-            {
+            if (!(extension.getRawValue() instanceof StringValue)) {
                 throw MachineException.invalidArgumentValueException();
             }
 

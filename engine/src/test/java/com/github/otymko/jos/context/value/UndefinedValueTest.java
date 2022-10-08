@@ -17,24 +17,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UndefinedValueTest {
 
-  @Test
-  void test() {
-    var value = ValueFactory.create();
+    @Test
+    void test() {
+        var value = ValueFactory.create();
 
-    assertThat(value).isEqualTo(ValueFactory.create());
-    assertThat(value.asString()).isEmpty();
+        assertThat(value).isEqualTo(ValueFactory.create());
+        assertThat(value.asString()).isEmpty();
 
-    Set<IValue> set = new HashSet<>();
-    set.add(ValueFactory.create());
-    set.add(ValueFactory.create());
+        Set<IValue> set = new HashSet<>();
+        set.add(ValueFactory.create());
+        set.add(ValueFactory.create());
 
-    assertThat(set).hasSize(1);
+        assertThat(set).hasSize(1);
 
-    set.add(BooleanValue.TRUE);
+        set.add(BooleanValue.TRUE);
 
-    assertThat(set).hasSize(2);
+        assertThat(set).hasSize(2);
 
-    // TODO: еще тесты
-  }
+        // TODO: еще тесты
+    }
 
 }

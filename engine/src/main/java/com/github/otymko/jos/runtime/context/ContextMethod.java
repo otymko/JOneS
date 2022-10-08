@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface ContextMethod {
-  String name();
-  String alias();
+    String name();
+
+    String alias();
 }

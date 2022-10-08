@@ -20,86 +20,86 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnumerationContext extends ContextValue implements PropertyNameAccessor {
-  private static final String ENUM_PREFIX = "Перечисление";
-  private final ContextInfo info;
-  @Getter
-  private final Class<? extends EnumType> enumType;
-  private final String preview;
+    private static final String ENUM_PREFIX = "Перечисление";
+    private final ContextInfo info;
+    @Getter
+    private final Class<? extends EnumType> enumType;
+    private final String preview;
 
-  @Getter
-  private final List<EnumerationValue> values = new ArrayList<>();
+    @Getter
+    private final List<EnumerationValue> values = new ArrayList<>();
 
-  public EnumerationContext(Class<? extends EnumType> enumTargetClass) {
-    var enumClass = enumTargetClass.getAnnotation(EnumClass.class);
-    if (enumClass == null) {
-      throw MachineException.operationNotSupportedException();
+    public EnumerationContext(Class<? extends EnumType> enumTargetClass) {
+        var enumClass = enumTargetClass.getAnnotation(EnumClass.class);
+        if (enumClass == null) {
+            throw MachineException.operationNotSupportedException();
+        }
+        this.info = ContextInfo.createByEnumClass(enumClass);
+        this.enumType = enumTargetClass;
+        this.preview = ENUM_PREFIX + info.getName();
+
+        for (var field : enumTargetClass.getFields()) {
+            var enumValueClass = field.getAnnotation(EnumValue.class);
+            if (enumValueClass == null) {
+                continue;
+            }
+
+            EnumType enumValue = null;
+            try {
+                enumValue = (EnumType) field.get(null);
+            } catch (IllegalAccessException e) {
+                throw MachineException.operationNotSupportedException();
+            }
+
+            var value = new EnumerationValue(this, enumValueClass, enumValue);
+            values.add(value);
+        }
     }
-    this.info = ContextInfo.createByEnumClass(enumClass);
-    this.enumType = enumTargetClass;
-    this.preview = ENUM_PREFIX + info.getName();
 
-    for (var field : enumTargetClass.getFields()) {
-      var enumValueClass = field.getAnnotation(EnumValue.class);
-      if (enumValueClass == null) {
-        continue;
-      }
+    @Override
+    public String asString() {
+        return preview;
+    }
 
-      EnumType enumValue = null;
-      try {
-        enumValue = (EnumType) field.get(null);
-      } catch (IllegalAccessException e) {
+    @Override
+    public IValue getPropertyValue(IValue index) {
+        // todo: проверить ключ на валидность
+        var key = index.asString();
+        for (var value : values) {
+            if (value.getName().equalsIgnoreCase(key) || value.getAlias().equalsIgnoreCase(key)) {
+                return value;
+            }
+        }
+        throw MachineException.getPropertyNotFoundException(key);
+    }
+
+    @Override
+    public void setPropertyValue(IValue index, IValue value) {
         throw MachineException.operationNotSupportedException();
-      }
-
-      var value = new EnumerationValue(this, enumValueClass, enumValue);
-      values.add(value);
     }
-  }
 
-  @Override
-  public String asString() {
-    return preview;
-  }
-
-  @Override
-  public IValue getPropertyValue(IValue index) {
-    // todo: проверить ключ на валидность
-    var key = index.asString();
-    for (var value : values) {
-      if (value.getName().equalsIgnoreCase(key) || value.getAlias().equalsIgnoreCase(key)) {
-        return value;
-      }
+    @Override
+    public boolean hasProperty(IValue index) {
+        // todo: проверить ключ на валидность
+        var key = index.asString();
+        for (var value : values) {
+            if (value.getName().equalsIgnoreCase(key) || value.getAlias().equalsIgnoreCase(key)) {
+                return true;
+            }
+        }
+        return false;
     }
-    throw MachineException.getPropertyNotFoundException(key);
-  }
 
-  @Override
-  public void setPropertyValue(IValue index, IValue value) {
-    throw MachineException.operationNotSupportedException();
-  }
-
-  @Override
-  public boolean hasProperty(IValue index) {
-    // todo: проверить ключ на валидность
-    var key = index.asString();
-    for (var value : values) {
-      if (value.getName().equalsIgnoreCase(key) || value.getAlias().equalsIgnoreCase(key)) {
-        return true;
-      }
+    @Override
+    public ContextInfo getContextInfo() {
+        return info;
     }
-    return false;
-  }
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return info;
-  }
-
-  public EnumerationValue getEnumValueType(EnumType enumType) {
-    return getValues().stream()
-      .filter(enumerationValue -> enumerationValue.getValue() == enumType)
-      .findAny()
-      .get();
-  }
+    public EnumerationValue getEnumValueType(EnumType enumType) {
+        return getValues().stream()
+                .filter(enumerationValue -> enumerationValue.getValue() == enumType)
+                .findAny()
+                .get();
+    }
 
 }
