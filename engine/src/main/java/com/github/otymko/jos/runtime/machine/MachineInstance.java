@@ -56,19 +56,14 @@ import static com.github.otymko.jos.util.StringUtils.toTitleCase;
  */
 public class MachineInstance {
     private static final String VARIABLE_STACK_NAME = "$stackvar";
-    private final Map<OperationCode, Consumer<Integer>> commands = createMachineCommands();
 
     private final ScriptEngine engine;
-
     @Getter
     private final List<Scope> scopes = new ArrayList<>();
-
     private final Deque<IValue> operationStack = new ArrayDeque<>();
     private final Deque<ExecutionFrame> callStack = new ArrayDeque<>();
     private final Deque<ExceptionJumpInfo> exceptionsStack = new ArrayDeque<>();
-
     private ExecutionFrame currentFrame;
-
     private ModuleImage currentImage;
 
     public MachineInstance(ScriptEngine engine) {
@@ -237,7 +232,7 @@ public class MachineInstance {
                     && currentFrame.getInstructionPointer() < currentImage.getCode().size()) {
 
                 var command = currentImage.getCode().get(currentFrame.getInstructionPointer());
-                commands.get(command.getCode()).accept(command.getArgument());
+                runCommand(command.getCode(), command.getArgument());
             }
         } catch (EngineException exception) {
             throw exception;
@@ -246,102 +241,243 @@ public class MachineInstance {
         }
     }
 
-    private Map<OperationCode, Consumer<Integer>> createMachineCommands() {
-        Map<OperationCode, Consumer<Integer>> map = new EnumMap<>(OperationCode.class);
-        map.put(OperationCode.LINE_NUM, this::lineNum);
-        map.put(OperationCode.PUSH_CONST, this::pushConst);
-        map.put(OperationCode.ARG_NUN, this::argNum);
-        map.put(OperationCode.PUSH_DEFAULT_ARG, this::pushDefaultArg);
-        map.put(OperationCode.CALL_PROC, this::callProc);
-        map.put(OperationCode.LOAD_LOC, this::loadLoc);
-        map.put(OperationCode.PUSH_LOC, this::pushLoc);
-        map.put(OperationCode.PUSH_REF, this::pushRef);
-        map.put(OperationCode.PUSH_VAR, this::pushVar);
-        map.put(OperationCode.LOAD_VAR, this::loadVar);
-        map.put(OperationCode.RETURN, this::toReturn);
-        map.put(OperationCode.ADD, this::add);
-        map.put(OperationCode.SUB, this::sub);
-        map.put(OperationCode.MUL, this::mul);
-        map.put(OperationCode.DIV, this::div);
-        map.put(OperationCode.MOD, this::mod);
-        map.put(OperationCode.NOT, this::not);
-        map.put(OperationCode.NEG, this::neg);
+    private void runCommand(OperationCode opCode, int argument) {
+        switch (opCode) {
+            case LINE_NUM:
+                lineNum(argument);
+                break;
+            case PUSH_CONST:
+                pushConst(argument);
+                break;
+            case ARG_NUN:
+                argNum(argument);
+                break;
+            case PUSH_DEFAULT_ARG:
+                pushDefaultArg(argument);
+                break;
+            case CALL_PROC:
+                callProc(argument);
+                break;
+            case LOAD_LOC:
+                loadLoc(argument);
+                break;
+            case PUSH_LOC:
+                pushLoc(argument);
+                break;
+            case PUSH_REF:
+                pushRef(argument);
+                break;
+            case PUSH_VAR:
+                pushVar(argument);
+                break;
+            case LOAD_VAR:
+                loadVar(argument);
+                break;
+            case RETURN:
+                toReturn(argument);
+                break;
+            case ADD:
+                add(argument);
+                break;
+            case SUB:
+                sub(argument);
+                break;
+            case MUL:
+                mul(argument);
+                break;
+            case DIV:
+                div(argument);
+                break;
+            case MOD:
+                mod(argument);
+                break;
+            case NOT:
+                not(argument);
+                break;
+            case NEG:
+                neg(argument);
+                break;
 
-        map.put(OperationCode.AND, this::and);
-        map.put(OperationCode.OR, this::or);
-        map.put(OperationCode.MAKE_BOOL, this::makeBool);
-        map.put(OperationCode.JMP, this::jmp);
-        map.put(OperationCode.JMP_FALSE, this::jmpFalse);
+            case AND:
+                and(argument);
+                break;
+            case OR:
+                or(argument);
+                break;
+            case MAKE_BOOL:
+            case BOOL:
+                makeBool(argument);
+                break;
+            case JMP:
+                jmp(argument);
+                break;
+            case JMP_FALSE:
+                jmpFalse(argument);
+                break;
 
-        map.put(OperationCode.GREATER, this::greater);
-        map.put(OperationCode.GREATER_OR_EQUAL, this::greaterOrEqual);
-        map.put(OperationCode.LESS, this::less);
-        map.put(OperationCode.LESS_OR_EQUAL, this::lessOrEqual);
-        map.put(OperationCode.EQUALS, this::toEquals);
-        map.put(OperationCode.NOT_EQUAL, this::notEqual);
+            case GREATER:
+                greater(argument);
+                break;
+            case GREATER_OR_EQUAL:
+                greaterOrEqual(argument);
+                break;
+            case LESS:
+                less(argument);
+                break;
+            case LESS_OR_EQUAL:
+                lessOrEqual(argument);
+                break;
+            case EQUALS:
+                toEquals(argument);
+                break;
+            case NOT_EQUAL:
+                notEqual(argument);
+                break;
 
+            case MAKE_RAW_VALUE:
+                makeRawValue(argument);
+                break;
+            case CALL_FUNC:
+                callFunc(argument);
+                break;
 
-        map.put(OperationCode.MAKE_RAW_VALUE, this::makeRawValue);
-        map.put(OperationCode.CALL_FUNC, this::callFunc);
+            case NEW_INSTANCE:
+                newInstance(argument);
+                break;
 
-        map.put(OperationCode.NEW_INSTANCE, this::newInstance);
+            case RESOLVE_METHOD_PROC:
+                resolveMethodProc(argument);
+                break;
+            case RESOLVE_METHOD_FUNC:
+                resolveMethodFunc(argument);
+                break;
 
-        map.put(OperationCode.RESOLVE_METHOD_PROC, this::resolveMethodProc);
-        map.put(OperationCode.RESOLVE_METHOD_FUNC, this::resolveMethodFunc);
+            case PUSH_INDEXED:
+                pushIndexed(argument);
+                break;
+            case BEGIN_TRY:
+                beginTry(argument);
+                break;
+            case END_TRY:
+                endTry(argument);
+                break;
+            case RAISE_EXCEPTION:
+                raiseException(argument);
+                break;
 
-        map.put(OperationCode.PUSH_INDEXED, this::pushIndexed);
-        map.put(OperationCode.BEGIN_TRY, this::beginTry);
-        map.put(OperationCode.END_TRY, this::endTry);
-        map.put(OperationCode.RAISE_EXCEPTION, this::raiseException);
+            case ASSIGN_REF:
+                assignReference(argument);
+                break;
+            case RESOLVE_PROP:
+                resolveProp(argument);
+                break;
 
-        map.put(OperationCode.ASSIGN_REF, this::assignReference);
+            // Функции работы с типами
+            case TYPE:
+                callType(argument);
+                break;
+            case VAL_TYPE:
+                callTypeOf(argument);
+                break;
 
-        map.put(OperationCode.RESOLVE_PROP, this::resolveProp);
+            case EXCEPTION_DESCR:
+                exceptionDescr(argument);
+                break;
+            case EXCEPTION_INFO:
+                exceptionInfo(argument);
+                break;
 
-        // Функции работы с типами
-        map.put(OperationCode.TYPE, this::callType);
-        map.put(OperationCode.VAL_TYPE, this::callTypeOf);
+            case PUSH_ITERATOR:
+                pushIterator(argument);
+                break;
+            case ITERATOR_NEXT:
+                iteratorNext(argument);
+                break;
+            case STOP_ITERATOR:
+                stopIterator(argument);
+                break;
 
-        map.put(OperationCode.EXCEPTION_DESCR, this::exceptionDescr);
-        map.put(OperationCode.EXCEPTION_INFO, this::exceptionInfo);
+            case PUSH_TMP:
+                pushTmp(argument);
+                break;
+            case INC:
+                increment(argument);
+                break;
+            case JMP_COUNTER:
+                jmpCounter(argument);
+                break;
+            case POP_TMP:
+                popTmp(argument);
+                break;
 
-        map.put(OperationCode.PUSH_ITERATOR, this::pushIterator);
-        map.put(OperationCode.ITERATOR_NEXT, this::iteratorNext);
-        map.put(OperationCode.STOP_ITERATOR, this::stopIterator);
+            case NOP:
+                nop(argument);
+                break;
 
-        map.put(OperationCode.PUSH_TMP, this::pushTmp);
-        map.put(OperationCode.INC, this::increment);
-        map.put(OperationCode.JMP_COUNTER, this::jmpCounter);
-        map.put(OperationCode.POP_TMP, this::popTmp);
+            case STR_LEN:
+                stringLength(argument);
+                break;
+            case U_CASE:
+                upperCase(argument);
+                break;
+            case L_CASE:
+                lowerCase(argument);
+                break;
+            case T_CASE:
+                titleCase(argument);
+                break;
+            case TRIM_L:
+                trimL(argument);
+                break;
+            case TRIM_R:
+                trimR(argument);
+                break;
+            case TRIM_LR:
+                trimLR(argument);
+                break;
 
-        map.put(OperationCode.NOP, this::nop);
+            case LEFT:
+                left(argument);
+                break;
+            case RIGHT:
+                right(argument);
+                break;
+            case MID:
+                middle(argument);
+                break;
 
-        map.put(OperationCode.STR_LEN, this::stringLength);
-        map.put(OperationCode.U_CASE, this::upperCase);
-        map.put(OperationCode.L_CASE, this::lowerCase);
-        map.put(OperationCode.T_CASE, this::titleCase);
-        map.put(OperationCode.TRIM_L, this::trimL);
-        map.put(OperationCode.TRIM_R, this::trimR);
-        map.put(OperationCode.TRIM_LR, this::trimLR);
+            case EMPTY_STR:
+                emptyStr(argument);
+                break;
+            case CHR:
+                chr(argument);
+                break;
+            case CHR_CODE:
+                chrCode(argument);
+                break;
+            case STR_REPLACE:
+                strReplace(argument);
+                break;
 
-        map.put(OperationCode.LEFT, this::left);
-        map.put(OperationCode.RIGHT, this::right);
-        map.put(OperationCode.MID, this::middle);
+            case CURRENT_DATE:
+                currentDate(argument);
+                break;
+            case NUMBER:
+                number(argument);
+                break;
+            case STR:
+                str(argument);
+                break;
+            case DATE:
+                date(argument);
+                break;
 
-        map.put(OperationCode.EMPTY_STR, this::emptyStr);
-        map.put(OperationCode.CHR, this::chr);
-        map.put(OperationCode.CHR_CODE, this::chrCode);
-        map.put(OperationCode.STR_REPLACE, this::strReplace);
-
-        map.put(OperationCode.CURRENT_DATE, this::currentDate);
-        map.put(OperationCode.NUMBER, this::number);
-        map.put(OperationCode.STR, this::str);
-        map.put(OperationCode.BOOL, this::makeBool);
-        map.put(OperationCode.DATE, this::date);
-
-        map.put(OperationCode.FORMAT, this::format);
-
-        return map;
+            case FORMAT:
+                format(argument);
+                break;
+            default:
+                throw MachineException.wrongStackConditionException();
+        }
     }
 
     private void format(int argument) {
@@ -1227,5 +1363,4 @@ public class MachineInstance {
             }
         }
     }
-
 }
