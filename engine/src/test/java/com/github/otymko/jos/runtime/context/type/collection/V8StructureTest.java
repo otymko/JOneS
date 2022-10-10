@@ -48,17 +48,4 @@ class V8StructureTest {
                 "0");
     }
 
-    @Test
-    void testIterable() throws Exception {
-        // TODO: Тест завязан на порядок, но порядок не гарантируется
-        var pathToScript = Path.of("src/test/resources/structures/iterable.os");
-        var model = "Ключ: Ключ1, Значение: Значение 1\n" +
-                "Ключ: Ключ1, Значение: Значение 1\n" +
-                "Ключ: Ключ2, Значение: Значение 2\n" +
-                "Ключ: Ключ2, Значение: Значение 2\n" +
-                "Ключ: Ключ3, Значение: Значение 3\n" +
-                "Ключ: Ключ3, Значение: Значение 3";
-        TestHelper.checkScript(pathToScript, model);
-    }
-
 }
