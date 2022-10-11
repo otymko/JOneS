@@ -18,13 +18,26 @@ class V8CollectionKey {
 
     private final Map<IValue, IValue> values;
 
+    public static V8CollectionKey extract(List<IValue> fields, PropertyNameAccessor element) {
+
+        final Map<IValue, IValue> result = new HashMap<>();
+
+        for (final var field: fields) {
+            if (element.hasProperty(field)) {
+                result.put(field, element.getPropertyValue(field));
+            }
+        }
+
+        return new V8CollectionKey(result);
+    }
+
     public V8CollectionKey(Map<IValue, IValue> values) {
         this.values = values;
     }
 
     public List<IValue> getFields()
     {
-        return new ArrayList<IValue>(values.keySet());
+        return new ArrayList<>(values.keySet());
     }
 
     @Override
@@ -40,16 +53,4 @@ class V8CollectionKey {
         return Objects.hash(values);
     }
 
-    public static V8CollectionKey extract(List<IValue> fields, PropertyNameAccessor element) {
-
-        final Map<IValue, IValue> result = new HashMap<>();
-
-        for (final var field: fields) {
-            if (element.hasProperty(field)) {
-                result.put(field, element.getPropertyValue(field));
-            }
-        }
-
-        return new V8CollectionKey(result);
-    }
 }

@@ -23,13 +23,21 @@ class V8ValueTableSortRule {
     private static String DIRECTION_DESC_RU = "УБЫВ";
     private static String DIRECTION_DESC_EN = "DESC";
 
-    V8ValueTableColumn column;
-    int order; // +1, -1
+    private static int COLUMN_NAME_INDEX = 0;
+    private static int SORT_DIRECTION_INDEX = 1;
 
-    public int apply(V8ValueTableRow r1, V8ValueTableRow r2) {
-        final var v1 = r1.get(column);
-        final var v2 = r2.get(column);
-        return v1.compareTo(v2) * order;
+    static V8ValueTableSortRule parse(String element, V8ValueTableColumnCollection columns) {
+        final var ruleElements = splitter.split(element);
+        final var columnName = ruleElements[COLUMN_NAME_INDEX].trim();
+        final var column = columns.findColumnByNameInternal(columnName);
+        if (column == null) {
+            throw MachineException.invalidArgumentValueException();
+        }
+        int direction = ASC;
+        if (ruleElements.length > SORT_DIRECTION_INDEX) {
+            direction = getDirection(ruleElements[SORT_DIRECTION_INDEX]);
+        }
+        return new V8ValueTableSortRule(column, direction);
     }
 
     private static int getDirection(String direction) {
@@ -44,14 +52,13 @@ class V8ValueTableSortRule {
         throw MachineException.invalidArgumentValueException();
     }
 
-    static V8ValueTableSortRule parse(String element, V8ValueTableColumnCollection columns) {
-        final var ruleElements = splitter.split(element);
-        final var columnName = ruleElements[0].trim();
-        final var column = columns.findColumnByNameInternal(columnName);
-        if (column == null) {
-            throw MachineException.invalidArgumentValueException();
-        }
-        final var direction = ruleElements.length < 2 ? ASC: getDirection(ruleElements[1]);
-        return new V8ValueTableSortRule(column, direction);
+    V8ValueTableColumn column;
+    int order; // +1, -1
+
+    public int apply(V8ValueTableRow r1, V8ValueTableRow r2) {
+        final var v1 = r1.get(column);
+        final var v2 = r2.get(column);
+        return v1.compareTo(v2) * order;
     }
+
 }
