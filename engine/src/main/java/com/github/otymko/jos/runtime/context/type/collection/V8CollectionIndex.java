@@ -13,7 +13,7 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +27,7 @@ public class V8CollectionIndex extends ContextValue {
 
     public V8CollectionIndex(List<IValue> fields) {
         this.fields = fields;
-        this.data = new Hashtable<>();
+        this.data = new HashMap<>();
     }
 
     void columnRemoved(V8ValueTableColumn column) {
