@@ -27,6 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Объект для работы с данными в табличном виде.
+ * Представляет из себя коллекцию строк с заранее заданной структурой.
+ */
 @ContextClass(name = "ТаблицаЗначений", alias = "ValueTable")
 public class V8ValueTable extends ContextValue implements IndexAccessor, CollectionIterable {
 

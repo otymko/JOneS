@@ -18,6 +18,13 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Индексы коллекции.
+ * Для объекта доступен обход коллекции посредством оператора Для Каждого.
+ *
+ * @see V8CollectionIndex
+ * @see V8ValueTable
+ */
 @ContextClass(name = "ИндексыКоллекции", alias="CollectionIndexes")
 public class V8CollectionIndexes extends ContextValue implements IndexAccessor, CollectionIterable<V8CollectionIndex> {
 

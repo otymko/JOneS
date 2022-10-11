@@ -18,6 +18,15 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Строка таблицы значений.
+ * Запись, соответствующая структуре Таблицы Значений.
+ * Для объекта доступен обход коллекции посредством оператора Для Каждого.
+ * Возможно обращение к элементу коллекции посредством оператора [].
+ * В качестве индекса передается индекс элемента или имя колонки.
+ *
+ * @see V8ValueTable
+ */
 @ContextClass(name = "СтрокаТаблицыЗначений", alias = "ValueTableRow")
 public class V8ValueTableRow extends ContextValue implements IndexAccessor, PropertyNameAccessor,
         CollectionIterable<V8KeyAndValue> {

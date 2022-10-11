@@ -17,6 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Индекс коллекции. Описывает набор ключей индекса и данные, проиндексированные по этим ключам.
+ *
+ * @see V8ValueTable
+ */
 @ContextClass(name = "ИндексКоллекции", alias = "CollectionIndex")
 public class V8CollectionIndex extends ContextValue {
 
@@ -25,7 +30,7 @@ public class V8CollectionIndex extends ContextValue {
     private final List<IValue> fields;
     private final Map<V8CollectionKey, List<IValue>> data;
 
-    public V8CollectionIndex(List<IValue> fields) {
+    V8CollectionIndex(List<IValue> fields) {
         this.fields = fields;
         this.data = new HashMap<>();
     }

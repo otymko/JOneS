@@ -16,6 +16,11 @@ import lombok.Builder;
 
 import java.util.Objects;
 
+/**
+ * Колонка таблицы значений.
+ * Содержит описание одной колонки Таблицы Значений.
+ * @see V8ValueTable
+ */
 @ContextClass(name = "КолонкаТаблицыЗначений", alias = "ValueTableColumn")
 @Builder
 public class V8ValueTableColumn extends ContextValue {

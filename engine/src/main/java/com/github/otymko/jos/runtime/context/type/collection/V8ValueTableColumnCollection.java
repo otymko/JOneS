@@ -22,6 +22,15 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Коллекция колонок таблицы значений.
+ * Для объекта доступен обход коллекции посредством оператора Для Каждого.
+ * Возможно обращение к элементу коллекции посредством оператора [].
+ * В качестве индекса передается индекс элемента или имя колонки.
+ *
+ * @see V8ValueTableColumn
+ * @see V8ValueTable
+ */
 @ContextClass(name = "КоллекцияКолонокТаблицыЗначений", alias="ValueTableColumnCollection")
 public class V8ValueTableColumnCollection extends ContextValue implements IndexAccessor, PropertyNameAccessor, CollectionIterable<V8ValueTableColumn> {
 

@@ -13,11 +13,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class V8ValueTableSorter implements Comparator<IValue> {
+class V8ValueTableSorter implements Comparator<IValue> {
 
     private static final Pattern splitter = Pattern.compile(",");
 
     private final List<V8ValueTableSortRule> rules;
+
+    public static V8ValueTableSorter create(V8ValueTableColumnCollection columns, IValue sortColumns) {
+        final var rules = parseRules(columns, sortColumns);
+        return new V8ValueTableSorter(rules);
+    }
 
     V8ValueTableSorter(List<V8ValueTableSortRule> rules) {
         this.rules = rules;
@@ -39,11 +44,6 @@ public class V8ValueTableSorter implements Comparator<IValue> {
         }
 
         return rules;
-    }
-
-    public static V8ValueTableSorter create(V8ValueTableColumnCollection columns, IValue sortColumns) {
-        final var rules = parseRules(columns, sortColumns);
-        return new V8ValueTableSorter(rules);
     }
 
     @Override
