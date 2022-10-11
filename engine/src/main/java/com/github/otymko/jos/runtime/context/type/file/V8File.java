@@ -28,6 +28,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.Date;
 import java.util.function.Supplier;
 
 /**
@@ -40,13 +41,8 @@ public class V8File extends ContextValue {
     private final File file;
 
     @ContextConstructor
-    public static IValue createByPath(IValue path) {
-        final var rawValue = path.getRawValue();
-        if (!(rawValue instanceof StringValue)) {
-            throw MachineException.invalidArgumentValueException();
-        }
-
-        return new V8File(rawValue.asString());
+    public static IValue createByPath(String path) {
+        return new V8File(path);
     }
 
     public V8File(String path) {
@@ -138,17 +134,8 @@ public class V8File extends ContextValue {
     }
 
     @ContextMethod(name = "УстановитьВремяИзменения", alias = "SetModificationTime")
-    public void setModificationTime(IValue rawDate) {
-        if (rawDate == null) {
-            throw MachineException.invalidArgumentValueException();
-        }
-
-        var value = rawDate.getRawValue();
-        if (!(value instanceof DateValue)) {
-            throw MachineException.invalidArgumentValueException();
-        }
-
-        var instant = value.asDate().toInstant();
+    public void setModificationTime(Date date) {
+        var instant = date.toInstant();
 
         doWithWrapException(() -> {
             try {
@@ -160,22 +147,14 @@ public class V8File extends ContextValue {
     }
 
     @ContextMethod(name = "УстановитьНевидимость", alias = "SetHidden")
-    public void setHidden(IValue value) {
-        if (value == null) {
-            throw MachineException.invalidArgumentValueException();
-        }
-
-        if (value.getDataType() != DataType.BOOLEAN) {
-            throw MachineException.invalidArgumentValueException();
-        }
-
+    public void setHidden(boolean value) {
         if (Common.isWindows()) {
             return;
         }
 
         doWithWrapException(() -> {
             try {
-                Files.setAttribute(file.toPath(), "dos:hidden", value.asBoolean());
+                Files.setAttribute(file.toPath(), "dos:hidden", value);
             } catch (IOException e) {
                 throw new FileAttributeException(e);
             }
@@ -183,17 +162,9 @@ public class V8File extends ContextValue {
     }
 
     @ContextMethod(name = "УстановитьТолькоЧтение", alias = "SetReadOnly")
-    public void setReadOnly(IValue value) {
-        if (value == null) {
-            throw MachineException.invalidArgumentValueException();
-        }
-
-        if (value.getDataType() != DataType.BOOLEAN) {
-            throw MachineException.invalidArgumentValueException();
-        }
-
+    public void setReadOnly(boolean value) {
         doWithWrapException(() -> {
-            var result = file.setReadable(value.asBoolean());
+            var result = file.setReadable(value);
             if (!result) {
                 throw new FileAttributeException();
             }
