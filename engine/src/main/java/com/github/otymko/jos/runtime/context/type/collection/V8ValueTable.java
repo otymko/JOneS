@@ -37,6 +37,11 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
 
     private final V8CollectionIndexes indexes;
 
+    @ContextConstructor
+    public static V8ValueTable constructor() {
+        return new V8ValueTable();
+    }
+
     public V8ValueTable() {
         values = new ArrayList<>();
         columns = new V8ValueTableColumnCollection(this);
@@ -54,11 +59,6 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
 
     public V8ValueTableColumnCollection getColumns() {
         return columns;
-    }
-
-    @ContextConstructor
-    public static V8ValueTable constructor() {
-        return new V8ValueTable();
     }
 
     @ContextMethod(name = "Количество", alias = "Count")
@@ -164,7 +164,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         }
     }
 
-    public V8Array unloadColumnInternal(IValue columnIndex) {
+    private V8Array unloadColumnInternal(IValue columnIndex) {
         final var result = V8Array.constructor();
         for (final var row: values) {
             final var castedRow = (V8ValueTableRow) row;
@@ -309,7 +309,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         return iterator();
     }
 
-    V8ValueTable copyInternal(IValue rowsToCopy, IValue columnsToCopy) {
+    private V8ValueTable copyInternal(IValue rowsToCopy, IValue columnsToCopy) {
 
         final var columns = parseColumnList(columnsToCopy, false);
         final Map<V8ValueTableColumn, V8ValueTableColumn> columnMap = new HashMap<>();
