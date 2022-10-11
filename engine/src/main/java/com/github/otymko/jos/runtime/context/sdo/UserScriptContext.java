@@ -11,15 +11,15 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 @ContextClass(name = "Скрипт", alias = "Script")
 public class UserScriptContext extends ScriptDrivenObject {
-  public static final ContextInfo INFO = ContextInfo.createByClass(UserScriptContext.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(UserScriptContext.class);
 
-  public UserScriptContext(ModuleImage moduleImage) {
-    super(moduleImage);
-  }
+    public UserScriptContext(ModuleImage moduleImage) {
+        super(moduleImage);
+    }
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
 
 }

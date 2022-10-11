@@ -11,8 +11,8 @@ import com.github.otymko.jos.runtime.context.EnumValue;
 
 @EnumClass(name = "НаправлениеПоиска", alias = "SearchDirection")
 public enum SearchDirection implements EnumType {
-  @EnumValue(name = "СНачала", alias = "FromBegin")
-  FROM_BEGIN,
-  @EnumValue(name = "СКонца", alias = "FromEnd")
-  FROM_END
+    @EnumValue(name = "СНачала", alias = "FromBegin")
+    FROM_BEGIN,
+    @EnumValue(name = "СКонца", alias = "FromEnd")
+    FROM_END
 }

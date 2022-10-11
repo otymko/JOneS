@@ -16,12 +16,12 @@ import java.nio.file.Path;
 @Value
 @RequiredArgsConstructor
 public class ModuleSource {
-  Path path;
-  String content;
+    Path path;
+    String content;
 
-  public ModuleSource(String content) {
-    this.path = Path.of("");
-    this.content = content;
-  }
+    public ModuleSource(String content) {
+        this.path = Path.of("");
+        this.content = content;
+    }
 
 }

@@ -6,7 +6,9 @@
 package com.github.otymko.jos.runtime.context;
 
 public interface PropertyNameAccessor {
-  IValue getPropertyValue(IValue index);
-  void setPropertyValue(IValue index, IValue value);
-  boolean hasProperty(IValue index);
+    IValue getPropertyValue(IValue index);
+
+    void setPropertyValue(IValue index, IValue value);
+
+    boolean hasProperty(IValue index);
 }

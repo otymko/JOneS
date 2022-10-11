@@ -12,18 +12,18 @@ import java.util.Date;
 
 public interface IValue {
 
-  BigDecimal asNumber();
+    BigDecimal asNumber();
 
-  Date asDate();
+    Date asDate();
 
-  boolean asBoolean();
+    boolean asBoolean();
 
-  String asString();
+    String asString();
 
-  IValue getRawValue();
+    IValue getRawValue();
 
-  DataType getDataType();
+    DataType getDataType();
 
-  int compareTo(IValue o);
+    int compareTo(IValue o);
 
 }

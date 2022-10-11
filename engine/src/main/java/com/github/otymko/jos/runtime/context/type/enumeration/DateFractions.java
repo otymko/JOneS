@@ -15,21 +15,21 @@ import com.github.otymko.jos.runtime.context.EnumValue;
 @EnumClass(name = "ЧастиДаты", alias = "DateFractions")
 public enum DateFractions implements EnumType {
 
-  /**
-   * Дата
-   */
-  @EnumValue(name = "Дата", alias = "Date")
-  DATE,
+    /**
+     * Дата
+     */
+    @EnumValue(name = "Дата", alias = "Date")
+    DATE,
 
-  /**
-   * Дата и время
-   */
-  @EnumValue(name = "ДатаВремя", alias = "DateTime")
-  DATE_TIME,
+    /**
+     * Дата и время
+     */
+    @EnumValue(name = "ДатаВремя", alias = "DateTime")
+    DATE_TIME,
 
-  /**
-   * Время
-   */
-  @EnumValue(name = "Время", alias = "DatTimeTime")
-  TIME
+    /**
+     * Время
+     */
+    @EnumValue(name = "Время", alias = "DatTimeTime")
+    TIME
 }

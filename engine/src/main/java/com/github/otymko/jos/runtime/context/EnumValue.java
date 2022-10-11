@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
 public @interface EnumValue {
-  String name();
-  String alias();
+    String name();
+
+    String alias();
 }

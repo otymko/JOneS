@@ -23,43 +23,43 @@ import java.util.stream.Collectors;
 
 @ContextClass(name = "КлючИЗначение", alias = "KeyAndValue")
 public class V8KeyAndValue extends ContextValue implements IndexAccessor {
-  public static final ContextInfo INFO = ContextInfo.createByClass(V8KeyAndValue.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(V8KeyAndValue.class);
 
-  @Getter(AccessLevel.PROTECTED)
-  @ContextProperty(name = "Ключ", alias = "Key", accessMode = PropertyAccessMode.READ_ONLY)
-  private final IValue key;
+    @Getter(AccessLevel.PROTECTED)
+    @ContextProperty(name = "Ключ", alias = "Key", accessMode = PropertyAccessMode.READ_ONLY)
+    private final IValue key;
 
-  @Getter(AccessLevel.PROTECTED)
-  @ContextProperty(name = "Значение", alias = "Value", accessMode = PropertyAccessMode.READ_ONLY)
-  private final IValue value;
+    @Getter(AccessLevel.PROTECTED)
+    @ContextProperty(name = "Значение", alias = "Value", accessMode = PropertyAccessMode.READ_ONLY)
+    private final IValue value;
 
-  public V8KeyAndValue(IValue key, IValue value) {
-    this.key = key;
-    this.value = value;
-  }
+    public V8KeyAndValue(IValue key, IValue value) {
+        this.key = key;
+        this.value = value;
+    }
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
 
-  @Override
-  public IValue getIndexedValue(IValue index) {
-    var name = index.asString();
-    var position = findProperty(name);
-    return getPropertyValue(position);
-  }
+    @Override
+    public IValue getIndexedValue(IValue index) {
+        var name = index.asString();
+        var position = findProperty(name);
+        return getPropertyValue(position);
+    }
 
-  @Override
-  public void setIndexedValue(IValue index, IValue value) {
-    throw MachineException.getPropertyIsNotWritableException(index.asString());
-  }
+    @Override
+    public void setIndexedValue(IValue index, IValue value) {
+        throw MachineException.getPropertyIsNotWritableException(index.asString());
+    }
 
-  public static IteratorValue iteratorOf(Set<Map.Entry<IValue, IValue>> values) {
-    var iterator = values.stream()
-            .sorted((valueOne, valueTwo) -> valueOne.getValue().compareTo(valueTwo.getValue()))
-            .map(entity -> (IValue)(new V8KeyAndValue(entity.getKey(), entity.getValue())))
-            .collect(Collectors.toList()).iterator();
-    return new IteratorValue(iterator);
-  }
+    public static IteratorValue iteratorOf(Set<Map.Entry<IValue, IValue>> values) {
+        var iterator = values.stream()
+                .sorted((valueOne, valueTwo) -> valueOne.getValue().compareTo(valueTwo.getValue()))
+                .map(entity -> (IValue) (new V8KeyAndValue(entity.getKey(), entity.getValue())))
+                .collect(Collectors.toList()).iterator();
+        return new IteratorValue(iterator);
+    }
 }

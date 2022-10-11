@@ -6,5 +6,5 @@
 package com.github.otymko.jos.runtime;
 
 public enum SymbolType {
-  VARIABLE, CONTEXT_PROPERTY
+    VARIABLE, CONTEXT_PROPERTY
 }

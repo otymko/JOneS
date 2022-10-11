@@ -22,34 +22,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ResourcesTest {
 
-  @Test
-  void testKeys() {
-    // проверим что ключи одинаковые в двух пропертях
-    var propertiesRu = Collections.list(
-      ResourceBundle.getBundle("Message", Locale.forLanguageTag("ru")).getKeys());
-    var propertiesEn = Collections.list(
-      ResourceBundle.getBundle("Message", Locale.forLanguageTag("en")).getKeys());
+    @Test
+    void testKeys() {
+        // проверим что ключи одинаковые в двух пропертях
+        var propertiesRu = Collections.list(
+                ResourceBundle.getBundle("Message", Locale.forLanguageTag("ru")).getKeys());
+        var propertiesEn = Collections.list(
+                ResourceBundle.getBundle("Message", Locale.forLanguageTag("en")).getKeys());
 
-    checkKeys(propertiesRu, propertiesEn);
-    checkKeys(propertiesEn, propertiesRu);
-  }
-
-  @SneakyThrows
-  @Test
-  void testMessageKeys() {
-    for (var field : MessageResource.class.getFields()) {
-      if (Modifier.isFinal(field.getModifiers())) {
-        var value = (String) field.get(null);
-        assertThat(Resources.getResourceString(value)).isNotNull().isNotEmpty();
-      }
+        checkKeys(propertiesRu, propertiesEn);
+        checkKeys(propertiesEn, propertiesRu);
     }
-  }
 
-  private static void checkKeys(List<String> values, List<String> values2) {
-    var delta = values.stream()
-      .filter(Predicate.not(values2::contains))
-      .collect(Collectors.toList());
-    assertThat(delta).isEmpty();
-  }
+    @SneakyThrows
+    @Test
+    void testMessageKeys() {
+        for (var field : MessageResource.class.getFields()) {
+            if (Modifier.isFinal(field.getModifiers())) {
+                var value = (String) field.get(null);
+                assertThat(Resources.getResourceString(value)).isNotNull().isNotEmpty();
+            }
+        }
+    }
+
+    private static void checkKeys(List<String> values, List<String> values2) {
+        var delta = values.stream()
+                .filter(Predicate.not(values2::contains))
+                .collect(Collectors.toList());
+        assertThat(delta).isEmpty();
+    }
 
 }

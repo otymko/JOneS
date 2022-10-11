@@ -18,87 +18,87 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class EnumerationValue implements ContextType, IValue {
-  @Getter
-  private final EnumerationContext owner;
-  @Getter
-  private final String name;
-  @Getter
-  private final String alias;
-  @Getter
-  private final EnumType value;
+    @Getter
+    private final EnumerationContext owner;
+    @Getter
+    private final String name;
+    @Getter
+    private final String alias;
+    @Getter
+    private final EnumType value;
 
-  public EnumerationValue(EnumerationContext owner, EnumValue enumValue, EnumType value) {
-    this.owner = owner;
-    var info = ContextInfo.createByEnumValue(enumValue);
+    public EnumerationValue(EnumerationContext owner, EnumValue enumValue, EnumType value) {
+        this.owner = owner;
+        var info = ContextInfo.createByEnumValue(enumValue);
 
-    this.name = info.getName();
-    this.alias = info.getAlias();
-    this.value = value;
-  }
-
-  @Override
-  public ContextInfo getContextInfo() {
-    return owner.getContextInfo();
-  }
-
-  @Override
-  public BigDecimal asNumber() {
-    throw MachineException.operationNotSupportedException();
-  }
-
-  @Override
-  public Date asDate() {
-    throw MachineException.operationNotSupportedException();
-  }
-
-  @Override
-  public boolean asBoolean() {
-    throw MachineException.operationNotSupportedException();
-  }
-
-  @Override
-  public String asString() {
-    return getName();
-  }
-
-  @Override
-  public IValue getRawValue() {
-    return this;
-  }
-
-  @Override
-  public DataType getDataType() {
-    return DataType.GENERIC_VALUE;
-  }
-
-  @Override
-  public int compareTo(IValue inputValue) {
-    // FIXME: кидать исключение при сравнении разных типов (не EnumerationValue)
-    if (inputValue == null || !(inputValue.getRawValue() instanceof EnumerationValue)) {
-      return 1;
+        this.name = info.getName();
+        this.alias = info.getAlias();
+        this.value = value;
     }
-    var rawValue = (EnumerationValue) inputValue.getRawValue();
-    if (rawValue.getValue() == getValue()) {
-      return 0;
-    }
-    return 1;
-  }
 
-  @Override
-  public int hashCode() {
-    return super.hashCode();
-  }
+    @Override
+    public ContextInfo getContextInfo() {
+        return owner.getContextInfo();
+    }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof IValue)) {
-      return false;
+    @Override
+    public BigDecimal asNumber() {
+        throw MachineException.operationNotSupportedException();
     }
-    final var rawObject = ((IValue) obj).getRawValue();
-    if (!(rawObject instanceof EnumerationValue)) {
-      return false;
+
+    @Override
+    public Date asDate() {
+        throw MachineException.operationNotSupportedException();
     }
-    final var enumerationValue = (EnumerationValue)rawObject;
-    return enumerationValue.getValue() == getValue();
-  }
+
+    @Override
+    public boolean asBoolean() {
+        throw MachineException.operationNotSupportedException();
+    }
+
+    @Override
+    public String asString() {
+        return getName();
+    }
+
+    @Override
+    public IValue getRawValue() {
+        return this;
+    }
+
+    @Override
+    public DataType getDataType() {
+        return DataType.GENERIC_VALUE;
+    }
+
+    @Override
+    public int compareTo(IValue inputValue) {
+        // FIXME: кидать исключение при сравнении разных типов (не EnumerationValue)
+        if (inputValue == null || !(inputValue.getRawValue() instanceof EnumerationValue)) {
+            return 1;
+        }
+        var rawValue = (EnumerationValue) inputValue.getRawValue();
+        if (rawValue.getValue() == getValue()) {
+            return 0;
+        }
+        return 1;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof IValue)) {
+            return false;
+        }
+        final var rawObject = ((IValue) obj).getRawValue();
+        if (!(rawObject instanceof EnumerationValue)) {
+            return false;
+        }
+        final var enumerationValue = (EnumerationValue) rawObject;
+        return enumerationValue.getValue() == getValue();
+    }
 }

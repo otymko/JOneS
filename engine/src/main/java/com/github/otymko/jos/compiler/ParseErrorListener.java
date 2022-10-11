@@ -24,34 +24,34 @@ import static com.github.otymko.jos.localization.MessageResource.ERROR_PARSING_S
 
 public class ParseErrorListener extends BSLParserBaseListener {
 
-  @Override
-  public void visitErrorNode(ErrorNode node) {
-    var errorNode = (ErrorNodeImpl) node;
-    if (errorNode.symbol.getTokenIndex() == -1) {
-      var message = String.format(Resources.getResourceString(ERROR_PARSING_SOURCE_CODE), node.getText());
-      throw new CompilerException(message);
+    @Override
+    public void visitErrorNode(ErrorNode node) {
+        var errorNode = (ErrorNodeImpl) node;
+        if (errorNode.symbol.getTokenIndex() == -1) {
+            var message = String.format(Resources.getResourceString(ERROR_PARSING_SOURCE_CODE), node.getText());
+            throw new CompilerException(message);
+        }
     }
-  }
 
-  @Override
-  public void enterFile(BSLParser.FileContext ctx) {
-    Trees.getDescendants(ctx).stream()
-      .filter(Predicate.not(parseTree -> parseTree instanceof TerminalNodeImpl))
-      .map(BSLParserRuleContext.class::cast)
-      .filter(node -> Objects.nonNull(node.exception))
-      .map(this::getErrorToken)
-      .forEach(this::throwCompileException);
-  }
+    @Override
+    public void enterFile(BSLParser.FileContext ctx) {
+        Trees.getDescendants(ctx).stream()
+                .filter(Predicate.not(parseTree -> parseTree instanceof TerminalNodeImpl))
+                .map(BSLParserRuleContext.class::cast)
+                .filter(node -> Objects.nonNull(node.exception))
+                .map(this::getErrorToken)
+                .forEach(this::throwCompileException);
+    }
 
-  private Token getErrorToken(BSLParserRuleContext node) {
-    var errorToken = node.exception.getOffendingToken();
-    return errorToken.getType() == Token.EOF ? node.getStart() : errorToken;
-  }
+    private Token getErrorToken(BSLParserRuleContext node) {
+        var errorToken = node.exception.getOffendingToken();
+        return errorToken.getType() == Token.EOF ? node.getStart() : errorToken;
+    }
 
-  private void throwCompileException(Token token) {
-    var message = String.format(Resources.getResourceString(ERROR_PARSING_SOURCE_CODE_AT),
-      token.getLine(), token.getCharPositionInLine() + 1);
-    throw new CompilerException(message);
-  }
+    private void throwCompileException(Token token) {
+        var message = String.format(Resources.getResourceString(ERROR_PARSING_SOURCE_CODE_AT),
+                token.getLine(), token.getCharPositionInLine() + 1);
+        throw new CompilerException(message);
+    }
 
 }

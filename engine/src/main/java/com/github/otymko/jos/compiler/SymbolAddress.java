@@ -9,6 +9,6 @@ import lombok.Value;
 
 @Value
 public class SymbolAddress {
-  int symbolId;
-  int contextId;
+    int symbolId;
+    int contextId;
 }

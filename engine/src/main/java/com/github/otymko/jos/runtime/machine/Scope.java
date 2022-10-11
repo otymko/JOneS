@@ -17,13 +17,13 @@ import lombok.Value;
 @Value
 @RequiredArgsConstructor
 public class Scope {
-  RuntimeContext instance;
-  IVariable[] variables;
-  MethodInfo[] methods;
+    RuntimeContext instance;
+    IVariable[] variables;
+    MethodInfo[] methods;
 
-  public Scope(RuntimeContext instance) {
-    this.instance = instance;
-    variables = new IVariable[0];
-    methods = new MethodInfo[0];
-  }
+    public Scope(RuntimeContext instance) {
+        this.instance = instance;
+        variables = new IVariable[0];
+        methods = new MethodInfo[0];
+    }
 }

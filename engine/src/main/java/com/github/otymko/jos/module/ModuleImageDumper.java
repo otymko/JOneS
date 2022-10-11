@@ -14,19 +14,19 @@ import java.io.Writer;
 @UtilityClass
 public class ModuleImageDumper {
 
-  public static void dump(ModuleImage image, Writer writer) throws IOException {
-    int offset = 0;
-    for (final var opCode : image.getCode()) {
-      writer.write(String.format("%6d: %s", offset, opCode));
-      if (opCode.getCode() == OperationCode.PUSH_CONST
-        || opCode.getCode() == OperationCode.RESOLVE_METHOD_PROC
-        || opCode.getCode() == OperationCode.RESOLVE_METHOD_FUNC
-        || opCode.getCode() == OperationCode.RESOLVE_PROP) {
-        writer.write(String.format(" ; %s", image.getConstants().get(opCode.getArgument())));
-      }
-      writer.write('\n');
-      offset++;
+    public static void dump(ModuleImage image, Writer writer) throws IOException {
+        int offset = 0;
+        for (final var opCode : image.getCode()) {
+            writer.write(String.format("%6d: %s", offset, opCode));
+            if (opCode.getCode() == OperationCode.PUSH_CONST
+                    || opCode.getCode() == OperationCode.RESOLVE_METHOD_PROC
+                    || opCode.getCode() == OperationCode.RESOLVE_METHOD_FUNC
+                    || opCode.getCode() == OperationCode.RESOLVE_PROP) {
+                writer.write(String.format(" ; %s", image.getConstants().get(opCode.getArgument())));
+            }
+            writer.write('\n');
+            offset++;
+        }
     }
-  }
 
 }

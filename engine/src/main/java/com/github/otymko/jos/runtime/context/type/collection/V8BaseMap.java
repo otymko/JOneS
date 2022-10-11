@@ -21,37 +21,37 @@ import java.util.Optional;
  * Абстрактная реализация коллекции для `Соответствие` И `ФиксированноеСоответствие`
  */
 public abstract class V8BaseMap extends ContextValue implements IndexAccessor, CollectionIterable<V8KeyAndValue> {
-  protected final Map<IValue, IValue> data = new HashMap<>();
+    protected final Map<IValue, IValue> data = new HashMap<>();
 
-  // region ContextMethod
+    // region ContextMethod
 
-  @ContextMethod(name = "Количество", alias = "Count")
-  public IValue count() {
-    return ValueFactory.create(data.size());
-  }
-
-  @ContextMethod(name = "Получить", alias = "Get")
-  public IValue get(IValue key) {
-    return getInternal(key).orElse(ValueFactory.create());
-  }
-
-  // endregion
-
-  // region CollectionIterable
-
-  @Override
-  public IteratorValue iterator() {
-    return V8KeyAndValue.iteratorOf(data.entrySet());
-  }
-
-  protected Optional<IValue> getInternal(IValue key) {
-    final var rawKey = ValueFactory.rawValueOrUndefined(key);
-    if (data.containsKey(rawKey)) {
-      return Optional.of(data.get(rawKey));
+    @ContextMethod(name = "Количество", alias = "Count")
+    public IValue count() {
+        return ValueFactory.create(data.size());
     }
-    return Optional.empty();
-  }
 
-  // endregion
+    @ContextMethod(name = "Получить", alias = "Get")
+    public IValue get(IValue key) {
+        return getInternal(key).orElse(ValueFactory.create());
+    }
+
+    // endregion
+
+    // region CollectionIterable
+
+    @Override
+    public IteratorValue iterator() {
+        return V8KeyAndValue.iteratorOf(data.entrySet());
+    }
+
+    protected Optional<IValue> getInternal(IValue key) {
+        final var rawKey = ValueFactory.rawValueOrUndefined(key);
+        if (data.containsKey(rawKey)) {
+            return Optional.of(data.get(rawKey));
+        }
+        return Optional.empty();
+    }
+
+    // endregion
 
 }

@@ -9,6 +9,6 @@ import lombok.Value;
 
 @Value
 public class AnnotationDefinition {
-  String name;
-  AnnotationParameter[] parameters;
+    String name;
+    AnnotationParameter[] parameters;
 }

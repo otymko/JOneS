@@ -24,69 +24,72 @@ import lombok.Value;
 @Value
 public class BinaryDataQualifiers extends ContextValue {
 
-  public static final ContextInfo INFO = ContextInfo.createByClass(BinaryDataQualifiers.class);
+    public static final ContextInfo INFO = ContextInfo.createByClass(BinaryDataQualifiers.class);
 
-  /**
-   * Размер двоичных данных
-   */
-  @ContextProperty(name = "Длина", alias = "Length", accessMode = PropertyAccessMode.READ_ONLY)
-  int length;
+    /**
+     * Размер двоичных данных
+     */
+    @ContextProperty(name = "Длина", alias = "Length", accessMode = PropertyAccessMode.READ_ONLY)
+    int length;
 
-  /**
-   * Допустимый размер данных. 0 - Неограниченно
-   *
-   * @see AllowedLength
-   */
-  @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
-  AllowedLength allowedLength;
+    /**
+     * Допустимый размер данных. 0 - Неограниченно
+     *
+     * @see AllowedLength
+     */
+    @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
+    AllowedLength allowedLength;
 
-  public IValue getLength() {
-    return ValueFactory.create(length);
-  }
+    public IValue getLength() {
+        return ValueFactory.create(length);
+    }
 
-  public IValue getAllowedLength() {
-    return EnumerationHelper.getEnumByClass(AllowedLength.class).getEnumValueType(allowedLength);
-  }
+    public IValue getAllowedLength() {
+        return EnumerationHelper.getEnumByClass(AllowedLength.class).getEnumValueType(allowedLength);
+    }
 
-  /**
-   * Возвращает квалификаторы двоичных данных по указанным параметрам
-   * @param length        Максимальный размер данных
-   * @param allowedLength Допустимый размер данных
-   * @return КвалификаторыДвоичныхДанных
-   * @see BinaryDataQualifiers
-   * @see AllowedLength
-   */
-  @ContextConstructor
-  public static BinaryDataQualifiers constructor(IValue length, IValue allowedLength) {
-    final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLength.VARIABLE);
-    return new BinaryDataQualifiers(length.asNumber().intValue(), (AllowedLength) allowedLengthValue.getValue());
-  }
+    /**
+     * Возвращает квалификаторы двоичных данных по указанным параметрам
+     *
+     * @param length        Максимальный размер данных
+     * @param allowedLength Допустимый размер данных
+     * @return КвалификаторыДвоичныхДанных
+     * @see BinaryDataQualifiers
+     * @see AllowedLength
+     */
+    @ContextConstructor
+    public static BinaryDataQualifiers constructor(IValue length, IValue allowedLength) {
+        final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLength.VARIABLE);
+        return new BinaryDataQualifiers(length.asNumber().intValue(), (AllowedLength) allowedLengthValue.getValue());
+    }
 
-  /**
-   * Возвращает квалификаторы двоичных данных указанной длины. Допустимая длина устанавливается Переменная.
-   * @param length        Максимальный размер данных
-   * @return КвалификаторыДвоичныхДанных
-   * @see BinaryDataQualifiers
-   * @see AllowedLength
-   */
-  @ContextConstructor
-  public static BinaryDataQualifiers constructor(IValue length) {
-    return new BinaryDataQualifiers(length.asNumber().intValue(), AllowedLength.VARIABLE);
-  }
+    /**
+     * Возвращает квалификаторы двоичных данных указанной длины. Допустимая длина устанавливается Переменная.
+     *
+     * @param length Максимальный размер данных
+     * @return КвалификаторыДвоичныхДанных
+     * @see BinaryDataQualifiers
+     * @see AllowedLength
+     */
+    @ContextConstructor
+    public static BinaryDataQualifiers constructor(IValue length) {
+        return new BinaryDataQualifiers(length.asNumber().intValue(), AllowedLength.VARIABLE);
+    }
 
-  /**
-   * Возвращает квалификаторы двоичных данных неограниченной длины. Допустимая длина устанавливается Переменная.
-   * @return КвалификаторыДвоичныхДанных
-   * @see BinaryDataQualifiers
-   * @see AllowedLength
-   */
-  @ContextConstructor
-  public static BinaryDataQualifiers constructor() {
-    return new BinaryDataQualifiers(0, AllowedLength.VARIABLE);
-  }
+    /**
+     * Возвращает квалификаторы двоичных данных неограниченной длины. Допустимая длина устанавливается Переменная.
+     *
+     * @return КвалификаторыДвоичныхДанных
+     * @see BinaryDataQualifiers
+     * @see AllowedLength
+     */
+    @ContextConstructor
+    public static BinaryDataQualifiers constructor() {
+        return new BinaryDataQualifiers(0, AllowedLength.VARIABLE);
+    }
 
-  @Override
-  public ContextInfo getContextInfo() {
-    return INFO;
-  }
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
 }
