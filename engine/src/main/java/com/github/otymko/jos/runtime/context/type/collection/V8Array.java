@@ -15,10 +15,13 @@ import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.machine.context.ContextValueConverter;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.otymko.jos.runtime.machine.context.ContextValueConverter.convertValue;
 
 @ContextClass(name = "Массив", alias = "Array")
 public class V8Array extends ContextValue implements IndexAccessor, CollectionIterable {
@@ -58,11 +61,11 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     }
 
     @ContextMethod(name = "Вставить", alias = "Insert")
-    public void insert(IValue inputIndex, IValue value) {
-        var index = inputIndex.getRawValue().asNumber().intValue();
+    public void insert(int index, IValue value) {
         if (index < 0) {
             throw MachineException.indexValueOutOfRangeException();
         }
+
         if (index > values.size()) {
             extend(index - values.size());
         }
@@ -87,8 +90,7 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     }
 
     @ContextMethod(name = "Удалить", alias = "Delete")
-    public void delete(IValue inputIndex) {
-        var index = inputIndex.getRawValue().asNumber().intValue();
+    public void delete(int index) {
         values.remove(index);
     }
 
@@ -98,14 +100,12 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     }
 
     @ContextMethod(name = "Получить", alias = "Get")
-    public IValue get(IValue inputIndex) {
-        var index = inputIndex.getRawValue().asNumber().intValue();
+    public IValue get(int index) {
         return values.get(index);
     }
 
     @ContextMethod(name = "Установить", alias = "Set")
-    public void set(IValue inputIndex, IValue value) {
-        var index = inputIndex.getRawValue().asNumber().intValue();
+    public void set(int index, IValue value) {
         if (index < 0 || index >= values.size()) {
             throw MachineException.indexValueOutOfRangeException();
         }
@@ -114,12 +114,12 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
 
     @Override
     public IValue getIndexedValue(IValue index) {
-        return get(index);
+        return get(convertValue(index, int.class));
     }
 
     @Override
     public void setIndexedValue(IValue index, IValue value) {
-        set(index, value);
+        set(convertValue(index, int.class), value);
     }
 
     @Override

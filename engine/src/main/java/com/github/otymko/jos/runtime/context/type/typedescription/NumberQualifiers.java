@@ -111,29 +111,29 @@ public class NumberQualifiers extends ContextValue {
     }
 
     @ContextConstructor
-    public static NumberQualifiers constructor(IValue digits, IValue fractionDigits, IValue allowedSign) {
+    public static NumberQualifiers constructor(int digits, int fractionDigits, IValue allowedSign) {
 
         final var allowedSignValue = EnumerationHelper.getEnumValueOrDefault(allowedSign, AllowedSign.ANY);
         return new NumberQualifiers(
-                digits.asNumber().intValue(),
-                fractionDigits.asNumber().intValue(),
+                digits,
+                fractionDigits,
                 (AllowedSign) allowedSignValue.getValue());
     }
 
     @ContextConstructor
-    public static NumberQualifiers constructor(IValue digits, IValue fractionDigits) {
+    public static NumberQualifiers constructor(int digits, int fractionDigits) {
 
         return new NumberQualifiers(
-                digits.asNumber().intValue(),
-                fractionDigits.asNumber().intValue(),
+                digits,
+                fractionDigits,
                 AllowedSign.ANY);
     }
 
     @ContextConstructor
-    public static NumberQualifiers constructor(IValue digits) {
+    public static NumberQualifiers constructor(int digits) {
 
         return new NumberQualifiers(
-                digits.asNumber().intValue(),
+                digits,
                 0,
                 AllowedSign.ANY);
     }
