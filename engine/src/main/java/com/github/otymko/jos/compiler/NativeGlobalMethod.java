@@ -64,6 +64,7 @@ public class NativeGlobalMethod {
         addNativeMethod("Булево", "Boolean", OperationCode.BOOL, REQUIRED_PARAMETER);
         addNativeMethod("Дата", "Date", OperationCode.DATE, REQUIRED_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER, OPTIONAL_PARAMETER);
         addNativeMethod("Формат", "Format", OperationCode.FORMAT, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
+        addNativeMethod("Найти", "Find", OperationCode.STR_POS, REQUIRED_PARAMETER, REQUIRED_PARAMETER);
     }
 
     private static void addNativeMethod(String name, String alias, OperationCode code, ParameterInfo... params) {

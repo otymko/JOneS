@@ -435,6 +435,9 @@ public class MachineInstance {
             case TRIM_LR:
                 trimLR(argument);
                 break;
+            case STR_POS:
+                strPos();
+                break;
 
             case LEFT:
                 left(argument);
@@ -572,6 +575,15 @@ public class MachineInstance {
     private void trimLR(int argument) {
         var value = operationStack.pop().asString();
         operationStack.push(ValueFactory.create(value.strip()));
+        nextInstruction();
+    }
+
+    private void strPos() {
+        var needle = operationStack.pop().asString();
+        var haystack = operationStack.pop().asString();
+
+        var result = haystack.indexOf(needle) + 1;
+        operationStack.push(ValueFactory.create(result));
         nextInstruction();
     }
 
