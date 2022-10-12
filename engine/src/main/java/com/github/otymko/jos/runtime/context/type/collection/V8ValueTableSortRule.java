@@ -10,6 +10,12 @@ import lombok.Value;
 
 import java.util.regex.Pattern;
 
+/**
+ * Элемент правил сортировки таблицы значений.
+ *
+ * @see V8ValueTable
+ * @see V8ValueTableSorter
+ */
 @Value
 class V8ValueTableSortRule {
     public static int ASC = 1;
@@ -25,6 +31,9 @@ class V8ValueTableSortRule {
 
     private static int COLUMN_NAME_INDEX = 0;
     private static int SORT_DIRECTION_INDEX = 1;
+
+    V8ValueTableColumn column;
+    int order; // +1, -1
 
     static V8ValueTableSortRule parse(String element, V8ValueTableColumnCollection columns) {
         final var ruleElements = splitter.split(element);
@@ -51,9 +60,6 @@ class V8ValueTableSortRule {
         }
         throw MachineException.invalidArgumentValueException();
     }
-
-    V8ValueTableColumn column;
-    int order; // +1, -1
 
     public int apply(V8ValueTableRow r1, V8ValueTableRow r2) {
         final var v1 = r1.get(column);

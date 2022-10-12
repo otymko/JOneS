@@ -13,12 +13,23 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Вспомогательный класс сортировки таблицы значений по набору полей и направлений.
+ *
+ * @see V8ValueTable
+ */
 class V8ValueTableSorter implements Comparator<IValue> {
 
     private static final Pattern splitter = Pattern.compile(",");
 
     private final List<V8ValueTableSortRule> rules;
 
+    /**
+     * Создает объект-сортировщик по представлениям полей
+     * @param columns - Колонки таблицы значений
+     * @param sortColumns - Параметры сортировки в виде "(Колонка [Направление])+"
+     * @return объект, позволяющий сравнивать строки по указанным правилам
+     */
     public static V8ValueTableSorter create(V8ValueTableColumnCollection columns, String sortColumns) {
         final var rules = parseRules(columns, sortColumns);
         return new V8ValueTableSorter(rules);
