@@ -9,6 +9,7 @@ import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.localization.Resources;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
 import com.github.otymko.jos.runtime.machine.context.ContextValueConverter;
 import com.github.otymko.jos.runtime.machine.info.ConstructorInfo;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
@@ -97,6 +98,24 @@ public final class ContextMethodCall {
         }
     }
 
+    private static Object[] prepareArgumentsWithVarArgs(Method method, IValue[] arguments) {
+        final var list = new ArrayList<Object>();
+        final var staticArgumentsCount = method.getParameterCount() - 1;
+        var parameters = method.getParameters();
+        for (int i = 0; i < staticArgumentsCount; i++) {
+            if (i < arguments.length) {
+                var parameter = parameters[i];
+                var value = arguments[i];
+                list.add(ContextValueConverter.convertValue(value, parameter.getType()));
+            } else {
+                list.add(UndefinedValue.VALUE);
+            }
+        }
+        final var varArgs = new ArrayList<>(Arrays.asList(arguments).subList(staticArgumentsCount, arguments.length));
+        list.add(varArgs.toArray(new IValue[0]));
+        return list.toArray(new Object[0]);
+    }
+
     /**
      * Подготовить аргументы для передачи в вызов метода.
      *
@@ -106,6 +125,9 @@ public final class ContextMethodCall {
      * @return Подготовленные аргументы метода, конвертированы в запрашиваемые типы.
      */
     private static Object[] prepareArguments(Method method, IValue[] arguments) {
+        if (method.isVarArgs()) {
+            return prepareArgumentsWithVarArgs(method, arguments);
+        }
         List<Object> newArguments = new ArrayList<>(Arrays.asList(arguments));
         if (method.getParameterCount() != arguments.length) {
             while (newArguments.size() < method.getParameterCount()) {
@@ -135,6 +157,13 @@ public final class ContextMethodCall {
         // Ищем первый с бОльшим количеством параметров
         for (var constructor : contextInfo.getConstructors()) {
             if (constructor.getParameters().length > argumentsCount) {
+                return constructor;
+            }
+        }
+
+        // Ищем конструктор с varargs
+        for (var constructor : contextInfo.getConstructors()) {
+            if (constructor.getMethod().isVarArgs()) {
                 return constructor;
             }
         }
