@@ -57,7 +57,6 @@ public class V8KeyAndValue extends ContextValue implements IndexAccessor {
 
     public static IteratorValue iteratorOf(Set<Map.Entry<IValue, IValue>> values) {
         var iterator = values.stream()
-                .sorted((valueOne, valueTwo) -> valueOne.getValue().compareTo(valueTwo.getValue()))
                 .map(entity -> (IValue) (new V8KeyAndValue(entity.getKey(), entity.getValue())))
                 .collect(Collectors.toList()).iterator();
         return new IteratorValue(iterator);
