@@ -6,6 +6,7 @@
 package com.github.otymko.jos.runtime.context.type;
 
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
+import com.github.otymko.jos.runtime.context.type.collection.V8FixedArray;
 import com.github.otymko.jos.runtime.context.type.collection.V8FixedMap;
 import com.github.otymko.jos.runtime.context.type.collection.V8KeyAndValue;
 import com.github.otymko.jos.runtime.context.type.collection.V8Map;
@@ -67,6 +68,7 @@ public class StandardTypeInitializer {
     private void initCollections(TypeManager typeManager) {
         // TODO: name и alias из contextType
         implementTypeByInfo(typeManager, V8Array.INFO);
+        implementTypeByInfo(typeManager, V8FixedArray.INFO);
         implementTypeByInfo(typeManager, V8KeyAndValue.INFO);
         implementTypeByInfo(typeManager, V8Structure.INFO);
         implementTypeByInfo(typeManager, V8Map.INFO);

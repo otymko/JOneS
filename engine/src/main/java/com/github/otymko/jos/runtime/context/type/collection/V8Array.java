@@ -16,6 +16,8 @@ import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.AccessLevel;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +28,20 @@ import static com.github.otymko.jos.runtime.machine.context.ContextValueConverte
 public class V8Array extends ContextValue implements IndexAccessor, CollectionIterable {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8Array.class);
 
+    @Getter(AccessLevel.PACKAGE)
     private final List<IValue> values;
+
+    @ContextConstructor
+    public static IValue createByV8FixedArray(V8FixedArray array) {
+        return new V8Array(array);
+    }
 
     public V8Array() {
         values = new ArrayList<>();
+    }
+
+    public V8Array(V8FixedArray array) {
+        values = List.copyOf(array.getValues());
     }
 
     @Override
