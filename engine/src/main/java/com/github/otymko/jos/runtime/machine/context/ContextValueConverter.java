@@ -9,15 +9,13 @@ import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
-import lombok.experimental.UtilityClass;
 
 import java.util.Date;
 
 /**
  * Конвертер IValue в значения райнтайма
  */
-@UtilityClass
-public class ContextValueConverter {
+public final class ContextValueConverter {
 
     /**
      * Конвертировать IValue в значение рантайма с указанным типом
@@ -29,7 +27,7 @@ public class ContextValueConverter {
      * @param <T> тип итогового значения
      */
     @SuppressWarnings("unchecked")
-    public <T> T convertValue(IValue value, Class<T> type) {
+    public static <T> T convertValue(IValue value, Class<T> type) {
         try {
             return (T) convertValueByType(value, type);
         }
@@ -38,7 +36,7 @@ public class ContextValueConverter {
         }
     }
 
-    private Object convertValueByType(IValue value, Class<?> type) {
+    private static Object convertValueByType(IValue value, Class<?> type) {
         if (value == null) {
             return null;
         }
@@ -78,5 +76,9 @@ public class ContextValueConverter {
         }
 
         return valueObject;
+    }
+
+    private ContextValueConverter() {
+        // None
     }
 }

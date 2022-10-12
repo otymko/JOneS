@@ -12,7 +12,6 @@ import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.machine.context.ContextValueConverter;
 import com.github.otymko.jos.runtime.machine.info.ConstructorInfo;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,8 +25,7 @@ import static com.github.otymko.jos.localization.MessageResource.ERROR_CALL_METH
 /**
  * Утилитный класс для упрощения вызова методов контекста
  */
-@UtilityClass
-public class ContextMethodCall {
+public final class ContextMethodCall {
     /**
      * Вызвать метод-конструктор. Поиск конструкторов ведется по количеству аргументов.
      *
@@ -36,7 +34,7 @@ public class ContextMethodCall {
      *
      * @return Результат вызова метода-конструктора
      */
-    public IValue callConstructor(ContextInfo contextInfo, IValue[] arguments) {
+    public static IValue callConstructor(ContextInfo contextInfo, IValue[] arguments) {
         final var constructorInfo = findConstructor(contextInfo, arguments.length);
 
         var methodCall = constructorInfo.getMethod();
@@ -60,7 +58,7 @@ public class ContextMethodCall {
      *
      * @return Результат вызова метода контекста.
      */
-    public IValue callAsFunction(RuntimeContext context, Method method, IValue[] arguments) {
+    public static IValue callAsFunction(RuntimeContext context, Method method, IValue[] arguments) {
         Object result;
         try {
             result = method.invoke(context, ContextMethodCall.prepareArguments(method, arguments));
@@ -84,7 +82,7 @@ public class ContextMethodCall {
      * @param method Метод контекста.
      * @param arguments Аргументы метода контекста.
      */
-    public void callAsProcedure(RuntimeContext context, Method method, IValue[] arguments) {
+    public static void callAsProcedure(RuntimeContext context, Method method, IValue[] arguments) {
         try {
             method.invoke(context, ContextMethodCall.prepareArguments(method, arguments));
         } catch (MachineException exception) {
@@ -107,7 +105,7 @@ public class ContextMethodCall {
      *
      * @return Подготовленные аргументы метода, конвертированы в запрашиваемые типы.
      */
-    private Object[] prepareArguments(Method method, IValue[] arguments) {
+    private static Object[] prepareArguments(Method method, IValue[] arguments) {
         List<Object> newArguments = new ArrayList<>(Arrays.asList(arguments));
         if (method.getParameterCount() != arguments.length) {
             while (newArguments.size() < method.getParameterCount()) {
@@ -126,7 +124,7 @@ public class ContextMethodCall {
         return convertedArguments;
     }
 
-    private ConstructorInfo findConstructor(ContextInfo contextInfo, int argumentsCount) {
+    private static ConstructorInfo findConstructor(ContextInfo contextInfo, int argumentsCount) {
         // TODO: ищем конструктор по количеству аргументов
         for (var constructor : contextInfo.getConstructors()) {
             if (constructor.getParameters().length == argumentsCount) {
@@ -142,5 +140,9 @@ public class ContextMethodCall {
         }
 
         throw MachineException.constructorNotFoundException(contextInfo.getName());
+    }
+
+    private ContextMethodCall() {
+        // None
     }
 }
