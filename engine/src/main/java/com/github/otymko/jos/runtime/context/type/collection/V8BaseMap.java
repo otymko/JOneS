@@ -49,9 +49,9 @@ public abstract class V8BaseMap extends ContextValue implements IndexAccessor, C
         if (data.containsKey(rawKey)) {
             return Optional.of(data.get(rawKey));
         }
+
         return Optional.empty();
     }
 
     // endregion
-
 }

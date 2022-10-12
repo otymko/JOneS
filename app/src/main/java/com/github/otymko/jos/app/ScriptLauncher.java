@@ -16,7 +16,6 @@ import java.nio.file.Path;
 public class ScriptLauncher {
 
     public static void main(String[] args) throws Exception {
-
         if (args.length == 0) {
             throw new ApplicationException(Resources.getResourceString(MessageResource.EXPECTED_AT_LEAST_ONE_ARGUMENT));
         }

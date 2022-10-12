@@ -34,14 +34,10 @@ public class FileOperationsGlobalContext implements AttachableContext {
     }
 
     @ContextMethod(name = "ПолучитьИмяВременногоФайла", alias = "GetTempFileName")
-    public static IValue getTempFileName(IValue extension) {
+    public static IValue getTempFileName(String extension) {
         String suffix = "";
         if (extension != null) {
-            if (!(extension.getRawValue() instanceof StringValue)) {
-                throw MachineException.invalidArgumentValueException();
-            }
-
-            suffix = "." + extension.getRawValue().asString();
+            suffix = "." + extension;
         }
 
         String tmpDirectory = System.getProperty(PROPERTY_TMPDIR);
