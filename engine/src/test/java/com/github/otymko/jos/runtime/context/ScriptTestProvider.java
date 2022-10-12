@@ -1,11 +1,13 @@
-package com.github.otymko.jos.runtime.context.type;
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+package com.github.otymko.jos.runtime.context;
 
 import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.common.ScriptTester;
 import com.github.otymko.jos.compiler.ScriptCompiler;
-import com.github.otymko.jos.runtime.context.BaseScriptTest;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.TestScript;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
