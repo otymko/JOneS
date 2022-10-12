@@ -87,7 +87,7 @@ public class SystemGlobalContext implements AttachableContext {
     }
 
     @ContextMethod(name = "ЗначениеЗаполнено", alias = "ValueIsFilled")
-    public static IValue valueIsFilled(IValue pValue) {
-        return ValueFactory.create(valueIsFilledInternal(pValue));
+    public static IValue valueIsFilled(IValue value) {
+        return ValueFactory.create(valueIsFilledInternal(value));
     }
 }

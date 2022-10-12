@@ -35,15 +35,13 @@ public class StringOperationGlobalContext implements AttachableContext {
     //endregion
 
     @ContextMethod(name = "СтрНайти", alias = "StrFind")
-    public static IValue find(IValue where, IValue what, IValue direction, IValue start, IValue occurrence) {
-        var whereValue = where.getRawValue().asString();
-        var whatValue = what.getRawValue().asString();
+    public static IValue find(String where, String what, IValue direction, IValue start, IValue occurrence) {
         var directionValue = EnumerationHelper.getEnumValueOrDefault(direction, SearchDirection.FROM_BEGIN);
         var startValue = start == null ? 0 : start.getRawValue().asNumber().intValue();
         var occurrenceValue = occurrence == null ? 1 : occurrence.getRawValue().asNumber().intValue();
 
-        var length = whereValue.length();
-        if (length == 0 || whatValue.length() == 0) {
+        var length = where.length();
+        if (length == 0 || what.length() == 0) {
             return ValueFactory.create(0);
         }
 
@@ -66,7 +64,7 @@ public class StringOperationGlobalContext implements AttachableContext {
 
         if (fromBegin) {
             while (foundTimes < occurrenceValue && index >= 0) {
-                index = whereValue.indexOf(whatValue);
+                index = where.indexOf(what);
                 if (index >= 0) {
                     startIndex = index + 1;
                     foundTimes++;
@@ -77,7 +75,7 @@ public class StringOperationGlobalContext implements AttachableContext {
             }
         } else {
             while (foundTimes < occurrenceValue && index >= 0) {
-                index = whereValue.lastIndexOf(whatValue);
+                index = where.lastIndexOf(what);
                 if (index >= 0) {
                     startIndex = index - 1;
                     foundTimes++;
@@ -95,7 +93,7 @@ public class StringOperationGlobalContext implements AttachableContext {
     }
 
     @ContextMethod(name = "СтрНачинаетсяС", alias = "StrStartsWith")
-    public static IValue startsWith(IValue inputString, IValue searchString) {
+    public static IValue startsWith(String inputString, String searchString) {
         var inputValue = getStringArgument(inputString);
         var searchValue = getStringArgument(searchString);
 
@@ -113,7 +111,7 @@ public class StringOperationGlobalContext implements AttachableContext {
     }
 
     @ContextMethod(name = "СтрЗаканчиваетсяНа", alias = "StrEndsWith")
-    public static IValue endsWith(IValue inputString, IValue searchString) {
+    public static IValue endsWith(String inputString, String searchString) {
         var inputValue = getStringArgument(inputString);
         var searchValue = getStringArgument(searchString);
 
@@ -131,10 +129,10 @@ public class StringOperationGlobalContext implements AttachableContext {
     }
 
     @ContextMethod(name = "СтрРазделить", alias = "StrSplit")
-    public static IValue strSplit(IValue source, IValue delimiter, IValue includeEmpty) {
+    public static IValue strSplit(String source, String delimiter, Boolean includeEmpty) {
         final var sourceString = getStringArgument(source);
         final var delimiterString = getStringArgument(delimiter);
-        final var includeEmptyFlag = includeEmpty == null || includeEmpty.asBoolean();
+        final var includeEmptyFlag = includeEmpty == null || includeEmpty;
 
         final var result = V8Array.constructor();
         if (delimiterString.isEmpty()) {
@@ -153,9 +151,7 @@ public class StringOperationGlobalContext implements AttachableContext {
     }
 
     @ContextMethod(name = "СтрСравнить", alias = "StrCompare")
-    public static IValue strCompare(IValue leftValue, IValue rightValue) {
-        var left = leftValue.getRawValue().asString();
-        var right = rightValue.getRawValue().asString();
+    public static IValue strCompare(String left, String right) {
         var result = left.compareToIgnoreCase(right);
         if (result < 0) {
             return ValueFactory.create(-1);
@@ -167,24 +163,19 @@ public class StringOperationGlobalContext implements AttachableContext {
     }
 
     @ContextMethod(name = "СтрСоединить", alias = "StrConcat")
-    public static IValue strConcat(IValue inputCollection, IValue inputSeparator) {
-        var collection = inputCollection.getRawValue();
-        if (!(collection instanceof V8Array)) {
-            throw MachineException.invalidArgumentValueException();
-        }
-
+    public static IValue strConcat(V8Array array, IValue inputSeparator) {
         var separator = inputSeparator == null ? "" : inputSeparator.getRawValue().asString();
 
         var joiner = new StringJoiner(separator);
-        for (var value : ((V8Array) collection).iterator()) {
+        for (var value : array.iterator()) {
             joiner.add(value.getRawValue().asString());
         }
 
         return ValueFactory.create(joiner.toString());
     }
 
-    private static String getStringArgument(IValue argument) {
-        return argument == null ? "" : argument.asString();
+    private static String getStringArgument(String argument) {
+        return argument == null ? "" : argument;
     }
 
 }

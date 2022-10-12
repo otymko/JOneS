@@ -9,6 +9,8 @@ import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.localization.Resources;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
+import com.github.otymko.jos.runtime.context.type.ContextMethodCall;
+import com.github.otymko.jos.runtime.machine.context.ContextValueConverter;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 
@@ -23,37 +25,15 @@ public interface RuntimeContext {
     default void callAsProcedure(int methodId, IValue[] arguments) {
         var methodInfo = getContextInfo().getMethods()[methodId];
         var callMethod = methodInfo.getMethod();
-        try {
-            callMethod.invoke(this, arguments);
-        } catch (MachineException exception) {
-            throw exception;
-        } catch (IllegalAccessException exception) {
-            throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
-        } catch (InvocationTargetException exception) {
-            if (exception.getTargetException() instanceof MachineException) {
-                throw (MachineException) exception.getTargetException();
-            }
-            throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
-        }
+
+        ContextMethodCall.callAsProcedure(this, callMethod, arguments);
     }
 
     default IValue callAsFunction(int methodId, IValue[] arguments) {
         var methodInfo = getContextInfo().getMethods()[methodId];
         var callMethod = methodInfo.getMethod();
-        Object result;
-        try {
-            result = callMethod.invoke(this, arguments);
-        } catch (MachineException exception) {
-            throw exception;
-        } catch (IllegalAccessException exception) {
-            throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
-        } catch (InvocationTargetException exception) {
-            if (exception.getTargetException() instanceof MachineException) {
-                throw (MachineException) exception.getTargetException();
-            }
-            throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
-        }
-        return (IValue) result;
+
+        return ContextMethodCall.callAsFunction(this, callMethod, arguments);
     }
 
     default int findMethodId(String name) {
@@ -110,14 +90,14 @@ public interface RuntimeContext {
         if (property.hasSetter()) {
             var setter = property.getSetter();
             try {
-                setter.invoke(this, value);
+                setter.invoke(this, ContextValueConverter.convertValue(value, setter.getParameterTypes()[0]));
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new MachineException(Resources.getResourceString(ERROR_SET_PROPERTY_VALUE));
             }
         } else {
             var field = property.getField();
             try {
-                field.set(this, value);
+                field.set(this, ContextValueConverter.convertValue(value, field.getType()));
             } catch (IllegalAccessException e) {
                 throw new MachineException(Resources.getResourceString(ERROR_SET_PROPERTY_VALUE));
             }

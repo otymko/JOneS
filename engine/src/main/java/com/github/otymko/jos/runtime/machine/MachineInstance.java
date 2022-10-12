@@ -26,7 +26,7 @@ import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.type.DataType;
-import com.github.otymko.jos.runtime.context.type.TypeFactory;
+import com.github.otymko.jos.runtime.context.type.ContextMethodCall;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.primitive.TypeValue;
 import com.github.otymko.jos.runtime.format.ValueFormatter;
@@ -41,12 +41,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Deque;
-import java.util.EnumMap;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.github.otymko.jos.util.StringUtils.toTitleCase;
@@ -1005,7 +1002,7 @@ public class MachineInstance {
         }
 
         // TODO: MachineRuntimeException.constructorNotFoundException
-        var typeInstance = TypeFactory.callConstructor(contextInfo, argumentValues);
+        var typeInstance = ContextMethodCall.callConstructor(contextInfo, argumentValues);
         operationStack.push(typeInstance);
 
         nextInstruction();

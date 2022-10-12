@@ -58,22 +58,23 @@ public class BinaryDataQualifiers extends ContextValue {
      * @see AllowedLength
      */
     @ContextConstructor
-    public static BinaryDataQualifiers constructor(IValue length, IValue allowedLength) {
+    public static BinaryDataQualifiers constructor(int length, IValue allowedLength) {
         final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLength.VARIABLE);
-        return new BinaryDataQualifiers(length.asNumber().intValue(), (AllowedLength) allowedLengthValue.getValue());
+        return new BinaryDataQualifiers(length, (AllowedLength) allowedLengthValue.getValue());
     }
 
     /**
      * Возвращает квалификаторы двоичных данных указанной длины. Допустимая длина устанавливается Переменная.
      *
      * @param length Максимальный размер данных
+     *
      * @return КвалификаторыДвоичныхДанных
      * @see BinaryDataQualifiers
      * @see AllowedLength
      */
     @ContextConstructor
-    public static BinaryDataQualifiers constructor(IValue length) {
-        return new BinaryDataQualifiers(length.asNumber().intValue(), AllowedLength.VARIABLE);
+    public static BinaryDataQualifiers constructor(int length) {
+        return new BinaryDataQualifiers(length, AllowedLength.VARIABLE);
     }
 
     /**

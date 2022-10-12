@@ -32,17 +32,13 @@ public class V8Map extends V8BaseMap {
     }
 
     @ContextConstructor
-    public static IValue constructor(IValue fixedMap) {
-        final var rawValue = fixedMap.getRawValue();
-        if (!(rawValue instanceof V8FixedMap)) {
-            throw MachineException.invalidArgumentValueException();
-        }
-        final var rawFixedMap = (V8FixedMap) rawValue;
+    public static IValue constructor(V8FixedMap fixedMap) {
         final var result = new V8Map();
-        for (final var value : rawFixedMap.iterator()) {
+        for (final var value : fixedMap.iterator()) {
             final var element = (V8KeyAndValue) value;
             result.insert(element.getKey(), element.getValue());
         }
+
         return result;
     }
 

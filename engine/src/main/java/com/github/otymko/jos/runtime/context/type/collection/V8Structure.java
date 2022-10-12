@@ -6,7 +6,7 @@
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.Variable;
+import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
@@ -108,7 +108,7 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
     }
 
     @ContextMethod(name = "Свойство", alias = "Property")
-    public IValue hasProperty(IValue key, Variable value) {
+    public IValue hasProperty(IValue key, IVariable value) {
         if (!Common.isValidStringIdentifier(key)) {
             throw MachineException.invalidPropertyNameStructureException(key.asString());
         }

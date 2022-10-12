@@ -41,7 +41,7 @@ public abstract class ContextValue implements IValue, ContextType, RuntimeContex
 
     @Override
     public DataType getDataType() {
-        return DataType.TYPE;
+        return DataType.OBJECT;
     }
 
     @Override

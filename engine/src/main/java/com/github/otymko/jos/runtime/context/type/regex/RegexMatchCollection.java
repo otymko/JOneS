@@ -61,6 +61,7 @@ public class RegexMatchCollection extends ContextValue implements CollectionIter
     public IValue getIndexedValue(IValue inputIndex) {
         var index = inputIndex.getRawValue().asNumber().intValue();
         var result = (MatchResult) results.toArray()[index];
+
         return new RegexMatch(result, pattern);
     }
 
@@ -68,5 +69,4 @@ public class RegexMatchCollection extends ContextValue implements CollectionIter
     public void setIndexedValue(IValue index, IValue value) {
         throw MachineException.getPropertyIsNotWritableException(index.asString());
     }
-
 }

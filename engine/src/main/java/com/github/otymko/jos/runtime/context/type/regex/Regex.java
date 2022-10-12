@@ -17,28 +17,24 @@ import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-import lombok.Getter;
 
 import java.util.regex.Pattern;
 
+/**
+ * Реализация типа "РегулярноеВыражение"
+ */
 @ContextClass(name = "РегулярноеВыражение", alias = "Regex")
 public class Regex extends ContextValue implements IndexAccessor {
     public static final ContextInfo INFO = ContextInfo.createByClass(Regex.class);
 
     private final String pattern;
     private Pattern regularExpression;
-
-    @Getter
-    @ContextProperty(name = "ИгнорироватьРегистр", alias = "IgnoreCase")
-    public IValue ignoreCase = ValueFactory.create(true);
-
-    @Getter
-    @ContextProperty(name = "Многострочный", alias = "Multiline")
-    public IValue multiline = ValueFactory.create(true);
+    public boolean ignoreCase = true;
+    public boolean multiline = true;
 
     private Regex(String pattern) {
         this.pattern = pattern;
-        this.regularExpression = Pattern.compile(this.pattern, getPatternFlags());
+        recompileRegular();
     }
 
     //region ContextValue
@@ -78,20 +74,26 @@ public class Regex extends ContextValue implements IndexAccessor {
 
     //endregion
 
-    public void setIgnoreCase(IValue inputIgnoreCase) {
-        if (!ignoreCase.equals(inputIgnoreCase.getRawValue())) {
-            ignoreCase = inputIgnoreCase.getRawValue();
-            int flags = getPatternFlags();
-            regularExpression = Pattern.compile(pattern, flags);
-        }
+    @ContextProperty(name = "ИгнорироватьРегистр", alias = "IgnoreCase")
+    public void setIgnoreCase(boolean ignoreCase) {
+        this.ignoreCase = ignoreCase;
+
+        recompileRegular();
     }
 
-    public void setMultiline(IValue inputMultiline) {
-        if (!multiline.equals(inputMultiline.getRawValue())) {
-            multiline = inputMultiline.getRawValue();
-            int flags = getPatternFlags();
-            regularExpression = Pattern.compile(pattern, flags);
-        }
+    public IValue getIgnoreCase() {
+        return ValueFactory.create(ignoreCase);
+    }
+
+    @ContextProperty(name = "Многострочный", alias = "Multiline")
+    public void setMultiline(boolean multiline) {
+        this.multiline = multiline;
+
+        recompileRegular();
+    }
+
+    public IValue getMultiline() {
+        return ValueFactory.create(multiline);
     }
 
     @ContextConstructor
@@ -100,57 +102,52 @@ public class Regex extends ContextValue implements IndexAccessor {
     }
 
     @ContextMethod(name = "Совпадает", alias = "IsMatch")
-    public IValue isMatch(IValue inputString, IValue startAt) {
-        var value = inputString.getRawValue().asString();
-
-        var startAtValue = startAt == null ? 0 : startAt.getRawValue().asNumber().intValue();
-        if (startAtValue > 0) {
-            return ValueFactory.create(regularExpression.matcher(value).find(startAtValue));
+    public IValue isMatch(String value, Integer startAt) {
+        if (startAt != null && startAt > 0) {
+            return ValueFactory.create(regularExpression.matcher(value).find(startAt));
         }
+
         return ValueFactory.create(regularExpression.matcher(value).find());
     }
 
     @ContextMethod(name = "НайтиСовпадения", alias = "Matches")
-    public IValue matches(IValue inputString, IValue startAt) {
-        var value = inputString.getRawValue().asString();
-
+    public IValue matches(String value, Integer startAt) {
         // TODO: учесть поиск с определенной позиции
-        //var startAtValue = startAt == null ? 0 : startAt.getRawValue().asNumber().intValue();
-
         return new RegexMatchCollection(regularExpression.matcher(value), regularExpression);
     }
 
     @ContextMethod(name = "Разделить", alias = "Split")
-    public IValue split(IValue inputString, IValue count, IValue startAt) {
-        var inputValue = inputString.getRawValue().asString();
-        var countValue = count == null ? 0 : count.getRawValue().asNumber().intValue();
+    public IValue split(String value, Integer count, IValue startAt) {
+        var countValue = count == null ? 0 : count;
 
         // TODO: startAt не используется
-
-        var values = regularExpression.split(inputValue, countValue);
+        var result = regularExpression.split(value, countValue);
         var array = new V8Array();
-        for (var value : values) {
-            array.add(ValueFactory.create(value));
+        for (var item : result) {
+            array.add(ValueFactory.create(item));
         }
+
         return array;
     }
 
     @ContextMethod(name = "Заменить", alias = "Replace")
-    public IValue replace(IValue inputString, IValue replacement) {
-        var value = inputString.asString();
-        var replacementValue = replacement.asString();
-        return ValueFactory.create(value.replaceAll(pattern, replacementValue));
+    public IValue replace(String value, String replacement) {
+        return ValueFactory.create(value.replaceAll(pattern, replacement));
     }
 
     private int getPatternFlags() {
         int flags = Pattern.UNICODE_CASE;
-        if (multiline.asBoolean()) {
+        if (multiline) {
             flags = flags | Pattern.MULTILINE;
         }
-        if (ignoreCase.asBoolean()) {
+        if (ignoreCase) {
             flags = flags | Pattern.CASE_INSENSITIVE;
         }
         return flags;
     }
 
+    private void recompileRegular() {
+        int flags = getPatternFlags();
+        regularExpression = Pattern.compile(pattern, flags);
+    }
 }

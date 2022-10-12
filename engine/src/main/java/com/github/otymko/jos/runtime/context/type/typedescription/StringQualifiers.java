@@ -66,14 +66,14 @@ public class StringQualifiers extends ContextValue {
     }
 
     @ContextConstructor
-    public static StringQualifiers constructor(IValue length, IValue allowedLength) {
+    public static StringQualifiers constructor(int length, IValue allowedLength) {
         final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLength.VARIABLE);
-        return new StringQualifiers(length.asNumber().intValue(), (AllowedLength) allowedLengthValue.getValue());
+        return new StringQualifiers(length, (AllowedLength) allowedLengthValue.getValue());
     }
 
     @ContextConstructor
-    public static StringQualifiers constructor(IValue length) {
-        return new StringQualifiers(length.asNumber().intValue(), AllowedLength.VARIABLE);
+    public static StringQualifiers constructor(int length) {
+        return new StringQualifiers(length, AllowedLength.VARIABLE);
     }
 
     @ContextConstructor

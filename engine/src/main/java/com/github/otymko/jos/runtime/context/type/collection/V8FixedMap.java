@@ -32,12 +32,8 @@ public class V8FixedMap extends V8BaseMap {
     }
 
     @ContextConstructor
-    public static IValue constructor(IValue source) {
-        final var rawValue = source.getRawValue();
-        if (!(rawValue instanceof V8Map)) {
-            throw MachineException.invalidArgumentValueException();
-        }
-        return new V8FixedMap((V8Map) rawValue);
+    public static IValue constructor(V8Map source) {
+        return new V8FixedMap(source);
     }
 
     @Override
@@ -49,5 +45,4 @@ public class V8FixedMap extends V8BaseMap {
     public void setIndexedValue(IValue index, IValue value) {
         throw MachineException.getPropertyIsNotWritableException(index.asString());
     }
-
 }
