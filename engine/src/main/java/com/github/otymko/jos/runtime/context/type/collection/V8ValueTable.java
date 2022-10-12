@@ -85,7 +85,6 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
 
     @ContextMethod(name = "Вставить", alias = "Insert")
     public IValue insert(int index) {
-        // var index = inputIndex.getRawValue().asNumber().intValue();
         if (index < 0) {
             throw MachineException.indexValueOutOfRangeException();
         }
@@ -428,11 +427,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     private List<IValue> asFields(List<V8ValueTableColumn> columns) {
-        final var result = new ArrayList<IValue>();
-        for (final var c: columns) {
-            result.add((IValue) c);
-        }
-        return result;
+        return new ArrayList<>(columns);
     }
 
     @ContextMethod(name = "Итог", alias = "Total")
