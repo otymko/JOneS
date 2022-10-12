@@ -84,8 +84,8 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Вставить", alias = "Insert")
-    public IValue insert(IValue inputIndex) {
-        var index = inputIndex.getRawValue().asNumber().intValue();
+    public IValue insert(int index) {
+        // var index = inputIndex.getRawValue().asNumber().intValue();
         if (index < 0) {
             throw MachineException.indexValueOutOfRangeException();
         }
@@ -96,18 +96,8 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Получить", alias = "Get")
-    public IValue get(IValue inputIndex) {
-        var index = inputIndex.getRawValue().asNumber().intValue();
+    public IValue get(int index) {
         return values.get(index);
-    }
-
-    @ContextMethod(name = "Установить", alias = "Set")
-    public void set(IValue inputIndex, IValue value) {
-        var index = inputIndex.getRawValue().asNumber().intValue();
-        if (index < 0 || index >= values.size()) {
-            throw MachineException.indexValueOutOfRangeException();
-        }
-        values.set(index, value);
     }
 
     @ContextMethod(name = "Удалить", alias = "Delete")
@@ -121,7 +111,13 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Сортировать", alias = "Sort")
-    public void sort(IValue sortColumns) {
+    public void sort(String sortColumns, IValue valueComparer) {
+
+        if (valueComparer != null
+            && valueComparer.getRawValue().getDataType() != DataType.UNDEFINED) {
+            throw MachineException.operationNotImplementedException();
+        }
+
         final var sorter = V8ValueTableSorter.create(columns, sortColumns);
         values.sort(sorter);
     }
@@ -152,7 +148,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Индекс", alias = "Index")
-    public IValue index(IValue row) {
+    public IValue index(V8ValueTableRow row) {
         return ValueFactory.create(indexOfRow(row));
     }
 
@@ -169,10 +165,11 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     private V8Array unloadColumnInternal(IValue columnIndex) {
+        var column = columns.getColumnInternal(columnIndex);
         final var result = V8Array.constructor();
         for (final var row: values) {
             final var castedRow = (V8ValueTableRow) row;
-            final var rowValue = castedRow.getIndexedValue(columnIndex);
+            final var rowValue = castedRow.getIndexedValueInternal(column);
             result.add(rowValue);
         }
         return result;
@@ -241,7 +238,10 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
 
     @ContextMethod(name = "НайтиСтроки", alias = "FindRows")
     public IValue findRows(IValue filterStructure) {
-        final var filter = (V8Structure)filterStructure.getRawValue();
+        if (!(filterStructure instanceof CollectionIterable)) {
+            throw MachineException.invalidArgumentValueException();
+        }
+        final var filter = (CollectionIterable)filterStructure.getRawValue();
         final var result = V8Array.constructor();
 
         final var filterKey = new V8CollectionKey(extractKeyAndValue(filter));
@@ -256,7 +256,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         return result;
     }
 
-    private Map<IValue, IValue> extractKeyAndValue(V8Structure s) {
+    private Map<IValue, IValue> extractKeyAndValue(CollectionIterable<IValue> s) {
         final var result = new HashMap<IValue, IValue>();
         for (final var kv: s.iterator()) {
             final var castedKeyAndValue = (V8KeyAndValue) kv;
@@ -330,7 +330,8 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
             final var newRow = (V8ValueTableRow)result.add();
             for (final var sourceColumn: columns) {
                 final var targetColumn = columnMap.get(sourceColumn);
-                newRow.setIndexedValue(targetColumn, castedRow.getIndexedValue(sourceColumn));
+                final var value = castedRow.getIndexedValueInternal(sourceColumn);
+                newRow.setIndexedValueInternal(targetColumn, value);
             }
         }
 
@@ -435,12 +436,12 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Итог", alias = "Total")
-    public IValue total(IValue index) {
+    public IValue total(IValue column) {
         boolean hasData = false;
         BigDecimal result = BigDecimal.ZERO;
         for (final var row: values) {
             final var castedRow = (V8ValueTableRow)row;
-            final var rowValue = castedRow.getIndexedValue(index);
+            final var rowValue = castedRow.getIndexedValue(column);
             if (rowValue.getDataType() == DataType.NUMBER) {
                 hasData = true;
                 result = result.add(rowValue.asNumber());
@@ -459,11 +460,11 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
 
     @Override
     public IValue getIndexedValue(IValue index) {
-        return get(index);
+        return get(index.asNumber().intValueExact());
     }
 
     @Override
     public void setIndexedValue(IValue index, IValue value) {
-        set(index, value);
+        throw MachineException.getPropertyIsNotWritableException("");
     }
 }

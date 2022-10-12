@@ -13,6 +13,7 @@ import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.typedescription.TypeDescription;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.util.Objects;
 
@@ -34,22 +35,36 @@ public class V8ValueTableColumn extends ContextValue {
     private TypeDescription valueType;
     private int width;
 
+    @Getter
+    private IValue defaultValue;
+
     @ContextProperty(name = "Имя", alias = "Name")
     public IValue getName() {
         return ValueFactory.create(name);
     }
 
-    public String getNameInternal() {
+    @ContextProperty(name = "Заголовок", alias = "Title")
+    public IValue getTitle() {
+        return ValueFactory.create(title);
+    }
+
+    @ContextProperty(name = "ТипЗначения", alias = "ValueType")
+    public IValue getValueType() {
+        return valueType;
+    }
+
+    @ContextProperty(name = "Ширина", alias = "Width")
+    public IValue getWidth() {
+        return ValueFactory.create(width);
+    }
+
+    String getNameInternal() {
         return name;
     }
 
     @Override
     public ContextInfo getContextInfo() {
         return INFO;
-    }
-
-    public IValue getDefaultValue() {
-        return adjustValue(ValueFactory.create());
     }
 
     public IValue adjustValue(IValue value) {
@@ -61,7 +76,14 @@ public class V8ValueTableColumn extends ContextValue {
     }
 
     public V8ValueTableColumn copyTo(V8ValueTable newOwner) {
-        return new V8ValueTableColumn(newOwner, name, title, valueType, width);
+        var newBuilder = new V8ValueTableColumnBuilder();
+        return newBuilder.owner(newOwner)
+                .name(name)
+                .title(title)
+                .valueType(valueType)
+                .width(width)
+                .defaultValue(defaultValue)
+                .build();
     }
 
     @Override

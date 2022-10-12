@@ -56,9 +56,7 @@ public class V8ValueTableRow extends ContextValue implements IndexAccessor, Prop
         return new IteratorValue(data.values().iterator());
     }
 
-    @Override
-    public IValue getIndexedValue(IValue index) {
-        final var column = owner.getColumns().getColumnInternal(index);
+    IValue getIndexedValueInternal(V8ValueTableColumn column) {
         if (data.containsKey(column)) {
             return column.adjustValue(data.get(column));
         }
@@ -66,9 +64,19 @@ public class V8ValueTableRow extends ContextValue implements IndexAccessor, Prop
     }
 
     @Override
+    public IValue getIndexedValue(IValue index) {
+        final var column = owner.getColumns().getColumnInternal(index);
+        return getIndexedValueInternal(column);
+    }
+
+    void setIndexedValueInternal(V8ValueTableColumn column, IValue value) {
+        data.put(column, column.adjustValue(value));
+    }
+
+    @Override
     public void setIndexedValue(IValue index, IValue value) {
         final var column = owner.getColumns().getColumnInternal(index);
-        data.put(column, column.adjustValue(value));
+        setIndexedValueInternal(column, value);
     }
 
     @Override

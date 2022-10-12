@@ -19,7 +19,7 @@ class V8ValueTableSorter implements Comparator<IValue> {
 
     private final List<V8ValueTableSortRule> rules;
 
-    public static V8ValueTableSorter create(V8ValueTableColumnCollection columns, IValue sortColumns) {
+    public static V8ValueTableSorter create(V8ValueTableColumnCollection columns, String sortColumns) {
         final var rules = parseRules(columns, sortColumns);
         return new V8ValueTableSorter(rules);
     }
@@ -28,7 +28,7 @@ class V8ValueTableSorter implements Comparator<IValue> {
         this.rules = rules;
     }
 
-    private static List<V8ValueTableSortRule> parseRules(V8ValueTableColumnCollection columns, IValue sortColumns) {
+    private static List<V8ValueTableSortRule> parseRules(V8ValueTableColumnCollection columns, String sortColumns) {
 
         if (sortColumns == null) {
             throw MachineException.invalidArgumentValueException();
@@ -36,8 +36,7 @@ class V8ValueTableSorter implements Comparator<IValue> {
 
         final var rules = new ArrayList<V8ValueTableSortRule>();
 
-        final var columnsAsString = sortColumns.asString();
-        final var splitted = splitter.split(columnsAsString);
+        final var splitted = splitter.split(sortColumns);
         for (final var ruleElement: splitted) {
             final var rule = V8ValueTableSortRule.parse(ruleElement.trim(), columns);
             rules.add(rule);

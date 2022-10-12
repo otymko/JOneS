@@ -44,10 +44,6 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         columns = new ArrayList<>();
     }
 
-    private void setInternal(IValue index, IValue newValue) {
-
-    }
-
     V8ValueTableColumn findColumnInternal(IValue index) {
         final var rawIndex = index.getRawValue();
         if (rawIndex.getDataType() == DataType.STRING) {
@@ -84,18 +80,22 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         return column;
     }
 
-    V8ValueTableColumn createColumn(IValue name, IValue typeDescription, IValue title, IValue width) {
+    V8ValueTableColumn createColumn(String name, IValue typeDescription, IValue title, IValue width) {
 
-        if (name.asString().isEmpty()) {
+        if (name.isEmpty()) {
             throw MachineException.invalidArgumentValueException();
         }
 
         final var columnBuilder = new V8ValueTableColumn.V8ValueTableColumnBuilder();
         columnBuilder.owner(owner);
-        columnBuilder.name(name.asString());
+        columnBuilder.name(name);
 
         if (typeDescription instanceof TypeDescription) {
-            columnBuilder.valueType((TypeDescription)typeDescription);
+            var casted = (TypeDescription)typeDescription;
+            columnBuilder.valueType(casted);
+            columnBuilder.defaultValue(casted.adjustValue(null));
+        } else {
+            columnBuilder.defaultValue(ValueFactory.create());
         }
 
         if (title != null) {
@@ -110,8 +110,8 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
     }
 
     @ContextMethod(name = "Добавить", alias = "Add")
-    public IValue add(IValue name, IValue typeDescription, IValue title, IValue width) {
-        if (hasColumn(name.asString())) {
+    public IValue add(String name, IValue typeDescription, IValue title, IValue width) {
+        if (hasColumn(name)) {
             throw MachineException.invalidArgumentValueException();
         }
         final var column = createColumn(name, typeDescription, title, width);
@@ -134,8 +134,8 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
     }
 
     @ContextMethod(name = "Найти", alias = "Find")
-    public IValue findColumn(IValue columnName) {
-        final var column = findColumnByNameInternal(columnName.asString());
+    public IValue findColumn(String columnName) {
+        final var column = findColumnByNameInternal(columnName);
         if (column == null) {
             return ValueFactory.create();
         }
@@ -164,7 +164,7 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
 
     @Override
     public void setIndexedValue(IValue index, IValue value) {
-        setInternal(index, value);
+        throw MachineException.getPropertyIsNotWritableException("");
     }
 
     public boolean hasColumn(String columnName) {
