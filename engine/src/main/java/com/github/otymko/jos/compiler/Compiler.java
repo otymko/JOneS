@@ -21,6 +21,7 @@ import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import com.github.otymko.jos.util.StringLineCleaner;
 import lombok.Data;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
@@ -49,6 +50,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     private MethodDescriptor currentMethodDescriptor;
     private SymbolScope localScope;
 
+    private boolean skipLineNumbers;
+
     @Data
     private static class NestedLoopInfo {
         private int startPoint = DUMMY_ADDRESS;
@@ -74,6 +77,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         this.imageCache = imageCache;
         this.compiler = compiler;
         this.annotationProcessing = new AnnotationProcessing(this);
+
+        this.skipLineNumbers = false;
     }
 
     @Override
@@ -193,10 +198,10 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
     @Override
     public ParseTree visitStatement(BSLParser.StatementContext statement) {
-        int numberLint = statement.getStart().getLine();
-        addCommand(OperationCode.LINE_NUM, numberLint);
+        var numberLint = statement.getStart().getLine();
+        var index = addLineNumCommand(numberLint);
         if (currentMethodDescriptor != null && currentMethodDescriptor.getEntry() == DUMMY_ADDRESS) {
-            currentMethodDescriptor.setEntry(imageCache.getCode().size() - 1);
+            currentMethodDescriptor.setEntry(index);
         }
         return super.visitStatement(statement);
     }
@@ -237,8 +242,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
         var alternativeBranches = false;
         for (var elseIfBranches : ifStatement.elsifBranch()) {
-            correctCommandArgument(jumpFalse, imageCache.getCode().size());
-            addCommand(OperationCode.LINE_NUM, elseIfBranches.getStart().getLine());
+            var index = addLineNumCommand(elseIfBranches.getStart().getLine());
+            correctCommandArgument(jumpFalse, index);
 
             visitExpression(elseIfBranches.expression());
 
@@ -250,13 +255,13 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
         if (ifStatement.elseBranch() != null) {
             alternativeBranches = true;
-            correctCommandArgument(jumpFalse, imageCache.getCode().size());
-            addCommand(OperationCode.LINE_NUM, ifStatement.elseBranch().getStart().getLine());
+            var index = addLineNumCommand(ifStatement.elseBranch().getStart().getLine());
+            correctCommandArgument(jumpFalse, index);
 
             visitCodeBlock(ifStatement.elseBranch().codeBlock());
         }
 
-        var endIndex = addCommand(OperationCode.LINE_NUM, ifStatement.getStop().getLine());
+        var endIndex = addLineNumCommand(ifStatement.getStop().getLine());
         if (!alternativeBranches) {
             correctCommandArgument(jumpFalse, endIndex);
         }
@@ -272,7 +277,13 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     public ParseTree visitWhileStatement(BSLParser.WhileStatementContext whileStatement) {
         // прыжок наверх цикла должен попадать на опкод LineNum
         // поэтому указываем адрес - 1
-        var conditionIndex = imageCache.getCode().size() - 1;
+        int conditionIndex;
+        if (skipLineNumbers) {
+            conditionIndex = imageCache.getCode().size();
+        } else {
+            conditionIndex = imageCache.getCode().size() - 1;
+        }
+//        var conditionIndex = imageCache.getCode().size() - 1;
         var loopRecord = Compiler.NestedLoopInfo.create(conditionIndex);
 
         nestedLoops.push(loopRecord);
@@ -303,7 +314,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         addCommand(OperationCode.PUSH_TMP);
 
         var jumpIndex = addCommand(OperationCode.JMP, DUMMY_ADDRESS);
-        var loopStart = addCommand(OperationCode.LINE_NUM, forStatement.getStart().getLine());
+        var loopStart = addLineNumCommand(forStatement.getStart().getLine());
 
         // инкремент
         processIdentifier(identifier);
@@ -337,7 +348,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
 
         addCommand(OperationCode.PUSH_ITERATOR);
 
-        var loopStart = addCommand(OperationCode.LINE_NUM, forEachStatement.getStart().getLine());
+        var loopStart = addLineNumCommand(forEachStatement.getStart().getLine());
 
         addCommand(OperationCode.ITERATOR_NEXT);
 
@@ -363,13 +374,13 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         visitTryCodeBlock(tryStatement.tryCodeBlock());
         var jmpIndex = addCommand(OperationCode.JMP, DUMMY_ADDRESS);
 
-        var beginHandler = addCommand(OperationCode.LINE_NUM, tryStatement.exceptCodeBlock().getStart().getLine());
+        var beginHandler = addLineNumCommand(tryStatement.exceptCodeBlock().getStart().getLine());
 
         correctCommandArgument(beginTryIndex, beginHandler);
 
         visitExceptCodeBlock(tryStatement.exceptCodeBlock());
 
-        var endIndex = addCommand(OperationCode.LINE_NUM, tryStatement.getStop().getLine());
+        var endIndex = addLineNumCommand(tryStatement.getStop().getLine());
 
         addCommand(OperationCode.END_TRY, 0);
         correctCommandArgument(jmpIndex, endIndex);
@@ -685,6 +696,22 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     private int addCommand(OperationCode operationCode, int argument) {
         var index = imageCache.getCode().size();
         imageCache.getCode().add(new Command(operationCode, argument));
+        return index;
+    }
+
+    private int addLineNumCommand(int lineNumber) {
+        if (skipLineNumbers) {
+            imageCache.getLinesOffset().add(Pair.of(imageCache.getCode().size(), lineNumber));
+
+            if (imageCache.getCode().isEmpty()) {
+                return 0;
+            }
+            return imageCache.getCode().size();
+        }
+
+        var index = imageCache.getCode().size();
+        imageCache.getCode().add(new Command(OperationCode.LINE_NUM, lineNumber));
+
         return index;
     }
 

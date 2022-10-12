@@ -167,6 +167,9 @@ public class MachineInstance {
 
                 var errorInfo = exception.getErrorInfo();
                 if (errorInfo.getLine() < 0) {
+
+                    nextInstruction();
+
                     errorInfo.setLine(currentFrame.getLineNumber());
                     errorInfo.setSource(Common.getAbsolutPath(currentImage.getSource().getPath()));
                     Common.fillCodePositionInErrorInfo(errorInfo, currentImage, currentFrame.getLineNumber());
@@ -232,7 +235,7 @@ public class MachineInstance {
                 runCommand(command.getCode(), command.getArgument());
             }
         } catch (EngineException exception) {
-            throw exception;
+             throw exception;
         } catch (Exception exception) {
             throw new WrappedJavaException(exception);
         }

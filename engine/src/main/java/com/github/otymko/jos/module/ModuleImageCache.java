@@ -11,6 +11,7 @@ import com.github.otymko.jos.compiler.SymbolAddress;
 import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Data;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class ModuleImageCache {
     private ModuleSource source;
     private int entryPoint = -1;
     private List<Command> code = new ArrayList<>();
+    private List<Pair<Integer, Integer>> linesOffset = new ArrayList<>();
     private List<ConstantDefinition> constants = new ArrayList<>();
     private List<VariableInfo> variables = new ArrayList<>();
     private List<MethodDescriptor> methods = new ArrayList<>();
