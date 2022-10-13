@@ -26,12 +26,49 @@ import java.util.List;
 
 import static com.github.otymko.jos.runtime.machine.context.ContextValueConverter.convertValue;
 
+/**
+ * Реализация типа коллекции "Массив"
+ */
 @ContextClass(name = "Массив", alias = "Array")
 public class V8Array extends ContextValue implements IndexAccessor, CollectionIterable {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8Array.class);
 
     @Getter(AccessLevel.PACKAGE)
     private final List<IValue> values;
+
+    /**
+     * Создать пустой массив.
+     */
+    @ContextConstructor
+    public static V8Array create() {
+        return new V8Array();
+    }
+
+    /**
+     * Создать новый массив на основании фиксированного массива или числа.
+     *
+     * @param value Фиксированный массив или число.
+     */
+    @ContextConstructor
+    public static IValue createByValue(IValue value) {
+        if (value.getDataType() == DataType.NUMBER) {
+            return new V8Array(value);
+        } else if (value instanceof V8FixedArray) {
+            return new V8Array((V8FixedArray) value);
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    /**
+     * Создать новый массив на основании списка чисел.
+     *
+     * @param numbers список чисел.
+     */
+    @ContextConstructor
+    public static IValue createByValues(IValue... numbers) {
+        return new V8Array(numbers);
+    }
 
     private V8Array(V8FixedArray array) {
         values = List.copyOf(array.getValues());
@@ -48,27 +85,6 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     @Override
     public ContextInfo getContextInfo() {
         return INFO;
-    }
-
-    @ContextConstructor
-    public static V8Array create() {
-        return new V8Array();
-    }
-
-    @ContextConstructor
-    public static IValue createByValue(IValue value) {
-        if (value.getDataType() == DataType.NUMBER) {
-            return new V8Array(value);
-        } else if (value instanceof V8FixedArray) {
-            return new V8Array((V8FixedArray) value);
-        }
-
-        throw new IllegalArgumentException();
-    }
-
-    @ContextConstructor
-    public static IValue createByValues(IValue... numbers) {
-        return new V8Array(numbers);
     }
 
     @ContextMethod(name = "Количество", alias = "Count")
