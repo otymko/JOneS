@@ -55,22 +55,22 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
     @ContextConstructor
     public static V8Structure constructorExtended(IValue keysOrFixedStructure,
                                                   IValue... values) {
-        final var result = new V8Structure();
-        if (keysOrFixedStructure.getDataType() == DataType.STRING) {
-
-            final var fieldNames = FIELDS_SPLITTER.split(keysOrFixedStructure.asString());
-            int valueIndex = 0;
-            for (final var fieldName : fieldNames) {
-                if (fieldName.isBlank()) {
-                    continue;
-                }
-                final var valueToPut = valueIndex < values.length ? values[valueIndex] : UndefinedValue.VALUE;
-                result.insert(ValueFactory.create(fieldName.trim()), valueToPut);
-                ++valueIndex;
-            }
-            return result;
+        if (keysOrFixedStructure.getDataType() != DataType.STRING) {
+            throw MachineException.invalidArgumentValueException();
         }
-        throw MachineException.invalidArgumentValueException();
+        final var result = new V8Structure();
+
+        final var fieldNames = FIELDS_SPLITTER.split(keysOrFixedStructure.asString());
+        int valueIndex = 0;
+        for (final var fieldName : fieldNames) {
+            if (fieldName.isBlank()) {
+                continue;
+            }
+            final var valueToPut = valueIndex < values.length ? values[valueIndex] : UndefinedValue.VALUE;
+            result.insert(ValueFactory.create(fieldName.trim()), valueToPut);
+            ++valueIndex;
+        }
+        return result;
     }
 
     @ContextMethod(name = "Вставить", alias = "Insert")
@@ -80,7 +80,7 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
             throw MachineException.invalidPropertyNameStructureException(keyValue);
         }
 
-        var addingValue = value == null ? ValueFactory.create() : value;
+        var addingValue = ValueFactory.rawValueOrUndefined(value);
         if (views.containsKey(keyValue)) {
             var objectKey = views.get(keyValue);
             values.put(objectKey, addingValue);
