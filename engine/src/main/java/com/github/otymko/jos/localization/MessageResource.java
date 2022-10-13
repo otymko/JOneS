@@ -58,6 +58,7 @@ public class MessageResource {
     public static final String KEY_NOT_FOUND = "keyNotFound";
     public static final String RETURN_STATEMENT_OUTSIDE_METHOD = "returnStatementOutsideMethod";
     public static final String FILE_ACCESS_DENIED = "fileAccessDenied";
+    public static final String INDEXED_VALUE_IS_READ_ONLY = "indexedValueIsReadOnly";
 
     private MessageResource() {
         // none
