@@ -14,16 +14,21 @@ import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
+import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.AccessLevel;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.github.otymko.jos.runtime.machine.context.ContextValueConverter.convertValue;
 
+/**
+ * Реализация типа коллекции "Массив"
+ */
 @ContextClass(name = "Массив", alias = "Array")
 public class V8Array extends ContextValue implements IndexAccessor, CollectionIterable {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8Array.class);
@@ -31,29 +36,55 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     @Getter(AccessLevel.PACKAGE)
     private final List<IValue> values;
 
+    /**
+     * Создать пустой массив.
+     */
     @ContextConstructor
-    public static IValue createByV8FixedArray(V8FixedArray array) {
-        return new V8Array(array);
+    public static V8Array create() {
+        return new V8Array();
     }
 
-    public V8Array() {
+    /**
+     * Создать новый массив на основании фиксированного массива или числа.
+     *
+     * @param value Фиксированный массив или число.
+     */
+    @ContextConstructor
+    public static IValue createByValue(IValue value) {
+        if (value.getDataType() == DataType.NUMBER) {
+            return new V8Array(value);
+        } else if (value instanceof V8FixedArray) {
+            return new V8Array((V8FixedArray) value);
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    /**
+     * Создать новый массив на основании списка чисел.
+     *
+     * @param numbers список чисел.
+     */
+    @ContextConstructor
+    public static IValue createByValues(IValue... numbers) {
+        return new V8Array(numbers);
+    }
+
+    private V8Array(V8FixedArray array) {
+        values = List.copyOf(array.getValues());
+    }
+    private V8Array() {
         values = new ArrayList<>();
     }
 
-    public V8Array(V8FixedArray array) {
-        values = List.copyOf(array.getValues());
+    private V8Array(IValue... numbers) {
+        values = new ArrayList<>();
+        values.addAll(Arrays.asList(numbers));
     }
 
     @Override
     public ContextInfo getContextInfo() {
         return INFO;
-    }
-
-    // TODO: конструктор
-
-    @ContextConstructor
-    public static V8Array constructor() {
-        return new V8Array();
     }
 
     @ContextMethod(name = "Количество", alias = "Count")

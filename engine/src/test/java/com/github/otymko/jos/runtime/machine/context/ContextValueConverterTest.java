@@ -55,7 +55,7 @@ class ContextValueConverterTest {
         assertThat(convertValue(ValueFactory.create(true), boolean.class)).isEqualTo(true);
         assertThat(convertValue(ValueFactory.create(true), Boolean.class)).isEqualTo(true);
 
-        var array = new V8Array();
+        var array = V8Array.create();
         assertThat(convertValue(array, V8Array.class)).isEqualTo(array);
     }
 

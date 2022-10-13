@@ -134,7 +134,7 @@ public class StringOperationGlobalContext implements AttachableContext {
         final var delimiterString = getStringArgument(delimiter);
         final var includeEmptyFlag = includeEmpty == null || includeEmpty;
 
-        final var result = V8Array.constructor();
+        final var result = V8Array.create();
         if (delimiterString.isEmpty()) {
             result.add(ValueFactory.create(sourceString));
         } else {

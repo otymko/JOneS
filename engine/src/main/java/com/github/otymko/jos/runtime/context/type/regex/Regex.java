@@ -122,7 +122,7 @@ public class Regex extends ContextValue implements IndexAccessor {
 
         // TODO: startAt не используется
         var result = regularExpression.split(value, countValue);
-        var array = new V8Array();
+        var array = V8Array.create();
         for (var item : result) {
             array.add(ValueFactory.create(item));
         }

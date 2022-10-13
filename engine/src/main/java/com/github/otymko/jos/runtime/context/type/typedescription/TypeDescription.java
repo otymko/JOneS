@@ -49,7 +49,7 @@ public class TypeDescription extends ContextValue {
 
     @ContextMethod(name = "Типы", alias = "Types")
     public V8Array types() {
-        final var result = new V8Array();
+        final var result = V8Array.create();
         for (final var type : types) {
             result.add(type);
         }

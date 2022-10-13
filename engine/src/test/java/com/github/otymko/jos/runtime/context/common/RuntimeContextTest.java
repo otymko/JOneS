@@ -17,7 +17,7 @@ class RuntimeContextTest {
 
     @Test
     void testNameAndAlias() throws Exception {
-        checkRuntimeContextObject(V8Array.constructor());
+        checkRuntimeContextObject(V8Array.create());
         checkRuntimeContextObject(V8Structure.constructor());
         checkRuntimeContextObject((RuntimeContext) V8Map.constructor());
     }
