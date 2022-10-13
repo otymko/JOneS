@@ -165,7 +165,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
 
     private V8Array unloadColumnInternal(IValue columnIndex) {
         var column = columns.getColumnInternal(columnIndex);
-        final var result = V8Array.constructor();
+        final var result = V8Array.create();
         for (final var row: values) {
             final var castedRow = (V8ValueTableRow) row;
             final var rowValue = castedRow.getIndexedValueInternal(column);
@@ -241,7 +241,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
             throw MachineException.invalidArgumentValueException();
         }
         final var filter = (CollectionIterable)filterStructure.getRawValue();
-        final var result = V8Array.constructor();
+        final var result = V8Array.create();
 
         final var filterKey = new V8CollectionKey(extractKeyAndValue(filter));
         final var fields = filterKey.getFields();
