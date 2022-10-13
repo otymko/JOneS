@@ -26,7 +26,7 @@ import static com.github.otymko.jos.runtime.machine.context.ContextValueConverte
 /**
  * Реализация типа `ФиксированныйМассив`
  */
-@ContextClass(name = "ФиксированныйМассив", alias = " FixedArray")
+@ContextClass(name = "ФиксированныйМассив", alias = "FixedArray")
 public class V8FixedArray extends ContextValue implements IndexAccessor, CollectionIterable {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8FixedArray.class);
 
@@ -87,6 +87,6 @@ public class V8FixedArray extends ContextValue implements IndexAccessor, Collect
 
     @Override
     public void setIndexedValue(IValue index, IValue value) {
-        throw MachineException.indexedValueIsReadable();
+        throw MachineException.indexedValueIsReadOnly();
     }
 }

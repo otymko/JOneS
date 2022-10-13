@@ -146,8 +146,8 @@ public class MachineException extends EngineException {
         return new MachineException(message);
     }
 
-    public static MachineException indexedValueIsReadable() {
-        return new MachineException(Resources.getResourceString(INDEXED_VALUE_IS_READABLE));
+    public static MachineException indexedValueIsReadOnly() {
+        return new MachineException(Resources.getResourceString(INDEXED_VALUE_IS_READ_ONLY));
     }
 
     public static MachineException getPropertyNotFoundException(String propertyName) {
