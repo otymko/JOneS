@@ -108,6 +108,7 @@ public class ScriptCompiler {
                 .source(cache.getSource())
                 .entry(cache.getEntryPoint())
                 .code(List.copyOf(cache.getCode()))
+                .linesOffset(List.copyOf(cache.getLinesOffset()))
                 .methods(List.copyOf(cache.getMethods()))
                 .variables(List.copyOf(cache.getVariables()))
                 .constants(List.copyOf(cache.getConstants()))

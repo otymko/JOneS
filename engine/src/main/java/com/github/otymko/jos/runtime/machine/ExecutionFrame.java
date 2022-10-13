@@ -12,7 +12,9 @@ import com.github.otymko.jos.runtime.context.IValue;
 import lombok.Data;
 
 import java.util.ArrayDeque;
+import java.util.Comparator;
 import java.util.Deque;
+import java.util.NoSuchElementException;
 
 @Data
 public class ExecutionFrame {
@@ -31,4 +33,27 @@ public class ExecutionFrame {
     private boolean discardReturnValue;
 
     private boolean oneTimeCall;
+
+    public int getLineNumber() {
+        if (lineNumber == 0) {
+            return findLineNumberByInstructionPointer(instructionPointer);
+        }
+
+        return lineNumber;
+    }
+
+    private int findLineNumberByInstructionPointer(int instruction) {
+        if (instruction < 0) {
+            return 1;
+        }
+
+        try {
+            return image.getLinesOffset().stream()
+                    .filter(pair -> pair.getLeft() <= instruction)
+                    .max(Comparator.naturalOrder())
+                    .stream().findAny().get().getRight();
+        } catch (NoSuchElementException e) {
+            throw e;
+        }
+    }
 }

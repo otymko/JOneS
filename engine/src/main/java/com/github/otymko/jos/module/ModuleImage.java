@@ -12,7 +12,9 @@ import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
 import lombok.Builder;
 import lombok.Data;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,6 +32,8 @@ public class ModuleImage {
      * Байткоды
      */
     private List<Command> code;
+
+    private List<Pair<Integer, Integer>> linesOffset;
     /**
      * Методы
      */
