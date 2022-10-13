@@ -86,6 +86,11 @@ class ExternalScriptTest extends BaseExternalScriptTest {
     }
 
     @TestFactory
+    Collection<DynamicTest> testValueTable() throws IOException {
+        return getTestsFromScript(Path.of("src/test/resources/tests/valuetable.os"));
+    }
+
+    @TestFactory
     Collection<DynamicTest> testTypeConversion() throws IOException {
         return getTestsFromScript(Path.of("src/test/resources/type-conversion.os"));
     }
