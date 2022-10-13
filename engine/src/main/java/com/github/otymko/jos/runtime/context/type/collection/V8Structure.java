@@ -27,6 +27,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+/**
+ * Коллекция пар КлючИЗначение. Хранит ключи как свойства объекта.
+ *
+ * @see V8KeyAndValue
+ */
 @ContextClass(name = "Структура", alias = "Structure")
 public class V8Structure extends ContextValue implements IndexAccessor, PropertyNameAccessor,
         CollectionIterable<V8KeyAndValue> {

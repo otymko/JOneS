@@ -21,6 +21,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Пара Ключ-Значение.
+ *
+ * @see V8Structure
+ * @see V8Map
+ * @see V8FixedMap
+ * @see V8BaseMap
+ */
 @ContextClass(name = "КлючИЗначение", alias = "KeyAndValue")
 public class V8KeyAndValue extends ContextValue implements IndexAccessor {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8KeyAndValue.class);
