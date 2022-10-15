@@ -48,7 +48,9 @@ public class V8Structure extends V8AbstractStructure {
 
     @ContextConstructor
     public static V8Structure constructorExtended(IValue keysOrFixedStructure, IValue... values) {
-        if (keysOrFixedStructure.getDataType() != DataType.STRING) {
+        if (keysOrFixedStructure.getDataType() != DataType.STRING
+                && keysOrFixedStructure.getDataType() != DataType.UNDEFINED) {
+            
             throw MachineException.invalidArgumentValueException();
         }
 
