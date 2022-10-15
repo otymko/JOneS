@@ -6,16 +6,10 @@
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.IVariable;
-import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.IndexAccessor;
-import com.github.otymko.jos.runtime.context.IteratorValue;
-import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
@@ -23,7 +17,6 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.util.Common;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -33,19 +26,9 @@ import java.util.regex.Pattern;
  * @see V8KeyAndValue
  */
 @ContextClass(name = "Структура", alias = "Structure")
-public class V8Structure extends ContextValue implements IndexAccessor, PropertyNameAccessor,
-        CollectionIterable<V8KeyAndValue> {
-
+public class V8Structure extends V8AbstractStructure {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8Structure.class);
     private static final Pattern FIELDS_SPLITTER = Pattern.compile(",");
-
-    private final Map<IValue, IValue> values;
-    private final Map<String, IValue> views;
-
-    private V8Structure() {
-        values = new HashMap<>();
-        views = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    }
 
     @ContextConstructor
     public static V8Structure constructor() {
@@ -53,13 +36,23 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
     }
 
     @ContextConstructor
-    public static V8Structure constructorExtended(IValue keysOrFixedStructure,
-                                                  IValue... values) {
+    public static V8Structure constructorByValue(IValue value) {
+        if (value instanceof V8FixedStructure) {
+            return new V8Structure((V8FixedStructure)value);
+        } else if (value.getDataType() == DataType.STRING) {
+            return constructorExtended(value);
+        }
+
+        throw MachineException.invalidArgumentValueException();
+    }
+
+    @ContextConstructor
+    public static V8Structure constructorExtended(IValue keysOrFixedStructure, IValue... values) {
         if (keysOrFixedStructure.getDataType() != DataType.STRING) {
             throw MachineException.invalidArgumentValueException();
         }
-        final var result = new V8Structure();
 
+        final var result = new V8Structure();
         final var fieldNames = FIELDS_SPLITTER.split(keysOrFixedStructure.asString());
         int valueIndex = 0;
         for (final var fieldName : fieldNames) {
@@ -70,7 +63,15 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
             result.insert(ValueFactory.create(fieldName.trim()), valueToPut);
             ++valueIndex;
         }
+
         return result;
+    }
+
+    private V8Structure(V8FixedStructure fixedStructure) {
+        super(new HashMap<>(fixedStructure.values), copyTreeMap(fixedStructure.views));
+    }
+    private V8Structure() {
+        super(new HashMap<>(), new TreeMap<>(String.CASE_INSENSITIVE_ORDER));
     }
 
     @ContextMethod(name = "Вставить", alias = "Insert")
@@ -90,11 +91,6 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
         }
     }
 
-    @ContextMethod(name = "Количество", alias = "Count")
-    public IValue count() {
-        return ValueFactory.create(values.size());
-    }
-
     @ContextMethod(name = "Очистить", alias = "Clear")
     public void clear() {
         values.clear();
@@ -112,36 +108,9 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
         values.remove(key);
     }
 
-    @ContextMethod(name = "Свойство", alias = "Property")
-    public IValue hasProperty(IValue key, IVariable value) {
-        if (!Common.isValidStringIdentifier(key)) {
-            throw MachineException.invalidPropertyNameStructureException(key.asString());
-        }
-
-        var keyValue = key.asString();
-        if (views.containsKey(keyValue)) {
-            var objectKey = views.get(keyValue);
-            if (value != null) {
-                value.setValue(values.get(objectKey));
-            }
-            return ValueFactory.create(true);
-        } else {
-            if (value != null) {
-                value.setValue(ValueFactory.create());
-            }
-        }
-
-        return ValueFactory.create(false);
-    }
-
     @Override
     public ContextInfo getContextInfo() {
         return INFO;
-    }
-
-    @Override
-    public IValue getIndexedValue(IValue index) {
-        return getValueInternal(index);
     }
 
     @Override
@@ -150,35 +119,8 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
     }
 
     @Override
-    public IValue getPropertyValue(IValue index) {
-        return getValueInternal(index);
-    }
-
-    @Override
     public void setPropertyValue(IValue index, IValue value) {
         setValueInternal(index, value);
-    }
-
-    @Override
-    public boolean hasProperty(IValue index) {
-        var key = index.asString();
-        if (!Common.isValidStringIdentifier(index)) {
-            throw MachineException.invalidPropertyNameStructureException(key);
-        }
-        return views.containsKey(key);
-    }
-
-    private IValue getValueInternal(IValue index) {
-        var key = index.asString();
-        if (!Common.isValidStringIdentifier(index)) {
-            throw MachineException.invalidPropertyNameStructureException(key);
-        }
-
-        if (!views.containsKey(key)) {
-            throw MachineException.getPropertyNotFoundException(key);
-        }
-        var keyObject = views.get(key);
-        return values.get(keyObject);
     }
 
     private void setValueInternal(IValue index, IValue value) {
@@ -191,10 +133,5 @@ public class V8Structure extends ContextValue implements IndexAccessor, Property
             throw MachineException.getPropertyNotFoundException(key);
         }
         insert(index, value);
-    }
-
-    @Override
-    public IteratorValue iterator() {
-        return V8KeyAndValue.iteratorOf(values.entrySet());
     }
 }
