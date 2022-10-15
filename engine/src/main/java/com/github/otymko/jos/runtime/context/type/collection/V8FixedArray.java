@@ -19,6 +19,7 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.AccessLevel;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.otymko.jos.runtime.machine.context.ContextValueConverter.convertValue;
@@ -39,7 +40,7 @@ public class V8FixedArray extends ContextValue implements IndexAccessor, Collect
     }
 
     private V8FixedArray(V8Array array) {
-        values = List.copyOf(array.getValues());
+        values = new ArrayList<>(array.getValues());
     }
 
     @ContextMethod(name = "Количество", alias = "Count")
