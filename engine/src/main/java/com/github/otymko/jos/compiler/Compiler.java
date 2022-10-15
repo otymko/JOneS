@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
+import java.util.StringJoiner;
 
 /**
  * Компилятор в опкод
@@ -49,25 +50,32 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     private MethodDescriptor currentMethodDescriptor;
     private SymbolScope localScope;
 
-    @Data
-    private static class NestedLoopInfo {
-        private int startPoint = DUMMY_ADDRESS;
-        private List<Integer> breakStatements = new ArrayList<>();
-        private int tryNesting = 0;
-
-        private NestedLoopInfo() {
-            // none
+    private static void checkFactNativeMethodArguments(ParameterInfo[] parameters, int factArguments) {
+        if (factArguments > parameters.length) {
+            throw CompilerException.tooManyMethodArgumentsException();
         }
 
-        public static Compiler.NestedLoopInfo create() {
-            return new Compiler.NestedLoopInfo();
+        for (var position = factArguments; position < parameters.length; position++) {
+            var parameter = parameters[factArguments];
+            if (!parameter.hasDefaultValue()) {
+                throw CompilerException.tooFewMethodArgumentsException();
+            }
+        }
+    }
+
+    private static String extractStringFromConstValue(BSLParser.StringContext context) {
+        String value;
+        if (context.multilineString().size() > 0) {
+            var joiner = new StringJoiner("\n");
+            context.multilineString().get(0).children.forEach(token -> {
+                joiner.add(token.getText());
+            });
+            value = StringLineCleaner.clean(joiner.toString());
+        } else {
+            value = StringLineCleaner.clean(context.getText());
         }
 
-        public static Compiler.NestedLoopInfo create(int startIndex) {
-            var loop = new Compiler.NestedLoopInfo();
-            loop.setStartPoint(startIndex);
-            return loop;
-        }
+        return value;
     }
 
     public Compiler(ModuleImageCache imageCache, ScriptCompiler compiler) {
@@ -876,8 +884,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
                                                                  boolean isDefaultValue) {
         ConstantDefinition constant;
         if (constValue.string() != null) {
-            var value = constValue.string().getText();
-            value = StringLineCleaner.clean(value);
+            String value = extractStringFromConstValue(constValue.string());
             constant = new ConstantDefinition(ValueFactory.create(value));
         } else if (constValue.numeric() != null) {
             var value = new BigDecimal(constValue.numeric().getText());
@@ -1194,17 +1201,24 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         return imageCache.getConstants().indexOf(constant);
     }
 
-    private static void checkFactNativeMethodArguments(ParameterInfo[] parameters, int factArguments) {
-        if (factArguments > parameters.length) {
-            throw CompilerException.tooManyMethodArgumentsException();
+    @Data
+    private static class NestedLoopInfo {
+        private int startPoint = DUMMY_ADDRESS;
+        private List<Integer> breakStatements = new ArrayList<>();
+        private int tryNesting = 0;
+
+        private NestedLoopInfo() {
+            // none
         }
 
-        for (var position = factArguments; position < parameters.length; position++) {
-            var parameter = parameters[factArguments];
-            if (!parameter.hasDefaultValue()) {
-                throw CompilerException.tooFewMethodArgumentsException();
-            }
+        public static Compiler.NestedLoopInfo create() {
+            return new Compiler.NestedLoopInfo();
+        }
+
+        public static Compiler.NestedLoopInfo create(int startIndex) {
+            var loop = new Compiler.NestedLoopInfo();
+            loop.setStartPoint(startIndex);
+            return loop;
         }
     }
-
 }
