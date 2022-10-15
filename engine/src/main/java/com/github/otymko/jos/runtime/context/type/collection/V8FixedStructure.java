@@ -43,6 +43,10 @@ public class V8FixedStructure extends V8AbstractStructure {
 
     @ContextConstructor
     public static V8FixedStructure constructorExtended(IValue keysOrFixedStructure, IValue... values) {
+        if (keysOrFixedStructure.getDataType() == DataType.UNDEFINED) {
+            throw MachineException.invalidArgumentValueException();
+        }
+
         var structure = V8Structure.constructorExtended(keysOrFixedStructure, values);
 
         return new V8FixedStructure(structure);
