@@ -174,6 +174,23 @@ public class StringOperationGlobalContext implements AttachableContext {
         return ValueFactory.create(joiner.toString());
     }
 
+    @ContextMethod(name = "СтрЧислоСтрок", alias = "StrLineCount")
+    public static IValue strLineCount(String value) {
+        int pos = 0;
+        int lineCount = 1;
+        while (pos >= 0 && pos < value.length())
+        {
+            pos = value.indexOf('\n', pos);
+            if (pos >= 0)
+            {
+                lineCount++;
+                pos++;
+            }
+        }
+
+        return ValueFactory.create(lineCount);
+    }
+
     private static String getStringArgument(String argument) {
         return argument == null ? "" : argument;
     }
