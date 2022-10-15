@@ -8,6 +8,7 @@ package com.github.otymko.jos.runtime.context.type;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.context.type.collection.V8FixedArray;
 import com.github.otymko.jos.runtime.context.type.collection.V8FixedMap;
+import com.github.otymko.jos.runtime.context.type.collection.V8FixedStructure;
 import com.github.otymko.jos.runtime.context.type.collection.V8KeyAndValue;
 import com.github.otymko.jos.runtime.context.type.collection.V8Map;
 import com.github.otymko.jos.runtime.context.type.collection.V8Structure;
@@ -72,6 +73,7 @@ public class StandardTypeInitializer {
         implementTypeByInfo(typeManager, V8FixedArray.INFO);
         implementTypeByInfo(typeManager, V8KeyAndValue.INFO);
         implementTypeByInfo(typeManager, V8Structure.INFO);
+        implementTypeByInfo(typeManager, V8FixedStructure.INFO);
         implementTypeByInfo(typeManager, V8Map.INFO);
         implementTypeByInfo(typeManager, V8FixedMap.INFO);
 
