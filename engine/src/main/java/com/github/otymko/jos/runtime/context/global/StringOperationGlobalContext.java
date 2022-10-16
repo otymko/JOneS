@@ -207,7 +207,7 @@ public class StringOperationGlobalContext implements AttachableContext {
     }
 
     @ContextMethod(name = "СтрПолучитьСтроку", alias = "StrGetLine")
-    public static IValue StrGetLine(String source, int lineNumber)
+    public static IValue strGetLine(String source, int lineNumber)
     {
         String result = "";
         if (lineNumber >= 1) {
