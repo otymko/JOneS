@@ -5,7 +5,6 @@
  */
 package com.github.otymko.jos.runtime.context.type.typedescription;
 
-import com.github.otymko.jos.compiler.EnumerationHelper;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextProperty;
@@ -15,6 +14,7 @@ import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.DateFractions;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.Getter;
 import lombok.Value;
 
 import java.util.Calendar;
@@ -30,17 +30,20 @@ public class DateQualifiers extends ContextValue {
     public static final ContextInfo INFO = ContextInfo.createByClass(DateQualifiers.class);
 
     /**
-     * Возвращает квалификаторы даты с указанными частями дат
+     * Возвращает квалификаторы даты с указанными частями дат.
      *
-     * @param dateParts Части дат
-     * @return Квалификатор дат
+     * @param sourceDateParts Части дат.
+     *
+     * @return Квалификатор дат.
+     *
      * @see DateFractions
      * @see DateQualifiers
      */
     @ContextConstructor
-    public static DateQualifiers constructor(IValue dateParts) {
-        final var datePartsValue = EnumerationHelper.getEnumValueOrDefault(dateParts, DateFractions.DATE_TIME);
-        return new DateQualifiers((DateFractions) datePartsValue.getValue());
+    public static DateQualifiers constructor(DateFractions sourceDateParts) {
+        var dateParts = sourceDateParts == null ? DateFractions.DATE_TIME : sourceDateParts;
+
+        return new DateQualifiers(dateParts);
     }
 
     /**
@@ -61,12 +64,8 @@ public class DateQualifiers extends ContextValue {
      * @see DateFractions
      */
     @ContextProperty(name = "ЧастиДаты", alias = "DateFractions", accessMode = PropertyAccessMode.READ_ONLY)
+    @Getter
     DateFractions dateFractions;
-
-    public IValue getDateFractions() {
-        return EnumerationHelper.getEnumByClass(DateFractions.class).getEnumValueType(dateFractions);
-    }
-
     private Date adjustDate(Date date) {
         switch (dateFractions) {
             case DATE: {

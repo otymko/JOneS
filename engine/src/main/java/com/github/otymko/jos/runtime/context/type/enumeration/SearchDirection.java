@@ -14,5 +14,12 @@ public enum SearchDirection implements EnumType {
     @EnumValue(name = "СНачала", alias = "FromBegin")
     FROM_BEGIN,
     @EnumValue(name = "СКонца", alias = "FromEnd")
-    FROM_END
+    FROM_END;
+
+    public static final EnumerationContext INFO = new EnumerationContext(SearchDirection.class);
+
+    @Override
+    public EnumerationContext getContextInfo() {
+        return INFO;
+    }
 }

@@ -31,5 +31,12 @@ public enum DateFractions implements EnumType {
      * Время
      */
     @EnumValue(name = "Время", alias = "DatTimeTime")
-    TIME
+    TIME;
+
+    public static final EnumerationContext INFO = new EnumerationContext(DateFractions.class);
+
+    @Override
+    public EnumerationContext getContextInfo() {
+        return INFO;
+    }
 }

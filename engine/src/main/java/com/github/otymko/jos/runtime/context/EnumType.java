@@ -5,5 +5,8 @@
  */
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
+
 public interface EnumType {
+    EnumerationContext getContextInfo();
 }

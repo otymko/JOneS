@@ -5,7 +5,6 @@
  */
 package com.github.otymko.jos.runtime.context.type.typedescription;
 
-import com.github.otymko.jos.compiler.EnumerationHelper;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextProperty;
@@ -40,12 +39,14 @@ public class StringQualifiers extends ContextValue {
      * @see AllowedLength
      */
     @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
+    @Getter
     AllowedLength allowedLength;
 
     @ContextConstructor
-    public static StringQualifiers constructor(int length, IValue allowedLength) {
-        final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLength.VARIABLE);
-        return new StringQualifiers(length, (AllowedLength) allowedLengthValue.getValue());
+    public static StringQualifiers constructor(int length, AllowedLength sourceAllowedLength) {
+        var allowedLength = sourceAllowedLength == null ? AllowedLength.VARIABLE : sourceAllowedLength;
+
+        return new StringQualifiers(length, allowedLength);
     }
 
     @ContextConstructor
@@ -56,10 +57,6 @@ public class StringQualifiers extends ContextValue {
     @ContextConstructor
     public static StringQualifiers constructor() {
         return new StringQualifiers(0, AllowedLength.VARIABLE);
-    }
-
-    public IValue getAllowedLength() {
-        return EnumerationHelper.getEnumByClass(AllowedLength.class).getEnumValueType(allowedLength);
     }
 
     private String adjustString(String value) {

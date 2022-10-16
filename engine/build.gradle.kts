@@ -12,6 +12,4 @@ dependencies {
 
     implementation("commons-io", "commons-io", "2.8.0")
     implementation("org.apache.commons", "commons-lang3", "3.12.0")
-
-    implementation("org.reflections:reflections:0.10.2")
 }

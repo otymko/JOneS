@@ -5,11 +5,14 @@
  */
 package com.github.otymko.jos.runtime.machine.context;
 
+import com.github.otymko.jos.compiler.Enumerations;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.IVariable;
 import com.github.otymko.jos.runtime.RuntimeContext;
+import com.github.otymko.jos.runtime.context.EnumType;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.runtime.context.type.EnumerationValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 
 import java.math.BigDecimal;
@@ -39,6 +42,7 @@ public final class ContextValueConverter {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static IValue convertReturnValue(Object sourceValue, Class<?> type) {
         if (sourceValue == null) {
             return ValueFactory.create();
@@ -66,7 +70,10 @@ public final class ContextValueConverter {
             return ValueFactory.create((Date) sourceValue);
         } else if (type == boolean.class || type == Boolean.class) {
             return ValueFactory.create((boolean) sourceValue);
-        // TODO enum value
+        } else if (EnumType.class.isAssignableFrom(type)) {
+            return Enumerations
+                    .getEnumByClass((Class<? extends EnumType>) type)
+                    .getEnumValueType((EnumType) sourceValue);
         } else if (RuntimeContext.class.isAssignableFrom(type)){
             return (IValue)sourceValue;
         } else {
@@ -111,6 +118,9 @@ public final class ContextValueConverter {
             valueObject = value.getRawValue().asDate();
         } else if (type == boolean.class || type == Boolean.class) {
             valueObject = value.getRawValue().asBoolean();
+        } else if (EnumType.class.isAssignableFrom(type)) {
+            var enumerationValue = (EnumerationValue)value.getRawValue();
+            valueObject = enumerationValue.getValue();
         } else {
             valueObject = value.getRawValue();
         }

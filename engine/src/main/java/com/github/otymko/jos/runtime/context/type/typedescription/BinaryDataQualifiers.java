@@ -5,16 +5,14 @@
  */
 package com.github.otymko.jos.runtime.context.type.typedescription;
 
-import com.github.otymko.jos.compiler.EnumerationHelper;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
-import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.AllowedLength;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.Getter;
 import lombok.Value;
 
 /**
@@ -30,15 +28,16 @@ public class BinaryDataQualifiers extends ContextValue {
      * Возвращает квалификаторы двоичных данных по указанным параметрам
      *
      * @param length        Максимальный размер данных
-     * @param allowedLength Допустимый размер данных
+     * @param sourceAllowedLength Допустимый размер данных
      * @return КвалификаторыДвоичныхДанных
      * @see BinaryDataQualifiers
      * @see AllowedLength
      */
     @ContextConstructor
-    public static BinaryDataQualifiers constructor(int length, IValue allowedLength) {
-        final var allowedLengthValue = EnumerationHelper.getEnumValueOrDefault(allowedLength, AllowedLength.VARIABLE);
-        return new BinaryDataQualifiers(length, (AllowedLength) allowedLengthValue.getValue());
+    public static BinaryDataQualifiers constructor(int length, AllowedLength sourceAllowedLength) {
+        var allowedLengthValue = sourceAllowedLength == null ? AllowedLength.VARIABLE : sourceAllowedLength;
+
+        return new BinaryDataQualifiers(length, allowedLengthValue);
     }
 
     /**
@@ -71,6 +70,7 @@ public class BinaryDataQualifiers extends ContextValue {
      * Размер двоичных данных
      */
     @ContextProperty(name = "Длина", alias = "Length", accessMode = PropertyAccessMode.READ_ONLY)
+    @Getter
     int length;
 
     /**
@@ -79,15 +79,8 @@ public class BinaryDataQualifiers extends ContextValue {
      * @see AllowedLength
      */
     @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
+    @Getter
     AllowedLength allowedLength;
-
-    public int getLength() {
-        return length;
-    }
-
-    public IValue getAllowedLength() {
-        return EnumerationHelper.getEnumByClass(AllowedLength.class).getEnumValueType(allowedLength);
-    }
 
     @Override
     public ContextInfo getContextInfo() {
