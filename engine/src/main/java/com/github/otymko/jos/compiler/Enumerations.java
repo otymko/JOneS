@@ -6,26 +6,30 @@
 package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.runtime.context.EnumType;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.EnumerationValue;
 import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
 import lombok.experimental.UtilityClass;
 
-import java.util.Optional;
-
+/**
+ * Утилитный класс по работе с перечислениями.
+ */
 @UtilityClass
-public class EnumerationHelper {
-
+public class Enumerations {
+    /**
+     * Получить контекст перечисления.
+     *
+     * @param enumClass Класс перечисления.
+     */
     public EnumerationContext getEnumByClass(Class<? extends EnumType> enumClass) {
         return TypeManager.getInstance().getEnumByClass(enumClass);
     }
 
-    public EnumerationValue getEnumValueOrDefault(IValue value, EnumType defaultValue) {
-        var context = getEnumByClass(defaultValue.getClass());
-        return Optional.ofNullable(value)
-                .map(em -> (EnumerationValue) value.getRawValue())
-                .orElse(context.getEnumValueType(defaultValue));
+    /**
+     * Получить именя значения перечисления.
+     *
+     * @param value Значение перечисления.
+     */
+    public String getValueName(EnumType value) {
+        return value.getContextInfo().getEnumValueType(value).getName();
     }
-
 }

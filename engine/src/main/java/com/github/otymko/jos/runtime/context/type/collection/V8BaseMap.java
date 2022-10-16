@@ -26,8 +26,8 @@ public abstract class V8BaseMap extends ContextValue implements IndexAccessor, C
     // region ContextMethod
 
     @ContextMethod(name = "Количество", alias = "Count")
-    public IValue count() {
-        return ValueFactory.create(data.size());
+    public int count() {
+        return data.size();
     }
 
     @ContextMethod(name = "Получить", alias = "Get")

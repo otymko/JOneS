@@ -22,5 +22,12 @@ public enum MessageStatus implements EnumType {
     @EnumValue(name = "Обычное", alias = "Ordinary")
     ORDINARY,
     @EnumValue(name = "ОченьВажное", alias = "VeryImportant")
-    VARY_IMPORTANT
+    VARY_IMPORTANT;
+
+    public static final EnumerationContext INFO = new EnumerationContext(MessageStatus.class);
+
+    @Override
+    public EnumerationContext getContextInfo() {
+        return INFO;
+    }
 }

@@ -73,15 +73,18 @@ public interface RuntimeContext {
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new MachineException(Resources.getResourceString(ERROR_GET_PROPERTY_VALUE));
             }
-        } else {
-            var field = property.getField();
-            try {
-                result = field.get(this);
-            } catch (IllegalAccessException exception) {
-                throw new MachineException(Resources.getResourceString(ERROR_GET_PROPERTY_VALUE));
-            }
+
+            return ContextValueConverter.convertReturnValue(result, getter.getReturnType());
         }
-        return (IValue) result;
+
+        var field = property.getField();
+        try {
+            result = field.get(this);
+        } catch (IllegalAccessException exception) {
+            throw new MachineException(Resources.getResourceString(ERROR_GET_PROPERTY_VALUE));
+        }
+
+        return ContextValueConverter.convertReturnValue(result, field.getType());
     }
 
     // FIXME: переписать на более низкий уровень

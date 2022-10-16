@@ -81,8 +81,8 @@ public class Regex extends ContextValue implements IndexAccessor {
         recompileRegular();
     }
 
-    public IValue getIgnoreCase() {
-        return ValueFactory.create(ignoreCase);
+    public boolean getIgnoreCase() {
+        return ignoreCase;
     }
 
     @ContextProperty(name = "Многострочный", alias = "Multiline")
@@ -92,8 +92,8 @@ public class Regex extends ContextValue implements IndexAccessor {
         recompileRegular();
     }
 
-    public IValue getMultiline() {
-        return ValueFactory.create(multiline);
+    public boolean getMultiline() {
+        return multiline;
     }
 
     @ContextConstructor
@@ -102,22 +102,22 @@ public class Regex extends ContextValue implements IndexAccessor {
     }
 
     @ContextMethod(name = "Совпадает", alias = "IsMatch")
-    public IValue isMatch(String value, Integer startAt) {
+    public boolean isMatch(String value, Integer startAt) {
         if (startAt != null && startAt > 0) {
-            return ValueFactory.create(regularExpression.matcher(value).find(startAt));
+            return regularExpression.matcher(value).find(startAt);
         }
 
-        return ValueFactory.create(regularExpression.matcher(value).find());
+        return regularExpression.matcher(value).find();
     }
 
     @ContextMethod(name = "НайтиСовпадения", alias = "Matches")
-    public IValue matches(String value, Integer startAt) {
+    public RegexMatchCollection matches(String value, Integer startAt) {
         // TODO: учесть поиск с определенной позиции
         return new RegexMatchCollection(regularExpression.matcher(value), regularExpression);
     }
 
     @ContextMethod(name = "Разделить", alias = "Split")
-    public IValue split(String value, Integer count, IValue startAt) {
+    public V8Array split(String value, Integer count, IValue startAt) {
         var countValue = count == null ? 0 : count;
 
         // TODO: startAt не используется
@@ -131,8 +131,8 @@ public class Regex extends ContextValue implements IndexAccessor {
     }
 
     @ContextMethod(name = "Заменить", alias = "Replace")
-    public IValue replace(String value, String replacement) {
-        return ValueFactory.create(value.replaceAll(pattern, replacement));
+    public String replace(String value, String replacement) {
+        return value.replaceAll(pattern, replacement);
     }
 
     private int getPatternFlags() {

@@ -6,7 +6,7 @@
 package com.github.otymko.jos.runtime.context;
 
 public interface IndexAccessor {
+    // FIXME: (#50) перейти на конвертацию значений
     IValue getIndexedValue(IValue index);
-
     void setIndexedValue(IValue index, IValue value);
 }

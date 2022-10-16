@@ -5,32 +5,10 @@
  */
 package com.github.otymko.jos.runtime.context.global;
 
-import com.github.otymko.jos.TestHelper;
-import com.github.otymko.jos.localization.MessageResource;
-import com.github.otymko.jos.localization.Resources;
-import org.junit.jupiter.api.Test;
+import com.github.otymko.jos.runtime.context.BaseScriptTest;
+import com.github.otymko.jos.runtime.context.TestScript;
 
-import java.nio.file.Path;
-
-class StringOperationGlobalContextTest {
-
-    private static final String YES_STRING = Resources.getResourceString(MessageResource.DEFAULT_TRUE_PRESENTATION);
-    private static final String NO_STRING = Resources.getResourceString(MessageResource.DEFAULT_FALSE_PRESENTATION);
-
-    @Test
-    void testFind() throws Exception {
-        var script = Path.of("src/test/resources/global/StringOperation/find.os");
-        var model = "8\n1\n23";
-        TestHelper.checkScript(script, model);
-        // TODO: протестировать индекс начала поиска и порядок срабатывания
-    }
-
-    @Test
-    void testStartsWith() throws Exception {
-        var script = Path.of("src/test/resources/global/StringOperation/startsWith.os");
-        var model = String.format("%s\n%s\n%s", YES_STRING, NO_STRING, NO_STRING);
-        TestHelper.checkScript(script, model);
-        // TODO: проверить СтрНачинаетсяС(ГдеИскать, "")
-    }
-
+@TestScript(script = "src/test/resources/tests/StringFunctions.os")
+class StringOperationGlobalContextTest extends BaseScriptTest {
+    // None
 }

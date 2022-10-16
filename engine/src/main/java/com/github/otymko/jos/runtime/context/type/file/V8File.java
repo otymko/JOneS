@@ -38,7 +38,7 @@ public class V8File extends ContextValue {
     private final File file;
 
     @ContextConstructor
-    public static IValue createByPath(String path) {
+    public static V8File createByPath(String path) {
         return new V8File(path);
     }
 
@@ -52,30 +52,28 @@ public class V8File extends ContextValue {
     }
 
     @ContextProperty(name = "Имя", alias = "Name", accessMode = PropertyAccessMode.READ_ONLY)
-    public IValue getName() {
-        return ValueFactory.create(file.getName());
+    public String getName() {
+        return file.getName();
     }
 
     @ContextProperty(name = "ИмяБезРасширения", alias = "BaseName", accessMode = PropertyAccessMode.READ_ONLY)
-    public IValue getBaseName() {
+    public String getBaseName() {
         var fileName = file.getName();
         if (fileName.contains(".")) {
             fileName = fileName.substring(0, fileName.lastIndexOf(".") - 1);
         }
 
-        return ValueFactory.create(fileName);
+        return fileName;
     }
 
     @ContextProperty(name = "Расширение", alias = "Extension", accessMode = PropertyAccessMode.READ_ONLY)
-    public IValue getExtension() {
+    public String getExtension() {
         var fileName = file.getName();
         if (!fileName.contains(".")) {
-            return ValueFactory.create("");
+            return "";
         }
 
-        var currentExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
-
-        return ValueFactory.create(currentExtension);
+        return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 
     @ContextProperty(name = "ПолноеИмя", alias = "FullName", accessMode = PropertyAccessMode.READ_ONLY)

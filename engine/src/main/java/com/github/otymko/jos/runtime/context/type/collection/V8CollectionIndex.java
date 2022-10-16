@@ -24,7 +24,6 @@ import java.util.Map;
  */
 @ContextClass(name = "ИндексКоллекции", alias = "CollectionIndex")
 public class V8CollectionIndex extends ContextValue {
-
     public static final ContextInfo INFO = ContextInfo.createByClass(V8CollectionIndex.class);
 
     private final List<IValue> fields;
@@ -84,7 +83,7 @@ public class V8CollectionIndex extends ContextValue {
     }
 
     public List<V8CollectionKey> keys() {
-        return new ArrayList<V8CollectionKey>(data.keySet());
+        return new ArrayList<>(data.keySet());
     }
 
     public List<IValue> data(V8CollectionKey key) {
@@ -92,6 +91,7 @@ public class V8CollectionIndex extends ContextValue {
         if (result == null) {
             return new ArrayList<>();
         }
+
         return result;
     }
 }

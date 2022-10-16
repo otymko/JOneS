@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
  * @see V8ValueTable
  */
 class V8ValueTableSorter implements Comparator<IValue> {
-
     private static final Pattern splitter = Pattern.compile(",");
 
     private final List<V8ValueTableSortRule> rules;

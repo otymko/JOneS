@@ -15,6 +15,11 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 public class V8FixedMap extends V8BaseMap {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8FixedMap.class);
 
+    @ContextConstructor
+    public static V8FixedMap constructor(V8Map source) {
+        return new V8FixedMap(source);
+    }
+
     private V8FixedMap() {
         // nope
     }
@@ -29,11 +34,6 @@ public class V8FixedMap extends V8BaseMap {
     @Override
     public ContextInfo getContextInfo() {
         return INFO;
-    }
-
-    @ContextConstructor
-    public static IValue constructor(V8Map source) {
-        return new V8FixedMap(source);
     }
 
     @Override

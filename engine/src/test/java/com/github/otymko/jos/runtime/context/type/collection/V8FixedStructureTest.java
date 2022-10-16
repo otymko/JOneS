@@ -8,7 +8,7 @@ package com.github.otymko.jos.runtime.context.type.collection;
 import com.github.otymko.jos.runtime.context.BaseScriptTest;
 import com.github.otymko.jos.runtime.context.TestScript;
 
-@TestScript(script = "src/test/resources/tests/Structure.os")
-class V8StructureTest extends BaseScriptTest {
+@TestScript(script = "src/test/resources/tests/FixedStructure.os")
+class V8FixedStructureTest extends BaseScriptTest {
     // None
 }

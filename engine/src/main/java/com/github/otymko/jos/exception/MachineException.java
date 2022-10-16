@@ -195,4 +195,16 @@ public class MachineException extends EngineException {
         return new MachineException(message);
     }
 
+    public static MachineException objectFieldIsNotWritable(String key) {
+        var message = String.format(Resources.getResourceString(OBJECT_FIELD_IS_NOT_WRITABLE), key);
+
+        return new MachineException(message);
+    }
+
+    public static MachineException objectFiledNotFound(String key) {
+        var message = String.format(Resources.getResourceString(OBJECT_FIELD_NOT_FOUND), key);
+
+        return new MachineException(message);
+    }
+
 }

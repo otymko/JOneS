@@ -63,7 +63,7 @@ public class EnumerationContext extends ContextValue implements PropertyNameAcce
 
     @Override
     public IValue getPropertyValue(IValue index) {
-        // todo: проверить ключ на валидность
+        // fixme: проверить ключ на валидность
         var key = index.asString();
         for (var value : values) {
             if (value.getName().equalsIgnoreCase(key) || value.getAlias().equalsIgnoreCase(key)) {
@@ -80,7 +80,7 @@ public class EnumerationContext extends ContextValue implements PropertyNameAcce
 
     @Override
     public boolean hasProperty(IValue index) {
-        // todo: проверить ключ на валидность
+        // fixme: проверить ключ на валидность
         var key = index.asString();
         for (var value : values) {
             if (value.getName().equalsIgnoreCase(key) || value.getAlias().equalsIgnoreCase(key)) {
