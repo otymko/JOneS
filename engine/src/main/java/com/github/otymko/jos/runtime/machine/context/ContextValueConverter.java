@@ -22,7 +22,6 @@ import java.util.Date;
  * Конвертер IValue в значения райнтайма
  */
 public final class ContextValueConverter {
-
     /**
      * Конвертировать IValue в значение рантайма с указанным типом
      * @param value значение IValue
@@ -42,6 +41,12 @@ public final class ContextValueConverter {
         }
     }
 
+    /**
+     * Конвертировать возвращаемое значение в IValue.
+     *
+     * @param sourceValue Возвращаемое значение.
+     * @param type Тип возвращаемого значения.
+     */
     @SuppressWarnings("unchecked")
     public static IValue convertReturnValue(Object sourceValue, Class<?> type) {
         if (sourceValue == null) {
@@ -59,13 +64,13 @@ public final class ContextValueConverter {
         } else if (type == double.class || type == Double.class) {
             return ValueFactory.create(BigDecimal.valueOf((double) sourceValue));
         } else if (type == byte.class || type == Byte.class) {
-            return ValueFactory.create(BigDecimal.valueOf((byte) sourceValue));
+            return ValueFactory.create(BigDecimal.valueOf((int) sourceValue));
         } else if (type == float.class || type == Float.class) {
             return ValueFactory.create((float) sourceValue);
         } else if (type == long.class || type == Long.class) {
             return ValueFactory.create((long) sourceValue);
         } else if (type == short.class || type == Short.class) {
-            return ValueFactory.create((short) sourceValue);
+            return ValueFactory.create((int) sourceValue);
         } else if (type == Date.class) {
             return ValueFactory.create((Date) sourceValue);
         } else if (type == boolean.class || type == Boolean.class) {

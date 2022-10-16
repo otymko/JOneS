@@ -5,8 +5,22 @@
  */
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.runtime.context.type.EnumerationValue;
 import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
 
+/**
+ * Базовый интерфейс типов перечислений.
+ */
 public interface EnumType {
+    /**
+     * Получить контекст перечисления.
+     */
     EnumerationContext getContextInfo();
+
+    /**
+     * Получить контекстное значение перечисления.
+     */
+    default EnumerationValue getEnumerationValue() {
+        return getContextInfo().getEnumValueType(this);
+    }
 }

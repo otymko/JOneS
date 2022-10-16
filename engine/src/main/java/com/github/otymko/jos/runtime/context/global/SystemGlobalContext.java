@@ -40,7 +40,7 @@ public class SystemGlobalContext implements AttachableContext {
                 rawMessage = message;
                 break;
             default:
-                rawMessage = String.format("%s: %s", Enumerations.getValueName(status), message);
+                rawMessage = String.format("%s: %s", status.getEnumerationValue().getName(), message);
                 break;
         }
 
