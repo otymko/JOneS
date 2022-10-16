@@ -178,11 +178,9 @@ public class StringOperationGlobalContext implements AttachableContext {
     public static IValue strLineCount(String value) {
         int pos = 0;
         int lineCount = 1;
-        while (pos >= 0 && pos < value.length())
-        {
+        while (pos >= 0 && pos < value.length()) {
             pos = value.indexOf('\n', pos);
-            if (pos >= 0)
-            {
+            if (pos >= 0) {
                 lineCount++;
                 pos++;
             }
@@ -191,8 +189,24 @@ public class StringOperationGlobalContext implements AttachableContext {
         return ValueFactory.create(lineCount);
     }
 
+    @ContextMethod(name = "СтрЧислоВхождений", alias = "StrOccurrenceCount")
+    public static IValue strOccurrenceCount(String where, String what) {
+        var pos = where.indexOf(what);
+        var occurrenceCount = 0;
+        while(pos >= 0) {
+            occurrenceCount++;
+            var nextIndex = pos + what.length();
+            if (nextIndex >= where.length()) {
+                break;
+            }
+
+            pos = where.indexOf(what, nextIndex);
+        }
+
+        return ValueFactory.create(occurrenceCount);
+    }
+
     private static String getStringArgument(String argument) {
         return argument == null ? "" : argument;
     }
-
 }
