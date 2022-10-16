@@ -206,6 +206,18 @@ public class StringOperationGlobalContext implements AttachableContext {
         return ValueFactory.create(occurrenceCount);
     }
 
+    @ContextMethod(name = "СтрПолучитьСтроку", alias = "StrGetLine")
+    public static IValue strGetLine(String source, int lineNumber)
+    {
+        String result = "";
+        if (lineNumber >= 1) {
+            String[] lines = source.split("\n", lineNumber + 1);
+            result = lines[lineNumber - 1];
+        }
+
+        return ValueFactory.create(result);
+    }
+
     private static String getStringArgument(String argument) {
         return argument == null ? "" : argument;
     }

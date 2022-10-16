@@ -68,7 +68,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         if (context.multilineString().size() > 0) {
             var joiner = new StringJoiner("\n");
             context.multilineString().get(0).children.forEach(token -> {
-                joiner.add(token.getText());
+                joiner.add(StringLineCleaner.cleanFromPipelineSymbol(token.getText()));
             });
             value = StringLineCleaner.clean(joiner.toString());
         } else {
