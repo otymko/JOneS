@@ -29,11 +29,7 @@ public class V8CompareValues extends ContextValue {
     public V8CompareValues() {}
 
     @ContextMethod(name = "Сравнить", alias = "Compare")
-    public IValue compare(IValue v1, IValue v2) {
-        return ValueFactory.create(compareInternal(v1, v2));
-    }
-
-    int compareInternal(IValue v1, IValue v2) {
+    public int compare(IValue v1, IValue v2) {
         var r1 = ValueFactory.rawValueOrUndefined(v1);
         var r2 = ValueFactory.rawValueOrUndefined(v2);
         try {

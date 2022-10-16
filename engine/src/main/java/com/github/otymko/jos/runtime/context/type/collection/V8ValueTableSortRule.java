@@ -65,7 +65,7 @@ class V8ValueTableSortRule {
     public int apply(V8ValueTableRow r1, V8ValueTableRow r2, V8CompareValues comparer) {
         final var v1 = r1.get(column);
         final var v2 = r2.get(column);
-        return comparer.compare(v1, v2).asNumber().intValue() * order;
+        return comparer.compare(v1, v2) * order;
     }
 
 }
