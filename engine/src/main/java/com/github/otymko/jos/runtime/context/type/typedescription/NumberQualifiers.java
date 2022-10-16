@@ -47,12 +47,49 @@ public class NumberQualifiers extends ContextValue {
     @ContextProperty(name = "ДопустимыйЗнак", alias = "allowedSign", accessMode = PropertyAccessMode.READ_ONLY)
     AllowedSign allowedSign;
 
-    public IValue getDigits() {
-        return ValueFactory.create(digits);
+    @ContextConstructor
+    public static NumberQualifiers constructor(int digits, int fractionDigits, IValue allowedSign) {
+
+        final var allowedSignValue = EnumerationHelper.getEnumValueOrDefault(allowedSign, AllowedSign.ANY);
+        return new NumberQualifiers(
+                digits,
+                fractionDigits,
+                (AllowedSign) allowedSignValue.getValue());
     }
 
-    public IValue getFractionDigits() {
-        return ValueFactory.create(fractionDigits);
+    @ContextConstructor
+    public static NumberQualifiers constructor(int digits, int fractionDigits) {
+
+        return new NumberQualifiers(
+                digits,
+                fractionDigits,
+                AllowedSign.ANY);
+    }
+
+    @ContextConstructor
+    public static NumberQualifiers constructor(int digits) {
+
+        return new NumberQualifiers(
+                digits,
+                0,
+                AllowedSign.ANY);
+    }
+
+    @ContextConstructor
+    public static NumberQualifiers constructor() {
+
+        return new NumberQualifiers(
+                0,
+                0,
+                AllowedSign.ANY);
+    }
+
+    public int getDigits() {
+        return digits;
+    }
+
+    public int getFractionDigits() {
+        return fractionDigits;
     }
 
     public IValue getAllowedSign() {
@@ -108,43 +145,6 @@ public class NumberQualifiers extends ContextValue {
 
     public int hashCode() {
         return digits;
-    }
-
-    @ContextConstructor
-    public static NumberQualifiers constructor(int digits, int fractionDigits, IValue allowedSign) {
-
-        final var allowedSignValue = EnumerationHelper.getEnumValueOrDefault(allowedSign, AllowedSign.ANY);
-        return new NumberQualifiers(
-                digits,
-                fractionDigits,
-                (AllowedSign) allowedSignValue.getValue());
-    }
-
-    @ContextConstructor
-    public static NumberQualifiers constructor(int digits, int fractionDigits) {
-
-        return new NumberQualifiers(
-                digits,
-                fractionDigits,
-                AllowedSign.ANY);
-    }
-
-    @ContextConstructor
-    public static NumberQualifiers constructor(int digits) {
-
-        return new NumberQualifiers(
-                digits,
-                0,
-                AllowedSign.ANY);
-    }
-
-    @ContextConstructor
-    public static NumberQualifiers constructor() {
-
-        return new NumberQualifiers(
-                0,
-                0,
-                AllowedSign.ANY);
     }
 
     @Override

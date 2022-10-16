@@ -27,28 +27,6 @@ public class BinaryDataQualifiers extends ContextValue {
     public static final ContextInfo INFO = ContextInfo.createByClass(BinaryDataQualifiers.class);
 
     /**
-     * Размер двоичных данных
-     */
-    @ContextProperty(name = "Длина", alias = "Length", accessMode = PropertyAccessMode.READ_ONLY)
-    int length;
-
-    /**
-     * Допустимый размер данных. 0 - Неограниченно
-     *
-     * @see AllowedLength
-     */
-    @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
-    AllowedLength allowedLength;
-
-    public IValue getLength() {
-        return ValueFactory.create(length);
-    }
-
-    public IValue getAllowedLength() {
-        return EnumerationHelper.getEnumByClass(AllowedLength.class).getEnumValueType(allowedLength);
-    }
-
-    /**
      * Возвращает квалификаторы двоичных данных по указанным параметрам
      *
      * @param length        Максимальный размер данных
@@ -87,6 +65,28 @@ public class BinaryDataQualifiers extends ContextValue {
     @ContextConstructor
     public static BinaryDataQualifiers constructor() {
         return new BinaryDataQualifiers(0, AllowedLength.VARIABLE);
+    }
+
+    /**
+     * Размер двоичных данных
+     */
+    @ContextProperty(name = "Длина", alias = "Length", accessMode = PropertyAccessMode.READ_ONLY)
+    int length;
+
+    /**
+     * Допустимый размер данных. 0 - Неограниченно
+     *
+     * @see AllowedLength
+     */
+    @ContextProperty(name = "ДопустимаяДлина", alias = "AllowedLength", accessMode = PropertyAccessMode.READ_ONLY)
+    AllowedLength allowedLength;
+
+    public int getLength() {
+        return length;
+    }
+
+    public IValue getAllowedLength() {
+        return EnumerationHelper.getEnumByClass(AllowedLength.class).getEnumValueType(allowedLength);
     }
 
     @Override

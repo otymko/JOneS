@@ -7,9 +7,12 @@ package com.github.otymko.jos.runtime.machine.context;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.IVariable;
+import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -36,6 +39,41 @@ public final class ContextValueConverter {
         }
     }
 
+    public static IValue convertReturnValue(Object sourceValue, Class<?> type) {
+        if (sourceValue == null) {
+            return ValueFactory.create();
+        }
+
+        if (type == IValue.class) {
+            return (IValue) sourceValue;
+        } else if (type == String.class) {
+            return ValueFactory.create((String) sourceValue);
+        } else if (type == BigDecimal.class) {
+            return ValueFactory.create((BigDecimal)sourceValue);
+        } else if (type == int.class || type == Integer.class) {
+            return ValueFactory.create((int) sourceValue);
+        } else if (type == double.class || type == Double.class) {
+            return ValueFactory.create(BigDecimal.valueOf((double) sourceValue));
+        } else if (type == byte.class || type == Byte.class) {
+            return ValueFactory.create(BigDecimal.valueOf((byte) sourceValue));
+        } else if (type == float.class || type == Float.class) {
+            return ValueFactory.create((float) sourceValue);
+        } else if (type == long.class || type == Long.class) {
+            return ValueFactory.create((long) sourceValue);
+        } else if (type == short.class || type == Short.class) {
+            return ValueFactory.create((short) sourceValue);
+        } else if (type == Date.class) {
+            return ValueFactory.create((Date) sourceValue);
+        } else if (type == boolean.class || type == Boolean.class) {
+            return ValueFactory.create((boolean) sourceValue);
+        // TODO enum value
+        } else if (RuntimeContext.class.isAssignableFrom(type)){
+            return (IValue)sourceValue;
+        } else {
+            throw MachineException.invalidArgumentValueException();
+        }
+    }
+
     private static Object convertValueByType(IValue value, Class<?> type) {
         if (value == null) {
             return null;
@@ -55,6 +93,8 @@ public final class ContextValueConverter {
             valueObject = null;
         } else if (type == String.class) {
             valueObject = value.getRawValue().asString();
+        } else if (type == BigDecimal.class) {
+            valueObject = value.getRawValue().asNumber();
         } else if (type == int.class || type == Integer.class) {
             valueObject = value.getRawValue().asNumber().intValue();
         } else if (type == double.class || type == Double.class) {

@@ -27,7 +27,6 @@ import java.util.List;
  */
 @ContextClass(name = "ИндексыКоллекции", alias="CollectionIndexes")
 public class V8CollectionIndexes extends ContextValue implements IndexAccessor, CollectionIterable<V8CollectionIndex> {
-
     public static final ContextInfo INFO = ContextInfo.createByClass(V8CollectionIndexes.class);
 
     private final List<IValue> values;

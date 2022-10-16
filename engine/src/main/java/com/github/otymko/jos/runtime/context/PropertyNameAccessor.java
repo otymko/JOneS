@@ -6,6 +6,7 @@
 package com.github.otymko.jos.runtime.context;
 
 public interface PropertyNameAccessor {
+    // FIXME: (#50) перейти на конвертацию значений
     IValue getPropertyValue(IValue index);
 
     void setPropertyValue(IValue index, IValue value);

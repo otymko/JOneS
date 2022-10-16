@@ -27,8 +27,33 @@ import java.util.GregorianCalendar;
 @ContextClass(name = "КвалификаторыДаты", alias = "DateQualifiers")
 @Value
 public class DateQualifiers extends ContextValue {
-
     public static final ContextInfo INFO = ContextInfo.createByClass(DateQualifiers.class);
+
+    /**
+     * Возвращает квалификаторы даты с указанными частями дат
+     *
+     * @param dateParts Части дат
+     * @return Квалификатор дат
+     * @see DateFractions
+     * @see DateQualifiers
+     */
+    @ContextConstructor
+    public static DateQualifiers constructor(IValue dateParts) {
+        final var datePartsValue = EnumerationHelper.getEnumValueOrDefault(dateParts, DateFractions.DATE_TIME);
+        return new DateQualifiers((DateFractions) datePartsValue.getValue());
+    }
+
+    /**
+     * Возвращает квалификаторы даты с частями дат Дата
+     *
+     * @return Квалификатор дат
+     * @see DateFractions
+     * @see DateQualifiers
+     */
+    @ContextConstructor
+    public static DateQualifiers constructor() {
+        return new DateQualifiers(DateFractions.DATE);
+    }
 
     /**
      * Части даты, хранимые в типе
@@ -74,32 +99,6 @@ public class DateQualifiers extends ContextValue {
         } catch (Exception e) {
             return ValueFactory.create(new GregorianCalendar(1, Calendar.JANUARY, 1).getTime());
         }
-    }
-
-    /**
-     * Возвращает квалификаторы даты с указанными частями дат
-     *
-     * @param dateParts Части дат
-     * @return Квалификатор дат
-     * @see DateFractions
-     * @see DateQualifiers
-     */
-    @ContextConstructor
-    public static DateQualifiers constructor(IValue dateParts) {
-        final var datePartsValue = EnumerationHelper.getEnumValueOrDefault(dateParts, DateFractions.DATE_TIME);
-        return new DateQualifiers((DateFractions) datePartsValue.getValue());
-    }
-
-    /**
-     * Возвращает квалификаторы даты с частями дат Дата
-     *
-     * @return Квалификатор дат
-     * @see DateFractions
-     * @see DateQualifiers
-     */
-    @ContextConstructor
-    public static DateQualifiers constructor() {
-        return new DateQualifiers(DateFractions.DATE);
     }
 
     public boolean equals(Object o) {

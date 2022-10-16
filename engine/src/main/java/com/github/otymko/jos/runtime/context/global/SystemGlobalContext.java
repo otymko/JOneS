@@ -28,35 +28,36 @@ public class SystemGlobalContext implements AttachableContext {
     public static final ContextInfo INFO = ContextInfo.createByClass(SystemGlobalContext.class);
 
     @ContextProperty(name = "Символы", alias = "Chars")
-    public static final IValue SYMBOLS = new SymbolsContext();
-
-    @Override
-    public ContextInfo getContextInfo() {
-        return INFO;
-    }
+    public static final SymbolsContext SYMBOLS = new SymbolsContext();
 
     @ContextMethod(name = "Сообщить", alias = "Message")
     // TODO: для null аргументов можно ввести @ContextMethodArgument(defaultValue = MessageStatus.ORDINARY)
-    public static void message(IValue message, IValue status) {
+    public static void message(String message, IValue status) {
         var statusValue = EnumerationHelper.getEnumValueOrDefault(status, MessageStatus.ORDINARY);
 
         String rawMessage;
         switch ((MessageStatus) statusValue.getValue()) {
             case WITHOUT_STATUS:
             case ORDINARY:
-                rawMessage = message.asString();
+                rawMessage = message;
                 break;
             default:
-                rawMessage = String.format("%s: %s", statusValue.getName(), message.asString());
+                rawMessage = String.format("%s: %s", statusValue.getName(), message);
                 break;
         }
 
+        // TODO: увести в отдельный класс консоли
         System.out.println(rawMessage);
     }
 
     @ContextMethod(name = "ТекущаяУниверсальнаяДатаВМиллисекундах", alias = "CurrentUniversalDateInMilliseconds")
-    public static IValue currentUniversalDateInMilliseconds() {
-        return ValueFactory.create(System.nanoTime() / 1000000);
+    public static float currentUniversalDateInMilliseconds() {
+        return System.nanoTime() / 1_000_000;
+    }
+
+    @ContextMethod(name = "ЗначениеЗаполнено", alias = "ValueIsFilled")
+    public static boolean valueIsFilled(IValue value) {
+        return valueIsFilledInternal(value);
     }
 
     private static boolean valueIsFilledInternal(IValue pValue) {
@@ -86,8 +87,8 @@ public class SystemGlobalContext implements AttachableContext {
         }
     }
 
-    @ContextMethod(name = "ЗначениеЗаполнено", alias = "ValueIsFilled")
-    public static IValue valueIsFilled(IValue value) {
-        return ValueFactory.create(valueIsFilledInternal(value));
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
     }
 }

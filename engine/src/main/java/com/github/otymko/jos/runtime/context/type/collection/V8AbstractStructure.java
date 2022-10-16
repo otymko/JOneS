@@ -41,12 +41,12 @@ public abstract class V8AbstractStructure extends ContextValue implements IndexA
     }
 
     @ContextMethod(name = "Количество", alias = "Count")
-    public IValue count() {
-        return ValueFactory.create(values.size());
+    public int count() {
+        return values.size();
     }
 
     @ContextMethod(name = "Свойство", alias = "Property")
-    public IValue hasProperty(IValue key, IVariable value) {
+    public boolean hasProperty(IValue key, IVariable value) {
         if (!Common.isValidStringIdentifier(key)) {
             throw MachineException.invalidPropertyNameStructureException(key.asString());
         }
@@ -57,14 +57,14 @@ public abstract class V8AbstractStructure extends ContextValue implements IndexA
             if (value != null) {
                 value.setValue(values.get(objectKey));
             }
-            return ValueFactory.create(true);
+            return true;
         } else {
             if (value != null) {
                 value.setValue(ValueFactory.create());
             }
         }
 
-        return ValueFactory.create(false);
+        return false;
     }
 
     @Override

@@ -53,8 +53,8 @@ public class RegexMatchCollection extends ContextValue implements CollectionIter
     }
 
     @ContextMethod(name = "Количество", alias = "Count")
-    public IValue getCount() {
-        return ValueFactory.create(BigDecimal.valueOf(results.size()));
+    public int getCount() {
+        return results.size();
     }
 
     @Override
