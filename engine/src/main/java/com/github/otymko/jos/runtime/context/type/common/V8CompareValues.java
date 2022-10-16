@@ -5,7 +5,6 @@
  */
 package com.github.otymko.jos.runtime.context.type.common;
 
-import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextConstructor;
 import com.github.otymko.jos.runtime.context.ContextMethod;

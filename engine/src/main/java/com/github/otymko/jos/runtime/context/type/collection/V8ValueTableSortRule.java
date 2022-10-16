@@ -6,6 +6,7 @@
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.runtime.context.type.common.V8CompareValues;
 import lombok.Value;
 
 import java.util.regex.Pattern;
@@ -61,10 +62,10 @@ class V8ValueTableSortRule {
         throw MachineException.invalidArgumentValueException();
     }
 
-    public int apply(V8ValueTableRow r1, V8ValueTableRow r2) {
+    public int apply(V8ValueTableRow r1, V8ValueTableRow r2, V8CompareValues comparer) {
         final var v1 = r1.get(column);
         final var v2 = r2.get(column);
-        return v1.compareTo(v2) * order;
+        return comparer.compare(v1, v2).asNumber().intValue() * order;
     }
 
 }
