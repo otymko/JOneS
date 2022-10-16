@@ -52,7 +52,7 @@ public class SystemGlobalContext implements AttachableContext {
 
     @ContextMethod(name = "ТекущаяУниверсальнаяДатаВМиллисекундах", alias = "CurrentUniversalDateInMilliseconds")
     public static float currentUniversalDateInMilliseconds() {
-        return System.nanoTime() / 1_000_000;
+        return System.nanoTime() / 1_000_000f;
     }
 
     @ContextMethod(name = "ЗначениеЗаполнено", alias = "ValueIsFilled")
