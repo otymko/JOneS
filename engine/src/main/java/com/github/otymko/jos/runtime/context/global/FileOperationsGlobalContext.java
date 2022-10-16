@@ -34,7 +34,7 @@ public class FileOperationsGlobalContext implements AttachableContext {
     }
 
     @ContextMethod(name = "ПолучитьИмяВременногоФайла", alias = "GetTempFileName")
-    public static IValue getTempFileName(String extension) {
+    public static String getTempFileName(String extension) {
         String suffix = "";
         if (extension != null) {
             suffix = "." + extension;
@@ -42,9 +42,8 @@ public class FileOperationsGlobalContext implements AttachableContext {
 
         String tmpDirectory = System.getProperty(PROPERTY_TMPDIR);
         String fileName = getRandomFileName(suffix);
-        String pathToFile = Path.of(tmpDirectory, fileName).toString();
 
-        return ValueFactory.create(pathToFile);
+        return Path.of(tmpDirectory, fileName).toString();
     }
 
     private static String getRandomFileName(String extension) {

@@ -33,7 +33,6 @@ import java.util.Map;
  */
 @ContextClass(name = "ТаблицаЗначений", alias = "ValueTable")
 public class V8ValueTable extends ContextValue implements IndexAccessor, CollectionIterable {
-
     public static final ContextInfo INFO = ContextInfo.createByClass(V8ValueTable.class);
 
     private final List<IValue> values;
@@ -53,7 +52,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextProperty(name = "Колонки", alias = "Columns", accessMode = PropertyAccessMode.READ_ONLY)
-    public IValue getColumnsExt() {
+    public V8ValueTableColumnCollection getColumns() {
         return columns;
     }
 
@@ -61,13 +60,9 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         return INFO;
     }
 
-    public V8ValueTableColumnCollection getColumns() {
-        return columns;
-    }
-
     @ContextMethod(name = "Количество", alias = "Count")
-    public IValue count() {
-        return ValueFactory.create(values.size());
+    public int count() {
+        return values.size();
     }
 
     @ContextMethod(name = "Очистить", alias = "Clear")
@@ -76,21 +71,23 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Добавить", alias = "Add")
-    public IValue add() {
+    public V8ValueTableRow add() {
         V8ValueTableRow newRow = new V8ValueTableRow(this);
         values.add(newRow);
         addRowToIndexes(newRow);
+
         return newRow;
     }
 
     @ContextMethod(name = "Вставить", alias = "Insert")
-    public IValue insert(int index) {
+    public V8ValueTableRow insert(int index) {
         if (index < 0) {
             throw MachineException.indexValueOutOfRangeException();
         }
         V8ValueTableRow newRow = new V8ValueTableRow(this);
         values.add(index, newRow);
         addRowToIndexes(newRow);
+
         return newRow;
     }
 
@@ -147,8 +144,8 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Индекс", alias = "Index")
-    public IValue index(V8ValueTableRow row) {
-        return ValueFactory.create(indexOfRow(row));
+    public int index(V8ValueTableRow row) {
+        return indexOfRow(row);
     }
 
     @ContextMethod(name = "ЗагрузитьКолонку", alias = "LoadColumn")
@@ -180,7 +177,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Найти", alias = "Find")
-    public IValue find(IValue searchValue, IValue columnNames) {
+    public V8ValueTableRow find(IValue searchValue, IValue columnNames) {
         final var rawValue = searchValue.getRawValue();
         final var searchColumns = parseColumnList(columnNames, false);
         for (final var row : values) {
@@ -192,7 +189,8 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
                 }
             }
         }
-        return ValueFactory.create();
+
+        return null;
     }
 
     @ContextMethod(name = "Сдвинуть", alias = "Move")
@@ -236,7 +234,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "НайтиСтроки", alias = "FindRows")
-    public IValue findRows(IValue filterStructure) {
+    public V8Array findRows(IValue filterStructure) {
         if (!(filterStructure instanceof CollectionIterable)) {
             throw MachineException.invalidArgumentValueException();
         }
@@ -252,6 +250,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
                 result.add(row);
             }
         }
+
         return result;
     }
 
@@ -338,7 +337,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Скопировать", alias = "Copy")
-    public IValue copy(IValue rowsToCopy, IValue columnsToCopy) {
+    public V8ValueTable copy(IValue rowsToCopy, IValue columnsToCopy) {
         return copyInternal(rowsToCopy, columnsToCopy);
     }
 
@@ -431,7 +430,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Итог", alias = "Total")
-    public IValue total(IValue column) {
+    public BigDecimal total(IValue column) {
         boolean hasData = false;
         BigDecimal result = BigDecimal.ZERO;
         for (final var row: values) {
@@ -443,9 +442,10 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
             }
         }
         if (hasData) {
-            return ValueFactory.create(result);
+            return result;
         }
-        return ValueFactory.create();
+
+        return null;
     }
 
     @Override

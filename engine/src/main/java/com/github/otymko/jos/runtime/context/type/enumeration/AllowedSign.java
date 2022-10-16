@@ -25,6 +25,12 @@ public enum AllowedSign implements EnumType {
      * Не может содерэать отрицательные значения
      */
     @EnumValue(name = "Неотрицательный", alias = "NonNegative")
-    NON_NEGATIVE
+    NON_NEGATIVE;
 
+    public static final EnumerationContext INFO = new EnumerationContext(AllowedSign.class);
+
+    @Override
+    public EnumerationContext getContextInfo() {
+        return INFO;
+    }
 }

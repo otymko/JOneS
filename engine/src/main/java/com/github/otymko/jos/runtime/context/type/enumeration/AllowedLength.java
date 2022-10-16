@@ -25,6 +25,12 @@ public enum AllowedLength implements EnumType {
      * Фиксированная длина
      */
     @EnumValue(name = "Фиксированная", alias = "Fixed")
-    FIXED
+    FIXED;
 
+    public static final EnumerationContext INFO = new EnumerationContext(AllowedLength.class);
+
+    @Override
+    public EnumerationContext getContextInfo() {
+        return INFO;
+    }
 }

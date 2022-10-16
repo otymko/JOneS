@@ -35,7 +35,7 @@ public class V8FixedArray extends ContextValue implements IndexAccessor, Collect
     private final List<IValue> values;
 
     @ContextConstructor
-    public static IValue createByV8Array(V8Array array) {
+    public static V8FixedArray createByV8Array(V8Array array) {
         return new V8FixedArray(array);
     }
 
@@ -44,13 +44,13 @@ public class V8FixedArray extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Количество", alias = "Count")
-    public IValue count() {
-        return ValueFactory.create(values.size());
+    public int count() {
+        return values.size();
     }
 
     @ContextMethod(name = "ВГраница", alias = "UBound")
-    public IValue upperBound() {
-        return ValueFactory.create(values.size() - 1);
+    public int upperBound() {
+        return values.size() - 1;
     }
 
     @ContextMethod(name = "Получить", alias = "Get")
@@ -59,16 +59,17 @@ public class V8FixedArray extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Найти", alias = "Find")
-    public IValue find(IValue inValue) {
+    public Integer find(IValue inValue) {
         var index = 0;
         while (index < values.size()) {
             var value = values.get(index);
             if (value.equals(inValue)) {
-                return ValueFactory.create(index);
+                return index;
             }
             index++;
         }
-        return ValueFactory.create();
+
+        return null;
     }
 
     @Override

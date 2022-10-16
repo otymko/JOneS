@@ -5,12 +5,10 @@
  */
 package com.github.otymko.jos.runtime.context.global;
 
-import com.github.otymko.jos.compiler.EnumerationHelper;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextMethod;
 import com.github.otymko.jos.runtime.context.GlobalContextClass;
-import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.context.type.enumeration.SearchDirection;
@@ -35,35 +33,37 @@ public class StringOperationGlobalContext implements AttachableContext {
     //endregion
 
     @ContextMethod(name = "СтрНайти", alias = "StrFind")
-    public static IValue find(String where, String what, IValue direction, IValue start, IValue occurrence) {
-        var directionValue = EnumerationHelper.getEnumValueOrDefault(direction, SearchDirection.FROM_BEGIN);
-        var startValue = start == null ? 0 : start.getRawValue().asNumber().intValue();
-        var occurrenceValue = occurrence == null ? 1 : occurrence.getRawValue().asNumber().intValue();
+    public static int find(String where, String what, SearchDirection sourceDirection, Integer sourceStart,
+                           Integer sourceOccurrence) {
+
+        var direction = sourceDirection == null ? SearchDirection.FROM_BEGIN : sourceDirection;
+        var start = sourceStart == null ? 0 : sourceStart;
+        var occurrence = sourceOccurrence == null ? 1 : sourceOccurrence;
 
         var length = where.length();
         if (length == 0 || what.length() == 0) {
-            return ValueFactory.create(0);
+            return 0;
         }
 
-        var fromBegin = directionValue.getValue() == SearchDirection.FROM_BEGIN;
-        if (startValue == 0) {
-            startValue = fromBegin ? 1 : length;
+        var fromBegin = direction == SearchDirection.FROM_BEGIN;
+        if (start == 0) {
+            start = fromBegin ? 1 : length;
         }
 
-        if (startValue < 1 || startValue > length) {
+        if (start < 1 || start > length) {
             throw MachineException.invalidArgumentValueException();
         }
 
-        if (occurrenceValue == 0) {
-            occurrenceValue = 1;
+        if (occurrence == 0) {
+            occurrence = 1;
         }
 
-        var startIndex = startValue - 1;
+        var startIndex = start - 1;
         var foundTimes = 0;
         var index = length + 1;
 
         if (fromBegin) {
-            while (foundTimes < occurrenceValue && index >= 0) {
+            while (foundTimes < occurrence && index >= 0) {
                 index = where.indexOf(what);
                 if (index >= 0) {
                     startIndex = index + 1;
@@ -74,7 +74,7 @@ public class StringOperationGlobalContext implements AttachableContext {
                 }
             }
         } else {
-            while (foundTimes < occurrenceValue && index >= 0) {
+            while (foundTimes < occurrence && index >= 0) {
                 index = where.lastIndexOf(what);
                 if (index >= 0) {
                     startIndex = index - 1;
@@ -86,14 +86,15 @@ public class StringOperationGlobalContext implements AttachableContext {
             }
         }
 
-        if (foundTimes == occurrenceValue) {
-            return ValueFactory.create(index + 1);
+        if (foundTimes == occurrence) {
+            return index + 1;
         }
-        return ValueFactory.create(0);
+
+        return 0;
     }
 
     @ContextMethod(name = "СтрНачинаетсяС", alias = "StrStartsWith")
-    public static IValue startsWith(String inputString, String searchString) {
+    public static boolean startsWith(String inputString, String searchString) {
         var inputValue = getStringArgument(inputString);
         var searchValue = getStringArgument(searchString);
 
@@ -107,11 +108,12 @@ public class StringOperationGlobalContext implements AttachableContext {
         } else {
             result = false;
         }
-        return ValueFactory.create(result);
+
+        return result;
     }
 
     @ContextMethod(name = "СтрЗаканчиваетсяНа", alias = "StrEndsWith")
-    public static IValue endsWith(String inputString, String searchString) {
+    public static boolean endsWith(String inputString, String searchString) {
         var inputValue = getStringArgument(inputString);
         var searchValue = getStringArgument(searchString);
 
@@ -125,11 +127,12 @@ public class StringOperationGlobalContext implements AttachableContext {
         } else {
             result = false;
         }
-        return ValueFactory.create(result);
+
+        return result;
     }
 
     @ContextMethod(name = "СтрРазделить", alias = "StrSplit")
-    public static IValue strSplit(String source, String delimiter, Boolean includeEmpty) {
+    public static V8Array strSplit(String source, String delimiter, Boolean includeEmpty) {
         final var sourceString = getStringArgument(source);
         final var delimiterString = getStringArgument(delimiter);
         final var includeEmptyFlag = includeEmpty == null || includeEmpty;
@@ -151,31 +154,31 @@ public class StringOperationGlobalContext implements AttachableContext {
     }
 
     @ContextMethod(name = "СтрСравнить", alias = "StrCompare")
-    public static IValue strCompare(String left, String right) {
+    public static int strCompare(String left, String right) {
         var result = left.compareToIgnoreCase(right);
         if (result < 0) {
-            return ValueFactory.create(-1);
+            return -1;
         } else if (result > 0) {
-            return ValueFactory.create(1);
+            return 1;
         } else {
-            return ValueFactory.create(0);
+            return 0;
         }
     }
 
     @ContextMethod(name = "СтрСоединить", alias = "StrConcat")
-    public static IValue strConcat(V8Array array, IValue inputSeparator) {
-        var separator = inputSeparator == null ? "" : inputSeparator.getRawValue().asString();
+    public static String strConcat(V8Array array, String sourceSeparator) {
+        var separator = sourceSeparator == null ? "" : sourceSeparator;
 
         var joiner = new StringJoiner(separator);
         for (var value : array.iterator()) {
             joiner.add(value.getRawValue().asString());
         }
 
-        return ValueFactory.create(joiner.toString());
+        return joiner.toString();
     }
 
     @ContextMethod(name = "СтрЧислоСтрок", alias = "StrLineCount")
-    public static IValue strLineCount(String value) {
+    public static int strLineCount(String value) {
         int pos = 0;
         int lineCount = 1;
         while (pos >= 0 && pos < value.length()) {
@@ -186,11 +189,11 @@ public class StringOperationGlobalContext implements AttachableContext {
             }
         }
 
-        return ValueFactory.create(lineCount);
+        return lineCount;
     }
 
     @ContextMethod(name = "СтрЧислоВхождений", alias = "StrOccurrenceCount")
-    public static IValue strOccurrenceCount(String where, String what) {
+    public static int strOccurrenceCount(String where, String what) {
         var pos = where.indexOf(what);
         var occurrenceCount = 0;
         while(pos >= 0) {
@@ -203,11 +206,11 @@ public class StringOperationGlobalContext implements AttachableContext {
             pos = where.indexOf(what, nextIndex);
         }
 
-        return ValueFactory.create(occurrenceCount);
+        return occurrenceCount;
     }
 
     @ContextMethod(name = "СтрПолучитьСтроку", alias = "StrGetLine")
-    public static IValue strGetLine(String source, int lineNumber)
+    public static String strGetLine(String source, int lineNumber)
     {
         String result = "";
         if (lineNumber >= 1) {
@@ -215,7 +218,7 @@ public class StringOperationGlobalContext implements AttachableContext {
             result = lines[lineNumber - 1];
         }
 
-        return ValueFactory.create(result);
+        return result;
     }
 
     private static String getStringArgument(String argument) {

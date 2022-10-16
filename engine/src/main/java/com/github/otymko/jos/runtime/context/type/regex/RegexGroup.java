@@ -18,16 +18,16 @@ public class RegexGroup extends ContextValue {
     public static final ContextInfo INFO = ContextInfo.createByClass(RegexGroup.class);
 
     @ContextProperty(name = "Значение", alias = "Value", accessMode = PropertyAccessMode.READ_ONLY)
-    private final IValue value;
+    private final String value;
 
     @ContextProperty(name = "Индекс", alias = "Index", accessMode = PropertyAccessMode.READ_ONLY)
-    private final IValue index;
+    private final int index;
 
     @ContextProperty(name = "Длина", alias = "Length", accessMode = PropertyAccessMode.READ_ONLY)
-    private final IValue length;
+    private final int length;
 
     @ContextProperty(name = "Имя", alias = "Name", accessMode = PropertyAccessMode.READ_ONLY)
-    private final IValue name;
+    private final String name;
 
     @Override
     public ContextInfo getContextInfo() {
@@ -35,12 +35,12 @@ public class RegexGroup extends ContextValue {
     }
 
     public RegexGroup(String value) {
-        this.value = ValueFactory.create(value);
+        this.value = value;
         // TODO: не реализовано
-        this.index = ValueFactory.create(0);
-        this.length = ValueFactory.create(value.length());
+        this.index = 0;
+        this.length = value.length();
         // TODO: не реализовано
-        this.name = ValueFactory.create();
+        this.name = null;
     }
 
 }

@@ -73,7 +73,8 @@ public final class ContextMethodCall {
             }
             throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
         }
-        return (IValue) result;
+
+        return ContextValueConverter.convertReturnValue(result, method.getReturnType());
     }
 
     /**

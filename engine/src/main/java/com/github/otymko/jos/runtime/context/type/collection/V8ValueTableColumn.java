@@ -25,42 +25,21 @@ import java.util.Objects;
 @ContextClass(name = "КолонкаТаблицыЗначений", alias = "ValueTableColumn")
 @Builder
 public class V8ValueTableColumn extends ContextValue {
-
     public static final ContextInfo INFO = ContextInfo.createByClass(V8ValueTableColumn.class);
 
     private final V8ValueTable owner;
 
+    @ContextProperty(name = "Имя", alias = "Name")
+    @Getter
     private String name;
+    @ContextProperty(name = "Заголовок", alias = "Title")
     private String title;
+    @ContextProperty(name = "ТипЗначения", alias = "ValueType")
     private TypeDescription valueType;
+    @ContextProperty(name = "Ширина", alias = "Width")
     private int width;
-
     @Getter
     private IValue defaultValue;
-
-    @ContextProperty(name = "Имя", alias = "Name")
-    public IValue getName() {
-        return ValueFactory.create(name);
-    }
-
-    @ContextProperty(name = "Заголовок", alias = "Title")
-    public IValue getTitle() {
-        return ValueFactory.create(title);
-    }
-
-    @ContextProperty(name = "ТипЗначения", alias = "ValueType")
-    public IValue getValueType() {
-        return valueType;
-    }
-
-    @ContextProperty(name = "Ширина", alias = "Width")
-    public IValue getWidth() {
-        return ValueFactory.create(width);
-    }
-
-    String getNameInternal() {
-        return name;
-    }
 
     @Override
     public ContextInfo getContextInfo() {

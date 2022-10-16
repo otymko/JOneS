@@ -17,7 +17,7 @@ import java.io.PrintStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-class EnumerationHelperTest {
+class EnumerationsTest {
     private static final String IN_LINE_SEPARATOR = "\n";
 
     @Test

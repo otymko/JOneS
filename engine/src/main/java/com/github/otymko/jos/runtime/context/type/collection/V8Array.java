@@ -50,7 +50,7 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
      * @param values список значений.
      */
     @ContextConstructor
-    public static IValue createByValues(IValue... values) {
+    public static V8Array createByValues(IValue... values) {
         IValue firstValue = values[0];
         if (firstValue instanceof V8FixedArray) {
             return new V8Array((V8FixedArray)firstValue);
@@ -78,8 +78,8 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     }
 
     @ContextMethod(name = "Количество", alias = "Count")
-    public IValue count() {
-        return ValueFactory.create(values.size());
+    public int count() {
+        return values.size();
     }
 
     @ContextMethod(name = "Очистить", alias = "Clear")
@@ -109,16 +109,17 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     }
 
     @ContextMethod(name = "Найти", alias = "Find")
-    public IValue find(IValue inValue) {
+    public Integer find(IValue inValue) {
         var index = 0;
         while (index < values.size()) {
             var value = values.get(index);
             if (value.equals(inValue)) {
-                return ValueFactory.create(index);
+                return index;
             }
             index++;
         }
-        return ValueFactory.create();
+
+        return null;
     }
 
     @ContextMethod(name = "Удалить", alias = "Delete")
@@ -127,8 +128,8 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     }
 
     @ContextMethod(name = "ВГраница", alias = "UBound")
-    public IValue upperBound() {
-        return ValueFactory.create(values.size() - 1);
+    public int upperBound() {
+        return values.size() - 1;
     }
 
     @ContextMethod(name = "Получить", alias = "Get")
@@ -164,5 +165,4 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
             values.add(ValueFactory.create());
         }
     }
-
 }

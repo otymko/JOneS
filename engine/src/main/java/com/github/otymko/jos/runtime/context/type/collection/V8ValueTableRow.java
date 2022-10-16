@@ -42,7 +42,7 @@ public class V8ValueTableRow extends ContextValue implements IndexAccessor, Prop
     }
 
     @ContextMethod(name="Владелец", alias="Owner")
-    public IValue owner() {
+    public V8ValueTable owner() {
         return owner;
     }
 

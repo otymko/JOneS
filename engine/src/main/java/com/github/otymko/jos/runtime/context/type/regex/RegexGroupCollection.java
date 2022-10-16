@@ -38,13 +38,13 @@ public class RegexGroupCollection extends ContextValue implements CollectionIter
     }
 
     @ContextMethod(name = "Количество", alias = "Count")
-    public IValue getCount() {
-        return ValueFactory.create(result.groupCount() + 1);
+    public int getCount() {
+        return result.groupCount() + 1;
     }
 
-    public IValue getByName(IValue inputName) {
+    public String getByName(IValue inputName) {
         // TODO: не реализовано
-        return ValueFactory.create();
+        return null;
     }
 
 
