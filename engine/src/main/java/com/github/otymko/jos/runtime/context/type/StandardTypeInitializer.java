@@ -13,6 +13,7 @@ import com.github.otymko.jos.runtime.context.type.collection.V8KeyAndValue;
 import com.github.otymko.jos.runtime.context.type.collection.V8Map;
 import com.github.otymko.jos.runtime.context.type.collection.V8Structure;
 import com.github.otymko.jos.runtime.context.type.collection.V8ValueTable;
+import com.github.otymko.jos.runtime.context.type.common.V8RandomNumberGenerator;
 import com.github.otymko.jos.runtime.context.type.file.V8File;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
@@ -85,6 +86,7 @@ public class StandardTypeInitializer {
 
         implementTypeByInfo(typeManager, Regex.INFO);
         implementTypeByInfo(typeManager, V8File.INFO);
+        implementTypeByInfo(typeManager, V8RandomNumberGenerator.INFO);
 
         implementTypeByInfo(typeManager, V8ValueTable.INFO);
     }
