@@ -36,11 +36,11 @@ public class V8RandomNumberGenerator extends ContextValue {
     }
 
     public V8RandomNumberGenerator() {
-        random = new Random();
+        random = new Random(); //NOSONAR
     }
 
     public V8RandomNumberGenerator(long seed) {
-        random = new Random(seed);
+        random = new Random(seed); //NOSONAR
     }
 
     @ContextMethod(name = "СлучайноеЧисло", alias = "RandomNumber")
