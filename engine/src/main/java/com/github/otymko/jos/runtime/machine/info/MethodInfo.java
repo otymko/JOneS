@@ -17,11 +17,29 @@ import java.lang.reflect.Method;
 @Value
 @RequiredArgsConstructor
 public class MethodInfo {
+    /**
+     * Имя метода на русском.
+     */
     String name;
+    /**
+     * Альтернативное имя метода на английском.
+     */
     String alias;
+    /**
+     * Это функция.
+     */
     boolean function;
+    /**
+     * Параметры метода.
+     */
     ParameterInfo[] parameters;
+    /**
+     * Аннотации метода.
+     */
     AnnotationDefinition[] annotations;
+    /**
+     * Ссылка на нативный метод.
+     */
     Method method;
 
     public MethodInfo(String name, String alias, boolean function, ParameterInfo[] parameters,

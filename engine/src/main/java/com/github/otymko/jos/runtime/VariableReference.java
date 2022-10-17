@@ -5,13 +5,14 @@
  */
 package com.github.otymko.jos.runtime;
 
+import com.github.otymko.jos.core.IVariable;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextType;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,48 +20,100 @@ import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * Ссылка на переменную.
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class VariableReference extends ContextValue implements IVariable {
+    /**
+     * Имя переменной.
+     */
     private String name;
+    /**
+     * Ссылка на типа ссылки на значение.
+     */
     private ReferenceType referenceType;
+    /**
+     * Ссылка на значение.
+     */
     private IVariable referencedValue;
+    /**
+     * Контекское значение, которому принадлежит ссылка.
+     */
     private RuntimeContext context;
+    /**
+     * Номер свойства в контектном значении.
+     */
     private int contextPropertyNumber;
+    /**
+     * Индекс свойства.
+     */
     private IValue index;
 
+    /**
+     * Создать ссылку на переменную.
+     *
+     * @param variable Переменная.
+     * @param referenceName Имя ссылки на переменную.
+     */
     public static VariableReference create(IVariable variable, String referenceName) {
         var reference = new VariableReference();
         reference.setReferenceType(ReferenceType.SIMPLE);
         reference.setReferencedValue(variable);
         reference.setName(referenceName);
+
         return reference;
     }
 
+    /**
+     * Создать ссылку на переменную по индексу свойства.
+     *
+     * @param context Контекст.
+     * @param index Индекс свойства.
+     * @param referenceName Имя ссылки на переменную.
+     */
     public static VariableReference createIndexedPropertyReference(RuntimeContext context, IValue index, String referenceName) {
         var reference = new VariableReference();
         reference.setReferenceType(ReferenceType.INDEXED_PROPERTY);
         reference.setContext(context);
         reference.setIndex(index);
         reference.setName(referenceName);
+
         return reference;
     }
 
+    /**
+     * Создать динамическую ссылка на переменную.
+     *
+     * @param context Контекст.
+     * @param index Индекс свойста.
+     * @param referenceName Имя ссылки на переменную.
+     */
     public static VariableReference createDynamicPropertyNameReference(RuntimeContext context, IValue index, String referenceName) {
         var reference = new VariableReference();
         reference.setReferenceType(ReferenceType.DYNAMIC_PROPERTY);
         reference.setContext(context);
         reference.setIndex(index);
         reference.setName(referenceName);
+
         return reference;
     }
 
+    /**
+     * Создать ссылка на свойство контекста.
+     *
+     * @param context Контекст.
+     * @param propertyNumber Номер свойства в контексте.
+     * @param referenceName Имя ссылки на переменную.
+     */
     public static VariableReference createContextPropertyReference(RuntimeContext context, int propertyNumber, String referenceName) {
         var reference = new VariableReference();
         reference.setReferenceType(ReferenceType.CONTEXT_PROPERTY);
         reference.setContext(context);
         reference.setContextPropertyNumber(propertyNumber);
         reference.setName(referenceName);
+
         return reference;
     }
 
@@ -120,6 +173,7 @@ public class VariableReference extends ContextValue implements IVariable {
         if (value instanceof ContextType) {
             return ((ContextType) value).getContextInfo();
         }
+
         throw MachineException.operationNotImplementedException();
     }
 
@@ -152,5 +206,4 @@ public class VariableReference extends ContextValue implements IVariable {
     public int compareTo(IValue o) {
         return getValue().compareTo(o);
     }
-
 }

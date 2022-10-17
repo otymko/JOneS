@@ -7,8 +7,17 @@ package com.github.otymko.jos.compiler;
 
 import lombok.Value;
 
+/**
+ * Определение аннотации.
+ */
 @Value
 public class AnnotationDefinition {
+    /**
+     * Имя аннотации.
+     */
     String name;
+    /**
+     * Параметры аннотации.
+     */
     AnnotationParameter[] parameters;
 }

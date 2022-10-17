@@ -14,7 +14,13 @@ import lombok.experimental.NonFinal;
  */
 @Value
 public class Command {
+    /**
+     * Код операции.
+     */
     OperationCode code;
+    /**
+     * Аргумент операции.
+     */
     @Setter
     @NonFinal
     int argument;

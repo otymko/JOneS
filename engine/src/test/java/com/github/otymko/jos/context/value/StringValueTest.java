@@ -5,8 +5,8 @@
  */
 package com.github.otymko.jos.context.value;
 
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import org.junit.jupiter.api.Test;
 

@@ -12,12 +12,23 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Вспомогательный класс обработки аннотаций при компиляции скриптов
+ * Обработка аннотации при компиляции модуля.
  */
 @RequiredArgsConstructor
 public class AnnotationProcessing {
     private final Compiler compiler;
 
+    private static void fillParameterName(AnnotationParameter.AnnotationParameterBuilder builder,
+                                          BSLParser.AnnotationParamContext annotationParameter) {
+        var parameterName = annotationParameter.annotationParamName().IDENTIFIER().getText();
+        builder.name(parameterName);
+    }
+
+    /**
+     * Получить определения аннотаций из контекста.
+     *
+     * @param annotationContexts узел контекста аннотаций.
+     */
     public AnnotationDefinition[] getAnnotationsFromContext(List<? extends BSLParser.AnnotationContext> annotationContexts) {
         return annotationContexts.stream()
                 .map(this::createAnnotationDefinition)
@@ -57,11 +68,4 @@ public class AnnotationProcessing {
                 .ifPresent(node -> fillParameterName(builder, annotationParameter));
         return builder.build();
     }
-
-    private static void fillParameterName(AnnotationParameter.AnnotationParameterBuilder builder,
-                                          BSLParser.AnnotationParamContext annotationParameter) {
-        var parameterName = annotationParameter.annotationParamName().IDENTIFIER().getText();
-        builder.name(parameterName);
-    }
-
 }

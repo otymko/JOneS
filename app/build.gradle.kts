@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":core"))
     implementation(project(":engine"))
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple

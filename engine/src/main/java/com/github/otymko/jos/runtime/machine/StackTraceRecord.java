@@ -9,10 +9,22 @@ import lombok.Value;
 
 import java.nio.file.Path;
 
+/**
+ * Записи стек трейса ошибки.
+ */
 @Value
 public class StackTraceRecord {
+    /**
+     * Имя метода.
+     */
     String methodName;
+    /**
+     * Номер строки.
+     */
     int lineNumber;
+    /**
+     * Источник.
+     */
     Path source;
 
     StackTraceRecord(ExecutionFrame frame) {
@@ -20,5 +32,4 @@ public class StackTraceRecord {
         source = frame.getImage().getSource().getPath();
         lineNumber = frame.getLineNumber();
     }
-
 }

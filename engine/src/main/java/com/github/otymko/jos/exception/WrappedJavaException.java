@@ -5,9 +5,9 @@
  */
 package com.github.otymko.jos.exception;
 
-import com.github.otymko.jos.localization.Resources;
+import com.github.otymko.jos.core.localization.Resources;
 
-import static com.github.otymko.jos.localization.MessageResource.EXTERNAL_SYSTEM_EXCEPTION;
+import static com.github.otymko.jos.core.localization.MessageResource.EXTERNAL_SYSTEM_EXCEPTION;
 
 public class WrappedJavaException extends MachineException {
     public WrappedJavaException(Exception exception) {

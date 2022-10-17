@@ -6,7 +6,7 @@
 package com.github.otymko.jos.runtime.context.type;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.localization.Resources;
+import com.github.otymko.jos.core.localization.Resources;
 import com.github.otymko.jos.runtime.context.EnumType;
 import com.github.otymko.jos.runtime.context.type.enumeration.AllowedLength;
 import com.github.otymko.jos.runtime.context.type.enumeration.AllowedSign;
@@ -20,47 +20,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.github.otymko.jos.localization.MessageResource.ENUM_TYPE_NOT_FOUND;
+import static com.github.otymko.jos.core.localization.MessageResource.ENUM_TYPE_NOT_FOUND;
 
+/**
+ * Менеджер типов.
+ */
 public class TypeManager {
     private static final TypeManager INSTANCE = new TypeManager();
 
     private final TypeStorage storage = new TypeStorage();
 
-    private TypeManager() {
-        storage.getEnumerationContext().addAll(getSystemEnums());
-        StandardTypeInitializer.initialize(this);
-    }
-
     public static TypeManager getInstance() {
         return INSTANCE;
-    }
-
-    public void registerType(String name, ContextInfo info) {
-        storage.getTypes().put(name, info);
-    }
-
-    public void implementEnumeration(Class<? extends EnumType> enumType) {
-        var context = new EnumerationContext(enumType);
-        storage.getEnumerationContext().add(context);
-    }
-
-    public EnumerationContext getEnumByClass(Class<? extends EnumType> enumClass) {
-        var enumContext = storage.getEnumerationContext().stream()
-                .filter(context -> context.getEnumType() == enumClass)
-                .findAny();
-        if (enumContext.isEmpty()) {
-            throw new MachineException(Resources.getResourceString(ENUM_TYPE_NOT_FOUND));
-        }
-        return enumContext.get();
-    }
-
-    public Optional<ContextInfo> getContextInfoByName(String name) {
-        return Optional.ofNullable(storage.getTypes().getOrDefault(name, null));
-    }
-
-    public List<EnumerationContext> getEnumerationContext() {
-        return storage.getEnumerationContext();
     }
 
     private static List<EnumerationContext> getSystemEnums() {
@@ -74,4 +45,59 @@ public class TypeManager {
         return contexts;
     }
 
+    private TypeManager() {
+        storage.getEnumerationContext().addAll(getSystemEnums());
+        StandardTypeInitializer.initialize(this);
+    }
+
+    /**
+     * Зарегистировать тип.
+     *
+     * @param name Имя типа.
+     * @param info Описание контекста.
+     */
+    public void registerType(String name, ContextInfo info) {
+        storage.getTypes().put(name, info);
+    }
+
+    /**
+     * Внедрить контекстное перечисление.
+     *
+     * @param enumType класс контекстного перечисление.
+     */
+    public void implementEnumeration(Class<? extends EnumType> enumType) {
+        var context = new EnumerationContext(enumType);
+        storage.getEnumerationContext().add(context);
+    }
+
+    /**
+     * Получить контекст перечисления по контекстному классу перечисления
+     *
+     * @param enumClass контекстный класс перечисления.
+     */
+    public EnumerationContext getEnumByClass(Class<? extends EnumType> enumClass) {
+        var enumContext = storage.getEnumerationContext().stream()
+                .filter(context -> context.getEnumType() == enumClass)
+                .findAny();
+        if (enumContext.isEmpty()) {
+            throw new MachineException(Resources.getResourceString(ENUM_TYPE_NOT_FOUND));
+        }
+        return enumContext.get();
+    }
+
+    /**
+     * Полуить описание контекста по имени.
+     *
+     * @param name Имя типа контекста.
+     */
+    public Optional<ContextInfo> getContextInfoByName(String name) {
+        return Optional.ofNullable(storage.getTypes().getOrDefault(name, null));
+    }
+
+    /**
+     * Получить список контекство перечислений.
+     */
+    public List<EnumerationContext> getEnumerationContext() {
+        return storage.getEnumerationContext();
+    }
 }
