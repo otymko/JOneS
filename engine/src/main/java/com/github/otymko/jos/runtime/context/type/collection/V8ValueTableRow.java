@@ -99,6 +99,11 @@ public class V8ValueTableRow extends ContextValue implements IndexAccessor, Prop
         return getIndexedValue(index);
     }
 
+    @ContextMethod(name = "Установить", alias = "Set")
+    public void set(IValue index, IValue value) {
+        setIndexedValue(index, value);
+    }
+
     void columnDeleted(V8ValueTableColumn column) {
         data.remove(column);
     }
