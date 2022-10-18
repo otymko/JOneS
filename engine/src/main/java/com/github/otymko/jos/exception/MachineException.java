@@ -22,18 +22,26 @@ import static com.github.otymko.jos.core.localization.MessageResource.*;
 public class MachineException extends EngineException {
     @Getter
     private final ErrorPositionInfo errorPositionInfo;
+    /**
+     * Кратное описание ошибки.
+     */
+    @Getter
+    private final String description;
 
     private List<StackTraceRecord> stackTrace;
 
     public MachineException(String message) {
         super(message);
 
+        description = message;
         errorPositionInfo = new ErrorPositionInfo();
         errorPositionInfo.setLine(-1);
     }
 
     public MachineException(String message, Throwable cause) {
         super(message, cause);
+
+        description = message;
         errorPositionInfo = new ErrorPositionInfo();
         errorPositionInfo.setLine(-1);
     }
