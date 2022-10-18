@@ -18,6 +18,8 @@ import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.core.PropertyAccessMode;
 import com.github.otymko.jos.core.DataType;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.common.V8CompareValues;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.math.BigDecimal;
@@ -107,14 +109,17 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
 
     @ContextMethod(name = "Сортировать", alias = "Sort")
     public void sort(String sortColumns, IValue valueComparer) {
-
-        if (valueComparer != null
-            && valueComparer.getRawValue().getDataType() != DataType.UNDEFINED) {
-            throw MachineException.operationNotImplementedException();
-        }
-
-        final var sorter = V8ValueTableSorter.create(columns, sortColumns);
+        final var compareValues = getCompareValues(valueComparer);
+        final var sorter = V8ValueTableSorter.create(columns, sortColumns, compareValues);
         values.sort(sorter);
+    }
+
+    private V8CompareValues getCompareValues(IValue param) {
+        var rawParam = ValueFactory.rawValueOrUndefined(param);
+        if (rawParam instanceof V8CompareValues) {
+            return (V8CompareValues) rawParam;
+        }
+        return (V8CompareValues) V8CompareValues.create();
     }
 
     private int indexOfRow(IValue row) {
