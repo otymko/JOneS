@@ -6,17 +6,17 @@
 package com.github.otymko.jos.runtime.context.type.file;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextConstructor;
-import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.ContextProperty;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextConstructor;
+import com.github.otymko.jos.core.annotation.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.PropertyAccessMode;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.file.exception.FileAttributeException;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-import com.github.otymko.jos.util.Common;
+import com.github.otymko.jos.util.CommonUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -143,7 +143,7 @@ public class V8File extends ContextValue {
 
     @ContextMethod(name = "УстановитьНевидимость", alias = "SetHidden")
     public void setHidden(boolean value) {
-        if (Common.isWindows()) {
+        if (CommonUtils.isWindows()) {
             return;
         }
 

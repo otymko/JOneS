@@ -5,13 +5,12 @@
  */
 package com.github.otymko.jos.runtime.context.global;
 
-import com.github.otymko.jos.compiler.Enumerations;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.AttachableContext;
-import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.ContextProperty;
-import com.github.otymko.jos.runtime.context.GlobalContextClass;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.annotation.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextProperty;
+import com.github.otymko.jos.core.annotation.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import com.github.otymko.jos.runtime.context.type.primitive.NullValue;

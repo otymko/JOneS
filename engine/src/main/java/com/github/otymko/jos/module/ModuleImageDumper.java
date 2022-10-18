@@ -11,22 +11,23 @@ import lombok.experimental.UtilityClass;
 import java.io.IOException;
 import java.io.Writer;
 
+/**
+ * Дампер образа модуля.
+ */
 @UtilityClass
 public class ModuleImageDumper {
-
     public static void dump(ModuleImage image, Writer writer) throws IOException {
         int offset = 0;
-        for (final var opCode : image.getCode()) {
-            writer.write(String.format("%6d: %s", offset, opCode));
-            if (opCode.getCode() == OperationCode.PUSH_CONST
-                    || opCode.getCode() == OperationCode.RESOLVE_METHOD_PROC
-                    || opCode.getCode() == OperationCode.RESOLVE_METHOD_FUNC
-                    || opCode.getCode() == OperationCode.RESOLVE_PROP) {
-                writer.write(String.format(" ; %s", image.getConstants().get(opCode.getArgument())));
+        for (var command : image.getCode()) {
+            writer.write(String.format("%6d: %s", offset, command));
+            if (command.getCode() == OperationCode.PUSH_CONST
+                    || command.getCode() == OperationCode.RESOLVE_METHOD_PROC
+                    || command.getCode() == OperationCode.RESOLVE_METHOD_FUNC
+                    || command.getCode() == OperationCode.RESOLVE_PROP) {
+                writer.write(String.format(" ; %s", image.getConstants().get(command.getArgument())));
             }
             writer.write('\n');
             offset++;
         }
     }
-
 }

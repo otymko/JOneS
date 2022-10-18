@@ -5,12 +5,12 @@
  */
 package com.github.otymko.jos.exception;
 
-import com.github.otymko.jos.localization.Resources;
+import com.github.otymko.jos.core.localization.Resources;
 
-import static com.github.otymko.jos.localization.MessageResource.*;
+import static com.github.otymko.jos.core.localization.MessageResource.*;
 
 /**
- * Исключение при компиляции
+ * Исключение, выбрасываемые при компиляции.
  */
 public class CompilerException extends EngineException {
 
@@ -67,5 +67,4 @@ public class CompilerException extends EngineException {
         var message = Resources.getResourceString(RETURN_STATEMENT_OUTSIDE_METHOD);
         return new CompilerException(message);
     }
-
 }

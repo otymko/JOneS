@@ -5,14 +5,15 @@
  */
 package com.github.otymko.jos.exception;
 
-import com.github.otymko.jos.localization.Resources;
+import com.github.otymko.jos.core.exception.ErrorPositionInfo;
+import com.github.otymko.jos.core.localization.Resources;
 import com.github.otymko.jos.runtime.machine.StackTraceRecord;
 import lombok.Getter;
 
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.otymko.jos.localization.MessageResource.*;
+import static com.github.otymko.jos.core.localization.MessageResource.*;
 
 
 /**
@@ -20,21 +21,21 @@ import static com.github.otymko.jos.localization.MessageResource.*;
  */
 public class MachineException extends EngineException {
     @Getter
-    private final ErrorInfo errorInfo;
+    private final ErrorPositionInfo errorPositionInfo;
 
     private List<StackTraceRecord> stackTrace;
 
     public MachineException(String message) {
         super(message);
 
-        errorInfo = new ErrorInfo();
-        errorInfo.setLine(-1);
+        errorPositionInfo = new ErrorPositionInfo();
+        errorPositionInfo.setLine(-1);
     }
 
     public MachineException(String message, Throwable cause) {
         super(message, cause);
-        errorInfo = new ErrorInfo();
-        errorInfo.setLine(-1);
+        errorPositionInfo = new ErrorPositionInfo();
+        errorPositionInfo.setLine(-1);
     }
 
     public void setBslStackTrace(List<StackTraceRecord> stackTrace) {
@@ -52,12 +53,12 @@ public class MachineException extends EngineException {
     public String getMessage() {
         var message = String.format(
                 Resources.getResourceString(ERROR_IN_MODULE_TEMPLATE),
-                errorInfo.getSource(),
-                errorInfo.getLine(),
+                errorPositionInfo.getSource(),
+                errorPositionInfo.getLine(),
                 super.getMessage()
         );
-        if (!errorInfo.getCode().isEmpty()) {
-            message += "\n" + errorInfo.getCode();
+        if (!errorPositionInfo.getCode().isEmpty()) {
+            message += "\n" + errorPositionInfo.getCode();
         }
         return message;
     }

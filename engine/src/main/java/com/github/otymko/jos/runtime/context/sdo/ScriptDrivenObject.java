@@ -7,11 +7,11 @@ package com.github.otymko.jos.runtime.context.sdo;
 
 import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.module.ModuleImage;
-import com.github.otymko.jos.runtime.IVariable;
+import com.github.otymko.jos.core.IVariable;
 import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.MachineInstance;
 import lombok.Getter;
@@ -20,8 +20,14 @@ import lombok.Getter;
  * Абстрактная реализация объекта скрипта
  */
 public abstract class ScriptDrivenObject extends ContextValue implements AttachableContext {
+    /**
+     * Образ модуля.
+     */
     @Getter
     private final ModuleImage moduleImage;
+    /**
+     * Состояние модуля.
+     */
     @Getter
     private IVariable[] state;
 
@@ -30,15 +36,30 @@ public abstract class ScriptDrivenObject extends ContextValue implements Attacha
         init();
     }
 
+    /**
+     * Инициализировать объект модуля.
+     *
+     * @param engine Движок.
+     */
     public void initialize(ScriptEngine engine) {
         engine.getMachine().executeModuleBody(this);
     }
 
-    /* Вариант с отдельной стековой машиной */
+    /**
+     * Инициализировать объект модуля на указанной стековой машине.
+     *
+     * @param machine Стековая машина.
+     *
+     */
     public void initialize(MachineInstance machine) {
         machine.executeModuleBody(this);
     }
 
+    /**
+     * Получить индекс метода скрипта.
+     *
+     * @param name Имя метода.
+     */
     public int getScriptMethod(String name) {
         for (var index = 0; index < moduleImage.getMethods().size(); index++) {
             var methodDescription = moduleImage.getMethods().get(index);
@@ -46,13 +67,28 @@ public abstract class ScriptDrivenObject extends ContextValue implements Attacha
                 return index;
             }
         }
+
         return -1;
     }
 
+    /**
+     * Выполнить метод скрипта и вернуть результат.
+     *
+     * @param engine Движок.
+     * @param methodId Индекс метода.
+     * @param parameters Параметры метода.
+     */
     public IValue callScriptMethod(ScriptEngine engine, int methodId, IValue[] parameters) {
         return engine.getMachine().executeMethod(this, methodId, parameters);
     }
 
+    /**
+     * Выполнить метод скрипта на указанной стековой машине и вернуть результат.
+     *
+     * @param machine Стековая машина.
+     * @param methodId Индекс метода.
+     * @param parameters Параметры метода.
+     */
     /* Вариант с отдельной стековой машиной */
     public IValue callScriptMethod(MachineInstance machine, int methodId, IValue[] parameters) {
         return machine.executeMethod(this, methodId, parameters);
@@ -70,5 +106,4 @@ public abstract class ScriptDrivenObject extends ContextValue implements Attacha
             state[index] = Variable.create(ValueFactory.create(), moduleImage.getVariables().get(index).getName());
         }
     }
-
 }

@@ -10,23 +10,34 @@ import lombok.Value;
 import lombok.experimental.Accessors;
 
 /**
- * Определение параметра метода
+ * Определение параметра метода.
  */
 @Value
 @Builder
 public class ParameterInfo {
+    /**
+     * Имя параметра метода.
+     */
     String name;
 
+    /**
+     * Передача параметра по значению.
+     */
     @Builder.Default
     boolean byValue = false;
 
+    /**
+     * Имеет значение по умолчанию.
+     */
     @Builder.Default
     @Accessors(fluent = true)
     boolean hasDefaultValue = false;
 
+    /**
+     * Индекс значения по умолчанию.
+     */
     @Builder.Default
     int defaultValueIndex = -1;
 
-    // todo: Аннотации ?
-
+    // TODO: Аннотации
 }

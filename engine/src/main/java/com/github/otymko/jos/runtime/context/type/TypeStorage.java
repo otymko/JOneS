@@ -14,9 +14,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Хранилище типов.
+ */
 public class TypeStorage {
+    /**
+     * Соответствие описания типов по именам.
+     */
     @Getter
     private final Map<String, ContextInfo> types = new HashMap<>();
+    /**
+     * Список контекство перечислений.
+     */
     @Getter
     private final List<EnumerationContext> enumerationContext = new ArrayList<>();
 }

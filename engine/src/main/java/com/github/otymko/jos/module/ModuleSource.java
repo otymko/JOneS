@@ -11,17 +11,22 @@ import lombok.Value;
 import java.nio.file.Path;
 
 /**
- * Источник скрипта
+ * Источник модуля.
  */
 @Value
 @RequiredArgsConstructor
 public class ModuleSource {
+    /**
+     * Путь к модулю.
+     */
     Path path;
+    /**
+     * Содержимое модуля.
+     */
     String content;
 
     public ModuleSource(String content) {
         this.path = Path.of("");
         this.content = content;
     }
-
 }
