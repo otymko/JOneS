@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.context.type.collection.V8FixedArray;
 import com.github.otymko.jos.runtime.context.type.collection.V8FixedMap;
