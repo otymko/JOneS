@@ -12,10 +12,25 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Определение метода.
+ */
 @Data
-public class MethodDescriptor {
+public class MethodDefinition {
+    /**
+     * Точка входа.
+     */
     private int entry = -1;
+    /**
+     * Признак, что это метод из тела модуля.
+     */
     private boolean bodyMethod;
+    /**
+     * Сигнатура метода.
+     */
     private MethodInfo signature;
+    /**
+     * Переменные метода.
+     */
     private List<VariableInfo> variables = new ArrayList<>();
 }

@@ -5,9 +5,10 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.localization.Resources;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.localization.Resources;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import com.github.otymko.jos.runtime.context.type.primitive.NullValue;
@@ -15,11 +16,19 @@ import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
 import com.github.otymko.jos.runtime.context.type.primitive.StringValue;
 import lombok.experimental.UtilityClass;
 
-import static com.github.otymko.jos.localization.MessageResource.PRIMITIVE_DATA_TYPE_NOT_SUPPORTED;
+import static com.github.otymko.jos.core.localization.MessageResource.PRIMITIVE_DATA_TYPE_NOT_SUPPORTED;
 
+/**
+ * Парсер значений.
+ */
 @UtilityClass
 public class ValueParser {
-
+    /**
+     * Распарсить значение.
+     *
+     * @param view Строковое представление.
+     * @param dataType Тип значения.
+     */
     public IValue parse(String view, DataType dataType) {
         IValue result;
         switch (dataType) {
@@ -48,5 +57,4 @@ public class ValueParser {
 
         return result;
     }
-
 }

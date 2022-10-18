@@ -8,14 +8,16 @@ package com.github.otymko.jos.runtime.context.type.collection;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.Arithmetic;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextConstructor;
-import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.ContextProperty;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextConstructor;
+import com.github.otymko.jos.core.annotation.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
+import com.github.otymko.jos.core.PropertyAccessMode;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
@@ -109,17 +111,14 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
 
     @ContextMethod(name = "Сортировать", alias = "Sort")
     public void sort(String sortColumns, IValue valueComparer) {
-        final var compareValues = getCompareValues(valueComparer);
-        final var sorter = V8ValueTableSorter.create(columns, sortColumns, compareValues);
-        values.sort(sorter);
-    }
 
-    private V8CompareValues getCompareValues(IValue param) {
-        var rawParam = ValueFactory.rawValueOrUndefined(param);
-        if (rawParam instanceof V8CompareValues) {
-            return (V8CompareValues) rawParam;
+        if (valueComparer != null
+            && valueComparer.getRawValue().getDataType() != DataType.UNDEFINED) {
+            throw MachineException.operationNotImplementedException();
         }
-        return new V8CompareValues();
+
+        final var sorter = V8ValueTableSorter.create(columns, sortColumns);
+        values.sort(sorter);
     }
 
     private int indexOfRow(IValue row) {

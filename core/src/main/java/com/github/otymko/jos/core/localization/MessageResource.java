@@ -3,8 +3,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.github.otymko.jos.localization;
+package com.github.otymko.jos.core.localization;
 
+/**
+ * Ключи ресурсных сообщений.
+ */
 public class MessageResource {
     public static final String ERROR_IN_MODULE_TEMPLATE = "errorInModuleTemplate";
     public static final String EXPECTED_AT_LEAST_ONE_ARGUMENT = "expectedAtLeastOneArgument";

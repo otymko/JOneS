@@ -14,7 +14,6 @@ import lombok.experimental.UtilityClass;
 public class StringLineCleaner {
     private final String QUOTE = "\"";
     private final String SINGLE_QUOTE = "'";
-
     private final String PIPELINE = "|";
 
     /**

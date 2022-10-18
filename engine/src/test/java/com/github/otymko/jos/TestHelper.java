@@ -6,7 +6,7 @@
 package com.github.otymko.jos;
 
 import com.github.otymko.jos.compiler.ScriptCompiler;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import lombok.experimental.UtilityClass;
 

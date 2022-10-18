@@ -6,10 +6,10 @@
 package com.github.otymko.jos.runtime.context.type.primitive;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.localization.Resources;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.localization.Resources;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.PrimitiveValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.ValueParser;
@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.github.otymko.jos.localization.MessageResource.NULL_VALUE_NOT_SUPPORTED;
+import static com.github.otymko.jos.core.localization.MessageResource.NULL_VALUE_NOT_SUPPORTED;
 
 @ContextClass(name = "Строка", alias = "String")
 public final class StringValue extends PrimitiveValue {

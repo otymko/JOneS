@@ -6,7 +6,7 @@
 package com.github.otymko.jos.runtime.context.type.primitive;
 
 import com.github.otymko.jos.ScriptEngine;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;

@@ -6,9 +6,12 @@
 package com.github.otymko.jos.runtime.context.sdo;
 
 import com.github.otymko.jos.module.ModuleImage;
-import com.github.otymko.jos.runtime.context.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextClass;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
+/**
+ * Реализация типа "Скрипт".
+ */
 @ContextClass(name = "Скрипт", alias = "Script")
 public class UserScriptContext extends ScriptDrivenObject {
     public static final ContextInfo INFO = ContextInfo.createByClass(UserScriptContext.class);
@@ -21,5 +24,4 @@ public class UserScriptContext extends ScriptDrivenObject {
     public ContextInfo getContextInfo() {
         return INFO;
     }
-
 }

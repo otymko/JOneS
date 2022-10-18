@@ -6,7 +6,7 @@
 package com.github.otymko.jos.module;
 
 import com.github.otymko.jos.compiler.ConstantDefinition;
-import com.github.otymko.jos.compiler.MethodDescriptor;
+import com.github.otymko.jos.compiler.MethodDefinition;
 import com.github.otymko.jos.compiler.SymbolAddress;
 import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
@@ -16,16 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Слепок образа модуля при компиляции
+ * Реализация образа модуля, используемая при компиляции.
  */
 @Data
-public class ModuleImageCache {
+public class ModuleImageCache implements IModuleImage {
     private ModuleSource source;
     private int entryPoint = -1;
     private List<Command> code = new ArrayList<>();
     private List<ConstantDefinition> constants = new ArrayList<>();
     private List<VariableInfo> variables = new ArrayList<>();
-    private List<MethodDescriptor> methods = new ArrayList<>();
+    private List<MethodDefinition> methods = new ArrayList<>();
     private List<SymbolAddress> methodRefs = new ArrayList<>();
     private List<SymbolAddress> variableRefs = new ArrayList<>();
 }

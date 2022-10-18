@@ -7,8 +7,8 @@ package com.github.otymko.jos.runtime.context.global;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.AttachableContext;
-import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.GlobalContextClass;
+import com.github.otymko.jos.core.annotation.ContextMethod;
+import com.github.otymko.jos.core.annotation.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.context.type.enumeration.SearchDirection;
@@ -18,19 +18,13 @@ import lombok.NoArgsConstructor;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
+/**
+ * Глобальные методы по работе со строками.
+ */
 @GlobalContextClass
 @NoArgsConstructor
 public class StringOperationGlobalContext implements AttachableContext {
     public static final ContextInfo INFO = ContextInfo.createByClass(StringOperationGlobalContext.class);
-
-    //region AttachableContext
-
-    @Override
-    public ContextInfo getContextInfo() {
-        return INFO;
-    }
-
-    //endregion
 
     @ContextMethod(name = "СтрНайти", alias = "StrFind")
     public static int find(String where, String what, SearchDirection sourceDirection, Integer sourceStart,
@@ -224,4 +218,13 @@ public class StringOperationGlobalContext implements AttachableContext {
     private static String getStringArgument(String argument) {
         return argument == null ? "" : argument;
     }
+
+    //region AttachableContext
+
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
+
+    //endregion
 }

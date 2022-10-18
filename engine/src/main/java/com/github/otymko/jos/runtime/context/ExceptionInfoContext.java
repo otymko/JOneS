@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.core.annotation.ContextClass;
 import com.github.otymko.jos.exception.EngineException;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.EqualsAndHashCode;
