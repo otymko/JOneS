@@ -8,6 +8,6 @@ package com.github.otymko.jos.runtime.context.type.collection;
 import com.github.otymko.jos.runtime.context.BaseScriptTest;
 import com.github.otymko.jos.runtime.context.TestScript;
 
-@TestScript(script = "src/test/resources/tests/valuetable.os")
+@TestScript(script = "src/test/resources/tests/ValueTable.os")
 public class V8ValueTableTest extends BaseScriptTest {
 }
