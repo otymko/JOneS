@@ -119,7 +119,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         if (rawParam instanceof V8CompareValues) {
             return (V8CompareValues) rawParam;
         }
-        return new V8CompareValues();
+        return (V8CompareValues) V8CompareValues.create();
     }
 
     private int indexOfRow(IValue row) {

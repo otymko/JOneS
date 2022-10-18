@@ -27,7 +27,9 @@ public class V8CompareValues extends ContextValue {
         return new V8CompareValues();
     }
 
-    public V8CompareValues() {}
+    private V8CompareValues() {
+        // None
+    }
 
     @ContextMethod(name = "Сравнить", alias = "Compare")
     public int compare(IValue v1, IValue v2) {
