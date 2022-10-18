@@ -81,7 +81,7 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         return column;
     }
 
-    V8ValueTableColumn createColumn(String name, IValue typeDescription, IValue title, IValue width) {
+    V8ValueTableColumn createColumn(String name, IValue typeDescription, String title, Integer width) {
 
         if (name.isEmpty()) {
             throw MachineException.invalidArgumentValueException();
@@ -100,18 +100,18 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         }
 
         if (title != null) {
-            columnBuilder.title(title.asString());
+            columnBuilder.title(title);
         }
 
         if (width != null) {
-            columnBuilder.width(width.asNumber().intValue());
+            columnBuilder.width(width);
         }
 
         return columnBuilder.build();
     }
 
     @ContextMethod(name = "Добавить", alias = "Add")
-    public V8ValueTableColumn add(String name, IValue typeDescription, IValue title, IValue width) {
+    public V8ValueTableColumn add(String name, IValue typeDescription, String title, Integer width) {
         if (hasColumn(name)) {
             throw MachineException.invalidArgumentValueException();
         }
@@ -122,7 +122,7 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
     }
 
     @ContextMethod(name = "Вставить", alias = "Insert")
-    public V8ValueTableColumn insert(int index, String name, IValue typeDescription, IValue title, IValue width) {
+    public V8ValueTableColumn insert(int index, String name, IValue typeDescription, String title, Integer width) {
         if (hasColumn(name)) {
             throw MachineException.invalidArgumentValueException();
         }
