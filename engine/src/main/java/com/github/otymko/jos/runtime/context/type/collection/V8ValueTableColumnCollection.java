@@ -172,11 +172,11 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
     public int indexOf(V8ValueTableColumn column) {
         return columns.indexOf(column);
     }
+
     @ContextMethod(name = "Сдвинуть", alias = "Move")
-    public void move(IValue row, IValue offset) {
-        final var intOffset = offset.getRawValue().asNumber().intValue();
+    public void move(IValue row, int offset) {
         final var sourceIndex = indexByValue(row);
-        final var newIndex = evalIndex(sourceIndex, intOffset);
+        final var newIndex = evalIndex(sourceIndex, offset);
 
         final var tmp = columns.get(sourceIndex);
         if (sourceIndex < newIndex) {
