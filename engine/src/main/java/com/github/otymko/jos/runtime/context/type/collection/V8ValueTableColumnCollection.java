@@ -121,6 +121,17 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         return column;
     }
 
+    @ContextMethod(name = "Вставить", alias = "Insert")
+    public V8ValueTableColumn insert(int index, String name, IValue typeDescription, IValue title, IValue width) {
+        if (hasColumn(name)) {
+            throw MachineException.invalidArgumentValueException();
+        }
+        final var column = createColumn(name, typeDescription, title, width);
+        columns.add(index, column);
+
+        return column;
+    }
+
     V8ValueTableColumn copy(V8ValueTableColumn column) {
         final var newColumn = column.copyTo(owner);
         columns.add(newColumn);
@@ -142,6 +153,64 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
     @ContextMethod(name = "Количество", alias = "Count")
     public int count() {
         return columns.size();
+    }
+
+    @ContextMethod(name = "Получить", alias = "Get")
+    public IValue get(int index) {
+        return columns.get(index);
+    }
+
+    @ContextMethod(name = "Очистить", alias = "Clear")
+    public void clear() {
+        for (var column: columns) {
+            owner.columnRemoved((V8ValueTableColumn) column);
+        }
+        columns.clear();
+    }
+
+    @ContextMethod(name = "Индекс", alias = "IndexOf")
+    public int indexOf(V8ValueTableColumn column) {
+        return columns.indexOf(column);
+    }
+    @ContextMethod(name = "Сдвинуть", alias = "Move")
+    public void move(IValue row, IValue offset) {
+        final var intOffset = offset.getRawValue().asNumber().intValue();
+        final var sourceIndex = indexByValue(row);
+        final var newIndex = evalIndex(sourceIndex, intOffset);
+
+        final var tmp = columns.get(sourceIndex);
+        if (sourceIndex < newIndex) {
+            columns.add(newIndex + 1, tmp);
+            columns.remove(sourceIndex);
+        } else {
+            columns.remove(sourceIndex);
+            columns.add(newIndex, tmp);
+        }
+    }
+
+    private int indexByValue(IValue param) {
+        final var index = param.getRawValue();
+        if (index instanceof V8ValueTableColumn) {
+            final var castedColumn = (V8ValueTableColumn) index;
+            int columnIndex = columns.indexOf(castedColumn);
+            if (columnIndex == -1) {
+                throw MachineException.invalidArgumentValueException();
+            }
+            return columnIndex;
+        }
+        final var intIndex = index.asNumber().intValueExact();
+        if (intIndex < 0 || intIndex >= columns.size()) {
+            throw MachineException.indexValueOutOfRangeException();
+        }
+        return intIndex;
+    }
+
+    private int evalIndex(int sourceIndex, int offset) {
+        var destIndex = sourceIndex + offset;
+        if (destIndex < 0 || destIndex >= columns.size()) {
+            throw MachineException.indexValueOutOfRangeException();
+        }
+        return destIndex;
     }
 
     @Override
