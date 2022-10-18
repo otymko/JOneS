@@ -7,9 +7,21 @@ package com.github.otymko.jos.runtime.machine;
 
 import lombok.Data;
 
+/**
+ * Прыжок исключения.
+ */
 @Data
 class ExceptionJumpInfo {
+    /**
+     * Адрес обработчик.
+     */
     private int handlerAddress;
+    /**
+     * Кадр обработчика.
+     */
     private ExecutionFrame handlerFrame;
+    /**
+     * Размер стека.
+     */
     private int stackSize;
 }

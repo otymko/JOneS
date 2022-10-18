@@ -6,7 +6,7 @@
 package com.github.otymko.jos.exception;
 
 /**
- * Общее исключение в движке
+ * Общее исключение в движка.
  */
 public class EngineException extends RuntimeException {
 

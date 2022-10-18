@@ -6,16 +6,16 @@
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.IVariable;
+import com.github.otymko.jos.core.IVariable;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
-import com.github.otymko.jos.runtime.context.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
-import com.github.otymko.jos.util.Common;
+import com.github.otymko.jos.util.CommonUtils;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -47,7 +47,7 @@ public abstract class V8AbstractStructure extends ContextValue implements IndexA
 
     @ContextMethod(name = "Свойство", alias = "Property")
     public boolean hasProperty(IValue key, IVariable value) {
-        if (!Common.isValidStringIdentifier(key)) {
+        if (!CommonUtils.isValidStringIdentifier(key)) {
             throw MachineException.invalidPropertyNameStructureException(key.asString());
         }
 
@@ -80,7 +80,7 @@ public abstract class V8AbstractStructure extends ContextValue implements IndexA
     @Override
     public boolean hasProperty(IValue index) {
         var key = index.asString();
-        if (!Common.isValidStringIdentifier(index)) {
+        if (!CommonUtils.isValidStringIdentifier(index)) {
             throw MachineException.invalidPropertyNameStructureException(key);
         }
         return views.containsKey(key);
@@ -93,7 +93,7 @@ public abstract class V8AbstractStructure extends ContextValue implements IndexA
 
     private IValue getValueInternal(IValue index) {
         var key = index.asString();
-        if (!Common.isValidStringIdentifier(index)) {
+        if (!CommonUtils.isValidStringIdentifier(index)) {
             throw MachineException.invalidPropertyNameStructureException(key);
         }
 

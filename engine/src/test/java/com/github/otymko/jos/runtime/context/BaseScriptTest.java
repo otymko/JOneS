@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.core.IValue;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 

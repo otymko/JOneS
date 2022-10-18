@@ -14,13 +14,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Область видимости символов.
+ */
 public class SymbolScope {
+    /**
+     * Соответствие имен переменных и их индексов в области.
+     */
     @Getter
     private final Map<String, Integer> variableNumbers = new HashMap<>();
+    /**
+     * Список переменных области.
+     */
     @Getter
     private final List<VariableInfo> variables = new ArrayList<>();
+    /**
+     * Соответствие имен методов и их индексов в области.
+     */
     @Getter
     private final Map<String, Integer> methodNumbers = new HashMap<>();
+    /**
+     * Список методов области.
+     */
     @Getter
     private final List<MethodInfo> methods = new ArrayList<>();
 }

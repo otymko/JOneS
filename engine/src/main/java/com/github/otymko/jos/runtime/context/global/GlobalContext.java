@@ -6,11 +6,11 @@
 package com.github.otymko.jos.runtime.context.global;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.IVariable;
+import com.github.otymko.jos.core.IVariable;
 import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.AttachableContext;
-import com.github.otymko.jos.runtime.context.GlobalContextClass;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.annotation.GlobalContextClass;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
@@ -18,6 +18,9 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Глобальный контекст.
+ */
 @GlobalContextClass
 public class GlobalContext implements AttachableContext {
     private final ContextInfo info;

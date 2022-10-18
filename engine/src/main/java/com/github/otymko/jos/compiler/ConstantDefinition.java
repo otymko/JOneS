@@ -5,15 +5,24 @@
  */
 package com.github.otymko.jos.compiler;
 
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.DataType;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
+/**
+ * Определение константы.
+ */
 @Value
 @EqualsAndHashCode
 public class ConstantDefinition {
+    /**
+     * Тип значения константы.
+     */
     DataType dataType;
+    /**
+     * Значение.
+     */
     IValue value;
 
     public ConstantDefinition(IValue value) {

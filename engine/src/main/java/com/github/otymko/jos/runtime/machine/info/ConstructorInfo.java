@@ -9,8 +9,17 @@ import lombok.Value;
 
 import java.lang.reflect.Method;
 
+/**
+ * Информация о конструкторе.
+ */
 @Value
 public class ConstructorInfo {
+    /**
+     * Параметры конструктора.
+     */
     ParameterInfo[] parameters;
+    /**
+     * Ссылка на нативный метод.
+     */
     Method method;
 }

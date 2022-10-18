@@ -8,12 +8,21 @@ package com.github.otymko.jos.compiler;
 import lombok.Builder;
 import lombok.Value;
 
+/**
+ * Определение параметра аннотации.
+ */
 @Value
 @Builder
 public class AnnotationParameter {
     public static final String UNKNOWN_NAME = "UNKNOWN";
+
+    /**
+     * Имя параметра аннотации.
+     */
     @Builder.Default
     String name = UNKNOWN_NAME;
+    /**
+     * Индекс значения с контексте модуля.
+     */
     int valueIndex;
-    // TODO: нужен ли runtimeValue ?
 }

@@ -7,8 +7,8 @@ package com.github.otymko.jos.app;
 
 import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.app.exception.ApplicationException;
-import com.github.otymko.jos.localization.MessageResource;
-import com.github.otymko.jos.localization.Resources;
+import com.github.otymko.jos.core.localization.MessageResource;
+import com.github.otymko.jos.core.localization.Resources;
 
 import java.io.File;
 import java.nio.file.Path;

@@ -6,7 +6,10 @@
 package com.github.otymko.jos.runtime.context;
 
 import com.github.otymko.jos.compiler.AnnotationDefinition;
-import com.github.otymko.jos.runtime.IVariable;
+import com.github.otymko.jos.core.IVariable;
+import com.github.otymko.jos.core.annotation.ContextConstructor;
+import com.github.otymko.jos.core.annotation.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextProperty;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.global.FileOperationsGlobalContext;
@@ -26,9 +29,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Помощник инициализации контекста.
+ */
 @UtilityClass
 public class ContextInitializer {
-
+    /**
+     * Инициализировать контекст в стековой машине.
+     *
+     * @param machineInstance Стековая машина.
+     */
     public void initialize(MachineInstance machineInstance) {
         machineInstance.implementContext(new GlobalContext());
         machineInstance.implementContext(new SystemGlobalContext());
@@ -36,6 +46,11 @@ public class ContextInitializer {
         machineInstance.implementContext(new FileOperationsGlobalContext());
     }
 
+    /**
+     * Получить контекст метода.
+     *
+     * @param contextClass контекстный класс.
+     */
     public MethodInfo[] getContextMethods(Class<? extends RuntimeContext> contextClass) {
         List<MethodInfo> methods = new ArrayList<>();
         for (var method : contextClass.getMethods()) {
@@ -52,6 +67,11 @@ public class ContextInitializer {
         return methods.toArray(new MethodInfo[0]);
     }
 
+    /**
+     * Получить параметры метода.
+     *
+     * @param method ссылка на нативный метод.
+     */
     public ParameterInfo[] getMethodParameters(Method method) {
         var length = method.getParameters().length;
         if (length == 0) {
@@ -70,6 +90,11 @@ public class ContextInitializer {
         return parameters;
     }
 
+    /**
+     * Получить конструкторы.
+     *
+     * @param contextClass Контекстный класс.
+     */
     public ConstructorInfo[] getConstructors(Class<? extends RuntimeContext> contextClass) {
         List<ConstructorInfo> constructors = new ArrayList<>();
         for (var method : contextClass.getMethods()) {
@@ -87,6 +112,11 @@ public class ContextInitializer {
         return constructors.toArray(new ConstructorInfo[0]);
     }
 
+    /**
+     * Получить свойства.
+     *
+     * @param contextClass Контекстный класс.
+     */
     public PropertyInfo[] getProperties(Class<? extends RuntimeContext> contextClass) {
         List<PropertyInfo> properties = new ArrayList<>();
 
@@ -167,5 +197,4 @@ public class ContextInitializer {
         }
         return null;
     }
-
 }
