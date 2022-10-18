@@ -6,15 +6,15 @@
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextConstructor;
-import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextConstructor;
+import com.github.otymko.jos.core.annotation.ContextMethod;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-import com.github.otymko.jos.util.Common;
+import com.github.otymko.jos.util.CommonUtils;
 
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -79,7 +79,7 @@ public class V8Structure extends V8AbstractStructure {
     @ContextMethod(name = "Вставить", alias = "Insert")
     public void insert(IValue key, IValue value) {
         var keyValue = key.asString();
-        if (!Common.isValidStringIdentifier(key)) {
+        if (!CommonUtils.isValidStringIdentifier(key)) {
             throw MachineException.invalidPropertyNameStructureException(keyValue);
         }
 
@@ -101,7 +101,7 @@ public class V8Structure extends V8AbstractStructure {
 
     @ContextMethod(name = "Удалить", alias = "Delete")
     public void remove(IValue key) {
-        if (!Common.isValidStringIdentifier(key)) {
+        if (!CommonUtils.isValidStringIdentifier(key)) {
             throw MachineException.invalidPropertyNameStructureException(key.asString());
         }
 
@@ -127,7 +127,7 @@ public class V8Structure extends V8AbstractStructure {
 
     private void setValueInternal(IValue index, IValue value) {
         var key = index.asString();
-        if (!Common.isValidStringIdentifier(index)) {
+        if (!CommonUtils.isValidStringIdentifier(index)) {
             throw MachineException.invalidPropertyNameStructureException(key);
         }
 

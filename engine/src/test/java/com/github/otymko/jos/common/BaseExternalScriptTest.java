@@ -8,7 +8,7 @@ package com.github.otymko.jos.common;
 import com.github.otymko.jos.ScriptEngine;
 import com.github.otymko.jos.compiler.ScriptCompiler;
 import com.github.otymko.jos.module.ModuleImageDumper;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;

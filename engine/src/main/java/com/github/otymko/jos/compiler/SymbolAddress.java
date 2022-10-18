@@ -7,8 +7,17 @@ package com.github.otymko.jos.compiler;
 
 import lombok.Value;
 
+/**
+ * Адрес символа.
+ */
 @Value
 public class SymbolAddress {
+    /**
+     * Индекс символа внутри контекста.
+     */
     int symbolId;
+    /**
+     * Индекс контекста.
+     */
     int contextId;
 }

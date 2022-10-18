@@ -1,6 +1,8 @@
 description = "JOneScript Engine"
 
 dependencies {
+    implementation(project(":core"))
+
     // https://github.com/1c-syntax/bsl-parser
     api("com.github.1c-syntax", "bsl-parser", "0.19.3") {
         exclude("com.tunnelvisionlabs", "antlr4-annotations")

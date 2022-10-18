@@ -5,9 +5,10 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextType;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,10 +16,20 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * Примитивное значение.
+ */
 public abstract class PrimitiveValue implements IValue, ContextType, Comparable<IValue> {
+    /**
+     * Тип значения.
+     */
     @Getter
     @Setter(AccessLevel.PROTECTED)
     private DataType dataType;
+
+    public static IValue parse(String view) {
+        throw MachineException.operationNotSupportedException();
+    }
 
     public BigDecimal asNumber() {
         throw MachineException.operationNotSupportedException();
@@ -51,9 +62,4 @@ public abstract class PrimitiveValue implements IValue, ContextType, Comparable<
     public int compareTo(IValue o) {
         throw MachineException.operationNotSupportedException();
     }
-
-    public static IValue parse(String view) {
-        throw MachineException.operationNotSupportedException();
-    }
-
 }

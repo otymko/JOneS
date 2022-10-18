@@ -9,9 +9,18 @@ import com.github.otymko.jos.runtime.SymbolType;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
+/**
+ * Связь с переменной.
+ */
 @Value
 @RequiredArgsConstructor
 public class VariableBinding {
+    /**
+     * Тип символа.
+     */
     SymbolType type;
+    /**
+     * Адрес символа.
+     */
     SymbolAddress address;
 }

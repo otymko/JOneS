@@ -19,7 +19,7 @@ import com.github.otymko.jos.runtime.context.global.SystemGlobalContext;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
-import com.github.otymko.jos.util.Common;
+import com.github.otymko.jos.util.CommonUtils;
 import lombok.Getter;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
@@ -28,13 +28,44 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Компилятор скриптов.
+ */
 public class ScriptCompiler {
+    /**
+     * Движок.
+     */
     @Getter
     private final ScriptEngine engine;
+    /**
+     * Внешний контекст компиляции.
+     */
     @Getter
     private final CompilerContext outerContext;
+    /**
+     * Контекст компиляции модуля.
+     */
     @Getter
     private CompilerContext moduleContext;
+
+    private static ModuleImage buildImage(ModuleImageCache cache) {
+        return ModuleImage.builder()
+                .source(cache.getSource())
+                .entryPoint(cache.getEntryPoint())
+                .code(List.copyOf(cache.getCode()))
+                .methods(List.copyOf(cache.getMethods()))
+                .variables(List.copyOf(cache.getVariables()))
+                .constants(List.copyOf(cache.getConstants()))
+                .methodRefs(List.copyOf(cache.getMethodRefs()))
+                .variableRefs(List.copyOf(cache.getVariableRefs()))
+                .build();
+    }
+
+    private static void findError(BSLParser.FileContext fileContext) {
+        var walker = new ParseTreeWalker();
+        var listener = new ParseErrorListener();
+        walker.walk(listener, fileContext);
+    }
 
     public ScriptCompiler(ScriptEngine engine) {
         this.engine = engine;
@@ -42,25 +73,42 @@ public class ScriptCompiler {
         initContext();
     }
 
+    /**
+     * Компилировать модуль скрипта.
+     *
+     * @param pathToScript Путь к модулю.
+     * @param sdoClass Контекстный класс объекта.
+     *
+     * @throws CompilerException Ошибка компиляции.
+     * @throws IOException Ошибка чтения содержимого модуля.
+     */
     public ModuleImage compile(Path pathToScript, Class<? extends ScriptDrivenObject> sdoClass) throws CompilerException, IOException {
         moduleContext.implementContext(sdoClass);
         String content;
-        content = Common.getContentFromFile(pathToScript);
+        content = CommonUtils.getContentFromFile(pathToScript);
         var source = new ModuleSource(pathToScript, content);
         return compileInternal(source);
     }
 
-    public ModuleImage compile(String content, Class<? extends ScriptDrivenObject> targetClass) throws CompilerException {
-        moduleContext.implementContext(targetClass);
+    /**
+     * Компилировать модуль скрипта из содержимого.
+     *
+     * @param content Содержимое модуля.
+     * @param sdoClass Контекстный класс объекта.
+     *
+     * @throws CompilerException Ошибка компиляции.
+     */
+    public ModuleImage compile(String content, Class<? extends ScriptDrivenObject> sdoClass) throws CompilerException {
+        moduleContext.implementContext(sdoClass);
         var source = new ModuleSource(content);
         return compileInternal(source);
     }
 
-    private void initContext() {
-        initOuterContext();
-        moduleContext = new CompilerContext(outerContext.getMaxScopeIndex());
-    }
-
+    /**
+     * Найти адрес символа метода в контексте по имени.
+     *
+     * @param name Имя метода.
+     */
     public SymbolAddress findMethodInContext(String name) {
         var address = moduleContext.getMethodByName(name);
         if (address == null) {
@@ -69,6 +117,11 @@ public class ScriptCompiler {
         return address;
     }
 
+    /**
+     * Найти связь символа переменной в контекте по имени.
+     *
+     * @param name Имя переменной.
+     */
     public VariableBinding findVariableBindingInContext(String name) {
         var address = moduleContext.getVariableByName(name);
         if (address != null) {
@@ -81,12 +134,22 @@ public class ScriptCompiler {
         return null;
     }
 
+    /**
+     * Получить адрес символа переменной в контесте по имени.
+     *
+     * @param name Имя переменной.
+     */
     public SymbolAddress findVariableInContext(String name) {
         var address = moduleContext.getVariableByName(name);
         if (address == null) {
             address = outerContext.getVariableByName(name);
         }
         return address;
+    }
+
+    private void initContext() {
+        initOuterContext();
+        moduleContext = new CompilerContext(outerContext.getMaxScopeIndex());
     }
 
     private ModuleImage compileInternal(ModuleSource source) {
@@ -101,25 +164,6 @@ public class ScriptCompiler {
         moduleContext.getScopes().clear();
 
         return buildImage(imageCache);
-    }
-
-    private static ModuleImage buildImage(ModuleImageCache cache) {
-        return ModuleImage.builder()
-                .source(cache.getSource())
-                .entry(cache.getEntryPoint())
-                .code(List.copyOf(cache.getCode()))
-                .methods(List.copyOf(cache.getMethods()))
-                .variables(List.copyOf(cache.getVariables()))
-                .constants(List.copyOf(cache.getConstants()))
-                .methodRefs(List.copyOf(cache.getMethodRefs()))
-                .variableRefs(List.copyOf(cache.getVariableRefs()))
-                .build();
-    }
-
-    private static void findError(BSLParser.FileContext fileContext) {
-        var walker = new ParseTreeWalker();
-        var listener = new ParseErrorListener();
-        walker.walk(listener, fileContext);
     }
 
     private void initOuterContext() {

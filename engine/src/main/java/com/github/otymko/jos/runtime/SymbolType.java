@@ -5,6 +5,16 @@
  */
 package com.github.otymko.jos.runtime;
 
+/**
+ * Тип символа.
+ */
 public enum SymbolType {
-    VARIABLE, CONTEXT_PROPERTY
+    /**
+     * Переменная.
+     */
+    VARIABLE,
+    /**
+     * Контекстное свойство.
+     */
+    CONTEXT_PROPERTY
 }

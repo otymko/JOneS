@@ -5,8 +5,26 @@
  */
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.core.IValue;
+
+/**
+ * Доступ по индексу.
+ */
 public interface IndexAccessor {
     // FIXME: (#50) перейти на конвертацию значений
+
+    /**
+     * Получить значене по индексу.
+     *
+     * @param index Индекс.
+     */
     IValue getIndexedValue(IValue index);
+
+    /**
+     * Установить значение по индексу.
+     *
+     * @param index Индекс.
+     * @param value Значение.
+     */
     void setIndexedValue(IValue index, IValue value);
 }

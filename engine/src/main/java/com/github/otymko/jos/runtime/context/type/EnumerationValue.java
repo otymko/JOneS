@@ -5,11 +5,12 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextType;
 import com.github.otymko.jos.runtime.context.EnumType;
-import com.github.otymko.jos.runtime.context.EnumValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.annotation.EnumValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Getter;
@@ -17,6 +18,9 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * Значение перечисления.
+ */
 public class EnumerationValue implements ContextType, IValue {
     @Getter
     private final EnumerationContext owner;
