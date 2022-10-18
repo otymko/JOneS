@@ -5,12 +5,10 @@
  */
 package com.github.otymko.jos.runtime.context.type.regex;
 
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextProperty;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.PropertyAccessMode;
-import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.core.PropertyAccessMode;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.regex.MatchResult;

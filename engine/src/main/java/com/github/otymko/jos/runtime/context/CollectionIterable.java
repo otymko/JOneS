@@ -5,6 +5,16 @@
  */
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.core.IValue;
+
+/**
+ * Итерируемая коллекция.
+ *
+ * @param <T> тип значений коллекции.
+ */
 public interface CollectionIterable<T extends IValue> {
+    /**
+     * Итератор коллекции.
+     */
     IteratorValue iterator();
 }

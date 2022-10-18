@@ -8,6 +8,9 @@ package com.github.otymko.jos.compiler;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Операторы выражений с учетом приоритета.
+ */
 @Getter
 @RequiredArgsConstructor
 public enum ExpressionOperator {
@@ -33,6 +36,12 @@ public enum ExpressionOperator {
     OPENED_PARENTHESIS(0, "("),
     CLOSED_PARENTHESIS(0, ")");
 
+    /**
+     * Приоритет операции.
+     */
     private final int priority;
+    /**
+     * Символьное представление операции.
+     */
     private final String text;
 }

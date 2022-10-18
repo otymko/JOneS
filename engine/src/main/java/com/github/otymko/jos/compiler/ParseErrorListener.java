@@ -9,7 +9,7 @@ import com.github._1c_syntax.bsl.parser.BSLParser;
 import com.github._1c_syntax.bsl.parser.BSLParserBaseListener;
 import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
 import com.github.otymko.jos.exception.CompilerException;
-import com.github.otymko.jos.localization.Resources;
+import com.github.otymko.jos.core.localization.Resources;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
@@ -19,9 +19,12 @@ import org.antlr.v4.runtime.tree.Trees;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import static com.github.otymko.jos.localization.MessageResource.ERROR_PARSING_SOURCE_CODE;
-import static com.github.otymko.jos.localization.MessageResource.ERROR_PARSING_SOURCE_CODE_AT;
+import static com.github.otymko.jos.core.localization.MessageResource.ERROR_PARSING_SOURCE_CODE;
+import static com.github.otymko.jos.core.localization.MessageResource.ERROR_PARSING_SOURCE_CODE_AT;
 
+/**
+ * Обработчик ошибок парсинга текста модуля.
+ */
 public class ParseErrorListener extends BSLParserBaseListener {
 
     @Override
@@ -53,5 +56,4 @@ public class ParseErrorListener extends BSLParserBaseListener {
                 token.getLine(), token.getCharPositionInLine() + 1);
         throw new CompilerException(message);
     }
-
 }

@@ -7,6 +7,8 @@ package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.runtime.machine.OperationCode;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -17,6 +19,7 @@ import java.util.Optional;
 /**
  * Описание методов платформы, которые выполняются нативно на стековой машине
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class NativeGlobalMethod {
     private static final ParameterInfo REQUIRED_PARAMETER = createParameterInfo(true);
     private static final ParameterInfo OPTIONAL_PARAMETER = createParameterInfo(false);
@@ -27,14 +30,20 @@ public class NativeGlobalMethod {
         initNativeMethods();
     }
 
-    private NativeGlobalMethod() {
-        // none
-    }
-
+    /**
+     * Получить нативный код операции по его имена.
+     *
+     * @param name Имя кода операции.
+     */
     public static Optional<OperationCode> getOperationCode(String name) {
         return Optional.ofNullable(methods.get(name.toUpperCase(Locale.ENGLISH)));
     }
 
+    /**
+     * Получить параметры нативного метода по его коду операции.
+     *
+     * @param code Код операции.
+     */
     public static ParameterInfo[] getMethodParameters(OperationCode code) {
         return methodParameters.get(code);
     }
@@ -78,5 +87,4 @@ public class NativeGlobalMethod {
         builder.hasDefaultValue(!required);
         return builder.build();
     }
-
 }

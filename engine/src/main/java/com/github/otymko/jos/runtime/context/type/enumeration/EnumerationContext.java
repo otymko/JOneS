@@ -7,10 +7,10 @@ package com.github.otymko.jos.runtime.context.type.enumeration;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.EnumClass;
+import com.github.otymko.jos.core.annotation.EnumClass;
 import com.github.otymko.jos.runtime.context.EnumType;
-import com.github.otymko.jos.runtime.context.EnumValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.annotation.EnumValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.type.EnumerationValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;

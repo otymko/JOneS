@@ -15,8 +15,17 @@ import lombok.Value;
 @Value
 @RequiredArgsConstructor
 public class VariableInfo {
+    /**
+     * Имя переменной на русском.
+     */
     String name;
+    /**
+     * Альтернативное имя переменной на английском.
+     */
     String alias;
+    /**
+     * Тип символа.
+     */
     SymbolType type;
 
     public VariableInfo(String name) {
@@ -24,5 +33,4 @@ public class VariableInfo {
         this.alias = name;
         this.type = SymbolType.VARIABLE;
     }
-
 }

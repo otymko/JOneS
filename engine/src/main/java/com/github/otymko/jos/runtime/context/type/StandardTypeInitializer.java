@@ -5,6 +5,7 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.context.type.collection.V8FixedArray;
 import com.github.otymko.jos.runtime.context.type.collection.V8FixedMap;
@@ -30,9 +31,16 @@ import com.github.otymko.jos.runtime.context.type.typedescription.TypeDescriptio
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.experimental.UtilityClass;
 
+/**
+ * Инициализация стандартных типов.
+ */
 @UtilityClass
 public class StandardTypeInitializer {
-
+    /**
+     * Инициализацировать стандартные типы.
+     *
+     * @param typeManager Менеджер типов.
+     */
     public void initialize(TypeManager typeManager) {
         initPrimitives(typeManager);
         initSystemEnumerations(typeManager);
@@ -92,5 +100,4 @@ public class StandardTypeInitializer {
     private void initSystemEnumerations(TypeManager typeManager) {
         typeManager.getEnumerationContext().forEach(context -> implementTypeByInfo(typeManager, context.getContextInfo()));
     }
-
 }

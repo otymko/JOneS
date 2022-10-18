@@ -15,8 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Контекст компилятора.
+ */
 public class CompilerContext {
+    /**
+     * Свиг областей видимости символов в общем стеке.
+     */
     private final int scopeIndexOffset;
+    /**
+     * Области видимости символов.
+     */
     @Getter
     private final List<SymbolScope> scopes = new ArrayList<>();
 
@@ -28,6 +37,11 @@ public class CompilerContext {
         scopeIndexOffset = 0;
     }
 
+    /**
+     * Внедрить контекст.
+     *
+     * @param targetClass Класс контекстного типа.
+     */
     public void implementContext(Class<? extends RuntimeContext> targetClass) {
         var methods = ContextInitializer.getContextMethods(targetClass);
         var scope = new SymbolScope();
@@ -51,6 +65,11 @@ public class CompilerContext {
         scopes.add(scope);
     }
 
+    /**
+     * Получить адрес символа метода по имени.
+     *
+     * @param originalName Имя метода.
+     */
     public SymbolAddress getMethodByName(String originalName) {
         var name = originalName.toUpperCase(Locale.ENGLISH);
         SymbolAddress address = null;
@@ -65,6 +84,11 @@ public class CompilerContext {
         return address;
     }
 
+    /**
+     * Получить адрес символа переменной по имени.
+     *
+     * @param originalName Имя переменной.
+     */
     public SymbolAddress getVariableByName(String originalName) {
         var name = originalName.toUpperCase(Locale.ENGLISH);
         SymbolAddress address = null;
@@ -79,25 +103,43 @@ public class CompilerContext {
         return address;
     }
 
+    /**
+     * Объявить переменную.
+     *
+     * @param variable Информация о переменной.
+     */
     public SymbolAddress defineVariable(VariableInfo variable) {
         var indexScope = scopes.size() - 1;
         var lastScope = scopes.get(indexScope);
         lastScope.getVariables().add(variable);
         var index = lastScope.getVariables().size() - 1;
         lastScope.getVariableNumbers().put(variable.getName().toUpperCase(Locale.ENGLISH), index);
+
         return new SymbolAddress(index, indexScope);
     }
 
+    /**
+     * Добавить области видимости символов в общий стек.
+     *
+     * @param scope Область видимости символов.
+     */
     public void pushScope(SymbolScope scope) {
         scopes.add(scope);
     }
 
+    /**
+     * Удалить область видимости символов из общего стека.
+     *
+     * @param scope Область видимости символов.
+     */
     public void popScope(SymbolScope scope) {
         scopes.remove(scope);
     }
 
+    /**
+     * Возвращает максимальное количество областей видимости в стеке.
+     */
     public int getMaxScopeIndex() {
         return scopes.size() + scopeIndexOffset - 1;
     }
-
 }

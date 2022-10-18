@@ -6,7 +6,7 @@
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 
 import java.util.ArrayList;
 import java.util.Comparator;

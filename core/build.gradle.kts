@@ -1,0 +1,4 @@
+description = "JOneScript Core"
+
+dependencies {
+}

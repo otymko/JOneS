@@ -6,8 +6,8 @@
 package com.github.otymko.jos.compiler;
 
 import com.github.otymko.jos.ScriptEngine;
-import com.github.otymko.jos.localization.MessageResource;
-import com.github.otymko.jos.localization.Resources;
+import com.github.otymko.jos.core.localization.MessageResource;
+import com.github.otymko.jos.core.localization.Resources;
 import com.github.otymko.jos.runtime.context.sdo.UserScriptContext;
 import org.junit.jupiter.api.Test;
 

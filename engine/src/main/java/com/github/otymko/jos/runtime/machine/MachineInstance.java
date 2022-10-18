@@ -6,26 +6,26 @@
 package com.github.otymko.jos.runtime.machine;
 
 import com.github.otymko.jos.ScriptEngine;
-import com.github.otymko.jos.compiler.MethodDescriptor;
+import com.github.otymko.jos.compiler.MethodDefinition;
 import com.github.otymko.jos.compiler.SymbolAddress;
 import com.github.otymko.jos.exception.EngineException;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.exception.WrappedJavaException;
 import com.github.otymko.jos.module.ModuleImage;
 import com.github.otymko.jos.runtime.Arithmetic;
-import com.github.otymko.jos.runtime.IVariable;
+import com.github.otymko.jos.core.IVariable;
 import com.github.otymko.jos.runtime.RuntimeContext;
 import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ExceptionInfoContext;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.ContextMethodCall;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.primitive.TypeValue;
@@ -34,7 +34,7 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 import com.github.otymko.jos.runtime.machine.info.ParameterInfo;
 import com.github.otymko.jos.runtime.machine.info.VariableInfo;
-import com.github.otymko.jos.util.Common;
+import com.github.otymko.jos.util.CommonUtils;
 import lombok.Getter;
 
 import java.util.ArrayDeque;
@@ -49,24 +49,48 @@ import java.util.stream.Collectors;
 import static com.github.otymko.jos.util.StringUtils.toTitleCase;
 
 /**
- * Экземпляр стековой машины
+ * Стековая машина.
  */
 public class MachineInstance {
     private static final String VARIABLE_STACK_NAME = "$stackvar";
 
+    /**
+     * Движок
+     */
     private final ScriptEngine engine;
+    /**
+     * Области контекстов.
+     */
     @Getter
     private final List<Scope> scopes = new ArrayList<>();
+    /**
+     * Стек операций.
+     */
     private final Deque<IValue> operationStack = new ArrayDeque<>();
+    /**
+     * Стек вызова.
+     */
     private final Deque<ExecutionFrame> callStack = new ArrayDeque<>();
+    /**
+     * Стек исключения.
+     */
     private final Deque<ExceptionJumpInfo> exceptionsStack = new ArrayDeque<>();
+    /**
+     * Текущий кадр выполнения.
+     */
     private ExecutionFrame currentFrame;
+    /**
+     * Образ модуля.
+     */
     private ModuleImage currentImage;
 
     public MachineInstance(ScriptEngine engine) {
         this.engine = engine;
     }
 
+    /**
+     * Внедрить контекст.
+     */
     public void implementContext(AttachableContext context) {
         var methods = context.getMethods();
         var variables = context.getVariables();
@@ -74,28 +98,29 @@ public class MachineInstance {
         scopes.add(scope);
     }
 
+    /**
+     * Выполнить метод тела модуля.
+     *
+     * @param sdo Объект модуля.
+     */
     public void executeModuleBody(ScriptDrivenObject sdo) {
         currentImage = sdo.getModuleImage();
-        if (currentImage.getEntry() >= 0) {
-            var methodDescriptor = currentImage.getMethods().get(currentImage.getEntry());
+        if (currentImage.getEntryPoint() >= 0) {
+            var methodDescriptor = currentImage.getMethods().get(currentImage.getEntryPoint());
             prepareReentrantMethodExecution(sdo, methodDescriptor);
             executeCode();
         }
     }
 
-    private void prepareReentrantMethodExecution(ScriptDrivenObject sdo, MethodDescriptor methodDescriptor) {
-        var image = sdo.getModuleImage();
-        var frame = new ExecutionFrame();
-        frame.setImage(image);
-        frame.setInstructionPointer(methodDescriptor.getEntry());
-        var variables = createVariables(methodDescriptor.getVariables());
-        frame.setLocalVariables(variables);
-        frame.setModuleLoadIndex(scopes.size() - 1);
-        frame.setModuleScope(createModuleScope(sdo));
-
-        pushFrame(frame);
-    }
-
+    /**
+     * Выполнить метод.
+     *
+     * @param sdo Объект модуля.
+     * @param methodId Индекс метода.
+     * @param parameters Параметры. // TODO: переименовать в аргументы.
+     *
+     * @return Результат выполнить метода.
+     */
     public IValue executeMethod(ScriptDrivenObject sdo, int methodId, IValue[] parameters) {
         // FIXME: нельзя повторно добавлять модульскоуп
         createModuleScope(sdo);
@@ -121,6 +146,19 @@ public class MachineInstance {
         }
 
         return methodResult;
+    }
+
+    private void prepareReentrantMethodExecution(ScriptDrivenObject sdo, MethodDefinition methodDefinition) {
+        var image = sdo.getModuleImage();
+        var frame = new ExecutionFrame();
+        frame.setImage(image);
+        frame.setInstructionPointer(methodDefinition.getEntry());
+        var variables = createVariables(methodDefinition.getVariables());
+        frame.setLocalVariables(variables);
+        frame.setModuleLoadIndex(scopes.size() - 1);
+        frame.setModuleScope(createModuleScope(sdo));
+
+        pushFrame(frame);
     }
 
     private Scope createModuleScope(ScriptDrivenObject sdo) {
@@ -165,11 +203,11 @@ public class MachineInstance {
 
             } catch (MachineException exception) {
 
-                var errorInfo = exception.getErrorInfo();
+                var errorInfo = exception.getErrorPositionInfo();
                 if (errorInfo.getLine() < 0) {
                     errorInfo.setLine(currentFrame.getLineNumber());
-                    errorInfo.setSource(Common.getAbsolutPath(currentImage.getSource().getPath()));
-                    Common.fillCodePositionInErrorInfo(errorInfo, currentImage, currentFrame.getLineNumber());
+                    errorInfo.setSource(CommonUtils.getAbsolutPath(currentImage.getSource().getPath()));
+                    CommonUtils.fillCodePositionInErrorInfo(errorInfo, currentImage, currentFrame.getLineNumber());
                 }
 
                 if (shouldRethrowException(exception))
@@ -885,7 +923,7 @@ public class MachineInstance {
 
     private void pushIndexed(int argument) {
         var index = operationStack.pop();
-        var context = breakVariableLink(operationStack.pop()); // FIXME: ??
+        var context = breakVariableLink(operationStack.pop());
 
         if (!(context instanceof IndexAccessor)) {
             throw MachineException.objectNotSupportAccessByIndexException();
@@ -1189,7 +1227,7 @@ public class MachineInstance {
         return !isFunction;
     }
 
-    private void setMethodParameters(ExecutionFrame frame, MethodDescriptor methodDescriptor, IValue[] argumentValues) {
+    private void setMethodParameters(ExecutionFrame frame, MethodDefinition methodDescriptor, IValue[] argumentValues) {
         // здесь нужно учесть значения по умолчанию и т.п.
         var variables = createVariables(methodDescriptor.getVariables());
         frame.setLocalVariables(variables);

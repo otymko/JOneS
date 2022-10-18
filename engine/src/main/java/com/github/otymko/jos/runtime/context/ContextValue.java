@@ -5,13 +5,17 @@
  */
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.RuntimeContext;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.DataType;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * Абструктное контекстное значение.
+ */
 public abstract class ContextValue implements IValue, ContextType, RuntimeContext {
 
     @Override
@@ -48,5 +52,4 @@ public abstract class ContextValue implements IValue, ContextType, RuntimeContex
     public int compareTo(IValue o) {
         throw MachineException.operationNotSupportedException();
     }
-
 }

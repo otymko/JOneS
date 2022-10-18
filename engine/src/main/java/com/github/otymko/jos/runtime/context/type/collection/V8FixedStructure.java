@@ -6,12 +6,12 @@
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextConstructor;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextConstructor;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-import com.github.otymko.jos.util.Common;
+import com.github.otymko.jos.util.CommonUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,7 +68,7 @@ public class V8FixedStructure extends V8AbstractStructure {
     @Override
     public void setIndexedValue(IValue index, IValue value) {
         var key = index.asString();
-        if (!Common.isValidStringIdentifier(index)) {
+        if (!CommonUtils.isValidStringIdentifier(index)) {
             throw MachineException.invalidPropertyNameStructureException(key);
         }
 
