@@ -8,6 +8,7 @@ package com.github.otymko.jos.runtime.context.type.common;
 import com.github.otymko.jos.runtime.context.BaseScriptTest;
 import com.github.otymko.jos.runtime.context.TestScript;
 
-@TestScript(script = "src/test/resources/tests/comparevalues.os")
+@TestScript(script = "src/test/resources/tests/CompareValues.os")
 public class V8CompareValuesTest extends BaseScriptTest {
+    // None
 }
