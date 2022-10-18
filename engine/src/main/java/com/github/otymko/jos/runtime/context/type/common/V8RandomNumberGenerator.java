@@ -16,6 +16,9 @@ import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import java.util.Random;
 
+/**
+ * Объект для получения последовательности псевдослучайных чисел
+ */
 @ContextClass(name = "ГенераторСлучайныхЧисел", alias = "RandomNumberGenerator")
 public class V8RandomNumberGenerator extends ContextValue {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8RandomNumberGenerator.class);
