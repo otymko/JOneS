@@ -33,6 +33,9 @@ import com.github.otymko.jos.runtime.context.type.typedescription.TypeDescriptio
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.experimental.UtilityClass;
 
+/**
+ * Инициализация стандартных типов.
+ */
 @UtilityClass
 public class StandardTypeInitializer {
     /**
