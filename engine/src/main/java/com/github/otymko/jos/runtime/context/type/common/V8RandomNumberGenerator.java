@@ -22,7 +22,7 @@ import java.util.Random;
 @ContextClass(name = "ГенераторСлучайныхЧисел", alias = "RandomNumberGenerator")
 public class V8RandomNumberGenerator extends ContextValue {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8RandomNumberGenerator.class);
-    public static final long MAX_RANGE = 4294967295L;
+    private static final long MAX_RANGE = 4294967295L;
 
     private final Random random;
 
@@ -38,11 +38,11 @@ public class V8RandomNumberGenerator extends ContextValue {
         }
     }
 
-    public V8RandomNumberGenerator() {
+    private V8RandomNumberGenerator() {
         random = new Random(); //NOSONAR
     }
 
-    public V8RandomNumberGenerator(long seed) {
+    private V8RandomNumberGenerator(long seed) {
         random = new Random(seed); //NOSONAR
     }
 
