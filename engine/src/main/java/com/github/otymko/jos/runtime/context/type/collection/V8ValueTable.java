@@ -386,6 +386,11 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         reindex();
     }
 
+    @ContextMethod(name = "ВыбратьСтроку", alias = "ChooseRow")
+    public void chooseRow(IValue title, IValue startRow) {
+        throw MachineException.operationNotSupportedException();
+    }
+
     private void deleteDeprecatedColumns(List<V8ValueTableColumn> groupingColumns, List<V8ValueTableColumn> totalColumns) {
         final var columnsToDelete = new ArrayList<V8ValueTableColumn>();
         for (final var column : columns.iterator()) {
