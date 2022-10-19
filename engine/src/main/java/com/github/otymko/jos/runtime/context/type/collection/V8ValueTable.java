@@ -197,6 +197,18 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         return null;
     }
 
+    @ContextMethod(name = "ЗаполнитьЗначения", alias = "FillValues")
+    public void FillValues(IValue value, IValue columnNames) {
+        final var rawValue = ValueFactory.rawValueOrUndefined(value);
+        final var searchColumns = parseColumnList(columnNames, false);
+        for (final var row : values) {
+            final var castedRow = (V8ValueTableRow) row;
+            for (final var column : searchColumns) {
+                castedRow.setIndexedValueInternal(column, rawValue);
+            }
+        }
+    }
+
     @ContextMethod(name = "Сдвинуть", alias = "Move")
     public void move(IValue row, IValue offset) {
         final var intOffset = offset.getRawValue().asNumber().intValue();
@@ -345,6 +357,11 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         return copyInternal(rowsToCopy, columnsToCopy);
     }
 
+    @ContextMethod(name = "СкопироватьКолонки", alias = "CopyColumns")
+    public V8ValueTable copyColumns(IValue columnsToCopy) {
+        return copyInternal(V8Array.create(), columnsToCopy);
+    }
+
     @ContextMethod(name = "Свернуть", alias = "GroupBy")
     public void groupBy(IValue groupingColumnNames, IValue totalColumnNames) {
         final var groupingColumns = parseColumnList(groupingColumnNames, true);
@@ -367,6 +384,11 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
             }
         }
         reindex();
+    }
+
+    @ContextMethod(name = "ВыбратьСтроку", alias = "ChooseRow")
+    public void chooseRow(IValue title, IValue startRow) {
+        throw MachineException.operationNotSupportedException();
     }
 
     private void deleteDeprecatedColumns(List<V8ValueTableColumn> groupingColumns, List<V8ValueTableColumn> totalColumns) {
