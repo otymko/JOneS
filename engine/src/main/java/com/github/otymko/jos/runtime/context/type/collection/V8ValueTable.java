@@ -357,6 +357,11 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         return copyInternal(rowsToCopy, columnsToCopy);
     }
 
+    @ContextMethod(name = "СкопироватьКолонки", alias = "CopyColumns")
+    public V8ValueTable copyColumns(IValue columnsToCopy) {
+        return copyInternal(V8Array.create(), columnsToCopy);
+    }
+
     @ContextMethod(name = "Свернуть", alias = "GroupBy")
     public void groupBy(IValue groupingColumnNames, IValue totalColumnNames) {
         final var groupingColumns = parseColumnList(groupingColumnNames, true);
