@@ -19,7 +19,7 @@ import com.github.otymko.jos.runtime.Variable;
 import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
-import com.github.otymko.jos.runtime.context.ExceptionInfoContext;
+import com.github.otymko.jos.runtime.context.type.ExceptionInfoContext;
 import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
@@ -157,6 +157,7 @@ public class MachineInstance {
         frame.setLocalVariables(variables);
         frame.setModuleLoadIndex(scopes.size() - 1);
         frame.setModuleScope(createModuleScope(sdo));
+        frame.setMethodName(methodDefinition.getSignature().getName());
 
         pushFrame(frame);
     }
@@ -210,8 +211,9 @@ public class MachineInstance {
                     CommonUtils.fillCodePositionInErrorInfo(errorInfo, currentImage, currentFrame.getLineNumber());
                 }
 
-                if (shouldRethrowException(exception))
+                if (shouldRethrowException(exception)) {
                     throw exception;
+                }
             }
         }
     }

@@ -912,7 +912,6 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     private void processComplexIdentifier(BSLParser.ComplexIdentifierContext complexIdentifierContext) {
         if (complexIdentifierContext.globalMethodCall() != null) {
             processGlobalStatement(complexIdentifierContext.globalMethodCall());
-            return;
         } else if (complexIdentifierContext.newExpression() != null) {
             processNewExpression(complexIdentifierContext.newExpression());
             return;
@@ -921,10 +920,13 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
             return;
         }
 
-        processIdentifier(complexIdentifierContext.IDENTIFIER().getText());
+        if (complexIdentifierContext.IDENTIFIER() != null) {
+            processIdentifier(complexIdentifierContext.IDENTIFIER().getText());
+        }
 
-        // проверим, что идет дальше
-        processModifier(complexIdentifierContext.modifier());
+        if (complexIdentifierContext.modifier() != null) {
+            processModifier(complexIdentifierContext.modifier());
+        }
     }
 
     private void processUnaryModifier(BSLParser.UnaryModifierContext child, Deque<ExpressionOperator> operators) {
