@@ -5,12 +5,20 @@
  */
 package com.github.otymko.jos.runtime.context.type.collection;
 
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.exception.MachineException;
+import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.runtime.context.IndexAccessor;
+import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.Value;
 
+import javax.crypto.Mac;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,18 +31,19 @@ import java.util.Map;
  * @see V8ValueTable
  */
 @ContextClass(name = "ИндексКоллекции", alias = "CollectionIndex")
-public class V8CollectionIndex extends ContextValue {
+public class V8CollectionIndex extends ContextValue implements IndexAccessor, CollectionIterable<IValue> {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8CollectionIndex.class);
 
     private final List<IValue> fields;
-    private final Map<V8CollectionKey, List<IValue>> data;
+    private final Map<V8CollectionKey, List<IValue>> data = new HashMap<>();
+    private final CollectionNamesResolver resolver;
 
-    V8CollectionIndex(List<IValue> fields) {
+    V8CollectionIndex(CollectionNamesResolver resolver, List<IValue> fields) {
         this.fields = fields;
-        this.data = new HashMap<>();
+        this.resolver = resolver;
     }
 
-    void columnRemoved(V8ValueTableColumn column) {
+    void columnRemoved(IValue column) {
         if (fields.contains(column)) {
             fields.remove(column);
             rebuild();
@@ -93,5 +102,29 @@ public class V8CollectionIndex extends ContextValue {
         }
 
         return result;
+    }
+
+    @Override
+    public IteratorValue iterator() {
+        var listOfStrings = new ArrayList<IValue>();
+        for (var field : fields) {
+            listOfStrings.add(ValueFactory.create(resolver.getName(field)));
+        }
+        return new IteratorValue(listOfStrings.iterator());
+    }
+
+    @Override
+    public IValue getIndexedValue(IValue index) {
+        var rawIndex = ValueFactory.rawValueOrUndefined(index);
+        if (rawIndex.getDataType() == DataType.NUMBER) {
+            var intIndex = rawIndex.asNumber().intValueExact();
+            return ValueFactory.create(resolver.getName(fields.get(intIndex)));
+        }
+        throw MachineException.invalidArgumentValueException();
+    }
+
+    @Override
+    public void setIndexedValue(IValue index, IValue value) {
+        throw MachineException.getPropertyIsNotWritableException("");
     }
 }

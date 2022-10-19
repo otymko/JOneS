@@ -49,12 +49,17 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     public V8ValueTable() {
         values = new ArrayList<>();
         columns = new V8ValueTableColumnCollection(this);
-        indexes = new V8CollectionIndexes();
+        indexes = new V8CollectionIndexes(columns);
     }
 
     @ContextProperty(name = "Колонки", alias = "Columns", accessMode = PropertyAccessMode.READ_ONLY)
     public V8ValueTableColumnCollection getColumns() {
         return columns;
+    }
+
+    @ContextProperty(name = "Индексы", alias = "Indexes", accessMode = PropertyAccessMode.READ_ONLY)
+    public V8CollectionIndexes getIndexes() {
+        return indexes;
     }
 
     public ContextInfo getContextInfo() {
@@ -181,9 +186,9 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Найти", alias = "Find")
-    public V8ValueTableRow find(IValue searchValue, IValue columnNames) {
+    public V8ValueTableRow find(IValue searchValue, String columnNames) {
         final var rawValue = searchValue.getRawValue();
-        final var searchColumns = parseColumnList(columnNames, false);
+        final var searchColumns = columns.parseColumnList(columnNames, false);
         for (final var row : values) {
             final var castedRow = (V8ValueTableRow) row;
             for (final var column: searchColumns) {
@@ -198,9 +203,9 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "ЗаполнитьЗначения", alias = "FillValues")
-    public void FillValues(IValue value, IValue columnNames) {
+    public void FillValues(IValue value, String columnNames) {
         final var rawValue = ValueFactory.rawValueOrUndefined(value);
-        final var searchColumns = parseColumnList(columnNames, false);
+        final var searchColumns = columns.parseColumnList(columnNames, false);
         for (final var row : values) {
             final var castedRow = (V8ValueTableRow) row;
             for (final var column : searchColumns) {
@@ -284,37 +289,6 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         return result;
     }
 
-    private List<V8ValueTableColumn> parseColumnListParameter(IValue columnList) {
-        final var result = new ArrayList<V8ValueTableColumn>();
-        if (columnList == null) {
-            return result;
-        }
-
-        final var castedList = columnList.asString();
-        final var columnNames = castedList.split(",");
-        for (final var columnName : columnNames) {
-
-            if (!columnName.isBlank()) {
-                final var column = columns.findColumnByNameInternal(columnName.trim());
-                if (column == null) {
-                    throw MachineException.invalidArgumentValueException();
-                }
-                result.add(column);
-            }
-        }
-
-        return result;
-    }
-
-    private List<V8ValueTableColumn> parseColumnList(IValue columnList, boolean emptyIfNotDefined) {
-        final var result = parseColumnListParameter(columnList);
-        if (result.isEmpty() && !emptyIfNotDefined) {
-            for (IValue iValue : columns.iterator()) {
-                result.add((V8ValueTableColumn) iValue);
-            }
-        }
-        return result;
-    }
 
     private IteratorValue rowsIterator(IValue rows) {
         if (rows != null) {
@@ -327,14 +301,14 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         return iterator();
     }
 
-    private V8ValueTable copyInternal(IValue rowsToCopy, IValue columnsToCopy) {
+    private V8ValueTable copyInternal(IValue rowsToCopy, String columnsToCopy) {
 
-        final var columns = parseColumnList(columnsToCopy, false);
+        final var columnsListToCopy = columns.parseColumnList(columnsToCopy, false);
         final Map<V8ValueTableColumn, V8ValueTableColumn> columnMap = new HashMap<>();
 
         final var result = new V8ValueTable();
 
-        for (final var sourceColumn: columns) {
+        for (final var sourceColumn: columnsListToCopy) {
             final var targetColumn = result.getColumns().copy(sourceColumn);
             columnMap.put(sourceColumn, targetColumn);
         }
@@ -342,7 +316,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         for (final var row: rowsIterator(rowsToCopy)) {
             final var castedRow = (V8ValueTableRow)row.getRawValue();
             final var newRow = (V8ValueTableRow)result.add();
-            for (final var sourceColumn: columns) {
+            for (final var sourceColumn: columnsListToCopy) {
                 final var targetColumn = columnMap.get(sourceColumn);
                 final var value = castedRow.getIndexedValueInternal(sourceColumn);
                 newRow.setIndexedValueInternal(targetColumn, value);
@@ -353,23 +327,23 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Скопировать", alias = "Copy")
-    public V8ValueTable copy(IValue rowsToCopy, IValue columnsToCopy) {
+    public V8ValueTable copy(IValue rowsToCopy, String columnsToCopy) {
         return copyInternal(rowsToCopy, columnsToCopy);
     }
 
     @ContextMethod(name = "СкопироватьКолонки", alias = "CopyColumns")
-    public V8ValueTable copyColumns(IValue columnsToCopy) {
+    public V8ValueTable copyColumns(String columnsToCopy) {
         return copyInternal(V8Array.create(), columnsToCopy);
     }
 
     @ContextMethod(name = "Свернуть", alias = "GroupBy")
-    public void groupBy(IValue groupingColumnNames, IValue totalColumnNames) {
-        final var groupingColumns = parseColumnList(groupingColumnNames, true);
-        final var totalColumns = parseColumnList(totalColumnNames, true);
+    public void groupBy(String groupingColumnNames, String totalColumnNames) {
+        final var groupingColumns = columns.parseColumnList(groupingColumnNames, true);
+        final var totalColumns = columns.parseColumnList(totalColumnNames, true);
 
         deleteDeprecatedColumns(groupingColumns, totalColumns);
 
-        final var index = new V8CollectionIndex(asFields(groupingColumns));
+        final var index = new V8CollectionIndex(columns, asFields(groupingColumns));
         for (final var row: values) {
             index.addElement((V8ValueTableRow) row);
         }
@@ -488,4 +462,5 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     public void setIndexedValue(IValue index, IValue value) {
         throw MachineException.getPropertyIsNotWritableException("");
     }
+
 }

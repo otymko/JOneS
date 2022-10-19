@@ -84,9 +84,12 @@ public class ScriptTester implements ContextType, IValue {
 
         if (oneValueRaw.equals(twoValueRaw)) {
             // TODO: локализация
-            // TODO: использование additionalErrorMessage
-            final var errorMessage = String.format("Сравниваемые значения (%s; %s) равны, а хотели, чтобы были не равны.",
+            var errorMessage = String.format("Сравниваемые значения (%s; %s) равны, а хотели, чтобы были не равны.",
                     oneValueRaw.asString(), twoValueRaw.asString());
+            var additionalString = ValueFactory.rawValueOrUndefined(additionalErrorMessage).asString();
+            if (!additionalString.isBlank()) {
+                errorMessage = String.format("%s: %s", errorMessage, additionalString);
+            }
             throw new MachineException(errorMessage);
         }
     }
