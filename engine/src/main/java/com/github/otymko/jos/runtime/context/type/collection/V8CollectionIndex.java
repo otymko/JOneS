@@ -16,14 +16,14 @@ import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-import lombok.Value;
 
-import javax.crypto.Mac;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * Индекс коллекции. Описывает набор ключей индекса и данные, проиндексированные по этим ключам.
@@ -36,11 +36,11 @@ public class V8CollectionIndex extends ContextValue implements IndexAccessor, Co
 
     private final List<IValue> fields;
     private final Map<V8CollectionKey, List<IValue>> data = new HashMap<>();
-    private final CollectionNamesResolver resolver;
+    private final IndexSourceCollection source;
 
-    V8CollectionIndex(CollectionNamesResolver resolver, List<IValue> fields) {
+    V8CollectionIndex(IndexSourceCollection source, List<IValue> fields) {
         this.fields = fields;
-        this.resolver = resolver;
+        this.source = source;
     }
 
     void columnRemoved(IValue column) {
@@ -48,6 +48,13 @@ public class V8CollectionIndex extends ContextValue implements IndexAccessor, Co
             fields.remove(column);
             rebuild();
         }
+    }
+
+    public List<IValue> getValues(V8CollectionKey key) {
+        if (data.containsKey(key)) {
+            return data.get(key);
+        }
+        return new ArrayList<>();
     }
 
     void rebuild() {
@@ -104,11 +111,18 @@ public class V8CollectionIndex extends ContextValue implements IndexAccessor, Co
         return result;
     }
 
+    boolean fitsTo(Collection<IValue> others) {
+        if (fields.size() != others.size()) {
+            return false;
+        }
+        return fields.containsAll(others);
+    }
+
     @Override
     public IteratorValue iterator() {
         var listOfStrings = new ArrayList<IValue>();
         for (var field : fields) {
-            listOfStrings.add(ValueFactory.create(resolver.getName(field)));
+            listOfStrings.add(ValueFactory.create(source.getName(field)));
         }
         return new IteratorValue(listOfStrings.iterator());
     }
@@ -118,7 +132,7 @@ public class V8CollectionIndex extends ContextValue implements IndexAccessor, Co
         var rawIndex = ValueFactory.rawValueOrUndefined(index);
         if (rawIndex.getDataType() == DataType.NUMBER) {
             var intIndex = rawIndex.asNumber().intValueExact();
-            return ValueFactory.create(resolver.getName(fields.get(intIndex)));
+            return ValueFactory.create(source.getName(fields.get(intIndex)));
         }
         throw MachineException.invalidArgumentValueException();
     }
@@ -126,5 +140,14 @@ public class V8CollectionIndex extends ContextValue implements IndexAccessor, Co
     @Override
     public void setIndexedValue(IValue index, IValue value) {
         throw MachineException.getPropertyIsNotWritableException("");
+    }
+
+    @Override
+    public String asString() {
+        var joiner = new StringJoiner(", ");
+        for (var field: fields) {
+            joiner.add(source.getName(field));
+        }
+        return joiner.toString();
     }
 }

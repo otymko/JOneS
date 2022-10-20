@@ -66,6 +66,7 @@ public class V8ValueTableColumn extends ContextValue {
 
     @Override
     public boolean equals(Object obj) {
+        if (obj == this) return true;
         if (obj instanceof V8ValueTableColumn) {
             final var castedObject = (V8ValueTableColumn)obj;
             return castedObject.name.equalsIgnoreCase(name)
@@ -76,6 +77,6 @@ public class V8ValueTableColumn extends ContextValue {
 
     @Override
     public int hashCode() {
-        return Objects.hash(owner, name);
+        return Objects.hash(owner);
     }
 }

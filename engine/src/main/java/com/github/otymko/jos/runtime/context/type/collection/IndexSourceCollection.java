@@ -10,18 +10,18 @@ import com.github.otymko.jos.core.IValue;
 import java.util.List;
 
 /**
- * Общий интерфейс для коллекций колонок
+ * Общий интерфейс для коллекций, которые можно индексировать
  */
-public interface CollectionNamesResolver {
+public interface IndexSourceCollection {
 
     /**
-     * Возвращает разобранный список колонок
-     * @param names - имена колонок через запятую
+     * Определяет поле по имени
+     * @param name - имя колонки
      * @return список объектов колонок
      *
      * @see V8ValueTableColumnCollection
      */
-    List<IValue> parseNames(String names);
+    IValue getField(String name);
 
     /**
      * Определяет имя колонки
@@ -29,4 +29,6 @@ public interface CollectionNamesResolver {
      * @return имя колонки
      */
     String getName(IValue field);
+
+    void indexAdded(V8CollectionIndex index);
 }

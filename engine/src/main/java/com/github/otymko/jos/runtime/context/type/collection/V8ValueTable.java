@@ -33,7 +33,7 @@ import java.util.Map;
  * Представляет из себя коллекцию строк с заранее заданной структурой.
  */
 @ContextClass(name = "ТаблицаЗначений", alias = "ValueTable")
-public class V8ValueTable extends ContextValue implements IndexAccessor, CollectionIterable {
+public class V8ValueTable extends ContextValue implements IndexAccessor, CollectionIterable, IndexSourceCollection {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8ValueTable.class);
 
     private final List<IValue> values;
@@ -49,7 +49,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     public V8ValueTable() {
         values = new ArrayList<>();
         columns = new V8ValueTableColumnCollection(this);
-        indexes = new V8CollectionIndexes(columns);
+        indexes = new V8CollectionIndexes(this);
     }
 
     @ContextProperty(name = "Колонки", alias = "Columns", accessMode = PropertyAccessMode.READ_ONLY)
@@ -103,12 +103,12 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "Удалить", alias = "Delete")
-    public void delete(IValue row) {
+    public void remove(IValue row) {
         final var index = indexOfRow(row);
         if (index == -1) {
             throw MachineException.invalidArgumentValueException();
         }
-        deleteRowFromIndexes((V8ValueTableRow) values.get(index));
+        removeRowFromIndexes((V8ValueTableRow) values.get(index));
         values.remove(index);
     }
 
@@ -265,7 +265,10 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         final var filterKey = new V8CollectionKey(extractKeyAndValue(filter));
         final var fields = filterKey.getFields();
 
-        for (final var row : values) {
+        var index = indexes.pickIndex(fields);
+        var list = index == null ? values : index.getValues(filterKey);
+
+        for (var row: list) {
             final var rowKey = V8CollectionKey.extract(fields, (V8ValueTableRow) row);
             if (rowKey.equals(filterKey)) {
                 result.add(row);
@@ -341,9 +344,9 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         final var groupingColumns = columns.parseColumnList(groupingColumnNames, true);
         final var totalColumns = columns.parseColumnList(totalColumnNames, true);
 
-        deleteDeprecatedColumns(groupingColumns, totalColumns);
+        removeDeprecatedColumns(groupingColumns, totalColumns);
 
-        final var index = new V8CollectionIndex(columns, asFields(groupingColumns));
+        final var index = new V8CollectionIndex(this, asFields(groupingColumns));
         for (final var row: values) {
             index.addElement((V8ValueTableRow) row);
         }
@@ -365,17 +368,17 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         throw MachineException.operationNotSupportedException();
     }
 
-    private void deleteDeprecatedColumns(List<V8ValueTableColumn> groupingColumns, List<V8ValueTableColumn> totalColumns) {
-        final var columnsToDelete = new ArrayList<V8ValueTableColumn>();
+    private void removeDeprecatedColumns(List<V8ValueTableColumn> groupingColumns, List<V8ValueTableColumn> totalColumns) {
+        final var columnsToRemove = new ArrayList<V8ValueTableColumn>();
         for (final var column : columns.iterator()) {
             final var castedColumn = (V8ValueTableColumn) column;
             if (!groupingColumns.contains(castedColumn)
                     && !totalColumns.contains(castedColumn)) {
-                columnsToDelete.add(castedColumn);
+                columnsToRemove.add(castedColumn);
             }
         }
-        for (final var column: columnsToDelete) {
-            columns.delete(column);
+        for (final var column: columnsToRemove) {
+            columns.remove(column);
         }
     }
 
@@ -400,25 +403,31 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         }
         for (final var row: values) {
             final var castedRow = (V8ValueTableRow) row;
-            castedRow.columnDeleted(column);
+            castedRow.columnRemoved(column);
         }
     }
 
     private void reindex() {
         for (final var index: indexes.iterator()) {
-            final var castedIndex = (V8CollectionIndex) index;
-            castedIndex.rebuild();
+            buildIndex((V8CollectionIndex) index);
         }
     }
 
-    private void addRowToIndexes(V8ValueTableRow row) {
+    private void buildIndex(V8CollectionIndex index) {
+        index.clear();
+        for (var row : values) {
+            index.addElement((V8ValueTableRow) row);
+        }
+    }
+
+    void addRowToIndexes(V8ValueTableRow row) {
         for (final var index: indexes.iterator()) {
             final var castedIndex = (V8CollectionIndex) index;
             castedIndex.addElement(row);
         }
     }
 
-    private void deleteRowFromIndexes(V8ValueTableRow row) {
+    void removeRowFromIndexes(V8ValueTableRow row) {
         for (final var index: indexes.iterator()) {
             final var castedIndex = (V8CollectionIndex) index;
             castedIndex.removeElement(row);
@@ -461,6 +470,21 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     @Override
     public void setIndexedValue(IValue index, IValue value) {
         throw MachineException.getPropertyIsNotWritableException("");
+    }
+
+    @Override
+    public IValue getField(String name) {
+        return columns.findColumn(name);
+    }
+
+    @Override
+    public String getName(IValue field) {
+        return columns.getColumnInternal(field).getName();
+    }
+
+    @Override
+    public void indexAdded(V8CollectionIndex index) {
+        buildIndex(index);
     }
 
 }

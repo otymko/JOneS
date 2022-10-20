@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ContextClass(name = "КоллекцияКолонокТаблицыЗначений", alias="ValueTableColumnCollection")
 public class V8ValueTableColumnCollection extends ContextValue implements IndexAccessor, PropertyNameAccessor,
-        CollectionIterable<V8ValueTableColumn>, CollectionNamesResolver {
+        CollectionIterable<V8ValueTableColumn> {
 
     public static final ContextInfo INFO = ContextInfo.createByClass(V8ValueTableColumnCollection.class);
 
@@ -139,7 +139,7 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
     }
 
     @ContextMethod(name = "Удалить", alias = "Delete")
-    public void delete(IValue index) {
+    public void remove(IValue index) {
         final var column = getColumnInternal(index);
         columns.remove(column);
         owner.columnRemoved(column);
@@ -212,46 +212,6 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         }
         return destIndex;
     }
-    private List<V8ValueTableColumn> parseColumnListParameter(String columnList) {
-        final var result = new ArrayList<V8ValueTableColumn>();
-        if (columnList == null) {
-            return result;
-        }
-
-        final var columnNames = columnList.split(",");
-        for (final var columnName : columnNames) {
-
-            if (!columnName.isBlank()) {
-                final var column = findColumnByNameInternal(columnName.trim());
-                if (column == null) {
-                    throw MachineException.invalidArgumentValueException();
-                }
-                result.add(column);
-            }
-        }
-
-        return result;
-    }
-
-    List<V8ValueTableColumn> parseColumnList(String columnList, boolean emptyIfNotDefined) {
-        final var result = parseColumnListParameter(columnList);
-        if (result.isEmpty() && !emptyIfNotDefined) {
-            for (IValue iValue : iterator()) {
-                result.add((V8ValueTableColumn) iValue);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<IValue> parseNames(String names) {
-        return new ArrayList<IValue>(parseColumnList(names, false));
-    }
-
-    @Override
-    public String getName(IValue field) {
-        return getColumnInternal(field).getName();
-    }
 
     @Override
     public ContextInfo getContextInfo() {
@@ -297,5 +257,35 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
     public boolean hasProperty(IValue index) {
         final var column = findColumnInternal(index);
         return (column != null);
+    }
+    private List<V8ValueTableColumn> parseColumnListParameter(String columnList) {
+        final var result = new ArrayList<V8ValueTableColumn>();
+        if (columnList == null) {
+            return result;
+        }
+
+        final var columnNames = columnList.split(",");
+        for (final var columnName : columnNames) {
+
+            if (!columnName.isBlank()) {
+                final var column = findColumnByNameInternal(columnName.trim());
+                if (column == null) {
+                    throw MachineException.invalidArgumentValueException();
+                }
+                result.add(column);
+            }
+        }
+
+        return result;
+    }
+
+    List<V8ValueTableColumn> parseColumnList(String columnList, boolean emptyIfNotDefined) {
+        final var result = parseColumnListParameter(columnList);
+        if (result.isEmpty() && !emptyIfNotDefined) {
+            for (IValue iValue : iterator()) {
+                result.add((V8ValueTableColumn) iValue);
+            }
+        }
+        return result;
     }
 }

@@ -10,6 +10,7 @@ import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -44,7 +45,25 @@ class V8CollectionKey {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         V8CollectionKey that = (V8CollectionKey) o;
-        return values.equals(that.values);
+        if (values.size() != that.values.size()) {
+            return false;
+        }
+        var allKeys = new HashSet<IValue>();
+        allKeys.addAll(values.keySet());
+        allKeys.addAll(that.values.keySet());
+        for (var key: allKeys) {
+            if (!that.values.containsKey(key)
+            || !values.containsKey(key)) {
+                return false;
+            }
+            var v1 = values.get(key);
+            var v2 = values.get(key);
+            if (!v1.equals(v2)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
