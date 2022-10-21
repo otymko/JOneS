@@ -5,6 +5,9 @@
  */
 package com.github.otymko.jos.runtime.context.global;
 
+import com.github.otymko.jos.core.DataType;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.exception.CompilerException;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.AttachableContext;
 import com.github.otymko.jos.core.annotation.ContextMethod;
@@ -15,7 +18,10 @@ import com.github.otymko.jos.runtime.context.type.enumeration.SearchDirection;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
@@ -25,6 +31,9 @@ import java.util.regex.Pattern;
 @NoArgsConstructor
 public class StringOperationGlobalContext implements AttachableContext {
     public static final ContextInfo INFO = ContextInfo.createByClass(StringOperationGlobalContext.class);
+
+    private static final Pattern STR_TEMPLATE_PATTERN =
+            Pattern.compile("(%%)|%(\\d+)|%\\((\\d+)\\)|%", Pattern.MULTILINE);
 
     @ContextMethod(name = "СтрНайти", alias = "StrFind")
     public static int find(String where, String what, SearchDirection sourceDirection, Integer sourceStart,
@@ -210,6 +219,61 @@ public class StringOperationGlobalContext implements AttachableContext {
         if (lineNumber >= 1) {
             String[] lines = source.split("\n", lineNumber + 1);
             result = lines[lineNumber - 1];
+        }
+
+        return result;
+    }
+
+    @ContextMethod(name = "СтрШаблон", alias = "StrTemplate")
+    public static String strTemplate(String template, IValue p1, IValue p2, IValue p3, IValue p4, IValue p5,
+                                     IValue p6, IValue p7, IValue p8, IValue p9, IValue p10) {
+        String result = getStringArgument(template);
+        var arguments = new IValue[] { p10, p9, p8, p7, p6, p5, p4, p3, p2, p1 };
+
+        AtomicInteger maxNumber = new AtomicInteger(0);
+        AtomicInteger indexMatcher = new AtomicInteger(0);
+
+        var matcher = STR_TEMPLATE_PATTERN.matcher(result);
+        if (matcher.find()) {
+            result = matcher.replaceAll(matchResult -> {
+                indexMatcher.set(indexMatcher.get() + 1);
+
+                if (matchResult.group(1) != null) {
+                    return "%";
+                }
+
+                if (matchResult.group(2) != null || matchResult.group(3) != null) {
+                    var number = Integer.parseInt(matchResult.group(2) != null
+                            ? matchResult.group(2)
+                            : matchResult.group(3));
+
+                    if (number < 1 || number > 10) {
+                        throw MachineException.templateSyntaxErrorAtPositionInvalidSubstitutionNumber(
+                                indexMatcher.get() + 1);
+                    }
+
+                    if (number > maxNumber.get()) {
+                        maxNumber.set(number);
+                    }
+
+                    var argument = arguments[10 - number];
+                    if (argument != null && argument.getDataType() != DataType.UNDEFINED) {
+                        return argument.asString();
+                    }
+                    else {
+                        return "";
+                    }
+                }
+
+                throw MachineException.templateSyntaxErrorAtPosition(indexMatcher.get() + 1);
+            });
+        }
+
+        var passedArgsCount = (int)Arrays.stream(arguments)
+                .filter(Predicate.not(iValue -> iValue == null || iValue.getDataType() == DataType.UNDEFINED))
+                .count();
+        if (passedArgsCount > maxNumber.get()) {
+            throw CompilerException.tooManyMethodArgumentsException();
         }
 
         return result;

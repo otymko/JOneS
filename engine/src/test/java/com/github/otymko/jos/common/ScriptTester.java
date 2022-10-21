@@ -139,6 +139,21 @@ public class ScriptTester implements ContextType, IValue {
         }
     }
 
+    @ContextMethod(name = "ТестПройден", alias = "TestPassed")
+    public static void testPassed(){
+        // None
+    }
+
+    @ContextMethod(name = "ТестПровален", alias = "TestFailed")
+    public static void testFailed(IValue additionalErrorMessage){
+        var message = "Тест провален.";
+        if (additionalErrorMessage != null && additionalErrorMessage.getDataType() != DataType.UNDEFINED) {
+            message += additionalErrorMessage.asString();
+        }
+
+        throw new MachineException(message);
+    }
+
     // модуль Ожидаем
 
     @ContextMethod(name = "Что", alias = "That")
