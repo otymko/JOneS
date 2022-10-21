@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.github.otymko.jos.core.localization.MessageResource.*;
+import static com.github.otymko.jos.core.localization.Resources.getResourceString;
 
 
 /**
@@ -60,7 +61,7 @@ public class MachineException extends EngineException {
     @Override
     public String getMessage() {
         var message = String.format(
-                Resources.getResourceString(ERROR_IN_MODULE_TEMPLATE),
+                getResourceString(ERROR_IN_MODULE_TEMPLATE),
                 errorPositionInfo.getSource(),
                 errorPositionInfo.getLine(),
                 super.getMessage()
@@ -76,142 +77,155 @@ public class MachineException extends EngineException {
     }
 
     public static MachineException typeNotSupportedException(String typeName) {
-        var message = String.format(Resources.getResourceString(TYPE_NOT_SUPPORTED), typeName);
+        var message = String.format(getResourceString(TYPE_NOT_SUPPORTED), typeName);
         return new MachineException(message);
     }
 
     public static MachineException typeNotRegisteredException(String typeName) {
-        var message = String.format(Resources.getResourceString(TYPE_NOT_REGISTERED), typeName);
+        var message = String.format(getResourceString(TYPE_NOT_REGISTERED), typeName);
         return new MachineException(message);
     }
 
     public static MachineException objectNotSupportAccessByIndexException() {
-        var message = Resources.getResourceString(OBJECT_NOT_SUPPORT_ACCESS_BY_INDEX);
+        var message = getResourceString(OBJECT_NOT_SUPPORT_ACCESS_BY_INDEX);
         return new MachineException(message);
     }
 
     public static MachineException constructorNotFoundException(String typeName) {
-        var message = String.format(Resources.getResourceString(CONSTRUCTOR_NOT_FOUND), typeName);
+        var message = String.format(getResourceString(CONSTRUCTOR_NOT_FOUND), typeName);
         return new MachineException(message);
     }
 
     public static MachineException objectIsNotContextTypeException() {
-        var message = Resources.getResourceString(OBJECT_IS_NOT_CONTEXT_TYPE);
+        var message = getResourceString(OBJECT_IS_NOT_CONTEXT_TYPE);
         return new MachineException(message);
     }
 
     public static MachineException operationNotSupportedException() {
-        var message = Resources.getResourceString(OPERATION_NOT_SUPPORTED);
+        var message = getResourceString(OPERATION_NOT_SUPPORTED);
         return new MachineException(message);
     }
 
     public static MachineException operationNotImplementedException() {
-        var message = Resources.getResourceString(OPERATION_NOT_IMPLEMENTED);
+        var message = getResourceString(OPERATION_NOT_IMPLEMENTED);
         return new MachineException(message);
     }
 
     public static MachineException divideByZeroException() {
-        var message = Resources.getResourceString(DIVIDE_BY_ZERO);
+        var message = getResourceString(DIVIDE_BY_ZERO);
         return new MachineException(message);
     }
 
     public static MachineException indexValueOutOfRangeException() {
-        var message = Resources.getResourceString(INDEX_VALUE_OUT_OF_RANGE);
+        var message = getResourceString(INDEX_VALUE_OUT_OF_RANGE);
         return new MachineException(message);
     }
 
     public static MachineException convertToNumberException() {
-        var message = Resources.getResourceString(CONVERT_TO_NUMBER);
+        var message = getResourceString(CONVERT_TO_NUMBER);
         return new MachineException(message);
     }
 
     public static MachineException convertToBooleanException() {
-        var message = Resources.getResourceString(CONVERT_TO_BOOLEAN);
+        var message = getResourceString(CONVERT_TO_BOOLEAN);
         return new MachineException(message);
     }
 
     public static MachineException convertToDateException() {
-        var message = Resources.getResourceString(CONVERT_TO_DATE);
+        var message = getResourceString(CONVERT_TO_DATE);
         return new MachineException(message);
     }
 
     public static MachineException invalidPropertyNameStructureException(String propertyName) {
-        var message = String.format(Resources.getResourceString(INVALID_PROPERTY_NAME_STRUCTURE), propertyName);
+        var message = String.format(getResourceString(INVALID_PROPERTY_NAME_STRUCTURE), propertyName);
         return new MachineException(message);
     }
 
     public static MachineException wrongStackConditionException() {
-        var message = Resources.getResourceString(WRONG_STACK_CONDITION);
+        var message = getResourceString(WRONG_STACK_CONDITION);
         return new MachineException(message);
     }
 
     public static MachineException getPropertyIsNotReadableException(String propertyName) {
-        var message = String.format(Resources.getResourceString(GET_PROPERTY_IS_NOT_READABLE), propertyName);
+        var message = String.format(getResourceString(GET_PROPERTY_IS_NOT_READABLE), propertyName);
         return new MachineException(message);
     }
 
     public static MachineException getPropertyIsNotWritableException(String propertyName) {
-        var message = String.format(Resources.getResourceString(GET_PROPERTY_IS_NOT_WRITABLE), propertyName);
+        var message = String.format(getResourceString(GET_PROPERTY_IS_NOT_WRITABLE), propertyName);
         return new MachineException(message);
     }
 
     public static MachineException indexedValueIsReadOnly() {
-        return new MachineException(Resources.getResourceString(INDEXED_VALUE_IS_READ_ONLY));
+        return new MachineException(getResourceString(INDEXED_VALUE_IS_READ_ONLY));
     }
 
     public static MachineException getPropertyNotFoundException(String propertyName) {
-        var message = String.format(Resources.getResourceString(GET_PROPERTY_NOT_FOUND), propertyName);
+        var message = String.format(getResourceString(GET_PROPERTY_NOT_FOUND), propertyName);
         return new MachineException(message);
     }
 
     public static MachineException iteratorIsNotDefinedException() {
-        var message = Resources.getResourceString(ITERATOR_IS_NOT_DEFINED);
+        var message = getResourceString(ITERATOR_IS_NOT_DEFINED);
         return new MachineException(message);
     }
 
     public static MachineException failedToInstantiateSdo() {
-        var message = Resources.getResourceString(FAILED_TO_INSTANTIATE_SDO);
+        var message = getResourceString(FAILED_TO_INSTANTIATE_SDO);
         return new MachineException(message);
     }
 
     public static MachineException invalidArgumentValueException() {
-        var message = Resources.getResourceString(INVALID_ARGUMENT_VALUE);
+        var message = getResourceString(INVALID_ARGUMENT_VALUE);
         return new MachineException(message);
     }
 
     public static MachineException methodCallWrongArgValue(String methodName, int argPosition) {
-        var message = Resources.getResourceString(METHOD_CALL_WRONG_ARG_VALUE);
+        var message = getResourceString(METHOD_CALL_WRONG_ARG_VALUE);
         return new MachineException(message);
     }
 
     public static MachineException methodNotFoundException(String methodName) {
-        var message = String.format(Resources.getResourceString(METHOD_NOT_FOUND), methodName);
+        var message = String.format(getResourceString(METHOD_NOT_FOUND), methodName);
         return new MachineException(message);
     }
 
     public static MachineException checkIsFilledNotSupportedForType(String typeName) {
-        var message = String.format(Resources.getResourceString(CHECK_IS_FILLED_NOT_SUPPORTED, typeName));
+        var message = String.format(getResourceString(CHECK_IS_FILLED_NOT_SUPPORTED, typeName));
         return new MachineException(message);
     }
 
     public static MachineException keyNotFound() {
-        var message = Resources.getResourceString(KEY_NOT_FOUND);
+        var message = getResourceString(KEY_NOT_FOUND);
         return new MachineException(message);
     }
 
     public static MachineException fileAccessDenied(String path) {
-        var message = String.format(Resources.getResourceString(FILE_ACCESS_DENIED), path);
+        var message = String.format(getResourceString(FILE_ACCESS_DENIED), path);
         return new MachineException(message);
     }
 
     public static MachineException objectFieldIsNotWritable(String key) {
-        var message = String.format(Resources.getResourceString(OBJECT_FIELD_IS_NOT_WRITABLE), key);
+        var message = String.format(getResourceString(OBJECT_FIELD_IS_NOT_WRITABLE), key);
 
         return new MachineException(message);
     }
 
     public static MachineException objectFiledNotFound(String key) {
-        var message = String.format(Resources.getResourceString(OBJECT_FIELD_NOT_FOUND), key);
+        var message = String.format(getResourceString(OBJECT_FIELD_NOT_FOUND), key);
+
+        return new MachineException(message);
+    }
+
+    public static MachineException templateSyntaxErrorAtPosition(int position) {
+        var message = String.format(getResourceString(TEMPLATE_SYNTAX_ERROR_AT_POSITION), position);
+
+        return new MachineException(message);
+    }
+
+    public static MachineException templateSyntaxErrorAtPositionInvalidSubstitutionNumber(int position) {
+        var message = String.format(
+                getResourceString(TEMPLATE_SYNTAX_ERROR_AT_POSITION_INVALID_SUBSTITUTION_NUMBER), position);
 
         return new MachineException(message);
     }
