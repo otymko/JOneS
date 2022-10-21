@@ -312,7 +312,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
         final var result = new V8ValueTable();
 
         for (final var sourceColumn: columnsListToCopy) {
-            final var targetColumn = result.getColumns().copy(sourceColumn);
+            final var targetColumn = result.getColumns().copyFrom(sourceColumn);
             columnMap.put(sourceColumn, targetColumn);
         }
 

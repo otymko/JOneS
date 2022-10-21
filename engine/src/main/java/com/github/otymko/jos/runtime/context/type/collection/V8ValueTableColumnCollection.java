@@ -40,6 +40,8 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
     private final List<IValue> columns;
     private final V8ValueTable owner;
 
+    private int maxId = 0;
+
     public V8ValueTableColumnCollection(V8ValueTable owner) {
         this.owner = owner;
         columns = new ArrayList<>();
@@ -88,6 +90,7 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         }
 
         final var columnBuilder = new V8ValueTableColumn.V8ValueTableColumnBuilder();
+        columnBuilder.id(maxId++);
         columnBuilder.owner(owner);
         columnBuilder.name(name);
 
@@ -132,8 +135,12 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         return column;
     }
 
-    V8ValueTableColumn copy(V8ValueTableColumn column) {
-        final var newColumn = column.copyTo(owner);
+    V8ValueTableColumn copyFrom(V8ValueTableColumn column) {
+        var newColumn = createColumn(
+                column.getName(),
+                column.getValueType(),
+                column.getTitle(),
+                column.getWidth());
         columns.add(newColumn);
         return newColumn;
     }
