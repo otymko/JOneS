@@ -203,7 +203,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
     }
 
     @ContextMethod(name = "ЗаполнитьЗначения", alias = "FillValues")
-    public void FillValues(IValue value, String columnNames) {
+    public void fillValues(IValue value, String columnNames) {
         final var rawValue = ValueFactory.rawValueOrUndefined(value);
         final var searchColumns = columns.parseColumnList(columnNames, false);
         for (final var row : values) {

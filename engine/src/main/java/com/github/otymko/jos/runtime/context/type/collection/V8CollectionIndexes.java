@@ -106,21 +106,6 @@ public class V8CollectionIndexes extends ContextValue implements IndexAccessor, 
         return new IteratorValue(values.iterator());
     }
 
-    private int indexInternal(IValue index) {
-        if (index == null) {
-            throw MachineException.invalidArgumentValueException();
-        }
-        final var rawIndex = index.getRawValue();
-        if (rawIndex.getDataType() != DataType.NUMBER) {
-            throw MachineException.invalidArgumentValueException();
-        }
-        final var intIndex = rawIndex.asNumber().intValue();
-        if (intIndex >= 0 && intIndex < values.size()) {
-            return intIndex;
-        }
-        throw MachineException.indexValueOutOfRangeException();
-    }
-
     private V8CollectionIndex getIndexInternal(IValue index) {
         if (index == null) {
             throw MachineException.invalidArgumentValueException();

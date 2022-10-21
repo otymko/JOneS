@@ -7,8 +7,6 @@ package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.core.IValue;
 
-import java.util.List;
-
 /**
  * Общий интерфейс для коллекций, которые можно индексировать
  */
