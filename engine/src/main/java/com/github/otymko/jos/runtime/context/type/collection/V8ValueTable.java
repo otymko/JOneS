@@ -441,21 +441,15 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
 
     @ContextMethod(name = "Итог", alias = "Total")
     public BigDecimal total(IValue column) {
-        boolean hasData = false;
         BigDecimal result = BigDecimal.ZERO;
         for (final var row: values) {
             final var castedRow = (V8ValueTableRow)row;
             final var rowValue = castedRow.getIndexedValue(column);
             if (rowValue.getDataType() == DataType.NUMBER) {
-                hasData = true;
                 result = result.add(rowValue.asNumber());
             }
         }
-        if (hasData) {
-            return result;
-        }
-
-        return null;
+        return result;
     }
 
     @Override
