@@ -351,14 +351,15 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
             index.addElement((V8ValueTableRow) row);
         }
 
+        values.clear();
+
         for (final var key: index.keys()) {
             final var rows = index.data(key).toArray(new IValue[0]);
-            if (rows.length > 1) {
-                for (int i = 1; i < rows.length; i++) {
-                    aggregate((V8ValueTableRow) rows[0], (V8ValueTableRow) rows[i], totalColumns);
-                    values.remove(rows[i]);
-                }
+            final var totalRow = (V8ValueTableRow) rows[0];
+            for (int i = 1; i < rows.length; i++) {
+                aggregate(totalRow, (V8ValueTableRow) rows[i], totalColumns);
             }
+            values.add(totalRow);
         }
         reindex();
     }

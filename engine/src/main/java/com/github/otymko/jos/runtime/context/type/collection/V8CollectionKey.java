@@ -57,7 +57,7 @@ class V8CollectionKey {
                 return false;
             }
             var v1 = values.get(key);
-            var v2 = values.get(key);
+            var v2 = that.values.get(key);
             if (!v1.equals(v2)) {
                 return false;
             }
