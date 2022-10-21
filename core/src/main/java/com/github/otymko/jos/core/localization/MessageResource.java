@@ -64,6 +64,9 @@ public class MessageResource {
     public static final String INDEXED_VALUE_IS_READ_ONLY = "indexedValueIsReadOnly";
     public static final String OBJECT_FIELD_IS_NOT_WRITABLE = "objectFieldIsNotWritable";
     public static final String OBJECT_FIELD_NOT_FOUND = "objectFiledNotFound";
+    public static final String TEMPLATE_SYNTAX_ERROR_AT_POSITION = "templateSyntaxErrorAtPosition";
+    public static final String TEMPLATE_SYNTAX_ERROR_AT_POSITION_INVALID_SUBSTITUTION_NUMBER =
+            "templateSyntaxErrorAtPositionInvalidSubstitutionNumber";
 
     private MessageResource() {
         // none
