@@ -28,5 +28,9 @@ public interface IndexSourceCollection {
      */
     String getName(IValue field);
 
+    /**
+     * Метод, вызываемый при добавлении нового индекса. Позволяет коллекции передать индексу необходимые данные.
+     * @param index - Новый индекс коллекции
+     */
     void indexAdded(V8CollectionIndex index);
 }
