@@ -14,8 +14,6 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Objects;
-
 /**
  * Колонка таблицы значений.
  * Содержит описание одной колонки Таблицы Значений.
