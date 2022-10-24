@@ -132,6 +132,6 @@ public class V8CollectionIndexes extends ContextValue implements IndexAccessor, 
 
     @Override
     public void setIndexedValue(IValue index, IValue value) {
-        throw MachineException.getPropertyIsNotWritableException("");
+        throw MachineException.indexedValueIsReadOnly();
     }
 }

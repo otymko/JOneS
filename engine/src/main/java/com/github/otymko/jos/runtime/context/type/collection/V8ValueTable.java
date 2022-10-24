@@ -464,7 +464,7 @@ public class V8ValueTable extends ContextValue implements IndexAccessor, Collect
 
     @Override
     public void setIndexedValue(IValue index, IValue value) {
-        throw MachineException.getPropertyIsNotWritableException("");
+        throw MachineException.indexedValueIsReadOnly();
     }
 
     @Override

@@ -237,7 +237,7 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
 
     @Override
     public void setIndexedValue(IValue index, IValue value) {
-        throw MachineException.getPropertyIsNotWritableException("");
+        throw MachineException.indexedValueIsReadOnly();
     }
 
     public boolean hasColumn(String columnName) {
