@@ -21,6 +21,7 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Коллекция колонок таблицы значений.
@@ -36,6 +37,7 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         CollectionIterable<V8ValueTableColumn> {
 
     public static final ContextInfo INFO = ContextInfo.createByClass(V8ValueTableColumnCollection.class);
+    private static final Pattern columnsSplitter = Pattern.compile(",");
 
     private final List<IValue> columns;
     private final V8ValueTable owner;
@@ -271,7 +273,7 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
             return result;
         }
 
-        final var columnNames = columnList.split(",");
+        final var columnNames = columnsSplitter.split(columnList);
         for (final var columnName : columnNames) {
 
             if (!columnName.isBlank()) {
