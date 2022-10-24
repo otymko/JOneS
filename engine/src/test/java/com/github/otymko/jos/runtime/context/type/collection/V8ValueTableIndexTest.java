@@ -9,5 +9,5 @@ import com.github.otymko.jos.runtime.context.BaseScriptTest;
 import com.github.otymko.jos.runtime.context.TestScript;
 
 @TestScript(script = "src/test/resources/tests/ValueTableIndex.os")
-public class V8ValueTableIndexTest extends BaseScriptTest {
+class V8ValueTableIndexTest extends BaseScriptTest {
 }
