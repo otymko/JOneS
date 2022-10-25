@@ -70,7 +70,9 @@ public class V8ValueTableRow extends ContextValue implements IndexAccessor, Prop
     }
 
     void setIndexedValueInternal(V8ValueTableColumn column, IValue value) {
+        owner.removeRowFromIndexes(this);
         data.put(column, column.adjustValue(value));
+        owner.addRowToIndexes(this);
     }
 
     @Override
@@ -104,7 +106,7 @@ public class V8ValueTableRow extends ContextValue implements IndexAccessor, Prop
         setIndexedValue(index, value);
     }
 
-    void columnDeleted(V8ValueTableColumn column) {
+    void columnRemoved(V8ValueTableColumn column) {
         data.remove(column);
     }
 }

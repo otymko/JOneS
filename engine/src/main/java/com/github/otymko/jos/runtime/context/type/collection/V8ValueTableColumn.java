@@ -14,8 +14,6 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Objects;
-
 /**
  * Колонка таблицы значений.
  * Содержит описание одной колонки Таблицы Значений.
@@ -28,14 +26,19 @@ public class V8ValueTableColumn extends ContextValue {
 
     private final V8ValueTable owner;
 
+    private final int id;
+
     @ContextProperty(name = "Имя", alias = "Name")
     @Getter
     private String name;
     @ContextProperty(name = "Заголовок", alias = "Title")
+    @Getter
     private String title;
     @ContextProperty(name = "ТипЗначения", alias = "ValueType")
+    @Getter
     private TypeDescription valueType;
     @ContextProperty(name = "Ширина", alias = "Width")
+    @Getter
     private int width;
     @Getter
     private IValue defaultValue;
@@ -53,29 +56,13 @@ public class V8ValueTableColumn extends ContextValue {
         return valueType.adjustValue(rawValue);
     }
 
-    public V8ValueTableColumn copyTo(V8ValueTable newOwner) {
-        var newBuilder = new V8ValueTableColumnBuilder();
-        return newBuilder.owner(newOwner)
-                .name(name)
-                .title(title)
-                .valueType(valueType)
-                .width(width)
-                .defaultValue(defaultValue)
-                .build();
-    }
-
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof V8ValueTableColumn) {
-            final var castedObject = (V8ValueTableColumn)obj;
-            return castedObject.name.equalsIgnoreCase(name)
-                    && castedObject.owner.equals(owner);
-        }
-        return false;
+        return obj == this;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(owner, name);
+        return id;
     }
 }

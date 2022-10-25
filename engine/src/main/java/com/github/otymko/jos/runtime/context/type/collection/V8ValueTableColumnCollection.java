@@ -21,6 +21,7 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Коллекция колонок таблицы значений.
@@ -36,9 +37,12 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         CollectionIterable<V8ValueTableColumn> {
 
     public static final ContextInfo INFO = ContextInfo.createByClass(V8ValueTableColumnCollection.class);
+    private static final Pattern columnsSplitter = Pattern.compile(",");
 
     private final List<IValue> columns;
     private final V8ValueTable owner;
+
+    private int maxId = 0;
 
     public V8ValueTableColumnCollection(V8ValueTable owner) {
         this.owner = owner;
@@ -88,6 +92,7 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         }
 
         final var columnBuilder = new V8ValueTableColumn.V8ValueTableColumnBuilder();
+        columnBuilder.id(maxId++);
         columnBuilder.owner(owner);
         columnBuilder.name(name);
 
@@ -132,14 +137,18 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
         return column;
     }
 
-    V8ValueTableColumn copy(V8ValueTableColumn column) {
-        final var newColumn = column.copyTo(owner);
+    V8ValueTableColumn copyFrom(V8ValueTableColumn column) {
+        var newColumn = createColumn(
+                column.getName(),
+                column.getValueType(),
+                column.getTitle(),
+                column.getWidth());
         columns.add(newColumn);
         return newColumn;
     }
 
     @ContextMethod(name = "Удалить", alias = "Delete")
-    public void delete(IValue index) {
+    public void remove(IValue index) {
         final var column = getColumnInternal(index);
         columns.remove(column);
         owner.columnRemoved(column);
@@ -230,7 +239,7 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
 
     @Override
     public void setIndexedValue(IValue index, IValue value) {
-        throw MachineException.getPropertyIsNotWritableException("");
+        throw MachineException.indexedValueIsReadOnly();
     }
 
     public boolean hasColumn(String columnName) {
@@ -257,5 +266,35 @@ public class V8ValueTableColumnCollection extends ContextValue implements IndexA
     public boolean hasProperty(IValue index) {
         final var column = findColumnInternal(index);
         return (column != null);
+    }
+    private List<V8ValueTableColumn> parseColumnListParameter(String columnList) {
+        final var result = new ArrayList<V8ValueTableColumn>();
+        if (columnList == null) {
+            return result;
+        }
+
+        final var columnNames = columnsSplitter.split(columnList);
+        for (final var columnName : columnNames) {
+
+            if (!columnName.isBlank()) {
+                final var column = findColumnByNameInternal(columnName.trim());
+                if (column == null) {
+                    throw MachineException.invalidArgumentValueException();
+                }
+                result.add(column);
+            }
+        }
+
+        return result;
+    }
+
+    List<V8ValueTableColumn> parseColumnList(String columnList, boolean emptyIfNotDefined) {
+        final var result = parseColumnListParameter(columnList);
+        if (result.isEmpty() && !emptyIfNotDefined) {
+            for (IValue iValue : iterator()) {
+                result.add((V8ValueTableColumn) iValue);
+            }
+        }
+        return result;
     }
 }
