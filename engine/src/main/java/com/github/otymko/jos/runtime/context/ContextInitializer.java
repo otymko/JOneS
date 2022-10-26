@@ -15,6 +15,7 @@ import com.github.otymko.jos.runtime.VariableReference;
 import com.github.otymko.jos.runtime.context.global.FileOperationsGlobalContext;
 import com.github.otymko.jos.runtime.context.global.GlobalContext;
 import com.github.otymko.jos.runtime.context.global.StringOperationGlobalContext;
+import com.github.otymko.jos.runtime.context.global.SystemEnvironmentGlobalContext;
 import com.github.otymko.jos.runtime.context.global.SystemGlobalContext;
 import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.machine.MachineInstance;
@@ -44,6 +45,7 @@ public class ContextInitializer {
         machineInstance.implementContext(new SystemGlobalContext());
         machineInstance.implementContext(new StringOperationGlobalContext());
         machineInstance.implementContext(new FileOperationsGlobalContext());
+        machineInstance.implementContext(new SystemEnvironmentGlobalContext());
     }
 
     /**
