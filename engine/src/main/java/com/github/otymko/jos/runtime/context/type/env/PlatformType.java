@@ -36,6 +36,17 @@ public enum PlatformType implements EnumType {
 
     public static final EnumerationContext INFO = new EnumerationContext(PlatformType.class);
 
+    public static PlatformType parse(String osName, boolean is64) {
+        var prepared = osName.toUpperCase();
+        if (prepared.contains("WINDOWS"))
+            return is64 ? Windows_x86_64 : Windows_x86;
+        if (prepared.contains("LINUX"))
+            return is64 ? Linux_x86_64 : Linux_x86;
+        if (prepared.contains("MAC OS"))
+            return is64 ? MacOS_x86_64 : MacOS_x86;
+        return PlatformType.Unknown;
+    }
+
     @Override
     public EnumerationContext getContextInfo() {
         return INFO;

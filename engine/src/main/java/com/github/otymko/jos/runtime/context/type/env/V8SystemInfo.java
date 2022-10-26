@@ -36,30 +36,35 @@ public class V8SystemInfo extends ContextValue {
 
     @ContextProperty(name = "ВерсияОС", alias = "OSVersion")
     public String getOsVersion() {
-        throw MachineException.operationNotImplementedException();
+        return String.format("%s %s",
+                System.getProperty("os.name"),
+                System.getProperty("os.version"));
     }
 
     @ContextProperty(name = "ТипПлатформы", alias = "PlatformType")
-    public String getPlatformType() {
-        throw MachineException.operationNotImplementedException();
+    public PlatformType getPlatformType() {
+        var is64 = getIs64bitOperatingSystem();
+        var osName = System.getProperty("os.name");
+        return PlatformType.parse(osName, is64);
     }
 
     @ContextProperty(name = "ПользовательОС", alias = "OSUser")
     public String getOsUser() {
-        throw MachineException.operationNotImplementedException();
+        return System.getProperty("user.name");
     }
 
     @ContextProperty(name = "Это64БитнаяОперационнаяСистема", alias = "Is64bitOperatingSystem")
-    public boolean is64bitOperatingSystem() {
-        throw MachineException.operationNotImplementedException();
+    public boolean getIs64bitOperatingSystem() {
+        var arch = System.getProperty("os.arch");
+        return arch.endsWith("64");
     }
 
     @ContextProperty(name = "КоличествоПроцессоров", alias = "ProcessorCount")
     public int getProcessorCount() {
-        throw MachineException.operationNotImplementedException();
+        return Runtime.getRuntime().availableProcessors();
     }
 
-    @ContextProperty(name = "ВремяРаботыСМоментаЗагрузки", alias = "SystemPageSize")
+    @ContextProperty(name = "РазмерСтраницы", alias = "SystemPageSize")
     public int getSystemPageSize() {
         throw MachineException.operationNotImplementedException();
     }
