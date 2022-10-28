@@ -2,10 +2,8 @@ package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.core.annotation.ContextClass;
-import com.github.otymko.jos.core.annotation.ContextConstructor;
 import com.github.otymko.jos.core.annotation.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,23 +34,21 @@ public class V8ValueListItem extends ContextValue {
     @Getter
     @Setter
     @ContextProperty(name = "Пометка", alias = "Check")
-    private BooleanValue check;
+    private Boolean check;
 
     @Getter
     @Setter
     @ContextProperty(name = "Картинка", alias = "Picture")
     private IValue picture;
 
-
-    @ContextConstructor
-    public static V8ValueListItem constructor(V8ValueList owner, IValue value, String presentation, BooleanValue check, IValue picture) {
+    public static V8ValueListItem constructor(V8ValueList owner, IValue value, String presentation, Boolean check, IValue picture) {
         return new V8ValueListItem(owner, value, presentation, check, picture);
     }
 
-    public V8ValueListItem(V8ValueList owner, IValue value, String presentation, BooleanValue check, IValue picture) {
+    public V8ValueListItem(V8ValueList owner, IValue value, String presentation, Boolean check, IValue picture) {
 
         if (check == null)
-            check = BooleanValue.FALSE;
+            check = Boolean.FALSE;
 
         if (presentation == null)
             presentation = "";
@@ -68,7 +64,7 @@ public class V8ValueListItem extends ContextValue {
         this.owner = owner;
         this.value = value;
         this.presentation = "";
-        this.check = BooleanValue.FALSE;
+        this.check = Boolean.FALSE;
     }
 
     @Override

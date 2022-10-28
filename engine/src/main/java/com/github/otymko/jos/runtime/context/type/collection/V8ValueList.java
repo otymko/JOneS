@@ -10,7 +10,6 @@ import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
-import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.ArrayList;
@@ -44,22 +43,20 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
     }
 
     @ContextMethod(name = "Добавить", alias = "Add")
-    public V8ValueListItem add(IValue value, String presentation, BooleanValue check, IValue picture) {
+    public V8ValueListItem add(IValue value, String presentation, Boolean check, IValue picture) {
         V8ValueListItem newItem = new V8ValueListItem(this, value, presentation, check, picture);
         values.add(newItem);
-//        addRowToIndexes(newRow);
 
         return newItem;
     }
 
     @ContextMethod(name = "Вставить", alias = "Insert")
-    public V8ValueListItem insert(int index, IValue value, String presentation, BooleanValue check, IValue picture) {
+    public V8ValueListItem insert(int index, IValue value, String presentation, Boolean check, IValue picture) {
         if (index < 0) {
             throw MachineException.indexValueOutOfRangeException();
         }
         V8ValueListItem newItem = new V8ValueListItem(this, value, presentation, check, picture);
         values.add(index, newItem);
-//        addRowToIndexes(newRow);
 
         return newItem;
     }
@@ -76,7 +73,6 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
             throw MachineException.invalidArgumentValueException();
         }
 
-//        removeRowFromIndexes((V8ValueTableRow) values.get(index));
         values.remove(index);
     }
 
@@ -98,8 +94,20 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
         }
     }
 
+    @ContextMethod(name = "ВыгрузитьЗначения", alias = "UnloadValues")
+    public V8Array unloadValues() {
+        final var result = V8Array.create();
+
+        for (final var item: values) {
+            final var castedItem = (V8ValueListItem) item;
+            result.add(castedItem.getValue());
+        }
+
+        return result;
+    }
+
     @ContextMethod(name = "ЗаполнитьПометки", alias = "FillChecks")
-    public void fillChecks(BooleanValue check) {
+    public void fillChecks(Boolean check) {
 
         for (IValue value : values) {
             final var castedValue = (V8ValueListItem) value.getRawValue();
@@ -125,10 +133,9 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
     }
 
     @ContextMethod(name = "Сдвинуть", alias = "Move")
-    public void move(IValue item, IValue offset) {
-        final var intOffset = offset.getRawValue().asNumber().intValue();
+    public void move(IValue item, int offset) {
         final var sourceIndex = indexByValue(item);
-        final var newIndex = evalIndex(sourceIndex, intOffset);
+        final var newIndex = evalIndex(sourceIndex, offset);
 
         final var tmp = values.get(sourceIndex);
         if (sourceIndex < newIndex) {
