@@ -1,3 +1,8 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.core.IValue;
@@ -34,7 +39,7 @@ public class V8ValueListItem extends ContextValue {
     @Getter
     @Setter
     @ContextProperty(name = "Пометка", alias = "Check")
-    private Boolean check;
+    private boolean check;
 
     @Getter
     @Setter
@@ -45,7 +50,7 @@ public class V8ValueListItem extends ContextValue {
         return new V8ValueListItem(owner, value, presentation, check, picture);
     }
 
-    public V8ValueListItem(V8ValueList owner, IValue value, String presentation, Boolean check, IValue picture) {
+    V8ValueListItem(V8ValueList owner, IValue value, String presentation, Boolean check, IValue picture) {
 
         if (check == null)
             check = Boolean.FALSE;
@@ -71,6 +76,5 @@ public class V8ValueListItem extends ContextValue {
     public ContextInfo getContextInfo() {
         return INFO;
     }
-
 
 }

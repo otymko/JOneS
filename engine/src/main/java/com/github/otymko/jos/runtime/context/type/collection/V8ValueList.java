@@ -1,3 +1,8 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.core.DataType;
@@ -28,7 +33,7 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
         return new V8ValueList();
     }
 
-    public V8ValueList() {
+    V8ValueList() {
         values = new ArrayList<>();
     }
 
@@ -124,7 +129,7 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
             final var newItem = (V8ValueListItem)result.add(
                     castedItem.getValue(),
                     castedItem.getPresentation(),
-                    castedItem.getCheck(),
+                    castedItem.isCheck(),
                     castedItem.getPicture()
             );
         }
@@ -163,6 +168,26 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
         return null;
     }
 
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
+    }
+
+    @Override
+    public IteratorValue iterator() {
+        return new IteratorValue(values.iterator());
+    }
+
+    @Override
+    public IValue getIndexedValue(IValue index) {
+        return get(index.asNumber().intValueExact());
+    }
+
+    @Override
+    public void setIndexedValue(IValue index, IValue value) {
+        throw MachineException.indexedValueIsReadOnly();
+    }
+
     private int indexByValue(IValue param) {
         final var index = param.getRawValue();
 
@@ -197,15 +222,10 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
         }
 
         if (castedItem.getDataType() == DataType.STRING) {
-            try {
-                final var itemIndex = Integer.parseInt(castedItem.asString());
-                if (itemIndex >= 0 && itemIndex < values.size()) {
-                    return itemIndex;
-                }
-            }catch (NumberFormatException ex) {
-                throw MachineException.convertToNumberException();
+            final var itemIndex = castedItem.asNumber().intValue();
+            if (itemIndex >= 0 && itemIndex < values.size()) {
+                return itemIndex;
             }
-
             throw MachineException.invalidArgumentValueException();
         }
 
@@ -225,26 +245,6 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
             throw MachineException.indexValueOutOfRangeException();
         }
         return destIndex;
-    }
-
-    @Override
-    public ContextInfo getContextInfo() {
-        return INFO;
-    }
-
-    @Override
-    public IteratorValue iterator() {
-        return new IteratorValue(values.iterator());
-    }
-
-    @Override
-    public IValue getIndexedValue(IValue index) {
-        return get(index.asNumber().intValueExact());
-    }
-
-    @Override
-    public void setIndexedValue(IValue index, IValue value) {
-        throw MachineException.indexedValueIsReadOnly();
     }
 
 }
