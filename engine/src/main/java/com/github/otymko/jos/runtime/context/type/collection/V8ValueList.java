@@ -15,6 +15,7 @@ import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
+import com.github.otymko.jos.runtime.context.type.enumeration.SortDirection;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.ArrayList;
@@ -126,7 +127,7 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
 
         for(final var value: values) {
             final var castedItem = (V8ValueListItem)value.getRawValue();
-            final var newItem = (V8ValueListItem)result.add(
+            result.add(
                     castedItem.getValue(),
                     castedItem.getPresentation(),
                     castedItem.isCheck(),
@@ -166,6 +167,16 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
         }
 
         return null;
+    }
+
+    @ContextMethod(name = "СортироватьПоЗначению", alias = "SortByValue")
+    public void sortByValue(SortDirection direction) {
+        sortByProperty(values, direction, "value");
+    }
+
+    @ContextMethod(name = "СортироватьПоПредставлению", alias = "SortByPresentation")
+    public void sortByPresentation(SortDirection direction) {
+        sortByProperty(values, direction, "presentation");
     }
 
     @Override
@@ -247,4 +258,28 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
         return destIndex;
     }
 
+    private void sortByProperty(List<IValue> values, SortDirection direction, String property) {
+
+        if (direction == null) {
+            direction = SortDirection.ASC;
+        }
+
+        SortDirection finalDirection = direction;
+
+        values.sort((value1, value2) -> {
+            final var castedValue1 = (V8ValueListItem) value1.getRawValue();
+            final var castedValue2 = (V8ValueListItem) value2.getRawValue();
+
+            final var propertyValue1 = castedValue1.getPropertyValue(
+                    castedValue1.findProperty(property)
+            );
+
+            final var propertyValue2 = castedValue2.getPropertyValue(
+                    castedValue2.findProperty(property)
+            );
+
+            return propertyValue1.compareTo(propertyValue2) * finalDirection.getOrder();
+
+        });
+    }
 }
