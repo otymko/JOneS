@@ -14,6 +14,7 @@ import com.github.otymko.jos.runtime.context.type.enumeration.DateFractions;
 import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
 import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
 import com.github.otymko.jos.runtime.context.type.enumeration.SearchDirection;
+import com.github.otymko.jos.runtime.context.type.enumeration.SortDirection;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class TypeManager {
         contexts.add(AllowedSign.INFO);
         contexts.add(DateFractions.INFO);
         contexts.add(SearchDirection.INFO);
+        contexts.add(SortDirection.INFO);
 
         return contexts;
     }
