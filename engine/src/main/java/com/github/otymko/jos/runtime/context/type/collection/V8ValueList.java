@@ -15,6 +15,7 @@ import com.github.otymko.jos.runtime.context.CollectionIterable;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
+import com.github.otymko.jos.runtime.context.type.common.V8CompareValues;
 import com.github.otymko.jos.runtime.context.type.enumeration.SortDirection;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
@@ -27,6 +28,8 @@ import java.util.List;
 @ContextClass(name = "СписокЗначений", alias = "ValueList")
 public class V8ValueList extends ContextValue implements IndexAccessor, CollectionIterable {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8ValueList.class);
+
+    private final static V8CompareValues compareValues = V8CompareValues.create(true);
     private final List<IValue> values;
 
     @ContextConstructor
@@ -278,8 +281,9 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
                     castedValue2.findProperty(property)
             );
 
-            return propertyValue1.compareTo(propertyValue2) * finalDirection.getOrder();
+            int result = compareValues.compare(propertyValue1, propertyValue2);
 
+            return result * finalDirection.getOrder();
         });
     }
 }
