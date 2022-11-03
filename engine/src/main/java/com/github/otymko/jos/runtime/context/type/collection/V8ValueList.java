@@ -116,7 +116,7 @@ public class V8ValueList extends ContextValue implements IndexAccessor, Collecti
     }
 
     @ContextMethod(name = "ЗаполнитьПометки", alias = "FillChecks")
-    public void fillChecks(Boolean check) {
+    public void fillChecks(boolean check) {
 
         for (IValue value : values) {
             final var castedValue = (V8ValueListItem) value.getRawValue();
