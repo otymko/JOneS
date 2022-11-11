@@ -18,7 +18,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class StringValueTest {
-
     @Test
     void test() {
         var trueValue = ValueFactory.create("ИстИНа");
@@ -51,5 +50,4 @@ class StringValueTest {
 
         // TODO: date -> object && true -> number
     }
-
 }

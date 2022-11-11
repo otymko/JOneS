@@ -19,16 +19,28 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
  */
 @ContextClass(name = "СравнениеЗначений", alias = "CompareValues")
 public class V8CompareValues extends ContextValue {
-
     public static final ContextInfo INFO = ContextInfo.createByClass(V8CompareValues.class);
 
+    /**
+     * Игнорировать регистр при сравнении строк
+     */
+    private final boolean ignoreCaseForString;
+
     @ContextConstructor
-    public static IValue create() {
-        return new V8CompareValues();
+    public static V8CompareValues create() {
+        return create(false);
+    }
+
+    public static V8CompareValues create(boolean ignoreCaseForString) {
+        return new V8CompareValues(ignoreCaseForString);
     }
 
     private V8CompareValues() {
-        // None
+        ignoreCaseForString = false;
+    }
+
+    private V8CompareValues(boolean ignoreCaseForString) {
+        this.ignoreCaseForString = ignoreCaseForString;
     }
 
     @ContextMethod(name = "Сравнить", alias = "Compare")
@@ -50,9 +62,15 @@ public class V8CompareValues extends ContextValue {
         }
 
         try {
-            return r1.compareTo(r2);
+            if (ignoreCaseForString && r1.getDataType() == DataType.STRING) {
+                return r1.asString().compareToIgnoreCase(r2.asString());
+            } else {
+                return r1.compareTo(r2);
+            }
         } catch (Exception ignored) {
+            // none
         }
+
         return r1.asString().compareTo(r2.asString());
     }
 

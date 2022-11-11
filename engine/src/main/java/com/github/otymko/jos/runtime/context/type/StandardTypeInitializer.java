@@ -13,10 +13,13 @@ import com.github.otymko.jos.runtime.context.type.collection.V8FixedStructure;
 import com.github.otymko.jos.runtime.context.type.collection.V8KeyAndValue;
 import com.github.otymko.jos.runtime.context.type.collection.V8Map;
 import com.github.otymko.jos.runtime.context.type.collection.V8Structure;
+import com.github.otymko.jos.runtime.context.type.collection.V8ValueList;
+import com.github.otymko.jos.runtime.context.type.collection.V8ValueListItem;
 import com.github.otymko.jos.runtime.context.type.collection.V8ValueTable;
 import com.github.otymko.jos.runtime.context.type.common.V8RandomNumberGenerator;
 import com.github.otymko.jos.runtime.context.type.common.V8CompareValues;
 import com.github.otymko.jos.runtime.context.type.env.V8SystemInfo;
+import com.github.otymko.jos.runtime.context.type.common.V8Uuid;
 import com.github.otymko.jos.runtime.context.type.file.V8File;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
@@ -101,6 +104,11 @@ public class StandardTypeInitializer {
 
         implementTypeByInfo(typeManager, V8ValueTable.INFO);
         implementTypeByInfo(typeManager, V8CompareValues.INFO);
+
+        implementTypeByInfo(typeManager, V8ValueList.INFO);
+        implementTypeByInfo(typeManager, V8ValueListItem.INFO);
+
+        implementTypeByInfo(typeManager, V8Uuid.INFO);
     }
 
     private void initSystemEnumerations(TypeManager typeManager) {

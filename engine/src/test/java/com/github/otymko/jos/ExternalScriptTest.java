@@ -21,11 +21,6 @@ class ExternalScriptTest extends BaseExternalScriptTest {
     }
 
     @TestFactory
-    Collection<DynamicTest> testArithmetic() throws IOException {
-        return getTestsFromScript(Path.of("src/test/resources/tests/arithmetic.os"));
-    }
-
-    @TestFactory
     Collection<DynamicTest> testDateFunctions() throws IOException {
         return getTestsFromScript(Path.of("src/test/resources/tests/DateFunctions.os"));
     }

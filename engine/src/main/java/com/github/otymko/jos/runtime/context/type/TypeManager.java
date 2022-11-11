@@ -16,6 +16,7 @@ import com.github.otymko.jos.runtime.context.type.enumeration.MessageStatus;
 import com.github.otymko.jos.runtime.context.type.enumeration.SearchDirection;
 import com.github.otymko.jos.runtime.context.type.env.PlatformType;
 import com.github.otymko.jos.runtime.context.type.env.SpecialFolder;
+import com.github.otymko.jos.runtime.context.type.enumeration.SortDirection;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class TypeManager {
         contexts.add(SearchDirection.INFO);
         contexts.add(PlatformType.INFO);
         contexts.add(SpecialFolder.INFO);
+        contexts.add(SortDirection.INFO);
 
         return contexts;
     }
