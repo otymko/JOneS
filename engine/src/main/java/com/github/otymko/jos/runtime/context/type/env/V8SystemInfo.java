@@ -12,8 +12,11 @@ import com.github.otymko.jos.core.annotation.ContextProperty;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.ContextValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.io.IOException;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 @NoArgsConstructor
 @ContextClass(name = "СистемнаяИнформация", alias = "SystemInfo")
@@ -25,9 +28,20 @@ public class V8SystemInfo extends ContextValue {
         return new V8SystemInfo();
     }
 
-    @Getter
     @ContextProperty(name = "Версия", alias = "Version", accessMode = PropertyAccessMode.READ_ONLY)
-    private final String version = "0.2.0"; // FIXME: извлекать из движка
+    public String getVersion() {
+        var manifestStream = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("META-INF/MANIFEST.MF");
+        var manifest = new Manifest();
+        try {
+            manifest.read(manifestStream);
+        } catch (IOException e) {
+            return "";
+        }
+        var versionFromFile = manifest.getMainAttributes().getValue(Attributes.Name.IMPLEMENTATION_VERSION);
+        return versionFromFile == null ? "" : versionFromFile;
+    }
 
     @ContextProperty(name = "ИмяКомпьютера", alias = "MachineName")
     public String getMachineName() {
