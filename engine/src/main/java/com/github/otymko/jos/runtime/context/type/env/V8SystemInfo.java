@@ -18,16 +18,29 @@ import java.io.IOException;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+/**
+ * Содержит описание ключевых параметров среды исполнения
+ */
 @NoArgsConstructor
 @ContextClass(name = "СистемнаяИнформация", alias = "SystemInfo")
 public class V8SystemInfo extends ContextValue {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8SystemInfo.class);
 
+    /**
+     * Создает новый объект СистеимнаяИнформация
+     *
+     * @return СистемнаяИнформация
+     */
     @ContextConstructor
     public static V8SystemInfo constructor() {
         return new V8SystemInfo();
     }
 
+    /**
+     * Возвращает версию движка среды исполнения
+     *
+     * @return Строка с версией движка
+     */
     @ContextProperty(name = "Версия", alias = "Version", accessMode = PropertyAccessMode.READ_ONLY)
     public String getVersion() {
         var manifestStream = Thread.currentThread()
@@ -43,11 +56,21 @@ public class V8SystemInfo extends ContextValue {
         return versionFromFile == null ? "" : versionFromFile;
     }
 
+    /**
+     * Возвразщает имя компьютера среды исполнения
+     *
+     * @return Имя компьютера
+     */
     @ContextProperty(name = "ИмяКомпьютера", alias = "MachineName")
     public String getMachineName() {
         throw MachineException.operationNotImplementedException();
     }
 
+    /**
+     * Возвращает имя и версию операцинной системы среды исполнения
+     *
+     * @return Имя и версия операционной системы
+     */
     @ContextProperty(name = "ВерсияОС", alias = "OSVersion")
     public String getOsVersion() {
         return String.format("%s %s",
@@ -55,6 +78,10 @@ public class V8SystemInfo extends ContextValue {
                 System.getProperty("os.version"));
     }
 
+    /**
+     * Возвращает тип платформы среды исполнения
+     * @return Тип платформы
+     */
     @ContextProperty(name = "ТипПлатформы", alias = "PlatformType")
     public PlatformType getPlatformType() {
         var is64 = getIs64bitOperatingSystem();
@@ -62,27 +89,51 @@ public class V8SystemInfo extends ContextValue {
         return PlatformType.parse(osName, is64);
     }
 
+    /**
+     * Возвращает пользователя операционной системы, от имени которого исполняется скрипт
+     * @return Имя пользователя ОС
+     */
     @ContextProperty(name = "ПользовательОС", alias = "OSUser")
     public String getOsUser() {
         return System.getProperty("user.name");
     }
 
+    /**
+     * Возвращает признак 64-битной операционной системы
+     *
+     * @return Признак 64-битной ОС
+     */
     @ContextProperty(name = "Это64БитнаяОперационнаяСистема", alias = "Is64bitOperatingSystem")
     public boolean getIs64bitOperatingSystem() {
         var arch = System.getProperty("os.arch");
         return arch.endsWith("64");
     }
 
+    /**
+     * Возвращает количество процессоров текущей среды исполнения
+     *
+     * @return Количество процессоров
+     */
     @ContextProperty(name = "КоличествоПроцессоров", alias = "ProcessorCount")
     public int getProcessorCount() {
         return Runtime.getRuntime().availableProcessors();
     }
 
+    /**
+     * Возвращает размер страницы оперативной памяти текущей среды исполнения
+     *
+     * @return Размер страницы
+     */
     @ContextProperty(name = "РазмерСтраницы", alias = "SystemPageSize")
     public int getSystemPageSize() {
         throw MachineException.operationNotImplementedException();
     }
 
+    /**
+     * Возвращает время работы с момента загрузки системы
+     *
+     * @return Время в миллисекундах
+     */
     @ContextProperty(name = "ВремяРаботыСМоментаЗагрузки", alias = "TickCount")
     public long getTickCount() {
         return System.currentTimeMillis();
