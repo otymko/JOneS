@@ -20,7 +20,7 @@ tasks.withType<JavaCompile> {
 
 allprojects {
     group = "com.github.otymko.jos"
-    version = "0.0.1"
+    version = "0.2.0"
 
     repositories {
         mavenCentral()
@@ -38,6 +38,13 @@ allprojects {
             property("sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco/test/jacoco.xml")
         }
     }
+
+    tasks.withType<Jar> {
+        manifest {
+            attributes["Implementation-Version"] = project.version
+        }
+    }
+
 }
 
 subprojects {
