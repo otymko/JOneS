@@ -44,7 +44,7 @@ public enum PlatformType implements EnumType {
      * Операционная система семейства WinNT, архитектура i386
      */
     @EnumValue(name = "Windows_x86", alias = "Windows_x86")
-    Windows_x86,
+    WINDOWS_X86,
 
     /**
      * Операционная система семейства WinNT, архитектура amd64
@@ -69,7 +69,7 @@ public enum PlatformType implements EnumType {
     public static PlatformType parse(String osName, boolean is64) {
         var prepared = osName.toUpperCase();
         if (prepared.contains("WINDOWS"))
-            return is64 ? WINDOWS_X86_64 : Windows_x86;
+            return is64 ? WINDOWS_X86_64 : WINDOWS_X86;
         if (prepared.contains("LINUX"))
             return is64 ? LINUX_X86_64 : LINUX_X86;
         if (prepared.contains("MAC OS"))
