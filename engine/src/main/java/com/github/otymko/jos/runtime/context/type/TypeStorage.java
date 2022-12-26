@@ -10,13 +10,22 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
+/**
+ * Хранилище типов.
+ */
 public class TypeStorage {
+    /**
+     * Соответствие описания типов по именам.
+     */
     @Getter
-    private final Map<String, ContextInfo> types = new HashMap<>();
+    private final Map<String, ContextInfo> types = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    /**
+     * Список контекство перечислений.
+     */
     @Getter
     private final List<EnumerationContext> enumerationContext = new ArrayList<>();
 }

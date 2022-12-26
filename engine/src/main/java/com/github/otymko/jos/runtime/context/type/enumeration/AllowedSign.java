@@ -5,9 +5,9 @@
  */
 package com.github.otymko.jos.runtime.context.type.enumeration;
 
-import com.github.otymko.jos.runtime.context.EnumClass;
+import com.github.otymko.jos.core.annotation.EnumClass;
 import com.github.otymko.jos.runtime.context.EnumType;
-import com.github.otymko.jos.runtime.context.EnumValue;
+import com.github.otymko.jos.core.annotation.EnumValue;
 
 /**
  * Допустимые знаки в Описании типов
@@ -25,6 +25,12 @@ public enum AllowedSign implements EnumType {
      * Не может содерэать отрицательные значения
      */
     @EnumValue(name = "Неотрицательный", alias = "NonNegative")
-    NON_NEGATIVE
+    NON_NEGATIVE;
 
+    public static final EnumerationContext INFO = new EnumerationContext(AllowedSign.class);
+
+    @Override
+    public EnumerationContext getContextInfo() {
+        return INFO;
+    }
 }

@@ -5,9 +5,9 @@
  */
 package com.github.otymko.jos.runtime.context.type.enumeration;
 
-import com.github.otymko.jos.runtime.context.EnumClass;
+import com.github.otymko.jos.core.annotation.EnumClass;
 import com.github.otymko.jos.runtime.context.EnumType;
-import com.github.otymko.jos.runtime.context.EnumValue;
+import com.github.otymko.jos.core.annotation.EnumValue;
 
 /**
  * Части даты
@@ -31,5 +31,12 @@ public enum DateFractions implements EnumType {
      * Время
      */
     @EnumValue(name = "Время", alias = "DatTimeTime")
-    TIME
+    TIME;
+
+    public static final EnumerationContext INFO = new EnumerationContext(DateFractions.class);
+
+    @Override
+    public EnumerationContext getContextInfo() {
+        return INFO;
+    }
 }

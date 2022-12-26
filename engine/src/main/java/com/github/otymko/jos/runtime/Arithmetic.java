@@ -6,8 +6,8 @@
 package com.github.otymko.jos.runtime;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import lombok.experimental.UtilityClass;
@@ -15,11 +15,17 @@ import lombok.experimental.UtilityClass;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * Базовая арифметика примитивных типов.
+ */
 @UtilityClass
 public class Arithmetic {
 
     private static BigDecimal THOUSAND = BigDecimal.valueOf(1000);
 
+    /**
+     * Сложить.
+     */
     public IValue add(IValue one, IValue two) {
         if (one.getDataType() == DataType.STRING) {
             return ValueFactory.create(one.asString() + two.asString());
@@ -33,6 +39,9 @@ public class Arithmetic {
         return ValueFactory.create(one.asNumber().add(two.asNumber()));
     }
 
+    /**
+     * Вычесть.
+     */
     public IValue sub(IValue one, IValue two) {
         if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.NUMBER) {
             var dateAsTime = one.asDate().getTime();
@@ -49,10 +58,16 @@ public class Arithmetic {
         return ValueFactory.create(one.asNumber().subtract(two.asNumber()));
     }
 
+    /**
+     * Умножить.
+     */
     public IValue mul(IValue one, IValue two) {
         return ValueFactory.create(one.asNumber().multiply(two.asNumber()));
     }
 
+    /**
+     * Разделить.
+     */
     public IValue div(IValue one, IValue two) {
         if (two.asNumber().equals(BigDecimal.ZERO)) {
             throw MachineException.divideByZeroException();
@@ -61,6 +76,9 @@ public class Arithmetic {
         return ValueFactory.create(one.asNumber().divide(two.asNumber()));
     }
 
+    /**
+     * Остаток.
+     */
     public IValue mod(IValue one, IValue two) {
         if (two.asNumber().equals(BigDecimal.ZERO)) {
             throw MachineException.divideByZeroException();
@@ -68,8 +86,10 @@ public class Arithmetic {
         return ValueFactory.create(one.asNumber().remainder(two.asNumber()));
     }
 
+    /**
+     * Инвертировать знак числа.
+     */
     public IValue negative(IValue value) {
         return ValueFactory.create(value.asNumber().negate());
     }
-
 }

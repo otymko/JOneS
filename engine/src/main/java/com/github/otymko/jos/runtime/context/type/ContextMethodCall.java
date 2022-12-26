@@ -6,9 +6,9 @@
 package com.github.otymko.jos.runtime.context.type;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.localization.Resources;
+import com.github.otymko.jos.core.localization.Resources;
 import com.github.otymko.jos.runtime.RuntimeContext;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.type.primitive.UndefinedValue;
 import com.github.otymko.jos.runtime.machine.context.ContextValueConverter;
 import com.github.otymko.jos.runtime.machine.info.ConstructorInfo;
@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.otymko.jos.localization.MessageResource.ERROR_CALL_CONSTRUCTOR;
-import static com.github.otymko.jos.localization.MessageResource.ERROR_CALL_METHOD;
+import static com.github.otymko.jos.core.localization.MessageResource.ERROR_CALL_CONSTRUCTOR;
+import static com.github.otymko.jos.core.localization.MessageResource.ERROR_CALL_METHOD;
 
 /**
  * Утилитный класс для упрощения вызова методов контекста
@@ -73,7 +73,8 @@ public final class ContextMethodCall {
             }
             throw new MachineException(Resources.getResourceString(ERROR_CALL_METHOD), exception);
         }
-        return (IValue) result;
+
+        return ContextValueConverter.convertReturnValue(result, method.getReturnType());
     }
 
     /**

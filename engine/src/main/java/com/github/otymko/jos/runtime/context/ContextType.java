@@ -8,7 +8,7 @@ package com.github.otymko.jos.runtime.context;
 import com.github.otymko.jos.runtime.RuntimeContext;
 
 /**
- * Маркер
+ * Маркер для контекстных типов.
  */
 public interface ContextType extends RuntimeContext {
 }

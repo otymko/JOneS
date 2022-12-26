@@ -6,9 +6,9 @@
 package com.github.otymko.jos.runtime;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.localization.Resources;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.PropertyAccessMode;
+import com.github.otymko.jos.core.localization.Resources;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.ContextMethodCall;
 import com.github.otymko.jos.runtime.machine.context.ContextValueConverter;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
@@ -16,12 +16,23 @@ import com.github.otymko.jos.runtime.machine.info.MethodInfo;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static com.github.otymko.jos.localization.MessageResource.*;
+import static com.github.otymko.jos.core.localization.MessageResource.*;
 
+/**
+ * Базовый класс контекста.
+ */
 public interface RuntimeContext {
-
+    /**
+     * Получить описание контекста.
+     */
     ContextInfo getContextInfo();
 
+    /**
+     * Выполнить как процедуру.
+     *
+     * @param methodId Индекс метода.
+     * @param arguments Аргументы.
+     */
     default void callAsProcedure(int methodId, IValue[] arguments) {
         var methodInfo = getContextInfo().getMethods()[methodId];
         var callMethod = methodInfo.getMethod();
@@ -29,6 +40,12 @@ public interface RuntimeContext {
         ContextMethodCall.callAsProcedure(this, callMethod, arguments);
     }
 
+    /**
+     * Выполнить как функцию и вернуть результат.
+     *
+     * @param methodId Индекс метода.
+     * @param arguments Аргументы.
+     */
     default IValue callAsFunction(int methodId, IValue[] arguments) {
         var methodInfo = getContextInfo().getMethods()[methodId];
         var callMethod = methodInfo.getMethod();
@@ -36,6 +53,13 @@ public interface RuntimeContext {
         return ContextMethodCall.callAsFunction(this, callMethod, arguments);
     }
 
+    /**
+     * Найти индекс методы по имени.
+     *
+     * @param name Имя метода.
+     *
+     * @return -1 - если метод не найден.
+     */
     default int findMethodId(String name) {
         var contextInfo = getContextInfo();
         for (var index = 0; index < contextInfo.getMethods().length; index++) {
@@ -47,10 +71,22 @@ public interface RuntimeContext {
         return -1;
     }
 
+    /**
+     * Получить метод по индексу.
+     *
+     * @param methodId Индекс метода.
+     */
     default MethodInfo getMethodById(int methodId) {
         return getContextInfo().getMethods()[methodId];
     }
 
+    /**
+     * Найти свойство по имени.
+     *
+     * @param propertyName Имя свойство.
+     *
+     * @return -1 - если свойство не найден.
+     */
     default int findProperty(String propertyName) {
         int position = 0;
         for (var property : getContextInfo().getProperties()) {
@@ -62,7 +98,11 @@ public interface RuntimeContext {
         return -1;
     }
 
-    // FIXME: переписать на более низкий уровень
+    /**
+     * Получить свойство по индексу.
+     *
+     * @param index Индекс свойства.
+     */
     default IValue getPropertyValue(int index) {
         var property = getContextInfo().getProperties()[index];
         Object result;
@@ -73,18 +113,26 @@ public interface RuntimeContext {
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new MachineException(Resources.getResourceString(ERROR_GET_PROPERTY_VALUE));
             }
-        } else {
-            var field = property.getField();
-            try {
-                result = field.get(this);
-            } catch (IllegalAccessException exception) {
-                throw new MachineException(Resources.getResourceString(ERROR_GET_PROPERTY_VALUE));
-            }
+
+            return ContextValueConverter.convertReturnValue(result, getter.getReturnType());
         }
-        return (IValue) result;
+
+        var field = property.getField();
+        try {
+            result = field.get(this);
+        } catch (IllegalAccessException exception) {
+            throw new MachineException(Resources.getResourceString(ERROR_GET_PROPERTY_VALUE));
+        }
+
+        return ContextValueConverter.convertReturnValue(result, field.getType());
     }
 
-    // FIXME: переписать на более низкий уровень
+    /**
+     * Установить значение свойства.
+     *
+     * @param index Индекс свойства.
+     * @param value Значение свойства.
+     */
     default void setPropertyValue(int index, IValue value) {
         var property = getContextInfo().getProperties()[index];
         if (property.hasSetter()) {
@@ -104,14 +152,23 @@ public interface RuntimeContext {
         }
     }
 
+    /**
+     * Это свойство только для чтения.
+     *
+     * @param index Индекс свойства.
+     */
     default boolean isPropertyReadOnly(int index) {
         var property = getContextInfo().getProperties()[index];
         return property.getAccessMode() == PropertyAccessMode.READ_ONLY;
     }
 
+    /**
+     * Это свойство только для записи.
+     *
+     * @param index Индекс свойства.
+     */
     default boolean isPropertyWriteOnly(int index) {
         var property = getContextInfo().getProperties()[index];
         return property.getAccessMode() == PropertyAccessMode.WRITE_ONLY;
     }
-
 }

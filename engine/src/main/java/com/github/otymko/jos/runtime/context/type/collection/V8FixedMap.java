@@ -6,14 +6,19 @@
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextConstructor;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextConstructor;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 @ContextClass(name = "ФиксированноеСоответствие", alias = "FixedMap")
 public class V8FixedMap extends V8BaseMap {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8FixedMap.class);
+
+    @ContextConstructor
+    public static V8FixedMap constructor(V8Map source) {
+        return new V8FixedMap(source);
+    }
 
     private V8FixedMap() {
         // nope
@@ -29,11 +34,6 @@ public class V8FixedMap extends V8BaseMap {
     @Override
     public ContextInfo getContextInfo() {
         return INFO;
-    }
-
-    @ContextConstructor
-    public static IValue constructor(V8Map source) {
-        return new V8FixedMap(source);
     }
 
     @Override

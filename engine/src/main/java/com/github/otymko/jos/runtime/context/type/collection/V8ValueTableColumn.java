@@ -5,17 +5,14 @@
  */
 package com.github.otymko.jos.runtime.context.type.collection;
 
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextProperty;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.type.typedescription.TypeDescription;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.Objects;
 
 /**
  * Колонка таблицы значений.
@@ -25,42 +22,26 @@ import java.util.Objects;
 @ContextClass(name = "КолонкаТаблицыЗначений", alias = "ValueTableColumn")
 @Builder
 public class V8ValueTableColumn extends ContextValue {
-
     public static final ContextInfo INFO = ContextInfo.createByClass(V8ValueTableColumn.class);
 
     private final V8ValueTable owner;
 
-    private String name;
-    private String title;
-    private TypeDescription valueType;
-    private int width;
-
-    @Getter
-    private IValue defaultValue;
+    private final int id;
 
     @ContextProperty(name = "Имя", alias = "Name")
-    public IValue getName() {
-        return ValueFactory.create(name);
-    }
-
+    @Getter
+    private String name;
     @ContextProperty(name = "Заголовок", alias = "Title")
-    public IValue getTitle() {
-        return ValueFactory.create(title);
-    }
-
+    @Getter
+    private String title;
     @ContextProperty(name = "ТипЗначения", alias = "ValueType")
-    public IValue getValueType() {
-        return valueType;
-    }
-
+    @Getter
+    private TypeDescription valueType;
     @ContextProperty(name = "Ширина", alias = "Width")
-    public IValue getWidth() {
-        return ValueFactory.create(width);
-    }
-
-    String getNameInternal() {
-        return name;
-    }
+    @Getter
+    private int width;
+    @Getter
+    private IValue defaultValue;
 
     @Override
     public ContextInfo getContextInfo() {
@@ -75,29 +56,13 @@ public class V8ValueTableColumn extends ContextValue {
         return valueType.adjustValue(rawValue);
     }
 
-    public V8ValueTableColumn copyTo(V8ValueTable newOwner) {
-        var newBuilder = new V8ValueTableColumnBuilder();
-        return newBuilder.owner(newOwner)
-                .name(name)
-                .title(title)
-                .valueType(valueType)
-                .width(width)
-                .defaultValue(defaultValue)
-                .build();
-    }
-
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof V8ValueTableColumn) {
-            final var castedObject = (V8ValueTableColumn)obj;
-            return castedObject.name.equalsIgnoreCase(name)
-                    && castedObject.owner.equals(owner);
-        }
-        return false;
+        return obj == this;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(owner, name);
+        return id;
     }
 }

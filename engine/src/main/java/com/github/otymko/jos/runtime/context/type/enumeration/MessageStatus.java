@@ -5,9 +5,9 @@
  */
 package com.github.otymko.jos.runtime.context.type.enumeration;
 
-import com.github.otymko.jos.runtime.context.EnumClass;
+import com.github.otymko.jos.core.annotation.EnumClass;
 import com.github.otymko.jos.runtime.context.EnumType;
-import com.github.otymko.jos.runtime.context.EnumValue;
+import com.github.otymko.jos.core.annotation.EnumValue;
 
 @EnumClass(name = "СтатусСообщения", alias = "MessageStatus")
 public enum MessageStatus implements EnumType {
@@ -22,5 +22,12 @@ public enum MessageStatus implements EnumType {
     @EnumValue(name = "Обычное", alias = "Ordinary")
     ORDINARY,
     @EnumValue(name = "ОченьВажное", alias = "VeryImportant")
-    VARY_IMPORTANT
+    VARY_IMPORTANT;
+
+    public static final EnumerationContext INFO = new EnumerationContext(MessageStatus.class);
+
+    @Override
+    public EnumerationContext getContextInfo() {
+        return INFO;
+    }
 }

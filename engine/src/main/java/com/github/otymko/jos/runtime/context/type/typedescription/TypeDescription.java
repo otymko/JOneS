@@ -7,14 +7,14 @@ package com.github.otymko.jos.runtime.context.type.typedescription;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.RuntimeContext;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextConstructor;
-import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.ContextProperty;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextConstructor;
+import com.github.otymko.jos.core.annotation.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.PropertyAccessMode;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.PropertyAccessMode;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
@@ -46,39 +46,6 @@ public class TypeDescription extends ContextValue {
 
     @ContextProperty(name = "КвалификаторыДвоичныхДанных", alias = "BinaryDataQualifiers", accessMode = PropertyAccessMode.READ_ONLY)
     BinaryDataQualifiers binaryDataQualifiers;
-
-    @ContextMethod(name = "Типы", alias = "Types")
-    public V8Array types() {
-        final var result = V8Array.create();
-        for (final var type : types) {
-            result.add(type);
-        }
-        return result;
-    }
-
-    private boolean containsTypeInternal(TypeValue typeValue) {
-        return types.stream().anyMatch(tv -> tv.equals(typeValue));
-    }
-
-    @ContextMethod(name = "СодержитТип", alias = "ContainsType")
-    public IValue containsType(IValue type) {
-        if (type == null) {
-            throw MachineException.invalidArgumentValueException();
-        }
-        final var typeRaw = type.getRawValue();
-        if (!(typeRaw instanceof TypeValue)) {
-            throw MachineException.invalidArgumentValueException();
-        }
-        return ValueFactory.create(containsTypeInternal((TypeValue) typeRaw));
-    }
-
-    private boolean adjustAsBoolean(IValue value) {
-        try {
-            return value.asBoolean();
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
     @ContextMethod(name = "ПривестиЗначение", alias = "AdjustValue")
     public IValue adjustValue(IValue value) {
@@ -172,6 +139,40 @@ public class TypeDescription extends ContextValue {
         }
 
         return builder.build();
+    }
+
+    @ContextMethod(name = "Типы", alias = "Types")
+    public V8Array types() {
+        final var result = V8Array.create();
+        for (final var type : types) {
+            result.add(type);
+        }
+        return result;
+    }
+
+    private boolean containsTypeInternal(TypeValue typeValue) {
+        return types.stream().anyMatch(tv -> tv.equals(typeValue));
+    }
+
+    @ContextMethod(name = "СодержитТип", alias = "ContainsType")
+    public boolean containsType(IValue type) {
+        if (type == null) {
+            throw MachineException.invalidArgumentValueException();
+        }
+        final var typeRaw = type.getRawValue();
+        if (!(typeRaw instanceof TypeValue)) {
+            throw MachineException.invalidArgumentValueException();
+        }
+
+        return containsTypeInternal((TypeValue) typeRaw);
+    }
+
+    private boolean adjustAsBoolean(IValue value) {
+        try {
+            return value.asBoolean();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

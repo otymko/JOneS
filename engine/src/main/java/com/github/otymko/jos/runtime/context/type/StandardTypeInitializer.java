@@ -5,13 +5,20 @@
  */
 package com.github.otymko.jos.runtime.context.type;
 
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.collection.V8Array;
 import com.github.otymko.jos.runtime.context.type.collection.V8FixedArray;
 import com.github.otymko.jos.runtime.context.type.collection.V8FixedMap;
+import com.github.otymko.jos.runtime.context.type.collection.V8FixedStructure;
 import com.github.otymko.jos.runtime.context.type.collection.V8KeyAndValue;
 import com.github.otymko.jos.runtime.context.type.collection.V8Map;
 import com.github.otymko.jos.runtime.context.type.collection.V8Structure;
+import com.github.otymko.jos.runtime.context.type.collection.V8ValueList;
+import com.github.otymko.jos.runtime.context.type.collection.V8ValueListItem;
 import com.github.otymko.jos.runtime.context.type.collection.V8ValueTable;
+import com.github.otymko.jos.runtime.context.type.common.V8RandomNumberGenerator;
+import com.github.otymko.jos.runtime.context.type.common.V8CompareValues;
+import com.github.otymko.jos.runtime.context.type.common.V8Uuid;
 import com.github.otymko.jos.runtime.context.type.file.V8File;
 import com.github.otymko.jos.runtime.context.type.primitive.BooleanValue;
 import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
@@ -29,9 +36,16 @@ import com.github.otymko.jos.runtime.context.type.typedescription.TypeDescriptio
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.experimental.UtilityClass;
 
+/**
+ * Инициализация стандартных типов.
+ */
 @UtilityClass
 public class StandardTypeInitializer {
-
+    /**
+     * Инициализацировать стандартные типы.
+     *
+     * @param typeManager Менеджер типов.
+     */
     public void initialize(TypeManager typeManager) {
         initPrimitives(typeManager);
         initSystemEnumerations(typeManager);
@@ -72,6 +86,7 @@ public class StandardTypeInitializer {
         implementTypeByInfo(typeManager, V8FixedArray.INFO);
         implementTypeByInfo(typeManager, V8KeyAndValue.INFO);
         implementTypeByInfo(typeManager, V8Structure.INFO);
+        implementTypeByInfo(typeManager, V8FixedStructure.INFO);
         implementTypeByInfo(typeManager, V8Map.INFO);
         implementTypeByInfo(typeManager, V8FixedMap.INFO);
 
@@ -83,12 +98,18 @@ public class StandardTypeInitializer {
 
         implementTypeByInfo(typeManager, Regex.INFO);
         implementTypeByInfo(typeManager, V8File.INFO);
+        implementTypeByInfo(typeManager, V8RandomNumberGenerator.INFO);
 
         implementTypeByInfo(typeManager, V8ValueTable.INFO);
+        implementTypeByInfo(typeManager, V8CompareValues.INFO);
+
+        implementTypeByInfo(typeManager, V8ValueList.INFO);
+        implementTypeByInfo(typeManager, V8ValueListItem.INFO);
+
+        implementTypeByInfo(typeManager, V8Uuid.INFO);
     }
 
     private void initSystemEnumerations(TypeManager typeManager) {
         typeManager.getEnumerationContext().forEach(context -> implementTypeByInfo(typeManager, context.getContextInfo()));
     }
-
 }

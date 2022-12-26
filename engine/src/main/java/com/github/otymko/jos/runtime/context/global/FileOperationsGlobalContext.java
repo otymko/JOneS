@@ -5,36 +5,29 @@
  */
 package com.github.otymko.jos.runtime.context.global;
 
-import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.AttachableContext;
-import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.GlobalContextClass;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.ValueFactory;
-import com.github.otymko.jos.runtime.context.type.primitive.StringValue;
+import com.github.otymko.jos.core.annotation.ContextMethod;
+import com.github.otymko.jos.core.annotation.GlobalContextClass;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
 
 import java.nio.file.Path;
 import java.security.SecureRandom;
 
+/**
+ * Глобальный контекст по работе с файлами.
+ */
 @GlobalContextClass
 @NoArgsConstructor
 public class FileOperationsGlobalContext implements AttachableContext {
     public static final ContextInfo INFO = ContextInfo.createByClass(FileOperationsGlobalContext.class);
 
     private static final SecureRandom random = new SecureRandom();
-
     private static final String PROPERTY_TMPDIR = "java.io.tmpdir";
     private static final String TMP_PREFIX = "tmp";
 
-    @Override
-    public ContextInfo getContextInfo() {
-        return INFO;
-    }
-
     @ContextMethod(name = "ПолучитьИмяВременногоФайла", alias = "GetTempFileName")
-    public static IValue getTempFileName(String extension) {
+    public static String getTempFileName(String extension) {
         String suffix = "";
         if (extension != null) {
             suffix = "." + extension;
@@ -42,9 +35,8 @@ public class FileOperationsGlobalContext implements AttachableContext {
 
         String tmpDirectory = System.getProperty(PROPERTY_TMPDIR);
         String fileName = getRandomFileName(suffix);
-        String pathToFile = Path.of(tmpDirectory, fileName).toString();
 
-        return ValueFactory.create(pathToFile);
+        return Path.of(tmpDirectory, fileName).toString();
     }
 
     private static String getRandomFileName(String extension) {
@@ -54,5 +46,10 @@ public class FileOperationsGlobalContext implements AttachableContext {
         }
 
         return name;
+    }
+
+    @Override
+    public ContextInfo getContextInfo() {
+        return INFO;
     }
 }

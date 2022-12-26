@@ -6,10 +6,10 @@
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.runtime.context.CollectionIterable;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.PropertyNameAccessor;
@@ -42,7 +42,7 @@ public class V8ValueTableRow extends ContextValue implements IndexAccessor, Prop
     }
 
     @ContextMethod(name="Владелец", alias="Owner")
-    public IValue owner() {
+    public V8ValueTable owner() {
         return owner;
     }
 
@@ -70,7 +70,9 @@ public class V8ValueTableRow extends ContextValue implements IndexAccessor, Prop
     }
 
     void setIndexedValueInternal(V8ValueTableColumn column, IValue value) {
+        owner.removeRowFromIndexes(this);
         data.put(column, column.adjustValue(value));
+        owner.addRowToIndexes(this);
     }
 
     @Override
@@ -99,7 +101,12 @@ public class V8ValueTableRow extends ContextValue implements IndexAccessor, Prop
         return getIndexedValue(index);
     }
 
-    void columnDeleted(V8ValueTableColumn column) {
+    @ContextMethod(name = "Установить", alias = "Set")
+    public void set(IValue index, IValue value) {
+        setIndexedValue(index, value);
+    }
+
+    void columnRemoved(V8ValueTableColumn column) {
         data.remove(column);
     }
 }

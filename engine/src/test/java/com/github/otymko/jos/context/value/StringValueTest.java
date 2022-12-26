@@ -5,8 +5,8 @@
  */
 package com.github.otymko.jos.context.value;
 
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class StringValueTest {
-
     @Test
     void test() {
         var trueValue = ValueFactory.create("ИстИНа");
@@ -51,5 +50,4 @@ class StringValueTest {
 
         // TODO: date -> object && true -> number
     }
-
 }

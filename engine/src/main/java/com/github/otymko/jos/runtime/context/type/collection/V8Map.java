@@ -5,17 +5,32 @@
  */
 package com.github.otymko.jos.runtime.context.type.collection;
 
-import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextConstructor;
-import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextConstructor;
+import com.github.otymko.jos.core.annotation.ContextMethod;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 @ContextClass(name = "Соответствие", alias = "Map")
 public class V8Map extends V8BaseMap {
     public static final ContextInfo INFO = ContextInfo.createByClass(V8Map.class);
+
+    @ContextConstructor
+    public static V8Map constructor() {
+        return new V8Map();
+    }
+
+    @ContextConstructor
+    public static V8Map constructor(V8FixedMap fixedMap) {
+        final var result = new V8Map();
+        for (final var value : fixedMap.iterator()) {
+            final var element = (V8KeyAndValue) value;
+            result.insert(element.getKey(), element.getValue());
+        }
+
+        return result;
+    }
 
     private V8Map() {
         // nope
@@ -24,22 +39,6 @@ public class V8Map extends V8BaseMap {
     @Override
     public ContextInfo getContextInfo() {
         return INFO;
-    }
-
-    @ContextConstructor
-    public static IValue constructor() {
-        return new V8Map();
-    }
-
-    @ContextConstructor
-    public static IValue constructor(V8FixedMap fixedMap) {
-        final var result = new V8Map();
-        for (final var value : fixedMap.iterator()) {
-            final var element = (V8KeyAndValue) value;
-            result.insert(element.getKey(), element.getValue());
-        }
-
-        return result;
     }
 
     // region ContextMethod

@@ -5,8 +5,8 @@
  */
 package com.github.otymko.jos.util;
 
-import com.github.otymko.jos.localization.MessageResource;
-import com.github.otymko.jos.localization.Resources;
+import com.github.otymko.jos.core.localization.MessageResource;
+import com.github.otymko.jos.core.localization.Resources;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 

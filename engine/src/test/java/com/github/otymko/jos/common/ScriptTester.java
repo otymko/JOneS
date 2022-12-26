@@ -7,11 +7,11 @@ package com.github.otymko.jos.common;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.RuntimeContext;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextType;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.TypeManager;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.primitive.TypeValue;
@@ -70,9 +70,12 @@ public class ScriptTester implements ContextType, IValue {
 
         if (!oneValueRaw.equals(twoValueRaw)) {
             // TODO: локализация
-            // TODO: использование additionalErrorMessage
-            final var errorMessage = String.format("Сравниваемые значения (%s; %s) не равны, а хотели, чтобы были равны.",
+            var errorMessage = String.format("Сравниваемые значения (%s; %s) не равны, а хотели, чтобы были равны.",
                     oneValueRaw.asString(), twoValueRaw.asString());
+            var additionalString = ValueFactory.rawValueOrUndefined(additionalErrorMessage).asString();
+            if (!additionalString.isBlank()) {
+                errorMessage = String.format("%s: %s", errorMessage, additionalString);
+            }
             throw new MachineException(errorMessage);
         }
     }
@@ -84,9 +87,12 @@ public class ScriptTester implements ContextType, IValue {
 
         if (oneValueRaw.equals(twoValueRaw)) {
             // TODO: локализация
-            // TODO: использование additionalErrorMessage
-            final var errorMessage = String.format("Сравниваемые значения (%s; %s) равны, а хотели, чтобы были не равны.",
+            var errorMessage = String.format("Сравниваемые значения (%s; %s) равны, а хотели, чтобы были не равны.",
                     oneValueRaw.asString(), twoValueRaw.asString());
+            var additionalString = ValueFactory.rawValueOrUndefined(additionalErrorMessage).asString();
+            if (!additionalString.isBlank()) {
+                errorMessage = String.format("%s: %s", errorMessage, additionalString);
+            }
             throw new MachineException(errorMessage);
         }
     }
@@ -129,7 +135,19 @@ public class ScriptTester implements ContextType, IValue {
         }
     }
 
-    // ПроверитьМеньшеИлиРавно
+    @ContextMethod(name = "ПроверитьМеньшеИлиРавно", alias = "CheckLessOrEquals")
+    public static void CheckLessOrEquals(IValue oneValue, IValue twoValue, IValue additionalErrorMessage) {
+        var oneValueRaw = oneValue.getRawValue();
+        var twoValueRaw = twoValue.getRawValue();
+
+        if (oneValueRaw.compareTo(twoValueRaw) > 0) {
+            // TODO: локализация
+            // TODO: использование additionalErrorMessage
+            final var errorMessage = String.format("Ожидали, что %s меньше или равно %s.",
+                    oneValueRaw.asString(), twoValueRaw.asString());
+            throw new MachineException(errorMessage);
+        }
+    }
 
     // ПроверитьЗаполненность
 
@@ -157,6 +175,21 @@ public class ScriptTester implements ContextType, IValue {
                     rawValue.asString(), type.asString(), typeEquals.asString());
             throw new MachineException(errorMessage);
         }
+    }
+
+    @ContextMethod(name = "ТестПройден", alias = "TestPassed")
+    public static void testPassed(){
+        // None
+    }
+
+    @ContextMethod(name = "ТестПровален", alias = "TestFailed")
+    public static void testFailed(IValue additionalErrorMessage){
+        var message = "Тест провален.";
+        if (additionalErrorMessage != null && additionalErrorMessage.getDataType() != DataType.UNDEFINED) {
+            message += additionalErrorMessage.asString();
+        }
+
+        throw new MachineException(message);
     }
 
     // модуль Ожидаем

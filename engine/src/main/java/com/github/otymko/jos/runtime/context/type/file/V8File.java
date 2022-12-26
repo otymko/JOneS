@@ -6,17 +6,17 @@
 package com.github.otymko.jos.runtime.context.type.file;
 
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextConstructor;
-import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.ContextProperty;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextConstructor;
+import com.github.otymko.jos.core.annotation.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.PropertyAccessMode;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.file.exception.FileAttributeException;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
-import com.github.otymko.jos.util.Common;
+import com.github.otymko.jos.util.CommonUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class V8File extends ContextValue {
     private final File file;
 
     @ContextConstructor
-    public static IValue createByPath(String path) {
+    public static V8File createByPath(String path) {
         return new V8File(path);
     }
 
@@ -52,30 +52,28 @@ public class V8File extends ContextValue {
     }
 
     @ContextProperty(name = "Имя", alias = "Name", accessMode = PropertyAccessMode.READ_ONLY)
-    public IValue getName() {
-        return ValueFactory.create(file.getName());
+    public String getName() {
+        return file.getName();
     }
 
     @ContextProperty(name = "ИмяБезРасширения", alias = "BaseName", accessMode = PropertyAccessMode.READ_ONLY)
-    public IValue getBaseName() {
+    public String getBaseName() {
         var fileName = file.getName();
         if (fileName.contains(".")) {
             fileName = fileName.substring(0, fileName.lastIndexOf(".") - 1);
         }
 
-        return ValueFactory.create(fileName);
+        return fileName;
     }
 
     @ContextProperty(name = "Расширение", alias = "Extension", accessMode = PropertyAccessMode.READ_ONLY)
-    public IValue getExtension() {
+    public String getExtension() {
         var fileName = file.getName();
         if (!fileName.contains(".")) {
-            return ValueFactory.create("");
+            return "";
         }
 
-        var currentExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
-
-        return ValueFactory.create(currentExtension);
+        return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 
     @ContextProperty(name = "ПолноеИмя", alias = "FullName", accessMode = PropertyAccessMode.READ_ONLY)
@@ -145,7 +143,7 @@ public class V8File extends ContextValue {
 
     @ContextMethod(name = "УстановитьНевидимость", alias = "SetHidden")
     public void setHidden(boolean value) {
-        if (Common.isWindows()) {
+        if (CommonUtils.isWindows()) {
             return;
         }
 

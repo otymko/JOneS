@@ -7,13 +7,12 @@ package com.github.otymko.jos.runtime.context.type.regex;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
-import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.ArrayList;
@@ -38,13 +37,13 @@ public class RegexGroupCollection extends ContextValue implements CollectionIter
     }
 
     @ContextMethod(name = "Количество", alias = "Count")
-    public IValue getCount() {
-        return ValueFactory.create(result.groupCount() + 1);
+    public int getCount() {
+        return result.groupCount() + 1;
     }
 
-    public IValue getByName(IValue inputName) {
+    public String getByName(IValue inputName) {
         // TODO: не реализовано
-        return ValueFactory.create();
+        return null;
     }
 
 

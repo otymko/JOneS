@@ -6,15 +6,18 @@
 package com.github.otymko.jos.runtime.machine.info;
 
 import com.github.otymko.jos.runtime.RuntimeContext;
-import com.github.otymko.jos.runtime.context.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextInitializer;
-import com.github.otymko.jos.runtime.context.EnumClass;
-import com.github.otymko.jos.runtime.context.EnumValue;
-import com.github.otymko.jos.runtime.context.GlobalContextClass;
+import com.github.otymko.jos.core.annotation.EnumClass;
+import com.github.otymko.jos.core.annotation.EnumValue;
+import com.github.otymko.jos.core.annotation.GlobalContextClass;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
+/**
+ * Информация о контексте.
+ */
 @Value
 @Builder
 @EqualsAndHashCode
@@ -45,6 +48,11 @@ public class ContextInfo {
      */
     ConstructorInfo[] constructors;
 
+    /**
+     * Создать информацию о контексте по его классу контекста.
+     *
+     * @param typeClass Класс контекста.
+     */
     public static ContextInfo createByClass(Class<? extends RuntimeContext> typeClass) {
         if (typeClass.getAnnotation(GlobalContextClass.class) != null) {
             return createByGlobalContextClass(typeClass);
@@ -53,6 +61,11 @@ public class ContextInfo {
         }
     }
 
+    /**
+     * Создать информацию о контексте по значению перечисления.
+     *
+     * @param enumValue Значение перечисления.
+     */
     public static ContextInfo createByEnumValue(EnumValue enumValue) {
         var builder = ContextInfo.builder();
         builder.name(enumValue.name());
@@ -64,10 +77,15 @@ public class ContextInfo {
         return builder.build();
     }
 
-    public static ContextInfo createByEnumClass(EnumClass enumValue) {
+    /**
+     * Создать информацию о контексте по классу перечисления.
+     *
+     * @param enumClass Класс перечисления.
+     */
+    public static ContextInfo createByEnumClass(EnumClass enumClass) {
         var builder = ContextInfo.builder();
-        builder.name(enumValue.name());
-        builder.alias(enumValue.alias());
+        builder.name(enumClass.name());
+        builder.alias(enumClass.alias());
         builder.typeClass(null);
         builder.methods(new MethodInfo[0]);
         builder.properties(new PropertyInfo[0]);

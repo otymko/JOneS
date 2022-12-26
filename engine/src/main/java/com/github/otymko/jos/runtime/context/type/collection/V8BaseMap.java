@@ -6,9 +6,9 @@
 package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.runtime.context.CollectionIterable;
-import com.github.otymko.jos.runtime.context.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
@@ -26,8 +26,8 @@ public abstract class V8BaseMap extends ContextValue implements IndexAccessor, C
     // region ContextMethod
 
     @ContextMethod(name = "Количество", alias = "Count")
-    public IValue count() {
-        return ValueFactory.create(data.size());
+    public int count() {
+        return data.size();
     }
 
     @ContextMethod(name = "Получить", alias = "Get")

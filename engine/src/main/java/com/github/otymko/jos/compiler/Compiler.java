@@ -11,7 +11,7 @@ import com.github._1c_syntax.bsl.parser.BSLParserRuleContext;
 import com.github.otymko.jos.exception.CompilerException;
 import com.github.otymko.jos.module.ModuleImageCache;
 import com.github.otymko.jos.runtime.SymbolType;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.Command;
 import com.github.otymko.jos.runtime.machine.OperationCode;
@@ -28,9 +28,10 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
+import java.util.StringJoiner;
 
 /**
- * Компилятор в опкод
+ * Компилятор модулей.
  */
 public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     private static final String ENTRY_METHOD_NAME = "$entry";
@@ -42,32 +43,37 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
      * Обработка аннотаций
      */
     private final AnnotationProcessing annotationProcessing;
-
     private final List<Integer> currentCommandReturnInMethod = new ArrayList<>();
     private final Deque<Compiler.NestedLoopInfo> nestedLoops = new ArrayDeque<>();
-
-    private MethodDescriptor currentMethodDescriptor;
+    private MethodDefinition currentMethodDefinition;
     private SymbolScope localScope;
 
-    @Data
-    private static class NestedLoopInfo {
-        private int startPoint = DUMMY_ADDRESS;
-        private List<Integer> breakStatements = new ArrayList<>();
-        private int tryNesting = 0;
-
-        private NestedLoopInfo() {
-            // none
+    private static void checkFactNativeMethodArguments(ParameterInfo[] parameters, int factArguments) {
+        if (factArguments > parameters.length) {
+            throw CompilerException.tooManyMethodArgumentsException();
         }
 
-        public static Compiler.NestedLoopInfo create() {
-            return new Compiler.NestedLoopInfo();
+        for (var position = factArguments; position < parameters.length; position++) {
+            var parameter = parameters[factArguments];
+            if (!parameter.hasDefaultValue()) {
+                throw CompilerException.tooFewMethodArgumentsException();
+            }
+        }
+    }
+
+    private static String extractStringFromConstValue(BSLParser.StringContext context) {
+        String value;
+        if (context.multilineString().size() > 0) {
+            var joiner = new StringJoiner("\n");
+            context.multilineString().get(0).children.forEach(token -> {
+                joiner.add(StringLineCleaner.cleanFromPipelineSymbol(token.getText()));
+            });
+            value = StringLineCleaner.clean(joiner.toString());
+        } else {
+            value = StringLineCleaner.clean(context.getText());
         }
 
-        public static Compiler.NestedLoopInfo create(int startIndex) {
-            var loop = new Compiler.NestedLoopInfo();
-            loop.setStartPoint(startIndex);
-            return loop;
-        }
+        return value;
     }
 
     public Compiler(ModuleImageCache imageCache, ScriptCompiler compiler) {
@@ -170,7 +176,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         for (var variable : variables) {
             var name = variable.var_name().getText();
             var variableInfo = new VariableInfo(name);
-            currentMethodDescriptor.getVariables().add(variableInfo);
+            currentMethodDefinition.getVariables().add(variableInfo);
 
             localScope.getVariables().add(variableInfo);
             localScope.getVariableNumbers().put(name.toUpperCase(Locale.ENGLISH), localScope.getVariables().indexOf(variableInfo));
@@ -195,8 +201,8 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     public ParseTree visitStatement(BSLParser.StatementContext statement) {
         int numberLint = statement.getStart().getLine();
         addCommand(OperationCode.LINE_NUM, numberLint);
-        if (currentMethodDescriptor != null && currentMethodDescriptor.getEntry() == DUMMY_ADDRESS) {
-            currentMethodDescriptor.setEntry(imageCache.getCode().size() - 1);
+        if (currentMethodDefinition != null && currentMethodDefinition.getEntry() == DUMMY_ADDRESS) {
+            currentMethodDefinition.setEntry(imageCache.getCode().size() - 1);
         }
         return super.visitStatement(statement);
     }
@@ -389,12 +395,12 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     public ParseTree visitReturnStatement(BSLParser.ReturnStatementContext returnStatement) {
         super.visitReturnStatement(returnStatement);
 
-        assert currentMethodDescriptor != null;
+        assert currentMethodDefinition != null;
 
-        if (currentMethodDescriptor.isBodyMethod()) {
+        if (currentMethodDefinition.isBodyMethod()) {
             throw CompilerException.returnStatementOutsideMethod();
         }
-        if (currentMethodDescriptor.getSignature().isFunction()) {
+        if (currentMethodDefinition.getSignature().isFunction()) {
             addCommand(OperationCode.MAKE_RAW_VALUE, 0);
         }
         var indexJump = addCommand(OperationCode.JMP, DUMMY_ADDRESS);
@@ -552,23 +558,6 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         return acceptor;
     }
 
-    private void processModifier(List<? extends BSLParser.ModifierContext> modifierList) {
-        if (modifierList == null) {
-            return;
-        }
-        for (final var modifier : modifierList) {
-            if (modifier.accessCall() != null) {
-                processAccessCall(modifier.accessCall(), true);
-            } else if (modifier.accessProperty() != null) {
-                visitAccessProperty(modifier.accessProperty());
-            } else if (modifier.accessIndex() != null) {
-                visitAccessIndex(modifier.accessIndex());
-            } else {
-                visitModifier(modifier);
-            }
-        }
-    }
-
     @Override
     public ParseTree visitAccessIndex(BSLParser.AccessIndexContext ctx) {
         visitExpression(ctx.expression());
@@ -588,7 +577,24 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         return accessProperty;
     }
 
-    private MethodDescriptor createMethodDescriptor(BSLParser.SubContext subContext) {
+    private void processModifier(List<? extends BSLParser.ModifierContext> modifierList) {
+        if (modifierList == null) {
+            return;
+        }
+        for (final var modifier : modifierList) {
+            if (modifier.accessCall() != null) {
+                processAccessCall(modifier.accessCall(), true);
+            } else if (modifier.accessProperty() != null) {
+                visitAccessProperty(modifier.accessProperty());
+            } else if (modifier.accessIndex() != null) {
+                visitAccessIndex(modifier.accessIndex());
+            } else {
+                visitModifier(modifier);
+            }
+        }
+    }
+
+    private MethodDefinition createMethodDescriptor(BSLParser.SubContext subContext) {
         boolean isFunction;
         String methodName;
         BSLParser.ParamListContext parametersList;
@@ -610,16 +616,16 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         var annotationDefinitions = annotationProcessing.getAnnotationsFromContext(annotations);
         var methodInfo = new MethodInfo(methodName, methodName, isFunction, parameterInfos, annotationDefinitions);
 
-        var methodDescriptor = new MethodDescriptor();
+        var methodDescriptor = new MethodDefinition();
         methodDescriptor.setSignature(methodInfo);
         return methodDescriptor;
     }
 
-    private MethodDescriptor createMethodDescriptorFromBody() {
+    private MethodDefinition createMethodDescriptorFromBody() {
         var methodInfo = new MethodInfo(ENTRY_METHOD_NAME, ENTRY_METHOD_NAME, false, new ParameterInfo[0],
                 new AnnotationDefinition[0]);
 
-        var methodDescriptor = new MethodDescriptor();
+        var methodDescriptor = new MethodDefinition();
         methodDescriptor.setSignature(methodInfo);
         methodDescriptor.setBodyMethod(true);
         return methodDescriptor;
@@ -672,7 +678,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         return parameterInfos;
     }
 
-    private MethodDescriptor getMethodDescriptor(String name) {
+    private MethodDefinition getMethodDescriptor(String name) {
         // TODO: поиск в локальной мапе
 
         //noinspection OptionalGetWithoutIsPresent
@@ -876,8 +882,7 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
                                                                  boolean isDefaultValue) {
         ConstantDefinition constant;
         if (constValue.string() != null) {
-            var value = constValue.string().getText();
-            value = StringLineCleaner.clean(value);
+            String value = extractStringFromConstValue(constValue.string());
             constant = new ConstantDefinition(ValueFactory.create(value));
         } else if (constValue.numeric() != null) {
             var value = new BigDecimal(constValue.numeric().getText());
@@ -907,7 +912,6 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     private void processComplexIdentifier(BSLParser.ComplexIdentifierContext complexIdentifierContext) {
         if (complexIdentifierContext.globalMethodCall() != null) {
             processGlobalStatement(complexIdentifierContext.globalMethodCall());
-            return;
         } else if (complexIdentifierContext.newExpression() != null) {
             processNewExpression(complexIdentifierContext.newExpression());
             return;
@@ -916,10 +920,13 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
             return;
         }
 
-        processIdentifier(complexIdentifierContext.IDENTIFIER().getText());
+        if (complexIdentifierContext.IDENTIFIER() != null) {
+            processIdentifier(complexIdentifierContext.IDENTIFIER().getText());
+        }
 
-        // проверим, что идет дальше
-        processModifier(complexIdentifierContext.modifier());
+        if (complexIdentifierContext.modifier() != null) {
+            processModifier(complexIdentifierContext.modifier());
+        }
     }
 
     private void processUnaryModifier(BSLParser.UnaryModifierContext child, Deque<ExpressionOperator> operators) {
@@ -1116,37 +1123,37 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
     }
 
     private void prepareModuleMethod(String methodName, boolean isBodyMethod) {
-        currentMethodDescriptor = getMethodDescriptor(methodName);
+        currentMethodDefinition = getMethodDescriptor(methodName);
 
         localScope = new SymbolScope();
         compiler.getModuleContext().pushScope(localScope);
 
         if (!isBodyMethod) {
-            addParametersToCurrentScope(currentMethodDescriptor.getSignature().getParameters());
+            addParametersToCurrentScope(currentMethodDefinition.getSignature().getParameters());
         }
     }
 
     private void pruneContextModuleMethod() {
         currentCommandReturnInMethod.clear();
-        currentMethodDescriptor = null;
+        currentMethodDefinition = null;
         compiler.getModuleContext().popScope(localScope);
         localScope = null;
     }
 
     private void processMethodEnd(boolean isBody) {
         if (isBody) {
-            if (currentMethodDescriptor.getEntry() >= 0) {
+            if (currentMethodDefinition.getEntry() >= 0) {
                 imageCache.setEntryPoint(imageCache.getMethods().size() - 1);
             }
         } else {
             var indexEndMethod = addReturn();
             currentCommandReturnInMethod.forEach(index -> correctCommandArgument(index, indexEndMethod));
-            if (currentMethodDescriptor.getEntry() == DUMMY_ADDRESS) {
-                currentMethodDescriptor.setEntry(indexEndMethod);
+            if (currentMethodDefinition.getEntry() == DUMMY_ADDRESS) {
+                currentMethodDefinition.setEntry(indexEndMethod);
             }
         }
 
-        currentMethodDescriptor.getVariables().addAll(localScope.getVariables());
+        currentMethodDefinition.getVariables().addAll(localScope.getVariables());
     }
 
     private void addHiddenReturnForMethod() {
@@ -1194,17 +1201,24 @@ public class Compiler extends BSLParserBaseVisitor<ParseTree> {
         return imageCache.getConstants().indexOf(constant);
     }
 
-    private static void checkFactNativeMethodArguments(ParameterInfo[] parameters, int factArguments) {
-        if (factArguments > parameters.length) {
-            throw CompilerException.tooManyMethodArgumentsException();
+    @Data
+    private static class NestedLoopInfo {
+        private int startPoint = DUMMY_ADDRESS;
+        private List<Integer> breakStatements = new ArrayList<>();
+        private int tryNesting = 0;
+
+        private NestedLoopInfo() {
+            // none
         }
 
-        for (var position = factArguments; position < parameters.length; position++) {
-            var parameter = parameters[factArguments];
-            if (!parameter.hasDefaultValue()) {
-                throw CompilerException.tooFewMethodArgumentsException();
-            }
+        public static Compiler.NestedLoopInfo create() {
+            return new Compiler.NestedLoopInfo();
+        }
+
+        public static Compiler.NestedLoopInfo create(int startIndex) {
+            var loop = new Compiler.NestedLoopInfo();
+            loop.setStartPoint(startIndex);
+            return loop;
         }
     }
-
 }

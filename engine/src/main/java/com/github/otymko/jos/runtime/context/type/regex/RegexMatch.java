@@ -5,12 +5,10 @@
  */
 package com.github.otymko.jos.runtime.context.type.regex;
 
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextProperty;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.PropertyAccessMode;
-import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.core.PropertyAccessMode;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.regex.MatchResult;
@@ -24,16 +22,16 @@ public class RegexMatch extends ContextValue {
     private final Pattern pattern;
 
     @ContextProperty(name = "Значение", alias = "Value", accessMode = PropertyAccessMode.READ_ONLY)
-    private final IValue value;
+    private final String value;
 
     @ContextProperty(name = "Индекс", alias = "Index", accessMode = PropertyAccessMode.READ_ONLY)
-    private final IValue index;
+    private final int index;
 
     @ContextProperty(name = "Длина", alias = "Index", accessMode = PropertyAccessMode.READ_ONLY)
-    private final IValue length;
+    private final int length;
 
     @ContextProperty(name = "Группы", alias = "Groups", accessMode = PropertyAccessMode.READ_ONLY)
-    private final IValue groups;
+    private final RegexGroupCollection groups;
 
     @Override
     public ContextInfo getContextInfo() {
@@ -44,9 +42,9 @@ public class RegexMatch extends ContextValue {
         this.result = result;
         this.pattern = pattern;
 
-        value = ValueFactory.create(result.group());
-        index = ValueFactory.create(result.start());
-        length = ValueFactory.create(result.group().length());
+        value = result.group();
+        index = result.start();
+        length = result.group().length();
         groups = new RegexGroupCollection(result, pattern);
     }
 

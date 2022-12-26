@@ -7,14 +7,14 @@ package com.github.otymko.jos.runtime.context.type.collection;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextConstructor;
-import com.github.otymko.jos.runtime.context.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextConstructor;
+import com.github.otymko.jos.core.annotation.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.AccessLevel;
@@ -45,41 +45,31 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     }
 
     /**
-     * Создать новый массив на основании фиксированного массива или числа.
+     * Создать новый массив на основании списка значений.
      *
-     * @param value Фиксированный массив или число.
+     * @param values список значений.
      */
     @ContextConstructor
-    public static IValue createByValue(IValue value) {
-        if (value.getDataType() == DataType.NUMBER) {
-            return new V8Array(value);
-        } else if (value instanceof V8FixedArray) {
-            return new V8Array((V8FixedArray) value);
+    public static V8Array createByValues(IValue... values) {
+        IValue firstValue = values[0];
+        if (firstValue instanceof V8FixedArray) {
+            return new V8Array((V8FixedArray)firstValue);
+        } else if (firstValue.getDataType() == DataType.NUMBER) {
+            return new V8Array(values);
         }
 
         throw new IllegalArgumentException();
     }
 
-    /**
-     * Создать новый массив на основании списка чисел.
-     *
-     * @param numbers список чисел.
-     */
-    @ContextConstructor
-    public static IValue createByValues(IValue... numbers) {
-        return new V8Array(numbers);
-    }
-
     private V8Array(V8FixedArray array) {
-        values = List.copyOf(array.getValues());
+        values = new ArrayList<>(array.getValues());
     }
     private V8Array() {
         values = new ArrayList<>();
     }
 
     private V8Array(IValue... numbers) {
-        values = new ArrayList<>();
-        values.addAll(Arrays.asList(numbers));
+        values = new ArrayList<>(Arrays.asList(numbers));
     }
 
     @Override
@@ -88,8 +78,8 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     }
 
     @ContextMethod(name = "Количество", alias = "Count")
-    public IValue count() {
-        return ValueFactory.create(values.size());
+    public int count() {
+        return values.size();
     }
 
     @ContextMethod(name = "Очистить", alias = "Clear")
@@ -119,16 +109,17 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     }
 
     @ContextMethod(name = "Найти", alias = "Find")
-    public IValue find(IValue inValue) {
+    public Integer find(IValue inValue) {
         var index = 0;
         while (index < values.size()) {
             var value = values.get(index);
             if (value.equals(inValue)) {
-                return ValueFactory.create(index);
+                return index;
             }
             index++;
         }
-        return ValueFactory.create();
+
+        return null;
     }
 
     @ContextMethod(name = "Удалить", alias = "Delete")
@@ -137,8 +128,8 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
     }
 
     @ContextMethod(name = "ВГраница", alias = "UBound")
-    public IValue upperBound() {
-        return ValueFactory.create(values.size() - 1);
+    public int upperBound() {
+        return values.size() - 1;
     }
 
     @ContextMethod(name = "Получить", alias = "Get")
@@ -174,5 +165,4 @@ public class V8Array extends ContextValue implements IndexAccessor, CollectionIt
             values.add(ValueFactory.create());
         }
     }
-
 }

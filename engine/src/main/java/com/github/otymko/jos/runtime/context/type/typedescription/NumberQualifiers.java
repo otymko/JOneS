@@ -5,16 +5,16 @@
  */
 package com.github.otymko.jos.runtime.context.type.typedescription;
 
-import com.github.otymko.jos.compiler.EnumerationHelper;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextConstructor;
-import com.github.otymko.jos.runtime.context.ContextProperty;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextConstructor;
+import com.github.otymko.jos.core.annotation.ContextProperty;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.PropertyAccessMode;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.PropertyAccessMode;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.context.type.enumeration.AllowedSign;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.Getter;
 import lombok.Value;
 
 import java.math.BigDecimal;
@@ -26,37 +26,61 @@ import java.math.RoundingMode;
 @ContextClass(name = "КвалификаторыЧисла", alias = "NumberQualifiers")
 @Value
 public class NumberQualifiers extends ContextValue {
-
     public static final ContextInfo INFO = ContextInfo.createByClass(NumberQualifiers.class);
 
     /**
      * Общее количество десятичных знаков, доступное для числа. 0 - Неограниченно
      */
     @ContextProperty(name = "Разрядность", alias = "Digits", accessMode = PropertyAccessMode.READ_ONLY)
+    @Getter
     int digits;
 
     /**
      * Количество знаков дробной части числа. 0 - Без дробной части
      */
     @ContextProperty(name = "РазрядностьДробнойЧасти", alias = "FractionDigits", accessMode = PropertyAccessMode.READ_ONLY)
+    @Getter
     int fractionDigits;
 
     /**
      * Допустимый знак числа
      */
     @ContextProperty(name = "ДопустимыйЗнак", alias = "allowedSign", accessMode = PropertyAccessMode.READ_ONLY)
+    @Getter
     AllowedSign allowedSign;
 
-    public IValue getDigits() {
-        return ValueFactory.create(digits);
+    @ContextConstructor
+    public static NumberQualifiers constructor(int digits, int fractionDigits, AllowedSign sourceAllowedSign) {
+        var allowedSign = sourceAllowedSign == null ? AllowedSign.ANY : sourceAllowedSign;
+
+        return new NumberQualifiers(digits, fractionDigits, allowedSign);
     }
 
-    public IValue getFractionDigits() {
-        return ValueFactory.create(fractionDigits);
+    @ContextConstructor
+    public static NumberQualifiers constructor(int digits, int fractionDigits) {
+
+        return new NumberQualifiers(
+                digits,
+                fractionDigits,
+                AllowedSign.ANY);
     }
 
-    public IValue getAllowedSign() {
-        return EnumerationHelper.getEnumByClass(AllowedSign.class).getEnumValueType(allowedSign);
+    @ContextConstructor
+    public static NumberQualifiers constructor(int digits) {
+
+        return new NumberQualifiers(
+                digits,
+                0,
+                AllowedSign.ANY);
+    }
+
+    @ContextConstructor
+    public static NumberQualifiers constructor() {
+
+        return new NumberQualifiers(
+                0,
+                0,
+                AllowedSign.ANY);
     }
 
     private BigDecimal getNines() {
@@ -108,43 +132,6 @@ public class NumberQualifiers extends ContextValue {
 
     public int hashCode() {
         return digits;
-    }
-
-    @ContextConstructor
-    public static NumberQualifiers constructor(int digits, int fractionDigits, IValue allowedSign) {
-
-        final var allowedSignValue = EnumerationHelper.getEnumValueOrDefault(allowedSign, AllowedSign.ANY);
-        return new NumberQualifiers(
-                digits,
-                fractionDigits,
-                (AllowedSign) allowedSignValue.getValue());
-    }
-
-    @ContextConstructor
-    public static NumberQualifiers constructor(int digits, int fractionDigits) {
-
-        return new NumberQualifiers(
-                digits,
-                fractionDigits,
-                AllowedSign.ANY);
-    }
-
-    @ContextConstructor
-    public static NumberQualifiers constructor(int digits) {
-
-        return new NumberQualifiers(
-                digits,
-                0,
-                AllowedSign.ANY);
-    }
-
-    @ContextConstructor
-    public static NumberQualifiers constructor() {
-
-        return new NumberQualifiers(
-                0,
-                0,
-                AllowedSign.ANY);
     }
 
     @Override

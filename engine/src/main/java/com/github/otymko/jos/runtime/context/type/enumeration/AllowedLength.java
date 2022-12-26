@@ -5,9 +5,9 @@
  */
 package com.github.otymko.jos.runtime.context.type.enumeration;
 
-import com.github.otymko.jos.runtime.context.EnumClass;
+import com.github.otymko.jos.core.annotation.EnumClass;
 import com.github.otymko.jos.runtime.context.EnumType;
-import com.github.otymko.jos.runtime.context.EnumValue;
+import com.github.otymko.jos.core.annotation.EnumValue;
 
 /**
  * Допустимая длина данных
@@ -25,6 +25,12 @@ public enum AllowedLength implements EnumType {
      * Фиксированная длина
      */
     @EnumValue(name = "Фиксированная", alias = "Fixed")
-    FIXED
+    FIXED;
 
+    public static final EnumerationContext INFO = new EnumerationContext(AllowedLength.class);
+
+    @Override
+    public EnumerationContext getContextInfo() {
+        return INFO;
+    }
 }

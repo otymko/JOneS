@@ -7,16 +7,14 @@ package com.github.otymko.jos.runtime.context.type.regex;
 
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextMethod;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextMethod;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
-import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -53,8 +51,8 @@ public class RegexMatchCollection extends ContextValue implements CollectionIter
     }
 
     @ContextMethod(name = "Количество", alias = "Count")
-    public IValue getCount() {
-        return ValueFactory.create(BigDecimal.valueOf(results.size()));
+    public int getCount() {
+        return results.size();
     }
 
     @Override

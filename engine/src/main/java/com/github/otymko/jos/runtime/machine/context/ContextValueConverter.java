@@ -5,18 +5,23 @@
  */
 package com.github.otymko.jos.runtime.machine.context;
 
+import com.github.otymko.jos.compiler.Enumerations;
 import com.github.otymko.jos.exception.MachineException;
-import com.github.otymko.jos.runtime.IVariable;
-import com.github.otymko.jos.runtime.context.IValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.IVariable;
+import com.github.otymko.jos.runtime.RuntimeContext;
+import com.github.otymko.jos.runtime.context.EnumType;
+import com.github.otymko.jos.core.IValue;
+import com.github.otymko.jos.core.DataType;
+import com.github.otymko.jos.runtime.context.type.EnumerationValue;
+import com.github.otymko.jos.runtime.context.type.ValueFactory;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * Конвертер IValue в значения райнтайма
  */
 public final class ContextValueConverter {
-
     /**
      * Конвертировать IValue в значение рантайма с указанным типом
      * @param value значение IValue
@@ -32,6 +37,51 @@ public final class ContextValueConverter {
             return (T) convertValueByType(value, type);
         }
         catch (ClassCastException exception) {
+            throw MachineException.invalidArgumentValueException();
+        }
+    }
+
+    /**
+     * Конвертировать возвращаемое значение в IValue.
+     *
+     * @param sourceValue Возвращаемое значение.
+     * @param type Тип возвращаемого значения.
+     */
+    @SuppressWarnings("unchecked")
+    public static IValue convertReturnValue(Object sourceValue, Class<?> type) {
+        if (sourceValue == null) {
+            return ValueFactory.create();
+        }
+
+        if (type == IValue.class) {
+            return (IValue) sourceValue;
+        } else if (type == String.class) {
+            return ValueFactory.create((String) sourceValue);
+        } else if (type == BigDecimal.class) {
+            return ValueFactory.create((BigDecimal)sourceValue);
+        } else if (type == int.class || type == Integer.class) {
+            return ValueFactory.create((int) sourceValue);
+        } else if (type == double.class || type == Double.class) {
+            return ValueFactory.create(BigDecimal.valueOf((double) sourceValue));
+        } else if (type == byte.class || type == Byte.class) {
+            return ValueFactory.create(BigDecimal.valueOf((int) sourceValue));
+        } else if (type == float.class || type == Float.class) {
+            return ValueFactory.create((float) sourceValue);
+        } else if (type == long.class || type == Long.class) {
+            return ValueFactory.create((long) sourceValue);
+        } else if (type == short.class || type == Short.class) {
+            return ValueFactory.create((int) sourceValue);
+        } else if (type == Date.class) {
+            return ValueFactory.create((Date) sourceValue);
+        } else if (type == boolean.class || type == Boolean.class) {
+            return ValueFactory.create((boolean) sourceValue);
+        } else if (EnumType.class.isAssignableFrom(type)) {
+            return Enumerations
+                    .getEnumByClass((Class<? extends EnumType>) type)
+                    .getEnumValueType((EnumType) sourceValue);
+        } else if (RuntimeContext.class.isAssignableFrom(type)){
+            return (IValue)sourceValue;
+        } else {
             throw MachineException.invalidArgumentValueException();
         }
     }
@@ -55,6 +105,8 @@ public final class ContextValueConverter {
             valueObject = null;
         } else if (type == String.class) {
             valueObject = value.getRawValue().asString();
+        } else if (type == BigDecimal.class) {
+            valueObject = value.getRawValue().asNumber();
         } else if (type == int.class || type == Integer.class) {
             valueObject = value.getRawValue().asNumber().intValue();
         } else if (type == double.class || type == Double.class) {
@@ -71,6 +123,9 @@ public final class ContextValueConverter {
             valueObject = value.getRawValue().asDate();
         } else if (type == boolean.class || type == Boolean.class) {
             valueObject = value.getRawValue().asBoolean();
+        } else if (EnumType.class.isAssignableFrom(type)) {
+            var enumerationValue = (EnumerationValue)value.getRawValue();
+            valueObject = enumerationValue.getValue();
         } else {
             valueObject = value.getRawValue();
         }

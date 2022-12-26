@@ -5,18 +5,22 @@
  */
 package com.github.otymko.jos.runtime.context;
 
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Iterator;
 
+/**
+ * Итерируемое значение.
+ */
+@RequiredArgsConstructor
 public class IteratorValue extends ContextValue implements Iterable<IValue> {
-
+    /**
+     * Итератор.
+     */
     private final Iterator<IValue> iterator;
-
-    public IteratorValue(Iterator<IValue> iterator) {
-        this.iterator = iterator;
-    }
 
     @Override
     public ContextInfo getContextInfo() {
@@ -27,5 +31,4 @@ public class IteratorValue extends ContextValue implements Iterable<IValue> {
     public Iterator<IValue> iterator() {
         return iterator;
     }
-
 }

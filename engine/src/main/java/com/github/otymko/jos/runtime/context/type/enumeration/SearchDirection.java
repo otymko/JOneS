@@ -5,14 +5,21 @@
  */
 package com.github.otymko.jos.runtime.context.type.enumeration;
 
-import com.github.otymko.jos.runtime.context.EnumClass;
+import com.github.otymko.jos.core.annotation.EnumClass;
 import com.github.otymko.jos.runtime.context.EnumType;
-import com.github.otymko.jos.runtime.context.EnumValue;
+import com.github.otymko.jos.core.annotation.EnumValue;
 
 @EnumClass(name = "НаправлениеПоиска", alias = "SearchDirection")
 public enum SearchDirection implements EnumType {
     @EnumValue(name = "СНачала", alias = "FromBegin")
     FROM_BEGIN,
     @EnumValue(name = "СКонца", alias = "FromEnd")
-    FROM_END
+    FROM_END;
+
+    public static final EnumerationContext INFO = new EnumerationContext(SearchDirection.class);
+
+    @Override
+    public EnumerationContext getContextInfo() {
+        return INFO;
+    }
 }

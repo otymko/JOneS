@@ -6,9 +6,9 @@
 package com.github.otymko.jos.sdo;
 
 import com.github.otymko.jos.module.ModuleImage;
-import com.github.otymko.jos.runtime.context.ContextClass;
-import com.github.otymko.jos.runtime.context.ContextMethod;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.annotation.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextMethod;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.sdo.ScriptDrivenObject;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;

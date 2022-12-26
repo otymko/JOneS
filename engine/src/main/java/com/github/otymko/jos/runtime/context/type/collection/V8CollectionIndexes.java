@@ -5,18 +5,20 @@
  */
 package com.github.otymko.jos.runtime.context.type.collection;
 
+import com.github.otymko.jos.core.annotation.ContextMethod;
 import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.CollectionIterable;
-import com.github.otymko.jos.runtime.context.ContextClass;
+import com.github.otymko.jos.core.annotation.ContextClass;
 import com.github.otymko.jos.runtime.context.ContextValue;
-import com.github.otymko.jos.runtime.context.IValue;
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.runtime.context.IndexAccessor;
 import com.github.otymko.jos.runtime.context.IteratorValue;
-import com.github.otymko.jos.runtime.context.type.DataType;
+import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Индексы коллекции.
@@ -27,13 +29,71 @@ import java.util.List;
  */
 @ContextClass(name = "ИндексыКоллекции", alias="CollectionIndexes")
 public class V8CollectionIndexes extends ContextValue implements IndexAccessor, CollectionIterable<V8CollectionIndex> {
-
     public static final ContextInfo INFO = ContextInfo.createByClass(V8CollectionIndexes.class);
 
-    private final List<IValue> values;
+    private static final Pattern fieldsSplitter = Pattern.compile(",");
 
-    public V8CollectionIndexes() {
+    private final List<IValue> values;
+    private final IndexSourceCollection source;
+
+    private static List<IValue> buildFieldList(IndexSourceCollection resolver, String columnList) {
+        final var columnNames = fieldsSplitter.split(columnList);
+        var fields = new ArrayList<IValue>();
+        for (final var columnName : columnNames) {
+
+            if (!columnName.isBlank()) {
+                final var column = resolver.getField(columnName.trim());
+                if (column == null) {
+                    throw MachineException.invalidArgumentValueException();
+                }
+                fields.add(column);
+            }
+        }
+        return fields;
+    }
+
+    public V8CollectionIndexes(IndexSourceCollection source) {
         values = new ArrayList<>();
+        this.source = source;
+    }
+
+    @ContextMethod(name = "Добавить", alias = "Add")
+    public V8CollectionIndex add(String columnList) {
+        var fields = buildFieldList(source, columnList);
+        var index = new V8CollectionIndex(source, fields);
+        source.indexAdded(index);
+        values.add(index);
+        return index;
+    }
+
+    @ContextMethod(name = "Очистить", alias = "clear")
+    public void clear() {
+        for (var index: values) {
+            ((V8CollectionIndex)index).clear();
+        }
+        values.clear();
+    }
+
+    @ContextMethod(name = "Удалить", alias = "Delete")
+    public void delete(IValue index) {
+        var indexValue = getIndexInternal(index);
+        indexValue.clear();
+        values.remove(indexValue);
+    }
+
+    @ContextMethod(name = "Количество", alias = "Count")
+    public int size() {
+        return values.size();
+    }
+
+    public V8CollectionIndex pickIndex(List<IValue> fields) {
+        for (var index: values) {
+            var castedIndex = (V8CollectionIndex) index;
+            if (castedIndex.fitsTo(fields)) {
+                return castedIndex;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -46,28 +106,32 @@ public class V8CollectionIndexes extends ContextValue implements IndexAccessor, 
         return new IteratorValue(values.iterator());
     }
 
-    private int indexInternal(IValue index) {
+    private V8CollectionIndex getIndexInternal(IValue index) {
         if (index == null) {
             throw MachineException.invalidArgumentValueException();
         }
         final var rawIndex = index.getRawValue();
-        if (rawIndex.getDataType() != DataType.NUMBER) {
-            throw MachineException.invalidArgumentValueException();
+        if (rawIndex.getDataType() == DataType.NUMBER) {
+            final var intIndex = rawIndex.asNumber().intValue();
+            if (intIndex >= 0 && intIndex < values.size()) {
+                return (V8CollectionIndex) values.get(intIndex);
+            }
+            throw MachineException.indexValueOutOfRangeException();
         }
-        final var intIndex = rawIndex.asNumber().intValue();
-        if (intIndex >= 0 && intIndex < values.size()) {
-            return intIndex;
+        if (rawIndex instanceof V8CollectionIndex
+            && values.contains(rawIndex)) {
+            return (V8CollectionIndex) rawIndex;
         }
-        throw MachineException.indexValueOutOfRangeException();
+        throw MachineException.invalidArgumentValueException();
     }
 
     @Override
     public IValue getIndexedValue(IValue index) {
-        return values.get(indexInternal(index));
+        return getIndexInternal(index);
     }
 
     @Override
     public void setIndexedValue(IValue index, IValue value) {
-        throw MachineException.getPropertyIsNotWritableException("");
+        throw MachineException.indexedValueIsReadOnly();
     }
 }

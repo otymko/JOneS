@@ -5,14 +5,22 @@
  */
 package com.github.otymko.jos;
 
-import com.github.otymko.jos.runtime.context.EnumClass;
+import com.github.otymko.jos.core.annotation.EnumClass;
 import com.github.otymko.jos.runtime.context.EnumType;
-import com.github.otymko.jos.runtime.context.EnumValue;
+import com.github.otymko.jos.core.annotation.EnumValue;
+import com.github.otymko.jos.runtime.context.type.enumeration.EnumerationContext;
 
 @EnumClass(name = "МоеПеречисление", alias = "MyEnum")
 public enum CustomEnum implements EnumType {
     @EnumValue(name = "Значение1", alias = "Value1")
     VALUE1,
     @EnumValue(name = "Значение2", alias = "Value2")
-    VALUE2
+    VALUE2;
+
+    public static final EnumerationContext INFO = new EnumerationContext(CustomEnum.class);
+
+    @Override
+    public EnumerationContext getContextInfo() {
+        return INFO;
+    }
 }

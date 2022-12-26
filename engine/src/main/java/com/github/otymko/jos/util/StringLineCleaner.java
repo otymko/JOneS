@@ -7,31 +7,57 @@ package com.github.otymko.jos.util;
 
 import lombok.experimental.UtilityClass;
 
+/**
+ * Утилитный класс для очистки строковых литералов от служебных символов.
+ */
 @UtilityClass
 public class StringLineCleaner {
-
     private final String QUOTE = "\"";
     private final String SINGLE_QUOTE = "'";
+    private final String PIPELINE = "|";
 
-    public String clean(String inValue) {
-        return clean(inValue, QUOTE);
+    /**
+     * Очистить строку литерала от служебных кавычек.
+     *
+     * @param source Строка литерала.
+     */
+    public String clean(String source) {
+        return clean(source, QUOTE);
     }
 
-    public String cleanSingleQuote(String inValue) {
-        return clean(inValue, SINGLE_QUOTE);
+    /**
+     * Очистить строку литерала от служебной одинарной кавычки.
+     *
+     * @param source Строка литерала.
+     */
+    public String cleanSingleQuote(String source) {
+        return clean(source, SINGLE_QUOTE);
     }
 
-    public String clean(String inValue, String quote) {
+    /**
+     * Очистить строкой литерал от служебного символа "|".
+     *
+     * @param source Строковой литерал.
+     */
+    public String cleanFromPipelineSymbol(String source) {
+        if (source.startsWith(PIPELINE)) {
+            return source.substring(1);
+        }
+
+        return source;
+    }
+
+    private String clean(String source, String quote) {
         final String DOUBLE_QUOTE = quote + quote;
 
         String value;
-        if (inValue.startsWith(quote)) {
-            value = inValue.substring(1, inValue.length() - 1);
+        if (source.startsWith(quote)) {
+            value = source.substring(1, source.length() - 1);
         } else {
-            value = inValue;
+            value = source;
         }
         value = value.replaceAll(DOUBLE_QUOTE, quote);
+
         return value;
     }
-
 }
