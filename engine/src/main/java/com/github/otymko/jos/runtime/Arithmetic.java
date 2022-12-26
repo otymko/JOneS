@@ -34,8 +34,10 @@ public class Arithmetic {
 
     public IValue sub(IValue one, IValue two) {
         if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.NUMBER) {
-            // TODO: реализовать сложение даты и числа
-            throw MachineException.operationNotImplementedException();
+            var date = one.asDate();
+            var delta = two.asNumber().multiply(THOUSAND).longValue();
+            var newValue = new Date(date.getTime() - delta);
+            return ValueFactory.create(newValue);
         }
 
         if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.DATE) {
