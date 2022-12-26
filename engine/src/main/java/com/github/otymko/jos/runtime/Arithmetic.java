@@ -9,6 +9,7 @@ import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.runtime.context.IValue;
 import com.github.otymko.jos.runtime.context.type.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
+import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import lombok.experimental.UtilityClass;
 
 import java.math.BigDecimal;
@@ -34,9 +35,9 @@ public class Arithmetic {
 
     public IValue sub(IValue one, IValue two) {
         if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.NUMBER) {
-            var date = one.asDate();
+            var dateAsTime = one.asDate().getTime();
             var delta = two.asNumber().multiply(THOUSAND).longValue();
-            var newValue = new Date(date.getTime() - delta);
+            var newValue = new Date(dateAsTime - delta);
             return ValueFactory.create(newValue);
         }
 
