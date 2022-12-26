@@ -9,7 +9,6 @@ import com.github.otymko.jos.exception.MachineException;
 import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.core.DataType;
 import com.github.otymko.jos.runtime.context.type.ValueFactory;
-import com.github.otymko.jos.runtime.context.type.primitive.DateValue;
 import lombok.experimental.UtilityClass;
 
 import java.math.BigDecimal;
@@ -21,7 +20,7 @@ import java.util.Date;
 @UtilityClass
 public class Arithmetic {
 
-    private static BigDecimal THOUSAND = BigDecimal.valueOf(1000);
+    private static final BigDecimal THOUSAND = BigDecimal.valueOf(1000);
 
     /**
      * Сложить.
