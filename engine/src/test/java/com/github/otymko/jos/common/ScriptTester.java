@@ -98,10 +98,42 @@ public class ScriptTester implements ContextType, IValue {
     }
 
     // ПроверитьБольше
+    @ContextMethod(name = "ПроверитьБольше", alias = "CheckGreater")
+    public static void checkGreater(IValue oneValue, IValue twoValue, IValue additionalErrorMessage) {
+        var oneValueRaw = oneValue.getRawValue();
+        var twoValueRaw = twoValue.getRawValue();
+
+        if (oneValueRaw.compareTo(twoValueRaw) <= 0) {
+            // TODO: локализация
+            var errorMessage = String.format("Ожидали что %s строго больше %s, но это не так.",
+            oneValueRaw.asString(), twoValueRaw.asString());
+            var additionalString = ValueFactory.rawValueOrUndefined(additionalErrorMessage).asString();
+            if (!additionalString.isBlank()) {
+                errorMessage = String.format("%s: %s", errorMessage, additionalString);
+            }
+            throw new MachineException(errorMessage);
+        }
+    }
 
     // ПроверитьБольшеИлиРавно
 
     // ПроверитьМеньше
+    @ContextMethod(name = "ПроверитьМеньше", alias = "CheckLess")
+    public static void checkLess(IValue oneValue, IValue twoValue, IValue additionalErrorMessage) {
+        var oneValueRaw = oneValue.getRawValue();
+        var twoValueRaw = twoValue.getRawValue();
+
+        if (oneValueRaw.compareTo(twoValueRaw) >= 0) {
+            // TODO: локализация
+            var errorMessage = String.format("Ожидали что %s строго меньше %s, но это не так.",
+                    oneValueRaw.asString(), twoValueRaw.asString());
+            var additionalString = ValueFactory.rawValueOrUndefined(additionalErrorMessage).asString();
+            if (!additionalString.isBlank()) {
+                errorMessage = String.format("%s: %s", errorMessage, additionalString);
+            }
+            throw new MachineException(errorMessage);
+        }
+    }
 
     @ContextMethod(name = "ПроверитьМеньшеИлиРавно", alias = "CheckLessOrEquals")
     public static void CheckLessOrEquals(IValue oneValue, IValue twoValue, IValue additionalErrorMessage) {

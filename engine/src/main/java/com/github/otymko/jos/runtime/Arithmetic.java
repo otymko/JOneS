@@ -19,6 +19,9 @@ import java.util.Date;
  */
 @UtilityClass
 public class Arithmetic {
+
+    private static final BigDecimal THOUSAND = BigDecimal.valueOf(1000);
+
     /**
      * Сложить.
      */
@@ -28,7 +31,8 @@ public class Arithmetic {
         }
         if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.NUMBER) {
             var date = one.asDate();
-            var newValue = new Date(date.getTime() + two.asNumber().longValue());
+            var delta = two.asNumber().multiply(THOUSAND).longValue();
+            var newValue = new Date(date.getTime() + delta);
             return ValueFactory.create(newValue);
         }
         return ValueFactory.create(one.asNumber().add(two.asNumber()));
@@ -39,8 +43,10 @@ public class Arithmetic {
      */
     public IValue sub(IValue one, IValue two) {
         if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.NUMBER) {
-            // TODO: реализовать сложение даты и числа
-            throw MachineException.operationNotImplementedException();
+            var dateAsTime = one.asDate().getTime();
+            var delta = two.asNumber().multiply(THOUSAND).longValue();
+            var newValue = new Date(dateAsTime - delta);
+            return ValueFactory.create(newValue);
         }
 
         if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.DATE) {

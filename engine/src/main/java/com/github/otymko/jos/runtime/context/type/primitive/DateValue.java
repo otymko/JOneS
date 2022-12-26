@@ -33,7 +33,7 @@ public class DateValue extends PrimitiveValue {
     private final Date value;
 
     public DateValue(Date value) {
-        this.value = value;
+        this.value = value.compareTo(EMPTY_DATE) < 0 ? EMPTY_DATE : value;
         setDataType(DataType.DATE);
     }
 
