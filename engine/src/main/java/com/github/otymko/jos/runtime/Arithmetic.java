@@ -17,13 +17,16 @@ import java.util.Date;
 @UtilityClass
 public class Arithmetic {
 
+    private static BigDecimal THOUSAND = BigDecimal.valueOf(1000);
+
     public IValue add(IValue one, IValue two) {
         if (one.getDataType() == DataType.STRING) {
             return ValueFactory.create(one.asString() + two.asString());
         }
         if (one.getDataType() == DataType.DATE && two.getDataType() == DataType.NUMBER) {
             var date = one.asDate();
-            var newValue = new Date(date.getTime() + two.asNumber().longValue());
+            var delta = two.asNumber().multiply(THOUSAND).longValue();
+            var newValue = new Date(date.getTime() + delta);
             return ValueFactory.create(newValue);
         }
         return ValueFactory.create(one.asNumber().add(two.asNumber()));
