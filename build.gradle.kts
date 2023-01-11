@@ -55,7 +55,7 @@ subprojects {
 
         // Use JUnit Jupiter
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.1")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
 
         testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
         testImplementation("org.assertj:assertj-core:3.23.1")
