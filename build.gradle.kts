@@ -54,7 +54,7 @@ subprojects {
         testAnnotationProcessor("org.projectlombok:lombok:1.18.20")
 
         // Use JUnit Jupiter
-        testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.1")
+        testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
 
         testImplementation("com.ginsberg:junit5-system-exit:1.1.2")
