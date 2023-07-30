@@ -22,14 +22,74 @@ import java.math.RoundingMode;
 public class NumberOperationGlobalContext implements AttachableContext {
     public static final ContextInfo INFO = ContextInfo.createByClass(NumberOperationGlobalContext.class);
 
+    @ContextMethod(name = "Цел", alias = "Int")
+    public static Integer integer(Double number) {
+        return (int) number.doubleValue();
+    }
+
     @ContextMethod(name = "Окр", alias = "Round")
-    public static BigDecimal round(BigDecimal number, Integer precision, Integer mode) {
+    public static BigDecimal round(Double number, Integer precision, Integer mode) {
 
         RoundingMode roundingMode = (mode != null && mode == 0) ? RoundingMode.HALF_DOWN : RoundingMode.HALF_UP;
         precision = (precision != null) ? precision : 0;
 
-        BigDecimal result = number.setScale(precision, roundingMode);
-        return precision > 0 ? result : result.setScale(0);
+        BigDecimal result = BigDecimal.valueOf(number).setScale(precision, roundingMode);
+        return result.scale() < 0 ? result.setScale(0) : result;
+    }
+
+    @ContextMethod(name = "Log", alias = "Log")
+    public static BigDecimal log(Double number) {
+        return BigDecimal.valueOf(Math.log(number)).stripTrailingZeros();
+    }
+
+    @ContextMethod(name = "Log10", alias = "Log10")
+    public static BigDecimal log10(Double number) {
+        return BigDecimal.valueOf(Math.log10(number)).stripTrailingZeros();
+    }
+
+    @ContextMethod(name = "Sin", alias = "Sin")
+    public static Double sin(Double number) {
+        return Math.sin(number);
+    }
+
+    @ContextMethod(name = "Cos", alias = "Cos")
+    public static Double cos(Double number) {
+        return Math.cos(number);
+    }
+
+    @ContextMethod(name = "Tan", alias = "Tan")
+    public static Double tan(Double number) {
+        return Math.tan(number);
+    }
+
+    @ContextMethod(name = "ASin", alias = "ASin")
+    public static Double asin(Double number) {
+        return Math.asin(number);
+    }
+
+    @ContextMethod(name = "ACos", alias = "ACos")
+    public static Double acos(Double number) {
+        return Math.acos(number);
+    }
+
+    @ContextMethod(name = "ATan", alias = "ATan")
+    public static Double atan(Double number) {
+        return Math.atan(number);
+    }
+
+    @ContextMethod(name = "Exp", alias = "Exp")
+    public static Double Exp(Double number) {
+        return Math.exp(number);
+    }
+
+    @ContextMethod(name = "Pow", alias = "Pow")
+    public static BigDecimal pow(Double base, Double power) {
+        return BigDecimal.valueOf(Math.pow(base, power)).stripTrailingZeros();
+    }
+
+    @ContextMethod(name = "Sqrt", alias = "Sqrt")
+    public static BigDecimal sqrt(Double number) {
+        return BigDecimal.valueOf(Math.sqrt(number)).stripTrailingZeros();
     }
 
     @Override
