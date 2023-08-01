@@ -23,76 +23,80 @@ public class NumberOperationsGlobalContext implements AttachableContext {
     public static final ContextInfo INFO = ContextInfo.createByClass(NumberOperationsGlobalContext.class);
 
     @ContextMethod(name = "Цел", alias = "Int")
-    public static Integer integer(Double number) {
+    public static Integer integer(BigDecimal number) {
         return (int) number.doubleValue();
     }
 
     @ContextMethod(name = "Окр", alias = "Round")
-    public static Double round(Double number, Integer precision, Integer mode) {
-
+    public static BigDecimal round(BigDecimal number, Integer precision, Integer mode) {
         RoundingMode roundingMode = (mode != null && mode == 0) ? RoundingMode.HALF_DOWN : RoundingMode.HALF_UP;
         precision = (precision != null) ? precision : 0;
 
-        return BigDecimal.valueOf(number).setScale(precision, roundingMode).doubleValue();
+        BigDecimal result = number.setScale(precision, roundingMode);
+        return result.scale() < 0 ? result.setScale(0) : result;
     }
 
     @ContextMethod(name = "Log", alias = "Log")
-    public static Double log(Double number) {
-        return Math.log(number);
+    public static BigDecimal log(BigDecimal number) {
+        return toBigDecimal(Math.log(number.doubleValue()));
     }
 
     @ContextMethod(name = "Log10", alias = "Log10")
-    public static Double log10(Double number) {
-        return Math.log10(number);
+    public static BigDecimal log10(BigDecimal number) {
+        return toBigDecimal(Math.log10(number.doubleValue()));
     }
 
     @ContextMethod(name = "Sin", alias = "Sin")
-    public static Double sin(Double number) {
-        return Math.sin(number);
+    public static BigDecimal sin(BigDecimal number) {
+        return toBigDecimal(Math.sin(number.doubleValue()));
     }
 
     @ContextMethod(name = "Cos", alias = "Cos")
-    public static Double cos(Double number) {
-        return Math.cos(number);
+    public static BigDecimal cos(BigDecimal number) {
+        return toBigDecimal(Math.cos(number.doubleValue()));
     }
 
     @ContextMethod(name = "Tan", alias = "Tan")
-    public static Double tan(Double number) {
-        return Math.tan(number);
+    public static BigDecimal tan(BigDecimal number) {
+        return toBigDecimal(Math.tan(number.doubleValue()));
     }
 
     @ContextMethod(name = "ASin", alias = "ASin")
-    public static Double asin(Double number) {
-        return Math.asin(number);
+    public static BigDecimal asin(BigDecimal number) {
+        return toBigDecimal(Math.asin(number.doubleValue()));
     }
 
     @ContextMethod(name = "ACos", alias = "ACos")
-    public static Double acos(Double number) {
-        return Math.acos(number);
+    public static BigDecimal acos(BigDecimal number) {
+        return toBigDecimal(Math.acos(number.doubleValue()));
     }
 
     @ContextMethod(name = "ATan", alias = "ATan")
-    public static Double atan(Double number) {
-        return Math.atan(number);
+    public static BigDecimal atan(BigDecimal number) {
+        return toBigDecimal(Math.atan(number.doubleValue()));
     }
 
     @ContextMethod(name = "Exp", alias = "Exp")
-    public static Double Exp(Double number) {
-        return Math.exp(number);
+    public static BigDecimal Exp(BigDecimal number) {
+        return toBigDecimal(Math.exp(number.doubleValue()));
     }
 
     @ContextMethod(name = "Pow", alias = "Pow")
-    public static Double pow(Double base, Double power) {
-        return Math.pow(base, power);
+    public static BigDecimal pow(BigDecimal base, BigDecimal power) {
+        return toBigDecimal(Math.pow(base.doubleValue(), power.doubleValue()));
     }
 
     @ContextMethod(name = "Sqrt", alias = "Sqrt")
-    public static Double sqrt(Double number) {
-        return Math.sqrt(number);
+    public static BigDecimal sqrt(BigDecimal number) {
+        return toBigDecimal(Math.sqrt(number.doubleValue()));
     }
 
     @Override
     public ContextInfo getContextInfo() {
         return INFO;
+    }
+
+    private static BigDecimal toBigDecimal(Double number) {
+        return BigDecimal.valueOf(number).stripTrailingZeros();
     }
 }
