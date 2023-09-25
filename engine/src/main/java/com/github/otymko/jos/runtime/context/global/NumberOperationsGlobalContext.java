@@ -5,14 +5,17 @@
  */
 package com.github.otymko.jos.runtime.context.global;
 
+import com.github.otymko.jos.core.IValue;
 import com.github.otymko.jos.core.annotation.ContextMethod;
 import com.github.otymko.jos.core.annotation.GlobalContextClass;
 import com.github.otymko.jos.runtime.context.AttachableContext;
+import com.github.otymko.jos.runtime.context.type.EnumerationValue;
+import com.github.otymko.jos.runtime.context.type.enumeration.RoundMode;
+import com.github.otymko.jos.runtime.context.type.primitive.NumberValue;
 import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Arrays;
 
@@ -30,8 +33,8 @@ public class NumberOperationsGlobalContext implements AttachableContext {
     }
 
     @ContextMethod(name = "Окр", alias = "Round")
-    public static BigDecimal round(BigDecimal number, Integer precision, Integer mode) {
-        RoundingMode roundingMode = (mode != null && mode == 0) ? RoundingMode.HALF_DOWN : RoundingMode.HALF_UP;
+    public static BigDecimal round(BigDecimal number, Integer precision, IValue mode) {
+        RoundingMode roundingMode = getRoundingMode(mode);
         precision = (precision != null) ? precision : 0;
 
         BigDecimal result = number.setScale(precision, roundingMode);
@@ -105,5 +108,18 @@ public class NumberOperationsGlobalContext implements AttachableContext {
 
     private static BigDecimal toBigDecimal(Double number) {
         return BigDecimal.valueOf(number).stripTrailingZeros();
+    }
+
+    private static RoundingMode getRoundingMode(IValue mode) {
+        if (mode == null)
+            return RoundingMode.HALF_UP;
+
+        if (mode instanceof EnumerationValue)
+            return ((EnumerationValue) mode).getValue() == RoundMode.HALF_DOWN ? RoundingMode.HALF_DOWN : RoundingMode.HALF_UP;
+
+        if (mode instanceof NumberValue)
+            return mode.asNumber().equals(BigDecimal.ZERO) ? RoundingMode.HALF_DOWN : RoundingMode.HALF_UP;
+
+        return null;
     }
 }
