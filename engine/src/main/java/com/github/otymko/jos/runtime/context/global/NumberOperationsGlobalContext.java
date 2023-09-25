@@ -12,7 +12,9 @@ import com.github.otymko.jos.runtime.machine.info.ContextInfo;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.Arrays;
 
 /**
  * Глобальные методы по работе с числами.
@@ -23,8 +25,8 @@ public class NumberOperationsGlobalContext implements AttachableContext {
     public static final ContextInfo INFO = ContextInfo.createByClass(NumberOperationsGlobalContext.class);
 
     @ContextMethod(name = "Цел", alias = "Int")
-    public static Integer integer(BigDecimal number) {
-        return (int) number.doubleValue();
+    public static BigDecimal integer(BigDecimal number) {
+        return new BigDecimal(number.toBigInteger());
     }
 
     @ContextMethod(name = "Окр", alias = "Round")
@@ -89,6 +91,11 @@ public class NumberOperationsGlobalContext implements AttachableContext {
     @ContextMethod(name = "Sqrt", alias = "Sqrt")
     public static BigDecimal sqrt(BigDecimal number) {
         return toBigDecimal(Math.sqrt(number.doubleValue()));
+    }
+
+    @ContextMethod(name = "Мин", alias = "Min")
+    public static BigDecimal min(BigDecimal number, BigDecimal... numbers) {
+        return Arrays.stream(numbers).min(BigDecimal::compareTo).get();
     }
 
     @Override
